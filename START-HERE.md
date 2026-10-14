@@ -2,6 +2,8 @@
 
 这是给人（Yu）看的操作手册：把种子文件放进仓库、下载数据、启动第一张卡，以及之后每张卡怎么启动。给 agent 的规则在 `AGENTS.md`，你不用转述给它们。
 
+**关于路径**：本文里的命令一律用环境变量（`$SEMDEBT_MAIN_DIR` 等），**环境变量是准绳**。本机实际装在 `~/dev/semdebt/` 下，不是早先文档里写的 `~/semdebt/`；想整体搬家，只改第 4 节那一个 `SEMDEBT_BASE`，其余不用动。第 1–4 节是一次性的，已于 2026-10-14 做完，留档备查。
+
 ## 0. 先准备好
 
 | 东西 | 什么时候要 | 说明 |
@@ -19,11 +21,14 @@
 在 Mac 的终端里逐行运行。`<你的用户名>` 换成你的 GitHub 用户名。
 
 ```bash
-mkdir -p ~/semdebt/data/raw ~/semdebt/cards
-cd ~/semdebt
+export SEMDEBT_BASE="$HOME/dev/semdebt"     # 想放别处就改这一行
+mkdir -p "$SEMDEBT_BASE/data/raw" "$SEMDEBT_BASE/cards"
+cd "$SEMDEBT_BASE"
 git clone https://github.com/<你的用户名>/semantic-debt.git
 git clone https://github.com/<你的用户名>/semantic-debt-eval.git
 ```
+
+两个仓库必须是同级目录：T01a 要在它们的上一级同时往两个仓库提交。
 
 如果仓库是空的，git 会提示 `You appear to have cloned an empty repository`，这是正常的。
 
@@ -32,16 +37,16 @@ git clone https://github.com/<你的用户名>/semantic-debt-eval.git
 假设种子包下载到了 `~/Downloads/semantic-debt-seed-v5.zip`。
 
 ```bash
-cd ~/semdebt
-unzip ~/Downloads/semantic-debt-seed-v5.zip -d ~/semdebt/_seed
-cp -R ~/semdebt/_seed/semantic-debt/. ~/semdebt/semantic-debt/
-cp -R ~/semdebt/_seed/semantic-debt-eval/. ~/semdebt/semantic-debt-eval/
-rm -rf ~/semdebt/_seed
+cd "$SEMDEBT_BASE"
+unzip ~/Downloads/semantic-debt-seed-v5.zip -d "$SEMDEBT_BASE/_seed"
+cp -R "$SEMDEBT_BASE/_seed/semantic-debt/." "$SEMDEBT_BASE/semantic-debt/"
+cp -R "$SEMDEBT_BASE/_seed/semantic-debt-eval/." "$SEMDEBT_BASE/semantic-debt-eval/"
+rm -rf "$SEMDEBT_BASE/_seed"
 
-cd ~/semdebt/semantic-debt
+cd "$SEMDEBT_BASE/semantic-debt"
 git add -A && git commit -m "Seed from design v5" && git branch -M main && git push -u origin main
 
-cd ~/semdebt/semantic-debt-eval
+cd "$SEMDEBT_BASE/semantic-debt-eval"
 git add -A && git commit -m "Seed from design v5" && git branch -M main && git push -u origin main
 ```
 
@@ -52,7 +57,7 @@ git add -A && git commit -m "Seed from design v5" && git branch -M main && git p
 ## 3. 下载数据
 
 1. 打开 <https://www.kaggle.com/datasets/bhanuthakurr/cleaned-contoso-dataset>，登录 Kaggle，点 Download，得到一个 zip。这是外部基准（Cube）论文里写明使用的数据集：微软 ContosoRetailDW 的 CSV 版，25 张表。
-2. 把 zip 移到 `~/semdebt/data/raw/`，不用解压；已经解压了也行，把解压出的文件夹一起放进去（约 2.5 GB）。
+2. 把 zip 移到 `$SEMDEBT_DATA_DIR/raw/`（本机 `~/dev/semdebt/data/raw/`），不用解压；已经解压了也行，把解压出的文件夹一起放进去（约 2.5 GB）。
 3. 看一眼页面上的 License 写的是什么，T01 会问你。
 
 如果页面打不开、或者表不是 25 张，告诉 T01 的 agent。备选来源是 Hugging Face 上的 `jocapc/ContosoRetailsDW`（MIT 许可），T01 会处理。
@@ -61,18 +66,21 @@ git add -A && git commit -m "Seed from design v5" && git branch -M main && git p
 
 ```bash
 cat >> ~/.zshrc <<'EOF'
-export SEMDEBT_DATA_DIR="$HOME/semdebt/data"
-export SEMDEBT_EVAL_DIR="$HOME/semdebt/semantic-debt-eval"
-export SEMDEBT_MAIN_DIR="$HOME/semdebt/semantic-debt"
+export SEMDEBT_BASE="$HOME/dev/semdebt"
+export SEMDEBT_DATA_DIR="$SEMDEBT_BASE/data"
+export SEMDEBT_EVAL_DIR="$SEMDEBT_BASE/semantic-debt-eval"
+export SEMDEBT_MAIN_DIR="$SEMDEBT_BASE/semantic-debt"
 # export DEEPSEEK_API_KEY="..."   # 到 T11 再填，去掉行首的 #
 EOF
 source ~/.zshrc
 ```
 
+这几个变量就是准绳：所有脚本和 agent 都只认它们。另外两个可选变量有默认值，一般不用设：`SEMDEBT_CARDS_DIR`（每张卡的 clone 放哪，默认是主工作区同级的 `cards/`）、`SEMDEBT_VENDOR_DIR`（外部基准克隆到哪，默认同级的 `_vendor/`）。
+
 ## 5. 启动第一张卡：T00
 
 ```bash
-cd ~/semdebt/semantic-debt
+cd "$SEMDEBT_MAIN_DIR"
 claude "执行任务卡 T00"
 ```
 
@@ -81,26 +89,30 @@ claude "执行任务卡 T00"
 ## 6. 之后每张卡怎么启动
 
 ```bash
-~/semdebt/semantic-debt/scripts/start-card.sh T01
+"$SEMDEBT_MAIN_DIR"/scripts/start-card.sh T01
 ```
+
+先看一眼它要做什么、不想它真动手，加 `--dry-run`；想看所有卡，`--list`。
 
 脚本会按 `tasks/cards.yaml` 准备好这张卡的工作目录和设置，然后打印一条启动命令，复制运行即可。例如：
 
-- Claude Code 的卡：`cd ~/semdebt/cards/T01 && claude "执行任务卡 T01"`
-- Codex 的题库卡：`cd ~/semdebt/semantic-debt-eval && codex "执行任务卡 T03"`
-- Codex 的 T01a：`cd ~/semdebt && codex "执行任务卡 T01a，卡片在 semantic-debt-eval/tasks/T01a-vendor-split.md"`（它要同时往两个仓库提交，所以在上一级启动）
-- Codex 的主仓库卡（T02、T16、T20）：`cd ~/semdebt/cards/T02 && codex "执行任务卡 T02"`
+- Claude Code 的卡：`cd "$SEMDEBT_BASE/cards/T01" && claude "执行任务卡 T01"`
+- Codex 的题库卡：`cd "$SEMDEBT_EVAL_DIR" && codex "执行任务卡 T03"`
+- Codex 的 T01a：`cd "$SEMDEBT_BASE" && codex "执行任务卡 T01a，卡片在 semantic-debt-eval/tasks/T01a-vendor-split.md"`（它要同时往两个仓库提交，所以在上一级启动）
+- Codex 的主仓库卡（T02、T16、T20）：`cd "$SEMDEBT_BASE/cards/T02" && codex "执行任务卡 T02"`
+
+脚本打印的就是展开好绝对路径的那一行，照抄即可，不用自己拼。
 
 几点说明：
 
-- **盲模式、普通模式不用你告诉 agent。** 模式由脚本写进那张卡文件夹里的设置文件决定，你在那个文件夹里启动 Claude Code，设置就自动生效；agent 开工时会自检。你只要别做两件事：在主工作区 `~/semdebt/semantic-debt` 里启动除 T00 以外的卡；启动时加 `--add-dir` 把题库加进来。
+- **盲模式、普通模式不用你告诉 agent。** 模式由脚本写进那张卡文件夹里的设置文件决定，你在那个文件夹里启动 Claude Code，设置就自动生效；agent 开工时会自检。你只要别做两件事：在主工作区 `$SEMDEBT_MAIN_DIR` 里启动除 T00 以外的卡；启动时加 `--add-dir` 把题库加进来。
 - **Claude Code 第一次在新文件夹启动**会问是否信任这个文件夹，选「是」，否则项目设置不会生效。
 - **Codex 可能会请求批准**联网或在工作区外写文件（安装依赖、推送分支）。这些可以批准。G1 之前如果它要读主仓库 `semantic/` 下除 `conventions.md` 以外的文件，拒绝。
 
 顺序看 `tasks/BOARD.md` 和设计文档里的执行图。开头几步是：
 
 1. Claude Code：T00
-2. Codex：T01a（把外部基准的文件分到两个仓库；在 `~/semdebt` 启动）
+2. Codex：T01a（把外部基准的文件分到两个仓库；在两个仓库的上一级启动）
 3. 你：看一眼约定清单第 12 条（`semantic/conventions.md`），下载数据
 4. Claude Code：T01（数据导入；第一步会做隔离验证）
 5. Codex：T02、T03 → 你过 G0
@@ -110,7 +122,7 @@ claude "执行任务卡 T00"
 
 1. agent 会推送一个分支并开 PR，或者告诉你分支名。
 2. 你在 GitHub 网页上看 PR，没问题就点 Merge。
-3. 回到主工作区同步：`cd ~/semdebt/semantic-debt && git pull`（题库卡则在 `~/semdebt/semantic-debt-eval` 里 `git pull`）。
+3. 回到主工作区同步：`cd "$SEMDEBT_MAIN_DIR" && git pull`（题库卡则在 `$SEMDEBT_EVAL_DIR` 里 `git pull`）。
 4. 如果 agent 说推送失败，在那张卡的目录里运行 `git push -u origin HEAD`。
 
 ## 8. 检查点由你把关

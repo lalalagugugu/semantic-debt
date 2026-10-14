@@ -3,7 +3,7 @@
 - 状态：未开始
 - 负责：Claude Code，两个**互不相通**的会话
   - A 角：普通模式（`scripts/start-card.sh T14`），可读题库，负责导出调优包、合并补充、跑结果。
-  - B 角：调优包模式（`scripts/start-card.sh T14-B <调优包目录>`，例如 `~/semdebt/cards/T14/build/tuning-packet/sql-l1`），工作目录里只有调优包和 `semantic/` 的副本，不是 git clone，看不到题库、`runs/` 和数据目录。
+  - B 角：调优包模式（`scripts/start-card.sh T14-B <调优包目录>`，例如 `$SEMDEBT_CARDS_DIR/T14/build/tuning-packet/sql-l1`），工作目录里只有调优包和 `semantic/` 的副本，不是 git clone，看不到题库、`runs/` 和数据目录。
 - 依赖：T13（SQL-L1 第一次运行的结果）；DAX 部分依赖 T18 的 DAX-L2 第一次运行结果
 - 预算：Flash 15 元 / Pro 50 元（只含跑调优后单元的费用）
 

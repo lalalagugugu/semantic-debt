@@ -10,11 +10,11 @@
 2. **核对负责方**：卡片的「负责」一行写的是 Claude Code 还是 Codex。不是你，就停下，告诉用户这张卡归谁。
 3. **核对依赖和检查点**（BOARD 的「依赖」列）：未满足就停下，告诉用户缺什么。
 4. **核对启动位置和模式**（模式定义见 `tasks/cards.yaml` 顶部）：
-   - Claude Code：除 T00 外，每张卡都在 `~/semdebt/cards/<卡号>/`（由 `scripts/start-card.sh` 建的独立 clone）里启动，不在主工作区 `~/semdebt/semantic-debt/` 里改代码。
+   - Claude Code：除 T00 外，每张卡都在 `$SEMDEBT_CARDS_DIR/<卡号>/`（由 `scripts/start-card.sh` 建的独立 clone）里启动，不在主工作区 `$SEMDEBT_MAIN_DIR` 里改代码。
    - 盲模式：`.claude/settings.local.json` 应由 `templates/claude-settings.blind.json` 生成。先试读 `$SEMDEBT_EVAL_DIR/README.md`：**应当被拒绝**。如果读到了，立即停止，不要看内容，告诉用户隔离失效。
    - 普通模式（G1 之后的 Claude Code 卡）：`.claude/settings.local.json` 应由 `templates/claude-settings.open.json` 生成。
-   - Codex：题库侧的卡在 `~/semdebt/semantic-debt-eval/` 里（T01a 例外，在上一级 `~/semdebt` 启动），主仓库的卡在 `~/semdebt/cards/<卡号>/` 里。
-5. 任何一条不对，停下，告诉用户正确的启动命令：`~/semdebt/semantic-debt/scripts/start-card.sh <卡号>`（T00 完成后才有这个脚本）。
+   - Codex：题库侧的卡在 `$SEMDEBT_EVAL_DIR` 里（T01a 例外，在两个仓库的上一级启动），主仓库的卡在 `$SEMDEBT_CARDS_DIR/<卡号>/` 里。
+5. 任何一条不对，停下，告诉用户正确的启动命令：`"$SEMDEBT_MAIN_DIR"/scripts/start-card.sh <卡号>`。
 
 只做任务卡里写的事。发现设计层面的问题（档位定义、评分规则、题目口径），**停下，写进 `decisions/open-questions.md`，然后问用户**，不要自行改设计。
 
@@ -99,8 +99,18 @@ templates/   Claude Code 的盲模式与普通模式设置模板
 
 ## 环境
 
-- 目录布局固定：`~/semdebt/semantic-debt`（主工作区）、`~/semdebt/semantic-debt-eval`（题库）、`~/semdebt/cards/<卡号>`（每张卡的 clone）、`~/semdebt/data`（数据）。
-- 环境变量：`SEMDEBT_DATA_DIR=~/semdebt/data`、`SEMDEBT_EVAL_DIR=~/semdebt/semantic-debt-eval`、`SEMDEBT_MAIN_DIR=~/semdebt/semantic-debt`、`DEEPSEEK_API_KEY`（T11 起需要）。代码只通过这些变量找路径，不得写死路径。
+- **路径一律以环境变量为准。** 文档里出现的 `~/semdebt/...` 只是默认示例，不是约定；本机实际在 `~/dev/semdebt/` 下。代码、脚本、任务卡只通过下表的变量找路径，**不得写死路径**（`tests/test_repo_layout.py` 会检查）。
+
+  | 变量 | 含义 | 本机值 |
+  |---|---|---|
+  | `SEMDEBT_MAIN_DIR` | 主工作区（本仓库） | `~/dev/semdebt/semantic-debt` |
+  | `SEMDEBT_EVAL_DIR` | 题库仓库 | `~/dev/semdebt/semantic-debt-eval` |
+  | `SEMDEBT_DATA_DIR` | 数据目录（在仓库之外） | `~/dev/semdebt/data` |
+  | `SEMDEBT_CARDS_DIR` | 每张卡的 clone 放在哪。不设则取主工作区的同级 `cards/` | `~/dev/semdebt/cards` |
+  | `SEMDEBT_VENDOR_DIR` | 外部基准克隆到哪（只有 T01a 用）。不设则取主工作区的同级 `_vendor/` | `~/dev/semdebt/_vendor` |
+  | `DEEPSEEK_API_KEY` | DeepSeek key，只从环境变量读（硬规则 5），T11 起需要 | — |
+
+  两个仓库必须是同级目录（T01a 要在它们的上一级同时往两个仓库提交）。裁决见 `decisions/2026-10-14-paths-from-env.md`。
 - Mac：Python 3.11+、uv、chDB；指标层阶段另需 Docker（ClickHouse 服务、Cube Core）。
 - Windows：Power BI Desktop、Python、ADOMD.NET（例如 pyadomd）；DAX 在 Desktop 打开 PBIP 后的本地 Analysis Services 端口上执行。
 - 模型：DeepSeek 官方 API（OpenAI 兼容格式）。思考模式开启（默认 high）；思考模式下 temperature 无效，不要设置。日志里记录接口返回的模型版本和题库的提交号。
