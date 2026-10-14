@@ -3,7 +3,8 @@ data/raw/
 data/parquet/
 data/chdb/
 data/clickhouse/
-build/
+build/*
+!build/README.md
 *.parquet
 *.chdb
 .env
