@@ -1,6 +1,6 @@
 # T00 仓库骨架、隔离设置、启动脚本
 
-- 状态：未开始
+- 状态：已完成（PR 待合并）
 - 负责：Claude Code
 - 模式：主工作区（只有这张卡在 `~/semdebt/semantic-debt` 里直接启动）
 - 依赖：用户已按 `START-HERE.md` 第 1–4 步把种子文件推送到两个仓库
@@ -49,9 +49,25 @@
 ## 用户确认
 
 - [ ] 合并 PR。
+- [ ] 裁决 `decisions/open-questions.md` 第 1 条：目录实际在 `~/dev/semdebt/`，而 `AGENTS.md`、`START-HERE.md` 写的是 `~/semdebt/`。代码已只认环境变量，不受影响；要不要把两份文档改成「以环境变量为准」？
+- [ ] 裁决 `decisions/open-questions.md` 第 2 条：本机没有 `gh`。装一个（`brew install gh && gh auth login`），还是以后每张卡都由 agent 推分支、你在 GitHub 网页上开 PR？
 
 ## 记录（完成后填写）
 
 - 产出：
+  - 骨架：`data/`、`vendor/`、`render/`、`build/`、`harness/`、`runs/`、`reports/`、`tests/` 新建，各带 `README.md`（写明用途、计划中的文件、相关硬规则）；`docs/`、`tasks/`、`semantic/` 补上 `README.md`。
+  - `pyproject.toml`（uv 管理，`requires-python = ">=3.11"`，`package = false`，dev 组只有 pytest）。
+  - `tests/test_repo_layout.py`：34 个用例。测骨架完整、`cards.yaml` 与 `BOARD.md` 覆盖同一批卡号、卡片文件存在、`cards.yaml` 用到的模式都已实现、盲模式卡只归 Claude Code、普通模式卡都有前置检查点、两份模板渲染后是合法 JSON 且盲模板确实禁掉题库与上网、提交的 `.claude/settings.json` 仍开着沙箱与禁读、`.gitignore` 仍把数据与 build 挡在外面、代码里没有写死的绝对路径、没有疑似 API key。另有一条跨实现校验：`cards.yaml` 的 bash 解析器（脚本内）与 Python 解析器（测试内）输出必须逐行一致。
+  - `scripts/start-card.sh`：实现 `cards.yaml` 里全部 10 种模式；另有 `--list` 和 `--dry-run`。
+  - `scripts/verify-isolation.md`：A 组 10 项（必须被拒绝，含绕道读 git 对象、WebSearch/WebFetch、`git clone`）、B 组 8 项（必须能用），以及「A 组有一项没被拒就立刻停止、不要看内容」的处置流程和结果表模板。
+  - `decisions/open-questions.md`、`runs/INDEX.md`、`decisions/isolation-settings.md` 三个模板/记录。
+  - `tasks/BOARD.md` 的 T00 状态已更新。
 - 偏离与理由：
-- 工时：
+  1. **目录布局**：实际是 `~/dev/semdebt/*`，不是文档里的 `~/semdebt/*`。脚本不写死路径，一律从 `SEMDEBT_MAIN_DIR` / `SEMDEBT_EVAL_DIR` / `SEMDEBT_DATA_DIR` 来；卡片目录取主工作区的同级 `cards/`（可用 `SEMDEBT_CARDS_DIR` 覆盖），外部基准目录取同级 `_vendor/`（可用 `SEMDEBT_VENDOR_DIR` 覆盖）。文档没动，等用户裁决（open-questions 第 1 条）。
+  2. **新增 `tests/` 目录**：不在 `AGENTS.md` 的目录清单里，但验收要求 `uv run pytest`。测试内容限于仓库自身的约定，不碰数据与模型。
+  3. **`.gitignore` 的 `build/`** 改成 `build/*` 加 `!build/README.md`：原写法会让 `build/README.md` 也被忽略，而验收要求每个目录都有 README。产物照旧全部被忽略。
+  4. **`--dry-run` 是额外加的**：卡片没要求。加它是因为这张卡自己不能 `git clone`、也不得读题库，而验收要求「用户运行 `start-card.sh T01` 能得到正确的 clone 和设置」——`--dry-run` 让这些路径可以在不触碰题库、不建目录的前提下被检验。`--dry-run` 下所有 git 写操作只打印；对主仓库以外的仓库连读都不做（`origin_url`、`branch_in_place` 都有 dry-run 短路）。
+  5. **`packet` 模式额外复制 `.claude/settings.json`**：卡片只说「复制 `semantic/` 和调优包、写盲模式设置」。但 packet 目录不是 clone，拿不到仓库里提交的那份项目设置（沙箱、禁读工作目录以外），不复制的话 B 角就没有沙箱。去掉数据目录放行的做法是删掉 `additionalDirectories` 一行。
+  6. **没有用 `gh pr create`**：本机没装 `gh`。分支已推送，PR 由用户在 GitHub 网页上开（open-questions 第 2 条）。
+  7. **隔离只做了可做的部分**：卡片禁止本卡读取 `$SEMDEBT_EVAL_DIR`，所以 `blockReadsOutsideWorkingDirectories` 和题库 deny 规则没有在 T00 实测，留给 T01 第一步。已在 `decisions/isolation-settings.md` 写明「T01 通过之前不要把隔离当成已验证」。`.claude/settings.json` 一个字没改。
+- 工时：约 1 小时（一个会话）。
