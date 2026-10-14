@@ -1,6 +1,6 @@
 # T02 评分器，并与外部基准的判定对齐
 
-- 状态：未开始
+- 状态：进行中（实现与验证完成；一致率验收待用户裁决）
 - 负责：Codex（与写 harness 的 Claude Code 独立实现，互相核对）
 - 模式：主仓库 clone（`scripts/start-card.sh T02`）
 - 依赖：T01（数据）、T01a（公开运行结果已在题库）
@@ -39,6 +39,6 @@
 
 ## 记录（完成后填写）
 
-- 产出：
-- 偏离与理由：
-- 工时：
+- 产出：`harness/scorer.py`、`tests/test_scorer.py`、`scripts/validate_scorer.py`、`reports/validation/scorer_check.md`；33 个评分器单测通过；600 条候选已重执行并逐条归类差异。
+- 偏离与理由：按裁决新增 `ExecError`、`tie_columns` 和 Top-N 完整边界组契约，并已提醒 T05/T05b/T06。最终 strict 一致率 515/594；排除 11 条本项目有意更宽的差异后为 515/583（88.3%），未达到 95%，见待裁决问题 #6；未修改冻结评分规则。
+- 工时：约 2 小时（截至待裁决）。
