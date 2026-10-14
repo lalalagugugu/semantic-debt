@@ -40,8 +40,8 @@
 
 ## 用户确认
 
-- [ ] 数据 zip 已放到 `$SEMDEBT_DATA_DIR/raw/`。
-- [ ] 告诉 agent 页面上的许可条款。
+- [x] 数据 zip 已放到 `$SEMDEBT_DATA_DIR/raw/`（`archive.zip`，2026-10-13 下载，25 个 CSV）。
+- [x] 告诉 agent 页面上的许可条款：**CC0: Public Domain**（用户 2026-10-14 答，已记在 `data/README.md`「数据来源与许可」，不必再问）。
 - [ ] 合并 PR。
 
 ## 记录（完成后填写）
