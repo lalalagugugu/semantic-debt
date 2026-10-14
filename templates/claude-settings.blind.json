@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "additionalDirectories": ["${SEMDEBT_DATA_DIR}"],
+    "deny": [
+      "WebSearch",
+      "WebFetch",
+      "Read(/${SEMDEBT_EVAL_DIR}/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/runs-raw/**)",
+      "Read(/${SEMDEBT_MAIN_DIR}/runs/**)",
+      "Read(./runs/**)"
+    ]
+  },
+  "sandbox": {
+    "filesystem": {
+      "denyRead": ["${SEMDEBT_EVAL_DIR}", "${SEMDEBT_DATA_DIR}/runs-raw", "${SEMDEBT_MAIN_DIR}/runs"]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "additionalDirectories": ["${SEMDEBT_DATA_DIR}", "${SEMDEBT_EVAL_DIR}"]
+  }
+}

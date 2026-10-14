@@ -1,0 +1,49 @@
+# 任务卡的机器可读清单。scripts/start-card.sh 和 agent 的开工自检都读它。
+# 人看的版本是 BOARD.md；两者不一致时以本文件为准，并修正 BOARD.md。
+#
+# 启动模式（mode）：
+#   main-checkout  只用于 T00：在 ~/semdebt/semantic-debt 里直接启动 Claude Code。
+#   blind          Claude Code。从 GitHub 克隆主仓库到 ~/semdebt/cards/<id>，新建分支，
+#                  用 templates/claude-settings.blind.json 生成 .claude/settings.local.json
+#                  （放行数据目录；禁止读题库和 runs-raw；禁止上网搜索和抓取）。
+#   open           Claude Code，只能在 G1 之后。同上，但用 templates/claude-settings.open.json
+#                  （放行数据目录和题库目录）。
+#   open-eval      Claude Code，只能在 G1 之后。克隆题库仓库到 ~/semdebt/cards/<id>，
+#                  启动时加 --add-dir 数据目录。
+#   packet         Claude Code，T14 的 B 角。~/semdebt/cards/<id> 不是 git clone，只放调优包和
+#                  semantic/ 的副本，设置同 blind，但不放行数据目录。
+#   codex-eval     Codex。在 ~/semdebt/semantic-debt-eval 里新建分支工作。
+#   codex-root     只用于 T01a：脚本先把外部基准克隆到 ~/semdebt/_vendor/、把主仓库克隆到
+#                  ~/semdebt/cards/T01a-main、在题库仓库建分支，然后在上一级 ~/semdebt 启动 Codex，
+#                  这样一个工作区就能同时写两个仓库。
+#   codex-main     Codex。克隆主仓库到 ~/semdebt/cards/<id>，新建分支工作。
+#   windows        在 Windows 电脑上做，步骤见卡片。
+#   user           用户自己做。
+#
+# card 路径相对于 repo 指明的仓库（main = 主仓库，eval = 题库仓库）。
+
+cards:
+  - {id: T00,  owner: claude, mode: main-checkout, repo: main, card: tasks/T00-bootstrap.md}
+  - {id: T01a, owner: codex,  mode: codex-root,    repo: eval, card: tasks/T01a-vendor-split.md, note: "同时往两个仓库提交，见卡片"}
+  - {id: T01,  owner: claude, mode: blind,         repo: main, card: tasks/T01-data-load.md}
+  - {id: T02,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T02-scorer.md}
+  - {id: T03,  owner: codex,  mode: codex-eval,    repo: eval, card: tasks/T03-apply-audit.md}
+  - {id: T04,  owner: codex,  mode: codex-eval,    repo: eval, card: tasks/T04-translate-label.md}
+  - {id: T05,  owner: codex,  mode: codex-eval,    repo: eval, card: tasks/T05-new-questions.md}
+  - {id: T05b, owner: claude, mode: open-eval,     repo: eval, card: tasks/T05b-ref-recheck.md, after: G1}
+  - {id: T06,  owner: codex,  mode: codex-eval,    repo: eval, card: tasks/T06-split-freeze.md, after: G1}
+  - {id: T07,  owner: user,   mode: user,          repo: main, card: tasks/T07-conventions-signoff.md}
+  - {id: T08,  owner: claude, mode: blind,         repo: main, card: tasks/T08-blind-semantic-layer.md, after: G0}
+  - {id: T09,  owner: claude, mode: blind,         repo: main, card: tasks/T09-l0-degrade.md}
+  - {id: T10,  owner: claude, mode: blind,         repo: main, card: tasks/T10-renderer.md}
+  - {id: T11,  owner: claude, mode: open,          repo: main, card: tasks/T11-sql-harness.md, after: G1}
+  - {id: T12,  owner: claude, mode: open,          repo: main, card: tasks/T12-pilot-model-choice.md, after: G2}
+  - {id: T13,  owner: claude, mode: open,          repo: main, card: tasks/T13-sql-full-run.md, after: G3}
+  - {id: T14,  owner: claude, mode: open,          repo: main, card: tasks/T14-tuning.md, after: G3, note: "A 角 open；B 角另开 T14-B（packet）"}
+  - {id: T14-B, owner: claude, mode: packet,       repo: none, card: tasks/T14-tuning.md}
+  - {id: T15,  owner: claude, mode: open,          repo: main, card: tasks/T15-explorer-agent.md, after: G3}
+  - {id: T16,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T16-metric-layer.md, after: G3}
+  - {id: T17,  owner: claude, mode: windows,       repo: main, card: tasks/T17-powerbi-dax.md, after: G1}
+  - {id: T18,  owner: claude, mode: windows,       repo: main, card: tasks/T18-dax-full-and-tuning.md, after: G3}
+  - {id: T19,  owner: claude, mode: open,          repo: main, card: tasks/T19-report.md}
+  - {id: T20,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T20-independent-recheck.md}

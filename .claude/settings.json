@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "blockReadsOutsideWorkingDirectories": true,
+    "deny": [
+      "WebFetch(domain:huggingface.co)",
+      "WebFetch(domain:kaggle.com)",
+      "WebFetch(domain:www.kaggle.com)",
+      "WebFetch(domain:arxiv.org)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git clone *)",
+      "Bash(git submodule *)",
+      "Bash(curl *)",
+      "Bash(wget *)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "allowUnsandboxedCommands": false,
+    "excludedCommands": ["git push *", "git fetch *", "git pull *", "gh pr *"],
+    "filesystem": {
+      "allowRead": ["~/.cache/uv", "~/.local/share/uv"],
+      "allowWrite": ["~/.cache/uv"]
+    },
+    "network": {
+      "allowedDomains": ["pypi.org", "files.pythonhosted.org", "github.com", "api.github.com", "api.deepseek.com"]
+    }
+  }
+}

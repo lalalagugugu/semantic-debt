@@ -1,0 +1,12 @@
+# data never enters the repo
+data/raw/
+data/parquet/
+data/chdb/
+data/clickhouse/
+build/
+*.parquet
+*.chdb
+.env
+.venv/
+__pycache__/
+.claude/settings.local.json
