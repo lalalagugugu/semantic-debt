@@ -8,6 +8,10 @@ diagnostic codes.  Questions and SQL remain in ``SEMDEBT_EVAL_DIR``.
 from __future__ import annotations
 
 import argparse
+import hashlib
+from collections import Counter
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import json
 import os
 import re
@@ -24,7 +28,7 @@ from harness.scorer import ExecError, score_detailed  # noqa: E402
 RUN_ID = "paper-2026-04-22"
 EXCLUDED_QUESTION_IDS = {33}
 ORDERED_QUESTION_IDS = {
-    7, 22, 25, 27, 33, 45, 46, 67, 69, 73, 74, 78, 79, 85, 87, 88,
+    7, 25, 27, 33, 45, 46, 67, 69, 73, 74, 78, 79, 85, 87, 88,
     92, 94, 97, 98,
 }
 TOP_N_RULES = {
@@ -49,28 +53,92 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--db-dir", type=Path, default=Path(data_dir) / "chdb-eval")
     parser.add_argument("--eval-dir", type=Path, default=Path(eval_dir))
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--report", type=Path, help="write the complete ID-only validation report")
     return parser.parse_args(argv)
 
 
-def question_rules(question_id: int) -> dict[str, object]:
+def question_rules(question_id: int, reference_sql: str) -> dict[str, object]:
     top_rule = TOP_N_RULES.get(question_id)
     return {
-        "ordered": question_id in ORDERED_QUESTION_IDS,
+        "ordered": question_id in ORDERED_QUESTION_IDS and final_order_clause(reference_sql) is not None,
         "top_n": top_rule[0] if top_rule else None,
         "tie_columns": list(top_rule[1]) if top_rule else [],
     }
 
 
+def final_order_clause(sql: str) -> str | None:
+    """Find an outer ORDER BY, excluding comments, strings and nested queries."""
+    masked = re.sub(r"--[^\n]*|/\*.*?\*/|'(?:''|[^'])*'|\"(?:\"\"|[^\"])*\"|`[^`]*`", lambda m: " " * len(m.group()), sql, flags=re.DOTALL)
+    depth = 0
+    start = None
+    for token in re.finditer(r"\(|\)|\bORDER\s+BY\b", masked, re.IGNORECASE):
+        if token.group() == "(":
+            depth += 1
+        elif token.group() == ")":
+            depth -= 1
+        elif depth == 0:
+            start = token.end()
+    if start is None:
+        return None
+    return re.split(r"\bLIMIT\b", sql[start:], maxsplit=1, flags=re.IGNORECASE)[0].strip().rstrip(";")
+
+
 def extend_boundary_ties(sql: str, question_id: int) -> str:
+    """Fetch the complete ranked domain; cut the exact boundary in Python."""
     top_rule = TOP_N_RULES.get(question_id)
     if not top_rule:
         return sql
-    top_n = top_rule[0]
-    pattern = re.compile(rf"\bLIMIT\s+{top_n}\s*;?\s*$", re.IGNORECASE)
-    extended, replacements = pattern.subn(f"LIMIT {top_n} WITH TIES", sql)
-    if replacements != 1:
+    pattern = re.compile(rf"\bLIMIT\s+{top_rule[0]}\s*;?\s*$", re.IGNORECASE)
+    extended, replacements = pattern.subn("", sql)
+    if replacements != 1 or final_order_clause(sql) is None:
         raise ValueError(f"q{question_id:02d}: cannot extend Top-N reference boundary")
     return extended
+
+
+def complete_boundary(rows: list[list[object]], rules: dict[str, object], descending: bool) -> list[list[object]]:
+    top_n = rules["top_n"]
+    columns = rules["tie_columns"]
+    if top_n is None:
+        return rows
+    if len(rows) < top_n:
+        raise ValueError("Top-N reference contains fewer than N rows")
+    # Use the reference's projected values, including its existing ROUND precision.
+    # The row encoding breaks ties reproducibly without discarding tied members.
+    ordered = sorted(rows, key=lambda row: json.dumps(row, ensure_ascii=False))
+    ordered.sort(key=lambda row: tuple(row[i] for i in columns), reverse=descending)
+    boundary = tuple(ordered[top_n - 1][i] for i in columns)
+    end = top_n
+    while end < len(ordered) and tuple(ordered[end][i] for i in columns) == boundary:
+        end += 1
+    return ordered[:end]
+
+
+def reference_digest(rows: list[list[object]]) -> str:
+    return hashlib.sha256(json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
+
+
+def verify_reference_digests(digests: list[str], question_id: int) -> None:
+    if len(digests) != 3 or len(set(digests)) != 1:
+        raise RuntimeError(f"q{question_id:02d}: reference boundary is not reproducible")
+
+
+def stable_reference(sess: Any, sql: str, question_id: int, rules: dict[str, object]) -> tuple[list[list[object]], dict[str, object] | None]:
+    expanded = extend_boundary_ties(sql, question_id)
+    rows = execute_rows(sess, expanded)
+    if isinstance(rows, ExecError):
+        raise RuntimeError(f"q{question_id:02d} reference failed: {rows.message}")
+    if rules["top_n"] is None:
+        return rows, None
+    descending = not bool(re.search(r"\bASC\s*$", final_order_clause(sql) or "", re.IGNORECASE))
+    rows = complete_boundary(rows, rules, descending)
+    digests = [reference_digest(rows)]
+    for _ in range(2):
+        repeated = execute_rows(sess, expanded)
+        if isinstance(repeated, ExecError):
+            raise RuntimeError(f"q{question_id:02d} repeated reference failed: {repeated.message}")
+        digests.append(reference_digest(complete_boundary(repeated, rules, descending)))
+    verify_reference_digests(digests, question_id)
+    return rows, {"question_id": question_id, "row_count": len(rows), "sha256": digests[0], "repeat_checks": 3, "tie_columns": rules["tie_columns"], "descending": descending, "criterion": "exact projected reference values"}
 
 
 def execute_rows(sess: Any, sql: str) -> list[list[object]] | ExecError:
@@ -84,6 +152,84 @@ def execute_rows(sess: Any, sql: str) -> list[list[object]] | ExecError:
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+SYSTEM_LABELS = {
+    "claude_claude_opus_4_7_raw": "O-R", "claude_claude_opus_4_7_semantic": "O-S",
+    "claude_claude_sonnet_4_6_raw": "S-R", "claude_claude_sonnet_4_6_semantic": "S-S",
+    "codex_gpt_5_4_raw": "G-R", "codex_gpt_5_4_semantic": "G-S",
+}
+INTENTIONAL_BROADER = {
+    ("G-R", 7): "边界并列", ("O-S", 27): "边界并列", ("S-S", 27): "边界并列",
+    ("S-R", 37): "百分数等价", ("S-S", 64): "百分数等价", ("G-S", 64): "百分数等价",
+    ("O-R", 96): "百分数等价", ("O-S", 96): "百分数等价", ("G-R", 96): "百分数等价", ("G-S", 96): "百分数等价",
+    ("S-S", 83): "数值容差",
+}
+
+
+def reviewed_categories() -> dict[tuple[str, int], tuple[str, str]]:
+    reviewed = {}
+    for line in (REPO / "reports/validation/scorer_check_review.md").read_text().splitlines():
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if len(cells) == 6 and cells[0] in SYSTEM_LABELS.values() and re.fullmatch(r"Q\d+", cells[1]):
+            reviewed[(cells[0], int(cells[1][1:]))] = (cells[3], cells[5])
+    if len(reviewed) != 68:
+        raise ValueError("expected the reviewed 68-case category ledger")
+    return reviewed
+
+
+def report_from_results(output: dict[str, Any], path: Path) -> None:
+    reviewed = reviewed_categories()
+    records = output["records"]
+    comparable = [r for r in records if r["our_outcome"] != "excluded"]
+    differences = []
+    unexplained = []
+    for record in comparable:
+        if (record["our_outcome"] == "correct") == (record["strict"] == "pass"):
+            continue
+        label = SYSTEM_LABELS[record["system"]]
+        key = (label, record["question_id"])
+        if key in INTENTIONAL_BROADER:
+            category, notes = INTENTIONAL_BROADER[key], "冻结规则第4/5/2条有意更宽（按类别）。"
+        elif key in reviewed:
+            category, notes = reviewed[key]
+        else:
+            unexplained.append(key)
+            category, notes = "原因不明", "需要逐条复核，不能标记完成。"
+        differences.append({**record, "label": label, "category": category, "notes": notes})
+    broad = sum((r["label"], r["question_id"]) in INTENTIONAL_BROADER for r in differences)
+    correct = sum(r["our_outcome"] == "correct" for r in comparable)
+    format_only = sum(r["our_outcome"] == "wrong" and r["sensitivity"] == "string_or_label_only" for r in comparable)
+    wrong_tags = Counter(r["sensitivity"] for r in comparable if r["our_outcome"] == "wrong")
+    current_counts = Counter(r["category"] for r in differences if (r["label"], r["question_id"]) not in INTENTIONAL_BROADER)
+    strict_agreements = output["strict_agreements"]
+    total = len(comparable)
+    date = datetime.now(ZoneInfo("Asia/Singapore")).date()
+    lines = ["# T02 评分器对齐检查", "", f"- 重跑日期：{date}", "- 外部 run：`paper-2026-04-22`", "- 执行库：`$SEMDEBT_DATA_DIR/chdb-eval`；没有打开主库。", f"- 已执行 {len(records)} 条；Q33 六条因公开参考不可用而单列，不进入594条的比率分母。", "", "## 历史数字（G0/G4 必须保留）", "", "修复前 strict 为 **515/594（86.7%）**；排除11条有意更宽差异后为 **515/583（88.3%）**。原68条复核主分类为：参考列缺失28、标签或列组合14、额外候选行9、公开工件/重执行差异7、舍入/相对误差4、行序与验证流程3、执行环境不兼容2、参考度量缺失1。8条改类完整保留于 `scorer_check_review.md`；历史类别账本不能被本次剩余差异数覆盖。", "", "## 本次结果", "", f"- strict 一致：**{strict_agreements}/{total}（{strict_agreements / total:.1%}）**。", f"- 排除本次仍存在的 {broad} 条有意更宽差异：**{strict_agreements}/{total - broad}（{strict_agreements / (total - broad):.1%}）**。", f"- analytical 一致：{output['analytical_agreements']}/{total}（{output['analytical_agreement_rate']:.1%}）。", f"- 原因不明：{len(unexplained)}。", "", "| 系统 | 可比较 | strict一致 | 我们更宽 | 我们更严 |", "|---|---:|---:|---:|---:|"]
+    for system, label in SYSTEM_LABELS.items():
+        group = [r for r in comparable if r["system"] == system]
+        agreed = sum((r["our_outcome"] == "correct") == (r["strict"] == "pass") for r in group)
+        wider = sum(r["our_outcome"] == "correct" and r["strict"] != "pass" for r in group)
+        stricter = sum(r["our_outcome"] != "correct" and r["strict"] == "pass" for r in group)
+        lines.append(f"| {label} | {len(group)} | {agreed} | {wider} | {stricter} |")
+    lines += ["", "## 三条缺陷的修复证据", "", "1. `ordered` 要求元数据与最终外层 ORDER BY 同时成立；窗口/子查询的排序不作为最终排序。O-R/O-S Q22现按无序完整行集比较，结果见全量表。", "2. 固定单线程运行，Top-N从完整排序域构造参考。使用参考已投影的排序值精确识别并列；Q88沿用其已有两位小数，排除未舍入浮点排序边界的不稳定。行编码固定同值前缀行序，每个参考三次成员哈希必须一致，否则报错停止。0.5%结果容差不再扩大并列组。", "3. 舍入差异实测：S-S Q24约0.70%/0.53%；O-S Q90最高约2.10%；G-S Q29约12.40%；S-S Q99最高约17.13%。不能统称小于1%。待裁决问题#7（近零量容差）仍待用户决定，未改冻结第2条。", "", f"运行条件：`{output['runtime']}`。", "", "| 题号 | 完整边界参考行数 | 三次哈希一致 | SHA256 |", "|---|---:|---|---|"]
+    for check in output["boundary_checks"]:
+        lines.append(f"| Q{check['question_id']:02} | {check['row_count']} | 是（{check['repeat_checks']}次） | `{check['sha256']}` |")
+    lines += ["", "## 本次剩余主分类与系统性影响", "", "主分类按裁决后的68条逐项账本固定，先记录具名主因，再保留复合次因；不是机械按评分器首个失败码归类。历史Q22问题修复后如已一致，移出本次差异但保留历史账本。", "", "| 类别 | 本次条数 | 系统性影响/规则依据 |", "|---|---:|---|"]
+    impacts = {"参考列缺失": "第3条：所有单元缺参考列均判错，包含问句未要求的辅助列；会系统性降低输出较简洁单元的严格准确率。", "标签或列组合": "第2/3条：只去字符串首尾空格，不拼姓名、不翻译标签；对所有单元施加格式敏感性。", "额外候选行": "第1/4条：完整结果集与Top-N行数约束；输出超集的单元均受罚，缺列等复合次因另记。", "公开工件/重执行差异": "属于外部基线的抽样/执行差异，不是全部单元的评分规则变化；六条Q14已由抽样解释，只有G-R Q30根因交T03跟进。", "舍入/相对误差": "第2条：0.5%相对误差在近零量放大舍入差异，会给全部单元引入与语义层无关的测量噪声；待裁决，不改判定。", "行序与验证流程": "第4条：修掉任意参考物理行序；同值前缀的严格行序仍可能影响所有Top-N单元，边界成员按确定性精确并列组验证。", "执行环境不兼容": "按本地执行态记exec_error；特定函数生成风格的单元会受本地能力限制，T11/T19须单列环境不兼容。", "参考度量缺失": "第3条：额外派生量不能替代参考度量；各单元必须输出全部参考度量。"}
+    for category, impact in impacts.items():
+        lines.append(f"| {category} | {current_counts[category]} | {impact} |")
+    lines += ["", "## 格式敏感性（不改变判定）", "", f"严格准确率为 **{correct}/{total}（{correct / total:.1%}）**；加上数值投影匹配的 {format_only} 条判错结果，格式敏感性上界为 **{correct + format_only}/{total}（{(correct + format_only) / total:.1%}）**。这不是与外部judge的一致率。", "", f"wrong标记计数：`{dict(wrong_tags)}`。exec_error/refused/excluded不被格式放宽挽回。", "", "数值投影保留联合行匹配、完整行数、NULL、排序、Top-N及每一数值参考列；删除非数值列只产生报告层上界，不证明标签指向同一实体。数字编码的维度（如月份）也视为数值列：改成文字时保守地不算纯格式挽回；没有角色元数据时不猜业务含义。纯文本参考标为no_numeric_reference，结构不符单列，不当作数值计算错。", "", "## 全部strict差异与次因", "", "| 系统 | 题号 | 我们 | strict | 主分类 | 说明/次因 |", "|---|---|---|---|---|---|"]
+    for r in differences:
+        lines.append(f"| {r['label']} | Q{r['question_id']:02} | {r['our_outcome']} | {r['strict']} | {r['category']} | {r['notes']} |")
+    lines += ["", "## 全部600条判定（含analytical与敏感性）", "", "| 系统 | 题号 | 我们 | strict | analytical | 原因 | 敏感性 |", "|---|---|---|---|---|---|---|"]
+    for r in records:
+        lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | {r['our_outcome']} | {r['strict']} | {r['analytical']} | {r['our_reason'] or 'matched'} | {r['sensitivity'] or '—'} |")
+    lines += ["", "## 复现与验收边界", "", "```bash", "uv run pytest", "uv run python scripts/validate_scorer.py --output /tmp/t02-scorer-check-ruling.json --report reports/validation/scorer_check.md", "```", "", "运行前设置SEMDEBT_EVAL_DIR、SEMDEBT_DATA_DIR；固定本报告的运行版本，单进程独占chdb-eval。所有候选原样执行，重执行或参考失败不静默重试。", "", "T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落实跨执行器可复现边界组要求，不能用本卡三次SQL重复取代跨厂商独立重算。G0/G4须同时披露历史低一致率、当前数字、系统性影响和敏感性上界，不能声称跨厂商独立核对已完成。"]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    if unexplained:
+        raise RuntimeError(f"unexplained strict differences: {unexplained}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -105,16 +251,19 @@ def main(argv: list[str] | None = None) -> int:
     sess = session.Session(str(args.db_dir))
     records: list[dict[str, object]] = []
     references: dict[int, list[list[object]] | ExecError] = {}
+    rules_by_id = {qid: question_rules(qid, q["expected_sql"]) for qid, q in questions.items()}
+    boundary_checks = []
     try:
         sess.query("SET max_execution_time = 30")
+        sess.query("SET max_threads = 1")
+        runtime_version = str(sess.query("SELECT version()", "CSV")).strip()
         for question_id, question in sorted(questions.items()):
             if question_id in EXCLUDED_QUESTION_IDS:
                 references[question_id] = ExecError("published reference excluded")
                 continue
-            reference_sql = extend_boundary_ties(question["expected_sql"], question_id)
-            references[question_id] = execute_rows(sess, reference_sql)
-            if isinstance(references[question_id], ExecError):
-                raise RuntimeError(f"q{question_id:02d} reference failed: {references[question_id].message}")
+            references[question_id], check = stable_reference(sess, question["expected_sql"], question_id, rules_by_id[question_id])
+            if check is not None:
+                boundary_checks.append(check)
 
         completed = 0
         for system in systems:
@@ -129,13 +278,15 @@ def main(argv: list[str] | None = None) -> int:
                     result_outcome = "excluded"
                     result_reason = "published_reference_unavailable"
                     reference_count = None
+                    sensitivity = None
                 elif isinstance(reference, ExecError):
                     raise AssertionError("unexpected reference error")
                 else:
-                    result = score_detailed(candidate, [reference], question_rules(question_id))
+                    result = score_detailed(candidate, [reference], rules_by_id[question_id])
                     result_outcome = result.outcome
-                    result_reason = result.reason
+                    result_reason = ("execution_environment_incompatible" if "UNKNOWN_FUNCTION" in candidate.message else "execution_error") if isinstance(candidate, ExecError) else result.reason
                     reference_count = len(reference)
+                    sensitivity = result.sensitivity
 
                 records.append(
                     {
@@ -143,11 +294,13 @@ def main(argv: list[str] | None = None) -> int:
                         "question_id": question_id,
                         "our_outcome": result_outcome,
                         "our_reason": result_reason,
+                        "sensitivity": sensitivity,
+                        "ordered": rules_by_id[question_id]["ordered"],
                         "strict": strict_record["verdict"],
                         "analytical": strict_record["analytical_verdict"],
                         "candidate_row_count": None if isinstance(candidate, ExecError) else len(candidate),
                         "reference_row_count": reference_count,
-                        "reexec_error": candidate.message if isinstance(candidate, ExecError) else None,
+                        "reexec_error": ("execution_environment_incompatible" if "UNKNOWN_FUNCTION" in candidate.message else "execution_error") if isinstance(candidate, ExecError) else None,
                     }
                 )
                 completed += 1
@@ -167,6 +320,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     output = {
         "run_id": RUN_ID,
+        "runtime": {"version": runtime_version, "max_threads": 1, "max_execution_time": 30},
+        "boundary_checks": boundary_checks,
         "systems": systems,
         "executed_candidates": len(records),
         "excluded_records": len(records) - len(strict_comparable),
@@ -179,6 +334,8 @@ def main(argv: list[str] | None = None) -> int:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.report is not None:
+        report_from_results(output, args.report)
     print(
         f"strict agreement: {strict_agreements}/{len(strict_comparable)} "
         f"({strict_agreements / len(strict_comparable):.1%})",

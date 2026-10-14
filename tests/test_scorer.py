@@ -149,3 +149,51 @@ def test_top_n_reference_rejects_rows_below_boundary_tie() -> None:
     rules = {"ordered": True, "top_n": 2, "tie_columns": [1]}
     with pytest.raises(ValueError, match="below the complete boundary"):
         score([("A", 10), ("B", 9)], [[("A", 10), ("B", 9), ("C", 8)]], rules)
+
+
+def test_numeric_tolerance_does_not_enlarge_boundary_ties() -> None:
+    rules = {"ordered": True, "top_n": 2, "tie_columns": [1]}
+    reference = [("A", 100), ("B", 99.6), ("C", 99.6)]
+    assert score([("B", 99.6), ("C", 99.6)], [reference], rules) == "wrong"
+
+
+def test_sensitivity_labels_only_does_not_change_outcome() -> None:
+    result = score_detailed([("Holiday", 10)], [[("Yes", 10)]], UNORDERED)
+    assert result.outcome == "wrong"
+    assert result.sensitivity == "string_or_label_only"
+
+
+def test_sensitivity_requires_joint_numeric_row_matching() -> None:
+    result = score_detailed([("X", 1, 20), ("Y", 2, 10)], [[("A", 1, 10), ("B", 2, 20)]], UNORDERED)
+    assert result.sensitivity == "numeric_mismatch"
+
+
+def test_sensitivity_missing_numeric_column_is_not_formatting() -> None:
+    assert score_detailed([("A", 10)], [[("A", 10, 20)]], UNORDERED).sensitivity == "numeric_mismatch"
+
+
+def test_sensitivity_preserves_numeric_nulls() -> None:
+    result = score_detailed([("X", None), ("Y", 2)], [[("A", None), ("B", 2)]], UNORDERED)
+    assert result.sensitivity == "string_or_label_only"
+
+
+def test_sensitivity_extra_rows_are_not_formatting() -> None:
+    assert score_detailed([("X", 1), ("Y", 2)], [[("A", 1)]], UNORDERED).sensitivity != "string_or_label_only"
+
+
+def test_sensitivity_respects_order_and_any_reference() -> None:
+    assert score_detailed([("X", 2), ("Y", 1)], [[("A", 1), ("B", 2)]], ORDERED).sensitivity == "numeric_mismatch"
+    assert score_detailed([("X", 2)], [[("A", 1)], [("B", 2)]], UNORDERED).sensitivity == "string_or_label_only"
+
+
+def test_sensitivity_keeps_non_results_and_no_numeric_separate() -> None:
+    assert score_detailed(ExecError("failure"), [[(1,)]], UNORDERED).sensitivity is None
+    assert score_detailed("CANNOT_ANSWER", [[(1,)]], UNORDERED).sensitivity is None
+    assert score_detailed([("X",)], [[("A",)]], UNORDERED).sensitivity == "no_numeric_reference"
+
+
+def test_sensitivity_top_n_keeps_boundary_contract() -> None:
+    rules = {"ordered": True, "top_n": 2, "tie_columns": [1]}
+    refs = [[("A", 10), ("B", 9), ("C", 9)]]
+    assert score_detailed([("X", 10), ("Y", 9)], refs, rules).sensitivity == "string_or_label_only"
+    assert score_detailed(refs[0], refs, rules).sensitivity == "structure_mismatch"
