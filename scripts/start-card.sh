@@ -209,7 +209,7 @@ mode_main_checkout() {
 }
 
 mode_claude_clone() {
-  local id=$1 card=$2 template=$3
+  local id=$1 card=$2 template=$3 strict_mcp=${4:-}
   need_env SEMDEBT_DATA_DIR "$DATA_DIR"
   [ "$template" = "$TEMPLATE_DIR/claude-settings.blind.json" ] || need_env SEMDEBT_EVAL_DIR "$EVAL_DIR"
   local dest="$CARDS_DIR/$id"
@@ -217,8 +217,25 @@ mode_claude_clone() {
     write_settings "$dest" "$template"
   fi
   printf '  卡片：%s/%s\n' "$dest" "$card"
-  banner "cd \"$dest\" && claude \"执行任务卡 $id\""
+  banner "cd \"$dest\" && claude $(mcp_flag "$strict_mcp")\"执行任务卡 $id\""
   printf '提示：第一次在新目录启动 Claude Code 会问是否信任这个文件夹，选「是」，否则项目设置不生效。\n'
+  mcp_note "$strict_mcp"
+}
+
+# 盲模式（含 packet）必须零 MCP server。MCP 工具不受项目 deny 的完全管辖，能联网的 server
+# （网页搜索、浏览器自动化、Notion 的 fetch）等于绕过 WebSearch/WebFetch 的禁令。
+# 模板里的 deny 是黑名单，只挡已知的 server；--strict-mcp-config 才是物理手段。
+mcp_flag() {
+  [ -n "$1" ] && printf -- '--strict-mcp-config '
+  return 0
+}
+
+mcp_note() {
+  [ -n "$1" ] || return 0
+  printf '\n盲模式为什么带 --strict-mcp-config：MCP 工具不受项目 deny 的完全管辖，能联网的 server\n'
+  printf '（网页搜索、浏览器自动化、Notion 的 fetch）会绕过 WebSearch/WebFetch 的禁令。这个标志让会话\n'
+  printf '不加载任何 MCP server。不要把它删掉——删了这张卡的结果作废。\n'
+  printf 'agent 开工第一步会自己核实「可用的 MCP 工具为空」，见 scripts/verify-isolation.md 的 A11。\n'
 }
 
 mode_open_eval() {
@@ -254,7 +271,8 @@ mode_packet() {
     write_settings "$dest" "$TEMPLATE_DIR/claude-settings.blind.json" no-data
   fi
   printf '  B 角只读调优包和 semantic/：没有 git 远端，不放行数据目录，禁止网页搜索与抓取。\n'
-  banner "cd \"$dest\" && claude \"执行任务卡 $id\""
+  banner "cd \"$dest\" && claude --strict-mcp-config \"执行任务卡 $id\""
+  mcp_note strict
 }
 
 mode_codex_eval() {
@@ -353,7 +371,7 @@ main() {
 
   case $mode in
     main-checkout) mode_main_checkout "$id" "$card" ;;
-    blind)         mode_claude_clone "$id" "$card" "$TEMPLATE_DIR/claude-settings.blind.json" ;;
+    blind)         mode_claude_clone "$id" "$card" "$TEMPLATE_DIR/claude-settings.blind.json" strict ;;
     open)          require_g1; mode_claude_clone "$id" "$card" "$TEMPLATE_DIR/claude-settings.open.json" ;;
     open-eval)     mode_open_eval "$id" "$card" ;;
     packet)        mode_packet "$id" "$packet" ;;

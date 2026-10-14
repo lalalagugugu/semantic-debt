@@ -227,6 +227,53 @@ def test_blind_template_denies_eval_and_web() -> None:
     assert "/abs/eval" in cfg["sandbox"]["filesystem"]["denyRead"]
 
 
+def test_blind_template_blocks_mcp_servers() -> None:
+    """MCP 工具不受项目 deny 之外的管辖，能联网的 server 会绕过 WebSearch/WebFetch。
+
+    这是第二道黑名单；物理手段是启动命令里的 --strict-mcp-config，准绳是
+    scripts/verify-isolation.md 的 A11（agent 自证可用 MCP 工具为空）。
+    """
+    cfg = json.loads((REPO / "templates" / "claude-settings.blind.json").read_text(encoding="utf-8"))
+    deny = cfg["permissions"]["deny"]
+    known_networked = {
+        "mcp__dashscope-websearch",
+        "mcp__chrome-devtools",
+        "mcp__claude_ai_Notion",
+        "mcp__claude_ai_Google_Drive",
+    }
+    missing = known_networked - set(deny)
+    assert not missing, f"盲模板没挡住这些能联网的 MCP server：{missing}"
+
+
+def test_blind_template_runs_rule_allows_the_dir_docs() -> None:
+    """只挡 runs/<run-id>/ 下的日志，放行 runs/README.md 与 INDEX.md。
+
+    否则 T00 的骨架测试在盲模式下 stat 不到它们，B4「测试能跑」永远红。
+    """
+    cfg = json.loads((REPO / "templates" / "claude-settings.blind.json").read_text(encoding="utf-8"))
+    deny = cfg["permissions"]["deny"]
+    assert "Read(./runs/*/**)" in deny
+    assert "Read(./runs/**)" not in deny, "这条会把 runs/README.md、runs/INDEX.md 也挡住"
+
+
+def test_blind_and_packet_launch_with_strict_mcp_config() -> None:
+    """盲模式与 packet 的启动命令必须带 --strict-mcp-config；普通模式不必。"""
+    script = START_CARD.read_text(encoding="utf-8")
+    assert "--strict-mcp-config" in script
+    blind_arm = re.search(r"^\s{4}blind\)\s+(.*)$", script, flags=re.MULTILINE)
+    open_arm = re.search(r"^\s{4}open\)\s+(.*)$", script, flags=re.MULTILINE)
+    assert blind_arm and blind_arm.group(1).rstrip().endswith("strict ;;"), "blind 分支没传 strict"
+    assert open_arm and "strict" not in open_arm.group(1), "open 分支不该传 strict"
+    packet = re.search(r"mode_packet\(\)(.*?)\n}", script, flags=re.DOTALL)
+    assert packet and "--strict-mcp-config" in packet.group(1), "packet 的启动命令没带标志"
+
+
+def test_isolation_checklist_has_the_mcp_check() -> None:
+    text = (REPO / "scripts" / "verify-isolation.md").read_text(encoding="utf-8")
+    assert "A11" in text and "mcp__" in text, "隔离清单缺 MCP 自证那一项"
+    assert "--strict-mcp-config" in text
+
+
 def test_committed_project_settings_keep_isolation() -> None:
     cfg = json.loads((REPO / ".claude" / "settings.json").read_text(encoding="utf-8"))
     assert cfg["permissions"]["blockReadsOutsideWorkingDirectories"] is True

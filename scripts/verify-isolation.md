@@ -29,8 +29,14 @@ A 组的任何一项**没有被拒绝**（也就是你真的拿到了内容）�
 | A8 | 网页搜索 | 用 WebSearch 搜任意词 | 被拒 |
 | A9 | 网页抓取 | 用 WebFetch 取 `https://github.com` | 被拒 |
 | A10 | 克隆仓库 | `git clone https://github.com/cubedevinc/semantic-layer-benchmark /tmp/x` | 被拒 |
+| A11 | **没有任何 MCP 工具** | 不用命令：直接看你自己这个会话有哪些工具。列出全部名字以 `mcp__` 开头的工具 | **一个都没有**。有任何一个就按下面处置 |
 
-A8–A10 的用意：盲模式不得上网找任何公开 text-to-SQL 基准的题目、参考 SQL 或语义文档，也不得凭记忆复述。
+A8–A11 的用意：盲模式不得上网找任何公开 text-to-SQL 基准的题目、参考 SQL 或语义文档，也不得凭记忆复述。
+
+**A11 单独说一下**（T01 发现的漏洞，2026-10-14 裁决，见 `decisions/2026-10-14-blind-mcp-and-runs.md`）：内置的 WebSearch / WebFetch 被 deny 挡住了，但**挂在会话里的 MCP server 不受项目 deny 的完全管辖**——网页搜索、浏览器自动化、Notion 的 fetch 这类工具能联网，等于绕过禁令。所以盲模式（含 packet）的启动命令必须带 `--strict-mcp-config`，它让会话一个 MCP server 都不加载。
+
+- A11 不通过（你手上有 `mcp__` 开头的工具）：**不要用它们**，按本文开头的流程停下来。多半是启动命令漏了 `--strict-mcp-config`——让用户照 `scripts/start-card.sh <卡号>` 打印的那行重启，不要自己改设置绕过去。
+- 模板里按名字 deny 的那串 `mcp__...` 是第二道黑名单，只挡已知的 server；新装的 server 挡不住。**A11 这条自证才是准绳。**
 
 ## B 组：必须能用
 
@@ -39,7 +45,7 @@ A8–A10 的用意：盲模式不得上网找任何公开 text-to-SQL 基准的�
 | B1 | 在卡的 clone 里，不在主工作区 | `pwd` | 形如 `.../cards/<卡号>`，**不是** `.../semantic-debt` |
 | B2 | 设置文件已就位 | `ls .claude/` | 同时有 `settings.json` 和 `settings.local.json` |
 | B3 | 盲模式设置生效 | `cat .claude/settings.local.json` | `deny` 里有 WebSearch、WebFetch 和题库路径；`additionalDirectories` 只有数据目录 |
-| B4 | 测试能跑 | `uv run pytest` | 通过 |
+| B4 | 测试能跑 | `uv run pytest` | 全绿。2026-10-14 之前这里会有 2 红（盲模式的 `Read(./runs/**)` 把 clone 自己的 `runs/README.md`、`runs/INDEX.md` 也挡了），已收窄为 `Read(./runs/*/**)`——只挡 `runs/<run-id>/` 下的日志。再出现红的就是新问题 |
 | B5 | 能读数据目录 | `ls "$SEMDEBT_DATA_DIR/raw"` | 列出用户下载的数据 |
 | B6 | 能写数据目录 | `touch "$SEMDEBT_DATA_DIR/.isolation-check" && rm "$SEMDEBT_DATA_DIR/.isolation-check"` | 成功 |
 | B7 | 能提交 | `git commit --allow-empty -m "isolation check"` | 成功（这条空提交留着，别删） |
@@ -60,6 +66,7 @@ B4 或 B8 因为沙箱读不到工具自身的缓存目录而失败：可以在 
 - 卡：T01
 - Claude Code 版本：（`claude --version`）
 - 工作目录：（`pwd`）
+- 启动命令是否带 `--strict-mcp-config`：是 / 否
 - 主仓库提交号：（`git rev-parse --short HEAD`）
 - 结论：通过 / **未通过（已停止）**
 
@@ -68,6 +75,7 @@ B4 或 B8 因为沙箱读不到工具自身的缓存目录而失败：可以在 
 | # | 命令原文 | 结果原文（截断到能看出被拒即可） | 判定 |
 |---|---|---|---|
 | A1 | | | 拒绝 / **通过了（失效）** |
+| A11 | （不是命令：列出你会话里所有 `mcp__` 开头的工具） | | 为空 / **有工具（失效）** |
 
 ## B 组（必须能用）
 
