@@ -49,8 +49,8 @@
 ## 用户确认
 
 - [ ] 合并 PR。
-- [ ] 裁决 `decisions/open-questions.md` 第 1 条：目录实际在 `~/dev/semdebt/`，而 `AGENTS.md`、`START-HERE.md` 写的是 `~/semdebt/`。代码已只认环境变量，不受影响；要不要把两份文档改成「以环境变量为准」？
-- [ ] 裁决 `decisions/open-questions.md` 第 2 条：本机没有 `gh`。装一个（`brew install gh && gh auth login`），还是以后每张卡都由 agent 推分支、你在 GitHub 网页上开 PR？
+- [x] 裁决 `decisions/open-questions.md` 第 1 条：**以环境变量为准**（2026-10-14）。`AGENTS.md`、`START-HERE.md`、BOARD、T14 卡已改，裁决记在 `decisions/2026-10-14-paths-from-env.md`。
+- [x] 裁决 `decisions/open-questions.md` 第 2 条：`gh` 2.102.0 已装并已登录（2026-10-14）。PR 已由 agent 用 `gh pr create` 开。
 
 ## 记录（完成后填写）
 
@@ -63,11 +63,12 @@
   - `decisions/open-questions.md`、`runs/INDEX.md`、`decisions/isolation-settings.md` 三个模板/记录。
   - `tasks/BOARD.md` 的 T00 状态已更新。
 - 偏离与理由：
-  1. **目录布局**：实际是 `~/dev/semdebt/*`，不是文档里的 `~/semdebt/*`。脚本不写死路径，一律从 `SEMDEBT_MAIN_DIR` / `SEMDEBT_EVAL_DIR` / `SEMDEBT_DATA_DIR` 来；卡片目录取主工作区的同级 `cards/`（可用 `SEMDEBT_CARDS_DIR` 覆盖），外部基准目录取同级 `_vendor/`（可用 `SEMDEBT_VENDOR_DIR` 覆盖）。文档没动，等用户裁决（open-questions 第 1 条）。
+  1. **目录布局**：实际是 `~/dev/semdebt/*`，不是文档里的 `~/semdebt/*`。脚本不写死路径，一律从 `SEMDEBT_MAIN_DIR` / `SEMDEBT_EVAL_DIR` / `SEMDEBT_DATA_DIR` 来；卡片目录取主工作区的同级 `cards/`（可用 `SEMDEBT_CARDS_DIR` 覆盖），外部基准目录取同级 `_vendor/`（可用 `SEMDEBT_VENDOR_DIR` 覆盖）。**用户当日裁决：以环境变量为准**，`AGENTS.md`、`START-HERE.md`、BOARD、T14 卡已随之改写，`docs/` 按规矩不动；见 `decisions/2026-10-14-paths-from-env.md`。
   2. **新增 `tests/` 目录**：不在 `AGENTS.md` 的目录清单里，但验收要求 `uv run pytest`。测试内容限于仓库自身的约定，不碰数据与模型。
   3. **`.gitignore` 的 `build/`** 改成 `build/*` 加 `!build/README.md`：原写法会让 `build/README.md` 也被忽略，而验收要求每个目录都有 README。产物照旧全部被忽略。
   4. **`--dry-run` 是额外加的**：卡片没要求。加它是因为这张卡自己不能 `git clone`、也不得读题库，而验收要求「用户运行 `start-card.sh T01` 能得到正确的 clone 和设置」——`--dry-run` 让这些路径可以在不触碰题库、不建目录的前提下被检验。`--dry-run` 下所有 git 写操作只打印；对主仓库以外的仓库连读都不做（`origin_url`、`branch_in_place` 都有 dry-run 短路）。
   5. **`packet` 模式额外复制 `.claude/settings.json`**：卡片只说「复制 `semantic/` 和调优包、写盲模式设置」。但 packet 目录不是 clone，拿不到仓库里提交的那份项目设置（沙箱、禁读工作目录以外），不复制的话 B 角就没有沙箱。去掉数据目录放行的做法是删掉 `additionalDirectories` 一行。
-  6. **没有用 `gh pr create`**：本机没装 `gh`。分支已推送，PR 由用户在 GitHub 网页上开（open-questions 第 2 条）。
+  6. **`gh` 在会话里只有 `gh pr *` 能用**：`gh` 已装（2.102.0）并已登录，但会话跑在沙箱里读不到 macOS keyring，`gh auth status` 报 token 无效、`gh api` 还会 TLS 验证失败。种子设置的 `sandbox.excludedCommands` 里已有 `gh pr *`，所以 `gh pr create` 正常——PR 就是这么开的。没有为此放宽任何沙箱设置；记在 `decisions/open-questions.md` 末尾。
   7. **隔离只做了可做的部分**：卡片禁止本卡读取 `$SEMDEBT_EVAL_DIR`，所以 `blockReadsOutsideWorkingDirectories` 和题库 deny 规则没有在 T00 实测，留给 T01 第一步。已在 `decisions/isolation-settings.md` 写明「T01 通过之前不要把隔离当成已验证」。`.claude/settings.json` 一个字没改。
-- 工时：约 1 小时（一个会话）。
+- 顺带完成（用户当日裁决后的收尾，不属于 T00 的交付物）：T07 定稿落账——`semantic/conventions.md` 顶部状态行改为「第 12 条已确认（2026-10-14）」，`tasks/T07-conventions-signoff.md` 和 BOARD 的 T07 状态改为已完成。清单正文一个字没改。
+- 工时：约 1.5 小时（一个会话）。
