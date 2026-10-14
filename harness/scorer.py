@@ -17,6 +17,9 @@ from typing import Literal, TypeAlias
 
 
 Outcome: TypeAlias = Literal["correct", "wrong", "exec_error", "refused"]
+Sensitivity: TypeAlias = Literal[
+    "string_or_label_only", "numeric_mismatch", "structure_mismatch", "no_numeric_reference"
+]
 Cell: TypeAlias = object
 Row: TypeAlias = tuple[Cell, ...]
 Rows: TypeAlias = tuple[Row, ...]
@@ -44,6 +47,7 @@ class ScoreResult:
     outcome: Outcome
     reason: str | None = None
     matched_ref: int | None = None
+    sensitivity: Sensitivity | None = None
 
 
 @dataclass(frozen=True)
@@ -96,8 +100,43 @@ def score_detailed(
         mismatch_reasons.append(reason)
 
     if BOUNDARY_TIE_FULL_GROUP in mismatch_reasons:
-        return ScoreResult("wrong", BOUNDARY_TIE_FULL_GROUP)
-    return ScoreResult("wrong", mismatch_reasons[0])
+        return ScoreResult("wrong", BOUNDARY_TIE_FULL_GROUP, sensitivity="structure_mismatch")
+    return ScoreResult("wrong", mismatch_reasons[0], sensitivity=_sensitivity(candidate, references, parsed_rules))
+
+
+def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -> Sensitivity:
+    """Numeric projection is a reporting diagnostic, never a second verdict.
+
+    Keep row multiplicities, numeric NULLs, order, and Top-N constraints. Missing
+    numeric columns remain failures; extra candidate columns are still allowed.
+    """
+    if not candidate or not any(references):
+        return "structure_mismatch"
+    expected_counts = {rules.top_n if rules.top_n is not None else len(ref) for ref in references}
+    if len(candidate) not in expected_counts:
+        return "structure_mismatch"
+    saw_numeric = False
+    for reference in references:
+        if not reference:
+            continue
+        numeric_ref = tuple(i for i in range(len(reference[0])) if any(_is_numeric(row[i]) for row in reference))
+        numeric_candidate = tuple(i for i in range(len(candidate[0])) if any(_is_numeric(row[i]) for row in candidate))
+        if not numeric_ref:
+            continue
+        saw_numeric = True
+        if len(numeric_candidate) < len(numeric_ref):
+            continue
+        if any(i not in numeric_ref for i in rules.tie_columns):
+            continue
+        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns))
+        projected_candidate = tuple(tuple(row[i] for i in numeric_candidate) for row in candidate)
+        projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
+        matched, _ = _matches_reference(projected_candidate, projected_reference, projected_rules)
+        if matched:
+            return "string_or_label_only"
+    if not saw_numeric:
+        return "no_numeric_reference"
+    return "numeric_mismatch"
 
 
 def _parse_rules(rules: Mapping[str, object]) -> _Rules:
@@ -252,7 +291,8 @@ def _boundary_start(reference: Rows, top_n: int, tie_columns: tuple[int, ...]) -
 
 
 def _tie_keys_equal(left: Row, right: Row, columns: tuple[int, ...]) -> bool:
-    return all(_cells_equal(left[column], right[column], allow_percentage=False) for column in columns)
+    # Result tolerance must not enlarge a ranking tie group.
+    return all(left[column] == right[column] for column in columns)
 
 
 def _rows_match_unordered(candidate: Rows, reference: Rows, mapping: tuple[int, ...]) -> bool:
