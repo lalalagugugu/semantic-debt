@@ -8,8 +8,8 @@ agent 发现设计层面的问题（档位定义、评分规则、题目口径�
 |---|---|---|---|---|---|---|
 | 1 | 2026-10-14 | T00（Claude Code） | 目录布局实际是 `~/dev/semdebt/*`，而 `AGENTS.md`、`START-HERE.md` 写的是 `~/semdebt/*` | 影响所有卡的启动位置说明；代码已改为只认环境变量，但文档与实际不一致会误导下一张卡 | 已裁决（2026-10-14，用户：以环境变量为准） | `decisions/2026-10-14-paths-from-env.md` |
 | 2 | 2026-10-14 | T00（Claude Code） | 本机未安装 `gh`，无法按工作方式用 `gh pr create` 开 PR | 每张卡的收尾动作都依赖它 | 已裁决（2026-10-14，用户已装 `gh` 2.102.0 并登录） | 见本表下方「gh 的实际情况」 |
-| 3 | 2026-10-14 | T01（Claude Code） | 盲模式的 `Read(./runs/**)` 把本 clone 自己的 `runs/README.md`、`runs/INDEX.md` 也挡住，`uv run pytest` 因此 2 红（`tests/test_repo_layout.py:81`、`tests/test_repo_layout.py:86`）。两条路：(a) 改测试，把 `PermissionError` 当成「存在但盲模式不可读」放行；(b) 放宽 deny，只许读 `runs/README.md` 与 `runs/INDEX.md` | 动的是隔离设置或 T00 冻结的测试，两者都不该由盲模式的卡自己定；而且 B4「测试能跑」是隔离清单的验收项 | 待裁决 | — |
-| 4 | 2026-10-14 | T01（Claude Code） | 内置 WebSearch/WebFetch 已被拒，但会话里仍挂着能联网的 MCP server（`mcp__dashscope-websearch__bailian_web_search`、`mcp__chrome-devtools__*`、`mcp__claude-in-chrome__*`、Google Drive、Notion），不受项目 `deny` 约束 | 硬规则 1 要求隔离靠物理手段；MCP 不在项目设置的管辖范围内，只能由用户在客户端层面关掉。T08 之前必须堵上，否则盲写语义层的结果可被质疑 | 待裁决 | — |
+| 3 | 2026-10-14 | T01（Claude Code） | 盲模式的 `Read(./runs/**)` 把本 clone 自己的 `runs/README.md`、`runs/INDEX.md` 也挡住，`uv run pytest` 因此 2 红（`tests/test_repo_layout.py:81`、`tests/test_repo_layout.py:86`）。两条路：(a) 改测试，把 `PermissionError` 当成「存在但盲模式不可读」放行；(b) 放宽 deny，只许读 `runs/README.md` 与 `runs/INDEX.md` | 动的是隔离设置或 T00 冻结的测试，两者都不该由盲模式的卡自己定；而且 B4「测试能跑」是隔离清单的验收项 | 已裁决（2026-10-14，用户选 b 的收窄版：`Read(./runs/*/**)`，测试不动） | `decisions/2026-10-14-blind-mcp-and-runs.md` |
+| 4 | 2026-10-14 | T01（Claude Code） | 内置 WebSearch/WebFetch 已被拒，但会话里仍挂着能联网的 MCP server（`mcp__dashscope-websearch__bailian_web_search`、`mcp__chrome-devtools__*`、`mcp__claude-in-chrome__*`、Google Drive、Notion），不受项目 `deny` 约束 | 硬规则 1 要求隔离靠物理手段；MCP 不在项目设置的管辖范围内，只能由用户在客户端层面关掉。T08 之前必须堵上，否则盲写语义层的结果可被质疑 | 已裁决（2026-10-14，用户选三层：`--strict-mcp-config` + 模板 deny + A11 自证） | `decisions/2026-10-14-blind-mcp-and-runs.md` |
 
 <!-- 追加格式：
 | 3 | YYYY-MM-DD | Txx（Claude Code / Codex） | 一句话问题 | 为什么不能自己定 | 待裁决 | — |
