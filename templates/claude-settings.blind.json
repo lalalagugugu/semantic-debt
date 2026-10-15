@@ -9,7 +9,6 @@
       "Read(/${SEMDEBT_EVAL_DIR}/**)",
       "Read(/${SEMDEBT_DATA_DIR}/runs-raw/**)",
       "Read(/${SEMDEBT_MAIN_DIR}/runs/**)",
-      "Read(./runs/*/**)",
       "mcp__dashscope-websearch",
       "mcp__chrome-devtools",
       "mcp__claude-in-chrome",

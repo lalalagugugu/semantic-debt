@@ -6,6 +6,11 @@
 #   scripts/start-card.sh <卡号> --dry-run    只打印将要做什么，不动文件
 #   scripts/start-card.sh T14-B <调优包>      packet 模式需要指定调优包
 #   scripts/start-card.sh --list              列出所有卡（id|owner|mode|repo|card|after|note）
+#   scripts/start-card.sh <卡号> --refresh-settings
+#                                             模板改了之后，用新模板重写已存在 clone 的
+#                                             .claude/settings.local.json，不重新克隆。
+#                                             **不要在一张卡进行中用**——中途换隔离设置会让
+#                                             这张卡的 isolation-check.md 不再描述实际会话。
 #
 # 由**用户在终端**运行；agent 的会话里不要运行（会话里禁止 git clone）。
 # 所有路径只从环境变量来：SEMDEBT_MAIN_DIR / SEMDEBT_EVAL_DIR / SEMDEBT_DATA_DIR，
@@ -27,6 +32,7 @@ TEMPLATE_DIR="$MAIN_DIR/templates"
 FREEZE_TAG="semantic-v1"
 
 DRY_RUN=0
+REFRESH_SETTINGS=0
 
 # ---------- 输出 ----------
 
@@ -318,6 +324,31 @@ mode_codex_root() {
   banner "cd \"$PARENT_DIR\" && codex \"执行任务卡 ${id}，卡片在 $card_ref\""
 }
 
+# 用当前模板重写已存在 clone 的 settings.local.json。模板改了之后用。
+refresh_settings() {
+  local id=$1 mode=$2
+  local dest="$CARDS_DIR/$id"
+  [ -d "$dest" ] || die "${dest} 不存在，没有可刷新的设置。先正常跑一次 start-card.sh ${id}。"
+  local template no_data=""
+  case $mode in
+    blind)  template="$TEMPLATE_DIR/claude-settings.blind.json" ;;
+    open)   require_g1; template="$TEMPLATE_DIR/claude-settings.open.json" ;;
+    packet) template="$TEMPLATE_DIR/claude-settings.blind.json"; no_data=no-data ;;
+    *)      die "模式 ${mode} 没有 Claude Code 设置文件可刷新。" ;;
+  esac
+  need_env SEMDEBT_DATA_DIR "$DATA_DIR"
+  [ "$mode" = blind ] || [ "$mode" = packet ] || need_env SEMDEBT_EVAL_DIR "$EVAL_DIR"
+  if [ "$DRY_RUN" = 0 ] && [ -n "$(git -C "$dest" status --porcelain 2>/dev/null)" ]; then
+    warn "${dest} 有未提交的改动——这张卡多半正在进行中。"
+    printf '  在一张卡进行中换隔离设置，会让它的 isolation-check.md 不再描述实际会话。\n' >&2
+    printf '  确实要刷新就先提交或暂存，再重跑本命令。\n' >&2
+    exit 1
+  fi
+  write_settings "$dest" "$template" "$no_data"
+  printf '\n设置已按当前模板重写。重启该目录的 Claude Code 才会生效：\n'
+  banner "cd \"$dest\" && claude $(mcp_flag "$([ "$mode" = blind ] || [ "$mode" = packet ] && echo strict)")\"执行任务卡 $id\""
+}
+
 mode_windows() {
   local id=$1 card=$2
   step "$id 在 Windows 电脑上做。"
@@ -346,6 +377,7 @@ main() {
     case $1 in
       --list)    dump_cards; exit 0 ;;
       --dry-run) DRY_RUN=1 ;;
+      --refresh-settings) REFRESH_SETTINGS=1 ;;
       -h|--help) usage 0 ;;
       -*)        die "不认识的参数：$1" ;;
       *)         if [ -z "$id" ]; then id=$1; else packet=$1; fi ;;
@@ -368,6 +400,11 @@ main() {
   [ -n "$note" ] && printf '备注：%s\n' "$note"
   [ "$DRY_RUN" = 1 ] && printf '（dry-run：只打印，不动文件）\n'
   printf '\n'
+
+  if [ "$REFRESH_SETTINGS" = 1 ]; then
+    refresh_settings "$id" "$mode"
+    exit 0
+  fi
 
   case $mode in
     main-checkout) mode_main_checkout "$id" "$card" ;;
