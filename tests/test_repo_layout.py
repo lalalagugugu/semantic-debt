@@ -14,6 +14,18 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parent.parent
+
+
+def _script_env() -> dict[str, str]:
+    """让 start-card.sh 认这份 checkout。
+
+    脚本平时从 $SEMDEBT_MAIN_DIR 读 tasks/cards.yaml——在卡的 clone 里那是主工作区，
+    盲模式沙箱会拒读，于是这几条测试在盲模式下全红（T09 实测 4 条）。测试要验的是
+    「这份 checkout 的脚本和这份 checkout 的 cards.yaml 一致」，所以把变量指到 REPO。
+    """
+    import os
+
+    return {**os.environ, "SEMDEBT_MAIN_DIR": str(REPO)}
 CARDS_YAML = REPO / "tasks" / "cards.yaml"
 BOARD = REPO / "tasks" / "BOARD.md"
 START_CARD = REPO / "scripts" / "start-card.sh"
@@ -136,7 +148,7 @@ def test_no_api_key_literals() -> None:
 def test_bash_and_python_parsers_agree(cards: list[dict[str, str]]) -> None:
     out = subprocess.run(
         ["bash", str(START_CARD), "--list"],
-        capture_output=True, text=True, check=True, cwd=REPO,
+        capture_output=True, text=True, check=True, cwd=REPO, env=_script_env(),
     ).stdout.strip().splitlines()
     expected = ["|".join(row[f] for f in FIELDS) for row in cards]
     assert out == expected, "start-card.sh 的 cards.yaml 解析与测试里的实现不一致"
@@ -307,7 +319,7 @@ def test_start_card_is_executable_and_parses() -> None:
 def test_start_card_refuses_unknown_id() -> None:
     r = subprocess.run(
         ["bash", str(START_CARD), "T99", "--dry-run"],
-        capture_output=True, text=True, cwd=REPO,
+        capture_output=True, text=True, cwd=REPO, env=_script_env(),
     )
     assert r.returncode != 0
     assert "T99" in r.stderr
@@ -323,7 +335,7 @@ def test_start_card_refuses_open_mode_before_g1() -> None:
         pytest.skip("semantic-v1 已存在，G1 已过")
     r = subprocess.run(
         ["bash", str(START_CARD), "T11", "--dry-run"],
-        capture_output=True, text=True, cwd=REPO,
+        capture_output=True, text=True, cwd=REPO, env=_script_env(),
     )
     assert r.returncode != 0
     assert "G1" in r.stderr
@@ -331,10 +343,7 @@ def test_start_card_refuses_open_mode_before_g1() -> None:
 
 def test_start_card_dry_run_touches_nothing(tmp_path) -> None:
     cards_dir = tmp_path / "cards"
-    env_overrides = {"SEMDEBT_CARDS_DIR": str(cards_dir)}
-    import os
-
-    env = {**os.environ, **env_overrides}
+    env = {**_script_env(), "SEMDEBT_CARDS_DIR": str(cards_dir)}
     r = subprocess.run(
         ["bash", str(START_CARD), "T01", "--dry-run"],
         capture_output=True, text=True, cwd=REPO, env=env,
