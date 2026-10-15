@@ -245,23 +245,29 @@ def test_blind_template_blocks_mcp_servers() -> None:
     assert not missing, f"盲模板没挡住这些能联网的 MCP server：{missing}"
 
 
-def test_blind_template_runs_rule_allows_the_dir_docs() -> None:
-    """只挡 runs/<run-id>/ 下的日志，放行 runs/README.md 与 INDEX.md。
+def test_blind_template_has_no_clone_local_runs_rule() -> None:
+    """clone 自己的 runs/ 不设 deny；主工作区的 runs/ 仍然挡住。
 
-    否则 T00 的骨架测试在盲模式下 stat 不到它们，B4「测试能跑」永远红。
+    盲模式卡都在 G1 之前，而所有 run 都在 G1 之后，所以盲写期间 clone 的 runs/
+    里只有 README.md 和 INDEX.md 两个文档，没有保护对象。而沙箱层会把
+    Read(./runs/...) 落成 ./runs/*，连这两个文档一起挡住，使 B4「测试能跑」
+    固定变红——收窄过两次都没解决。见 decisions/isolation-settings.md。
     """
-    cfg = json.loads((REPO / "templates" / "claude-settings.blind.json").read_text(encoding="utf-8"))
+    raw = (REPO / "templates" / "claude-settings.blind.json").read_text(encoding="utf-8")
+    cfg = json.loads(raw)
     deny = cfg["permissions"]["deny"]
-    assert "Read(./runs/*/**)" in deny
-    assert "Read(./runs/**)" not in deny, "这条会把 runs/README.md、runs/INDEX.md 也挡住"
+    assert not [d for d in deny if d.startswith("Read(./runs")], "clone 本地的 runs deny 应当已移除"
+    assert any("runs/**" in d and "SEMDEBT_MAIN_DIR" in d for d in deny), "主工作区的 runs/ 仍须挡住"
+    assert any("runs-raw" in d for d in deny), "模型原始输出仍须挡住"
 
 
 def test_blind_and_packet_launch_with_strict_mcp_config() -> None:
     """盲模式与 packet 的启动命令必须带 --strict-mcp-config；普通模式不必。"""
     script = START_CARD.read_text(encoding="utf-8")
     assert "--strict-mcp-config" in script
-    blind_arm = re.search(r"^\s{4}blind\)\s+(.*)$", script, flags=re.MULTILINE)
-    open_arm = re.search(r"^\s{4}open\)\s+(.*)$", script, flags=re.MULTILINE)
+    # 锚在主分发的 case 上：refresh_settings 里也有同名的 case 分支
+    blind_arm = re.search(r"^\s{4}blind\)\s+(mode_claude_clone.*)$", script, flags=re.MULTILINE)
+    open_arm = re.search(r"^\s{4}open\)\s+(require_g1.*)$", script, flags=re.MULTILINE)
     assert blind_arm and blind_arm.group(1).rstrip().endswith("strict ;;"), "blind 分支没传 strict"
     assert open_arm and "strict" not in open_arm.group(1), "open 分支不该传 strict"
     packet = re.search(r"mode_packet\(\)(.*?)\n}", script, flags=re.DOTALL)
@@ -284,6 +290,12 @@ def test_committed_project_settings_keep_isolation() -> None:
 
 
 # ---------- 启动脚本 ----------
+
+
+def test_start_card_can_refresh_settings_of_an_existing_clone() -> None:
+    """模板改了，已存在的 clone 不会自动更新；要有办法重新生成。"""
+    script = START_CARD.read_text(encoding="utf-8")
+    assert "--refresh-settings" in script
 
 
 def test_start_card_is_executable_and_parses() -> None:
