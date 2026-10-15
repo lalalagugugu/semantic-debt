@@ -1,0 +1,7103 @@
+{
+  "chdb_version": "26.9.2.1",
+  "low_card_max": 50,
+  "tables": {
+    "DimAccount": {
+      "rows": 24,
+      "columns": {
+        "AccountKey": {
+          "type": "Int32",
+          "distinct": 24,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "24",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 1
+            },
+            {
+              "value": "4",
+              "rows": 1
+            },
+            {
+              "value": "5",
+              "rows": 1
+            },
+            {
+              "value": "6",
+              "rows": 1
+            },
+            {
+              "value": "7",
+              "rows": 1
+            },
+            {
+              "value": "8",
+              "rows": 1
+            },
+            {
+              "value": "9",
+              "rows": 1
+            },
+            {
+              "value": "10",
+              "rows": 1
+            },
+            {
+              "value": "11",
+              "rows": 1
+            },
+            {
+              "value": "12",
+              "rows": 1
+            },
+            {
+              "value": "13",
+              "rows": 1
+            },
+            {
+              "value": "14",
+              "rows": 1
+            },
+            {
+              "value": "15",
+              "rows": 1
+            },
+            {
+              "value": "16",
+              "rows": 1
+            },
+            {
+              "value": "17",
+              "rows": 1
+            },
+            {
+              "value": "18",
+              "rows": 1
+            },
+            {
+              "value": "19",
+              "rows": 1
+            },
+            {
+              "value": "20",
+              "rows": 1
+            },
+            {
+              "value": "21",
+              "rows": 1
+            },
+            {
+              "value": "22",
+              "rows": 1
+            },
+            {
+              "value": "23",
+              "rows": 1
+            },
+            {
+              "value": "24",
+              "rows": 1
+            }
+          ]
+        },
+        "ParentAccountKey": {
+          "type": "Nullable(Float64)",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "24",
+          "values": [
+            {
+              "value": "1",
+              "rows": 2
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 2
+            },
+            {
+              "value": "6",
+              "rows": 7
+            },
+            {
+              "value": "13",
+              "rows": 5
+            },
+            {
+              "value": "14",
+              "rows": 4
+            },
+            {
+              "value": "24",
+              "rows": 3
+            }
+          ]
+        },
+        "AccountName": {
+          "type": "String",
+          "distinct": 24,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Administration Expense",
+              "rows": 1
+            },
+            {
+              "value": "Back-to-School Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Business Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Cost of Goods Sold",
+              "rows": 1
+            },
+            {
+              "value": "Expense",
+              "rows": 1
+            },
+            {
+              "value": "Holiday Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Human Capital",
+              "rows": 1
+            },
+            {
+              "value": "IT Cost",
+              "rows": 1
+            },
+            {
+              "value": "Income",
+              "rows": 1
+            },
+            {
+              "value": "Internet",
+              "rows": 1
+            },
+            {
+              "value": "Light, Heat, Communication Cost",
+              "rows": 1
+            },
+            {
+              "value": "Marketing Cost",
+              "rows": 1
+            },
+            {
+              "value": "Other",
+              "rows": 1
+            },
+            {
+              "value": "Other Expenses",
+              "rows": 1
+            },
+            {
+              "value": "Print",
+              "rows": 1
+            },
+            {
+              "value": "Profit and Loss after tax",
+              "rows": 1
+            },
+            {
+              "value": "Profit and Loss before tax",
+              "rows": 1
+            },
+            {
+              "value": "Property Costs",
+              "rows": 1
+            },
+            {
+              "value": "Radio & TV",
+              "rows": 1
+            },
+            {
+              "value": "Sale Revenue",
+              "rows": 1
+            },
+            {
+              "value": "Selling, General & Administrative Expenses",
+              "rows": 1
+            },
+            {
+              "value": "Spring Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Tax Time / Summer Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Taxation",
+              "rows": 1
+            }
+          ]
+        },
+        "AccountDescription": {
+          "type": "String",
+          "distinct": 24,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Administration Expense",
+              "rows": 1
+            },
+            {
+              "value": "Back-to-School Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Business Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Cost of Goods Sold",
+              "rows": 1
+            },
+            {
+              "value": "Expense",
+              "rows": 1
+            },
+            {
+              "value": "Holiday Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Holiday Ad Cost by Internet",
+              "rows": 1
+            },
+            {
+              "value": "Holiday Ad Cost by Other",
+              "rows": 1
+            },
+            {
+              "value": "Holiday Ad Cost by Print",
+              "rows": 1
+            },
+            {
+              "value": "Holiday Ad Cost by Radio & TV",
+              "rows": 1
+            },
+            {
+              "value": "Human Capital",
+              "rows": 1
+            },
+            {
+              "value": "IT Cost",
+              "rows": 1
+            },
+            {
+              "value": "Income",
+              "rows": 1
+            },
+            {
+              "value": "Light, Heat, Communication Cost",
+              "rows": 1
+            },
+            {
+              "value": "Marketing & Advertisement Cost",
+              "rows": 1
+            },
+            {
+              "value": "Other Expenses",
+              "rows": 1
+            },
+            {
+              "value": "Profit and Loss after tax",
+              "rows": 1
+            },
+            {
+              "value": "Profit and Loss before tax",
+              "rows": 1
+            },
+            {
+              "value": "Property Costs",
+              "rows": 1
+            },
+            {
+              "value": "Sale Revenue",
+              "rows": 1
+            },
+            {
+              "value": "Selling, General & Administrative Expenses",
+              "rows": 1
+            },
+            {
+              "value": "Spring Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Tax Time / Summer Ad Cost",
+              "rows": 1
+            },
+            {
+              "value": "Taxation",
+              "rows": 1
+            }
+          ]
+        },
+        "AccountType": {
+          "type": "String",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Expense",
+              "rows": 19
+            },
+            {
+              "value": "Income",
+              "rows": 4
+            },
+            {
+              "value": "Taxation",
+              "rows": 1
+            }
+          ]
+        },
+        "ValueType": {
+          "type": "String",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Expense",
+              "rows": 19
+            },
+            {
+              "value": "Income",
+              "rows": 4
+            },
+            {
+              "value": "Taxation",
+              "rows": 1
+            }
+          ]
+        }
+      }
+    },
+    "DimChannel": {
+      "rows": 4,
+      "columns": {
+        "ChannelKey": {
+          "type": "Int32",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "4",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 1
+            },
+            {
+              "value": "4",
+              "rows": 1
+            }
+          ]
+        },
+        "ChannelName": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Catalog",
+              "rows": 1
+            },
+            {
+              "value": "Online",
+              "rows": 1
+            },
+            {
+              "value": "Reseller",
+              "rows": 1
+            },
+            {
+              "value": "Store",
+              "rows": 1
+            }
+          ]
+        },
+        "ChannelDescription": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Catalog",
+              "rows": 1
+            },
+            {
+              "value": "Online",
+              "rows": 1
+            },
+            {
+              "value": "Reseller",
+              "rows": 1
+            },
+            {
+              "value": "Store",
+              "rows": 1
+            }
+          ]
+        }
+      }
+    },
+    "DimCurrency": {
+      "rows": 28,
+      "columns": {
+        "CurrencyKey": {
+          "type": "Int32",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "28",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 1
+            },
+            {
+              "value": "4",
+              "rows": 1
+            },
+            {
+              "value": "5",
+              "rows": 1
+            },
+            {
+              "value": "6",
+              "rows": 1
+            },
+            {
+              "value": "7",
+              "rows": 1
+            },
+            {
+              "value": "8",
+              "rows": 1
+            },
+            {
+              "value": "9",
+              "rows": 1
+            },
+            {
+              "value": "10",
+              "rows": 1
+            },
+            {
+              "value": "11",
+              "rows": 1
+            },
+            {
+              "value": "12",
+              "rows": 1
+            },
+            {
+              "value": "13",
+              "rows": 1
+            },
+            {
+              "value": "14",
+              "rows": 1
+            },
+            {
+              "value": "15",
+              "rows": 1
+            },
+            {
+              "value": "16",
+              "rows": 1
+            },
+            {
+              "value": "17",
+              "rows": 1
+            },
+            {
+              "value": "18",
+              "rows": 1
+            },
+            {
+              "value": "19",
+              "rows": 1
+            },
+            {
+              "value": "20",
+              "rows": 1
+            },
+            {
+              "value": "21",
+              "rows": 1
+            },
+            {
+              "value": "22",
+              "rows": 1
+            },
+            {
+              "value": "23",
+              "rows": 1
+            },
+            {
+              "value": "24",
+              "rows": 1
+            },
+            {
+              "value": "25",
+              "rows": 1
+            },
+            {
+              "value": "26",
+              "rows": 1
+            },
+            {
+              "value": "27",
+              "rows": 1
+            },
+            {
+              "value": "28",
+              "rows": 1
+            }
+          ]
+        },
+        "CurrencyName": {
+          "type": "String",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "AMD",
+              "rows": 1
+            },
+            {
+              "value": "AUD",
+              "rows": 1
+            },
+            {
+              "value": "BTN",
+              "rows": 1
+            },
+            {
+              "value": "CAD",
+              "rows": 1
+            },
+            {
+              "value": "CHF",
+              "rows": 1
+            },
+            {
+              "value": "CNY",
+              "rows": 1
+            },
+            {
+              "value": "DKK",
+              "rows": 1
+            },
+            {
+              "value": "EUR",
+              "rows": 1
+            },
+            {
+              "value": "GBP",
+              "rows": 1
+            },
+            {
+              "value": "HKD",
+              "rows": 1
+            },
+            {
+              "value": "INR",
+              "rows": 1
+            },
+            {
+              "value": "IRR",
+              "rows": 1
+            },
+            {
+              "value": "JPY",
+              "rows": 1
+            },
+            {
+              "value": "KGS",
+              "rows": 1
+            },
+            {
+              "value": "KRW",
+              "rows": 1
+            },
+            {
+              "value": "MTL",
+              "rows": 1
+            },
+            {
+              "value": "PKR",
+              "rows": 1
+            },
+            {
+              "value": "PLN",
+              "rows": 1
+            },
+            {
+              "value": "ROL",
+              "rows": 1
+            },
+            {
+              "value": "RUB",
+              "rows": 1
+            },
+            {
+              "value": "SEK",
+              "rows": 1
+            },
+            {
+              "value": "SGD",
+              "rows": 1
+            },
+            {
+              "value": "SIT",
+              "rows": 1
+            },
+            {
+              "value": "SYP",
+              "rows": 1
+            },
+            {
+              "value": "THB",
+              "rows": 1
+            },
+            {
+              "value": "TMM",
+              "rows": 1
+            },
+            {
+              "value": "TWD",
+              "rows": 1
+            },
+            {
+              "value": "USD",
+              "rows": 1
+            }
+          ]
+        },
+        "CurrencyDescription": {
+          "type": "String",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Armenian Dram",
+              "rows": 1
+            },
+            {
+              "value": "Australian Dollar",
+              "rows": 1
+            },
+            {
+              "value": "Bhutan Ngultrum",
+              "rows": 1
+            },
+            {
+              "value": "British Pound",
+              "rows": 1
+            },
+            {
+              "value": "Canadian Dollar",
+              "rows": 1
+            },
+            {
+              "value": "Danish Krone",
+              "rows": 1
+            },
+            {
+              "value": "EURO",
+              "rows": 1
+            },
+            {
+              "value": "Hong Kong Dollar",
+              "rows": 1
+            },
+            {
+              "value": "Indian Rupee",
+              "rows": 1
+            },
+            {
+              "value": "Iranian Rial",
+              "rows": 1
+            },
+            {
+              "value": "Japanese Yen",
+              "rows": 1
+            },
+            {
+              "value": "Maltese Lira",
+              "rows": 1
+            },
+            {
+              "value": "Pakistan Rupee",
+              "rows": 1
+            },
+            {
+              "value": "Polish Zloty",
+              "rows": 1
+            },
+            {
+              "value": "Renminbi Yuan",
+              "rows": 1
+            },
+            {
+              "value": "Romanian Leu",
+              "rows": 1
+            },
+            {
+              "value": "Russian Ruble",
+              "rows": 1
+            },
+            {
+              "value": "Singapore Dollar",
+              "rows": 1
+            },
+            {
+              "value": "Slovenian Tolar",
+              "rows": 1
+            },
+            {
+              "value": "Som",
+              "rows": 1
+            },
+            {
+              "value": "South Korean Won",
+              "rows": 1
+            },
+            {
+              "value": "Swedish Krona",
+              "rows": 1
+            },
+            {
+              "value": "Swiss Franc",
+              "rows": 1
+            },
+            {
+              "value": "Syrian Pound",
+              "rows": 1
+            },
+            {
+              "value": "Taiwan Dollar",
+              "rows": 1
+            },
+            {
+              "value": "Thai Baht",
+              "rows": 1
+            },
+            {
+              "value": "Turkmenistan Manat",
+              "rows": 1
+            },
+            {
+              "value": "US Dollar",
+              "rows": 1
+            }
+          ]
+        }
+      }
+    },
+    "DimCustomer": {
+      "rows": 18869,
+      "columns": {
+        "RowNum": {
+          "type": "Int32",
+          "distinct": 18869,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "18868"
+        },
+        "CustomerKey": {
+          "type": "Int32",
+          "distinct": 18869,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "19145"
+        },
+        "GeographyKey": {
+          "type": "Int32",
+          "distinct": 476,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "423",
+          "max": "952"
+        },
+        "FirstName": {
+          "type": "String",
+          "distinct": 671,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Not Provided",
+            "Marcus",
+            "Katherine",
+            "Richard",
+            "Lucas"
+          ]
+        },
+        "LastName": {
+          "type": "String",
+          "distinct": 376,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Not Provided",
+            "Diaz",
+            "Hernandez",
+            "Sanchez",
+            "Torres"
+          ]
+        },
+        "BirthDate": {
+          "type": "Nullable(String)",
+          "distinct": 8452,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "1967-05-14",
+            "1966-03-18",
+            "1965-04-02",
+            "1972-03-13",
+            "1965-08-27"
+          ]
+        },
+        "MaritalStatus": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "M",
+              "rows": 10188
+            },
+            {
+              "value": "S",
+              "rows": 8681
+            }
+          ]
+        },
+        "Gender": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "M",
+              "rows": 9525
+            },
+            {
+              "value": "F",
+              "rows": 9344
+            }
+          ]
+        },
+        "YearlyIncome": {
+          "type": "Nullable(Float64)",
+          "distinct": 17,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "10000",
+          "max": "10000000",
+          "values": [
+            {
+              "value": "10000",
+              "rows": 1155
+            },
+            {
+              "value": "20000",
+              "rows": 1767
+            },
+            {
+              "value": "30000",
+              "rows": 2287
+            },
+            {
+              "value": "40000",
+              "rows": 2747
+            },
+            {
+              "value": "50000",
+              "rows": 670
+            },
+            {
+              "value": "60000",
+              "rows": 3127
+            },
+            {
+              "value": "70000",
+              "rows": 2349
+            },
+            {
+              "value": "80000",
+              "rows": 1342
+            },
+            {
+              "value": "90000",
+              "rows": 842
+            },
+            {
+              "value": "100000",
+              "rows": 571
+            },
+            {
+              "value": "110000",
+              "rows": 474
+            },
+            {
+              "value": "120000",
+              "rows": 332
+            },
+            {
+              "value": "130000",
+              "rows": 512
+            },
+            {
+              "value": "150000",
+              "rows": 103
+            },
+            {
+              "value": "160000",
+              "rows": 94
+            },
+            {
+              "value": "170000",
+              "rows": 112
+            },
+            {
+              "value": "10000000",
+              "rows": 385
+            }
+          ]
+        },
+        "TotalChildren": {
+          "type": "Nullable(Float64)",
+          "distinct": 6,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "5",
+          "values": [
+            {
+              "value": "0",
+              "rows": 5236
+            },
+            {
+              "value": "1",
+              "rows": 3674
+            },
+            {
+              "value": "2",
+              "rows": 3852
+            },
+            {
+              "value": "3",
+              "rows": 2257
+            },
+            {
+              "value": "4",
+              "rows": 2374
+            },
+            {
+              "value": "5",
+              "rows": 1476
+            }
+          ]
+        },
+        "NumberChildrenAtHome": {
+          "type": "Nullable(Float64)",
+          "distinct": 6,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "5",
+          "values": [
+            {
+              "value": "0",
+              "rows": 11185
+            },
+            {
+              "value": "1",
+              "rows": 2528
+            },
+            {
+              "value": "2",
+              "rows": 1704
+            },
+            {
+              "value": "3",
+              "rows": 1274
+            },
+            {
+              "value": "4",
+              "rows": 1136
+            },
+            {
+              "value": "5",
+              "rows": 1042
+            }
+          ]
+        },
+        "Education": {
+          "type": "Nullable(String)",
+          "distinct": 5,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Bachelors",
+              "rows": 5448
+            },
+            {
+              "value": "Partial College",
+              "rows": 5138
+            },
+            {
+              "value": "High School",
+              "rows": 3362
+            },
+            {
+              "value": "Graduate Degree",
+              "rows": 3260
+            },
+            {
+              "value": "Partial High School",
+              "rows": 1661
+            }
+          ]
+        },
+        "Occupation": {
+          "type": "Nullable(String)",
+          "distinct": 5,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Professional",
+              "rows": 5606
+            },
+            {
+              "value": "Skilled Manual",
+              "rows": 4649
+            },
+            {
+              "value": "Management",
+              "rows": 3147
+            },
+            {
+              "value": "Clerical",
+              "rows": 3014
+            },
+            {
+              "value": "Manual",
+              "rows": 2453
+            }
+          ]
+        },
+        "HouseOwnerFlag": {
+          "type": "Nullable(Float64)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "1",
+          "values": [
+            {
+              "value": "0",
+              "rows": 6165
+            },
+            {
+              "value": "1",
+              "rows": 12704
+            }
+          ]
+        },
+        "NumberCarsOwned": {
+          "type": "Nullable(Float64)",
+          "distinct": 5,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "4",
+          "values": [
+            {
+              "value": "0",
+              "rows": 4302
+            },
+            {
+              "value": "1",
+              "rows": 4973
+            },
+            {
+              "value": "2",
+              "rows": 6530
+            },
+            {
+              "value": "3",
+              "rows": 1726
+            },
+            {
+              "value": "4",
+              "rows": 1338
+            }
+          ]
+        }
+      }
+    },
+    "DimDate": {
+      "rows": 2556,
+      "columns": {
+        "DateKey": {
+          "type": "Date",
+          "distinct": 2556,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2005-01-01",
+          "max": "2011-12-31"
+        },
+        "CalendarYear": {
+          "type": "Int32",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2005",
+          "max": "2011",
+          "values": [
+            {
+              "value": "2005",
+              "rows": 365
+            },
+            {
+              "value": "2006",
+              "rows": 365
+            },
+            {
+              "value": "2007",
+              "rows": 365
+            },
+            {
+              "value": "2008",
+              "rows": 366
+            },
+            {
+              "value": "2009",
+              "rows": 365
+            },
+            {
+              "value": "2010",
+              "rows": 365
+            },
+            {
+              "value": "2011",
+              "rows": 365
+            }
+          ]
+        },
+        "CalendarYearLabel": {
+          "type": "String",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Year 2008",
+              "rows": 366
+            },
+            {
+              "value": "Year 2005",
+              "rows": 365
+            },
+            {
+              "value": "Year 2006",
+              "rows": 365
+            },
+            {
+              "value": "Year 2007",
+              "rows": 365
+            },
+            {
+              "value": "Year 2009",
+              "rows": 365
+            },
+            {
+              "value": "Year 2010",
+              "rows": 365
+            },
+            {
+              "value": "Year 2011",
+              "rows": 365
+            }
+          ]
+        },
+        "CalendarHalfYearLabel": {
+          "type": "String",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "H2",
+              "rows": 1288
+            },
+            {
+              "value": "H1",
+              "rows": 1268
+            }
+          ]
+        },
+        "CalendarQuarterLabel": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Q3",
+              "rows": 644
+            },
+            {
+              "value": "Q4",
+              "rows": 644
+            },
+            {
+              "value": "Q2",
+              "rows": 637
+            },
+            {
+              "value": "Q1",
+              "rows": 631
+            }
+          ]
+        },
+        "CalendarMonthLabel": {
+          "type": "String",
+          "distinct": 12,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "August",
+              "rows": 217
+            },
+            {
+              "value": "December",
+              "rows": 217
+            },
+            {
+              "value": "January",
+              "rows": 217
+            },
+            {
+              "value": "July",
+              "rows": 217
+            },
+            {
+              "value": "March",
+              "rows": 217
+            },
+            {
+              "value": "May",
+              "rows": 217
+            },
+            {
+              "value": "October",
+              "rows": 217
+            },
+            {
+              "value": "April",
+              "rows": 210
+            },
+            {
+              "value": "June",
+              "rows": 210
+            },
+            {
+              "value": "November",
+              "rows": 210
+            },
+            {
+              "value": "September",
+              "rows": 210
+            },
+            {
+              "value": "February",
+              "rows": 197
+            }
+          ]
+        },
+        "CalendarWeekLabel": {
+          "type": "String",
+          "distinct": 53,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Week 4",
+            "Week 32",
+            "Week 33",
+            "Week 6",
+            "Week 12"
+          ]
+        },
+        "CalendarDayOfWeekLabel": {
+          "type": "String",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Saturday",
+              "rows": 366
+            },
+            {
+              "value": "Friday",
+              "rows": 365
+            },
+            {
+              "value": "Monday",
+              "rows": 365
+            },
+            {
+              "value": "Sunday",
+              "rows": 365
+            },
+            {
+              "value": "Thursday",
+              "rows": 365
+            },
+            {
+              "value": "Tuesday",
+              "rows": 365
+            },
+            {
+              "value": "Wednesday",
+              "rows": 365
+            }
+          ]
+        },
+        "FiscalYear": {
+          "type": "Int32",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2005",
+          "max": "2011",
+          "values": [
+            {
+              "value": "2005",
+              "rows": 365
+            },
+            {
+              "value": "2006",
+              "rows": 365
+            },
+            {
+              "value": "2007",
+              "rows": 365
+            },
+            {
+              "value": "2008",
+              "rows": 366
+            },
+            {
+              "value": "2009",
+              "rows": 365
+            },
+            {
+              "value": "2010",
+              "rows": 365
+            },
+            {
+              "value": "2011",
+              "rows": 365
+            }
+          ]
+        },
+        "FiscalYearLabel": {
+          "type": "String",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "FiscalYear 2008",
+              "rows": 366
+            },
+            {
+              "value": "FiscalYear 2005",
+              "rows": 365
+            },
+            {
+              "value": "FiscalYear 2006",
+              "rows": 365
+            },
+            {
+              "value": "FiscalYear 2007",
+              "rows": 365
+            },
+            {
+              "value": "FiscalYear 2009",
+              "rows": 365
+            },
+            {
+              "value": "FiscalYear 2010",
+              "rows": 365
+            },
+            {
+              "value": "FiscalYear 2011",
+              "rows": 365
+            }
+          ]
+        },
+        "FiscalHalfYearLabel": {
+          "type": "String",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "H2",
+              "rows": 1288
+            },
+            {
+              "value": "H1",
+              "rows": 1268
+            }
+          ]
+        },
+        "FiscalQuarterLabel": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Q3",
+              "rows": 644
+            },
+            {
+              "value": "Q4",
+              "rows": 644
+            },
+            {
+              "value": "Q2",
+              "rows": 637
+            },
+            {
+              "value": "Q1",
+              "rows": 631
+            }
+          ]
+        },
+        "FiscalMonthLabel": {
+          "type": "String",
+          "distinct": 12,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Month 1",
+              "rows": 217
+            },
+            {
+              "value": "Month 10",
+              "rows": 217
+            },
+            {
+              "value": "Month 12",
+              "rows": 217
+            },
+            {
+              "value": "Month 3",
+              "rows": 217
+            },
+            {
+              "value": "Month 5",
+              "rows": 217
+            },
+            {
+              "value": "Month 7",
+              "rows": 217
+            },
+            {
+              "value": "Month 8",
+              "rows": 217
+            },
+            {
+              "value": "Month 11",
+              "rows": 210
+            },
+            {
+              "value": "Month 4",
+              "rows": 210
+            },
+            {
+              "value": "Month 6",
+              "rows": 210
+            },
+            {
+              "value": "Month 9",
+              "rows": 210
+            },
+            {
+              "value": "Month 2",
+              "rows": 197
+            }
+          ]
+        },
+        "IsWorkDay": {
+          "type": "String",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "WorkDay",
+              "rows": 1825
+            },
+            {
+              "value": "WeekEnd",
+              "rows": 731
+            }
+          ]
+        },
+        "IsHoliday": {
+          "type": "String",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "No",
+              "rows": 1825
+            },
+            {
+              "value": "Yes",
+              "rows": 731
+            }
+          ]
+        },
+        "EuropeSeason": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Holiday",
+              "rows": 861
+            },
+            {
+              "value": "No Season",
+              "rows": 847
+            },
+            {
+              "value": "Back to School",
+              "rows": 434
+            },
+            {
+              "value": "Spring/Business",
+              "rows": 414
+            }
+          ]
+        },
+        "NorthAmericaSeason": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "No Season",
+              "rows": 854
+            },
+            {
+              "value": "Back to School",
+              "rows": 644
+            },
+            {
+              "value": "Spring/Back to Business",
+              "rows": 631
+            },
+            {
+              "value": "Holiday",
+              "rows": 427
+            }
+          ]
+        },
+        "AsiaSeason": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "No Season",
+              "rows": 1071
+            },
+            {
+              "value": "Holiday",
+              "rows": 644
+            },
+            {
+              "value": "Spring/Back to School",
+              "rows": 624
+            },
+            {
+              "value": "Tax Time/Summer",
+              "rows": 217
+            }
+          ]
+        },
+        "MonthNumber": {
+          "type": "Int32",
+          "distinct": 12,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "12",
+          "values": [
+            {
+              "value": "1",
+              "rows": 217
+            },
+            {
+              "value": "2",
+              "rows": 197
+            },
+            {
+              "value": "3",
+              "rows": 217
+            },
+            {
+              "value": "4",
+              "rows": 210
+            },
+            {
+              "value": "5",
+              "rows": 217
+            },
+            {
+              "value": "6",
+              "rows": 210
+            },
+            {
+              "value": "7",
+              "rows": 217
+            },
+            {
+              "value": "8",
+              "rows": 217
+            },
+            {
+              "value": "9",
+              "rows": 210
+            },
+            {
+              "value": "10",
+              "rows": 217
+            },
+            {
+              "value": "11",
+              "rows": 210
+            },
+            {
+              "value": "12",
+              "rows": 217
+            }
+          ]
+        },
+        "CalendarDayOfWeekNumber": {
+          "type": "Int32",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "7",
+          "values": [
+            {
+              "value": "1",
+              "rows": 365
+            },
+            {
+              "value": "2",
+              "rows": 365
+            },
+            {
+              "value": "3",
+              "rows": 365
+            },
+            {
+              "value": "4",
+              "rows": 365
+            },
+            {
+              "value": "5",
+              "rows": 365
+            },
+            {
+              "value": "6",
+              "rows": 366
+            },
+            {
+              "value": "7",
+              "rows": 365
+            }
+          ]
+        }
+      }
+    },
+    "DimEmployee": {
+      "rows": 293,
+      "columns": {
+        "EmployeeKey": {
+          "type": "Int32",
+          "distinct": 293,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "296"
+        },
+        "ParentEmployeeKey": {
+          "type": "Nullable(Float64)",
+          "distinct": 11,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "18",
+          "values": [
+            {
+              "value": "1",
+              "rows": 7
+            },
+            {
+              "value": "2",
+              "rows": 6
+            },
+            {
+              "value": "3",
+              "rows": 5
+            },
+            {
+              "value": "4",
+              "rows": 3
+            },
+            {
+              "value": "5",
+              "rows": 3
+            },
+            {
+              "value": "6",
+              "rows": 65
+            },
+            {
+              "value": "7",
+              "rows": 33
+            },
+            {
+              "value": "8",
+              "rows": 33
+            },
+            {
+              "value": "9",
+              "rows": 89
+            },
+            {
+              "value": "10",
+              "rows": 44
+            },
+            {
+              "value": "18",
+              "rows": 5
+            }
+          ]
+        },
+        "FirstName": {
+          "type": "String",
+          "distinct": 234,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Michael",
+            "David",
+            "Jeff",
+            "Daniel",
+            "Chris"
+          ]
+        },
+        "LastName": {
+          "type": "String",
+          "distinct": 288,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Garcia",
+            "Brown",
+            "Smith",
+            "Alexander",
+            "Richardson"
+          ]
+        },
+        "Title": {
+          "type": "Nullable(String)",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Sales Store Manager",
+              "rows": 264
+            },
+            {
+              "value": "Sales State Manager",
+              "rows": 23
+            },
+            {
+              "value": "Sales Region Manager",
+              "rows": 5
+            },
+            {
+              "value": "Sales Group Manager",
+              "rows": 1
+            }
+          ]
+        },
+        "HireDate": {
+          "type": "Nullable(String)",
+          "distinct": 164,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2001-07-01",
+            "1999-03-30",
+            "1999-01-08",
+            "1999-03-12",
+            "1999-03-04"
+          ]
+        },
+        "BirthDate": {
+          "type": "Nullable(String)",
+          "distinct": 276,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "1968-03-13",
+            "1966-02-06",
+            "1977-03-13",
+            "1976-10-11",
+            "1976-11-01"
+          ]
+        },
+        "EmailAddress": {
+          "type": "Nullable(String)",
+          "distinct": 293,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "anibal0@contoso.com",
+            "suchitra0@contoso.com",
+            "stefen0@contoso.com",
+            "jack1@contoso.com",
+            "michael1@contoso.com"
+          ]
+        },
+        "Phone": {
+          "type": "Nullable(String)",
+          "distinct": 285,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "210-555-0193",
+            "612-555-0100",
+            "615-555-0110",
+            "913-555-0172",
+            "208-555-0114"
+          ]
+        },
+        "EmergencyContactName": {
+          "type": "Nullable(String)",
+          "distinct": 293,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Tien Dung Thoi",
+            "Terri Chudzik",
+            "David Campbell",
+            "Dushyant Bansal",
+            "Ian Palangio"
+          ]
+        },
+        "EmergencyContactPhone": {
+          "type": "Nullable(String)",
+          "distinct": 285,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "210-555-0193",
+            "612-555-0100",
+            "615-555-0110",
+            "913-555-0172",
+            "208-555-0114"
+          ]
+        },
+        "Gender": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Male",
+              "rows": 206
+            },
+            {
+              "value": "Female",
+              "rows": 87
+            }
+          ]
+        },
+        "PayFrequency": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "1",
+              "rows": 147
+            },
+            {
+              "value": "2",
+              "rows": 146
+            }
+          ]
+        },
+        "BaseRate": {
+          "type": "Nullable(Float64)",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "25",
+          "max": "125",
+          "values": [
+            {
+              "value": "25",
+              "rows": 264
+            },
+            {
+              "value": "55",
+              "rows": 23
+            },
+            {
+              "value": "72.45",
+              "rows": 5
+            },
+            {
+              "value": "125",
+              "rows": 1
+            }
+          ]
+        },
+        "VacationHours": {
+          "type": "Nullable(Float64)",
+          "distinct": 99,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "99"
+        },
+        "DepartmentName": {
+          "type": "Nullable(String)",
+          "distinct": 17,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Production",
+              "rows": 176
+            },
+            {
+              "value": "Sales",
+              "rows": 18
+            },
+            {
+              "value": "Purchasing",
+              "rows": 13
+            },
+            {
+              "value": "Finance",
+              "rows": 10
+            },
+            {
+              "value": "Information Services",
+              "rows": 10
+            },
+            {
+              "value": "Marketing",
+              "rows": 10
+            },
+            {
+              "value": "Facilities and Maintenance",
+              "rows": 7
+            },
+            {
+              "value": "Production Control",
+              "rows": 7
+            },
+            {
+              "value": "Engineering",
+              "rows": 6
+            },
+            {
+              "value": "Human Resources",
+              "rows": 6
+            },
+            {
+              "value": "Quality Assurance",
+              "rows": 6
+            },
+            {
+              "value": "Shipping and Receiving",
+              "rows": 6
+            },
+            {
+              "value": "Document Control",
+              "rows": 5
+            },
+            {
+              "value": "Tool Design",
+              "rows": 5
+            },
+            {
+              "value": "Research and Development",
+              "rows": 4
+            },
+            {
+              "value": "Executive",
+              "rows": 3
+            },
+            {
+              "value": "'Human Resources Contral",
+              "rows": 1
+            }
+          ]
+        },
+        "StartDate": {
+          "type": "Nullable(String)",
+          "distinct": 170,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2001-07-01",
+            "1999-01-08",
+            "1999-03-30",
+            "1999-03-12",
+            "1999-01-13"
+          ]
+        },
+        "Status": {
+          "type": "Nullable(String)",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Current",
+              "rows": 293
+            }
+          ]
+        },
+        "SalaryStatus": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Not Salaried",
+              "rows": 237
+            },
+            {
+              "value": "Salaried",
+              "rows": 56
+            }
+          ]
+        },
+        "IsSalesPerson": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "No",
+              "rows": 276
+            },
+            {
+              "value": "Yes",
+              "rows": 17
+            }
+          ]
+        },
+        "IsMarried": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "No",
+              "rows": 147
+            },
+            {
+              "value": "Yes",
+              "rows": 146
+            }
+          ]
+        }
+      }
+    },
+    "DimEntity": {
+      "rows": 421,
+      "columns": {
+        "EntityKey": {
+          "type": "Int32",
+          "distinct": 421,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "949"
+        },
+        "ParentEntityKey": {
+          "type": "Nullable(Float64)",
+          "distinct": 114,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "943"
+        },
+        "ParentEntityLabel": {
+          "type": "Nullable(String)",
+          "distinct": 113,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Texas",
+            "Colorado",
+            "Wisconsin",
+            "Massachusetts",
+            "Washington"
+          ]
+        },
+        "EntityName": {
+          "type": "String",
+          "distinct": 419,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Contoso Singapore",
+            "Contoso Taiwan",
+            "Contoso Montreal No.1 Store",
+            "Contoso Hong Kong",
+            "Contoso Everett Store"
+          ]
+        },
+        "EntityDescription": {
+          "type": "Nullable(String)",
+          "distinct": 419,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Contoso Taiwan",
+            "Contoso Singapore",
+            "Contoso Appleton Store",
+            "Contoso Longview Store",
+            "Contoso Cheney Store"
+          ]
+        },
+        "EntityType": {
+          "type": "Nullable(String)",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Store",
+              "rows": 306
+            },
+            {
+              "value": "State",
+              "rows": 79
+            },
+            {
+              "value": "Country/Region",
+              "rows": 33
+            },
+            {
+              "value": "Group",
+              "rows": 3
+            }
+          ]
+        },
+        "StartDate": {
+          "type": "Nullable(String)",
+          "distinct": 166,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2003-07-01 00:00:00.000",
+            "2002-11-01 00:00:00.000",
+            "2003-04-15 00:00:00.000",
+            "2001-07-01 00:00:00.000",
+            "1999-02-14 00:00:00.000"
+          ]
+        },
+        "Status": {
+          "type": "Nullable(String)",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Current",
+              "rows": 421
+            }
+          ]
+        }
+      }
+    },
+    "DimGeography": {
+      "rows": 674,
+      "columns": {
+        "GeographyKey": {
+          "type": "Int32",
+          "distinct": 674,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "952"
+        },
+        "GeographyType": {
+          "type": "String",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "City",
+              "rows": 517
+            },
+            {
+              "value": "State/Province",
+              "rows": 120
+            },
+            {
+              "value": "Country/Region",
+              "rows": 34
+            },
+            {
+              "value": "Continent",
+              "rows": 3
+            }
+          ]
+        },
+        "ContinentName": {
+          "type": "String",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "North America",
+              "rows": 339
+            },
+            {
+              "value": "Europe",
+              "rows": 221
+            },
+            {
+              "value": "Asia",
+              "rows": 114
+            }
+          ]
+        },
+        "CityName": {
+          "type": "Nullable(String)",
+          "distinct": 511,
+          "nulls": 157,
+          "null_rate": 0.232938,
+          "top_values": [
+            "Saint Ouen",
+            "Columbus",
+            "Frankfurt",
+            "Burbank",
+            "Birmingham"
+          ]
+        },
+        "StateProvinceName": {
+          "type": "Nullable(String)",
+          "distinct": 125,
+          "nulls": 37,
+          "null_rate": 0.054896,
+          "top_values": [
+            "California",
+            "England",
+            "Washington",
+            "Texas",
+            "Massachusetts"
+          ]
+        },
+        "RegionCountryName": {
+          "type": "String",
+          "distinct": 35,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "United States",
+              "rows": 312
+            },
+            {
+              "value": "France",
+              "rows": 65
+            },
+            {
+              "value": "Germany",
+              "rows": 54
+            },
+            {
+              "value": "Australia",
+              "rows": 47
+            },
+            {
+              "value": "United Kingdom",
+              "rows": 47
+            },
+            {
+              "value": "Canada",
+              "rows": 26
+            },
+            {
+              "value": "Japan",
+              "rows": 13
+            },
+            {
+              "value": "China",
+              "rows": 11
+            },
+            {
+              "value": "Italy",
+              "rows": 11
+            },
+            {
+              "value": "India",
+              "rows": 7
+            },
+            {
+              "value": "Russia",
+              "rows": 7
+            },
+            {
+              "value": "South Korea",
+              "rows": 5
+            },
+            {
+              "value": "",
+              "rows": 3
+            },
+            {
+              "value": "Armenia",
+              "rows": 3
+            },
+            {
+              "value": "Bhutan",
+              "rows": 3
+            },
+            {
+              "value": "Denmark",
+              "rows": 3
+            },
+            {
+              "value": "Greece",
+              "rows": 3
+            },
+            {
+              "value": "Iran",
+              "rows": 3
+            },
+            {
+              "value": "Ireland",
+              "rows": 3
+            },
+            {
+              "value": "Kyrgyzstan",
+              "rows": 3
+            },
+            {
+              "value": "Malta",
+              "rows": 3
+            },
+            {
+              "value": "Pakistan",
+              "rows": 3
+            },
+            {
+              "value": "Poland",
+              "rows": 3
+            },
+            {
+              "value": "Portugal",
+              "rows": 3
+            },
+            {
+              "value": "Romania",
+              "rows": 3
+            },
+            {
+              "value": "Singapore",
+              "rows": 3
+            },
+            {
+              "value": "Slovenia",
+              "rows": 3
+            },
+            {
+              "value": "Spain",
+              "rows": 3
+            },
+            {
+              "value": "Sweden",
+              "rows": 3
+            },
+            {
+              "value": "Switzerland",
+              "rows": 3
+            },
+            {
+              "value": "Syria",
+              "rows": 3
+            },
+            {
+              "value": "Taiwan",
+              "rows": 3
+            },
+            {
+              "value": "Thailand",
+              "rows": 3
+            },
+            {
+              "value": "Turkmenistan",
+              "rows": 3
+            },
+            {
+              "value": "the Netherlands",
+              "rows": 3
+            }
+          ]
+        }
+      }
+    },
+    "DimMachine": {
+      "rows": 7816,
+      "columns": {
+        "MachineKey": {
+          "type": "Int32",
+          "distinct": 7816,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "7816"
+        },
+        "StoreKey": {
+          "type": "Int32",
+          "distinct": 303,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "307"
+        },
+        "MachineType": {
+          "type": "String",
+          "distinct": 9,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "WSR01",
+              "rows": 3040
+            },
+            {
+              "value": "POS01",
+              "rows": 2679
+            },
+            {
+              "value": "WSR02",
+              "rows": 1060
+            },
+            {
+              "value": "HUB01",
+              "rows": 460
+            },
+            {
+              "value": "MSR01",
+              "rows": 346
+            },
+            {
+              "value": "POS02",
+              "rows": 102
+            },
+            {
+              "value": "POS03",
+              "rows": 73
+            },
+            {
+              "value": "POS04",
+              "rows": 46
+            },
+            {
+              "value": "RUT01",
+              "rows": 10
+            }
+          ]
+        },
+        "MachineName": {
+          "type": "String",
+          "distinct": 9,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Fabrikam NAS Web Server",
+              "rows": 3040
+            },
+            {
+              "value": "Fabrikam Point of Sale 4-in-1",
+              "rows": 1945
+            },
+            {
+              "value": "Fabrikam Imperium SVIXV9080H Server",
+              "rows": 1060
+            },
+            {
+              "value": "A. Datum Corporation DUB-H7 High Speed USB 2.0 7-Port Hub",
+              "rows": 460
+            },
+            {
+              "value": "Fabrikam Point of Sale System 2.0",
+              "rows": 383
+            },
+            {
+              "value": "Fabrikam Point of Sale System",
+              "rows": 359
+            },
+            {
+              "value": "Fabrikam 250GB Mail Server Mail Server",
+              "rows": 346
+            },
+            {
+              "value": "Fabrikam Point of Sale High Version 1.0",
+              "rows": 213
+            },
+            {
+              "value": "A. Datum Corporation ME1004-R Wireless Cable/DSL Router",
+              "rows": 10
+            }
+          ]
+        },
+        "MachineDescription": {
+          "type": "Nullable(String)",
+          "distinct": 9,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "4GB DDR2 Memory; 250GB Hard Drives; Windows 2003 Web Server",
+              "rows": 3040
+            },
+            {
+              "value": "Kit contains one convenient box, barcode scanner, receipt printer, cash drawer and keyboard.",
+              "rows": 1945
+            },
+            {
+              "value": "Dual Contoso 2.00GHz Core Processors; Windows 2008 Web Server",
+              "rows": 1060
+            },
+            {
+              "value": "PC and Mac Compatible; Up to 40 Times Faster than USB 1.1",
+              "rows": 460
+            },
+            {
+              "value": "Kit contains 15\" LCD screen, Cash Drawer, Barcode Scanner and Receipt Printer.",
+              "rows": 383
+            },
+            {
+              "value": "Kit contains 15\" LCD screen, 1 cash drawer port and 5 USB ports.",
+              "rows": 359
+            },
+            {
+              "value": "Contoso 2.00GHz Core Processor; Windows 2003",
+              "rows": 346
+            },
+            {
+              "value": "Kit contains 15\" LCD screen, Cash Drawer, Barcode Scanner, Receipt Printer,Power Supply and Magstripe Reader.",
+              "rows": 213
+            },
+            {
+              "value": "Offers backward-compatibility with all 802.11b devices",
+              "rows": 10
+            }
+          ]
+        },
+        "VendorName": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Fabrikam, Inc.",
+              "rows": 7346
+            },
+            {
+              "value": "A. Datum Corporation",
+              "rows": 470
+            }
+          ]
+        },
+        "MachineOS": {
+          "type": "Nullable(String)",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Windows Server 2003",
+              "rows": 3386
+            },
+            {
+              "value": "Linux2.6",
+              "rows": 2304
+            },
+            {
+              "value": "Windows Server 2008",
+              "rows": 1060
+            },
+            {
+              "value": "UNKNOWN",
+              "rows": 460
+            },
+            {
+              "value": "Windows Embedded for Point of Service",
+              "rows": 383
+            },
+            {
+              "value": "Windows Embedded POSReady 2009",
+              "rows": 213
+            },
+            {
+              "value": "Router OS",
+              "rows": 10
+            }
+          ]
+        },
+        "MachineSource": {
+          "type": "Nullable(String)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Online Data Center",
+              "rows": 4341
+            },
+            {
+              "value": "Store",
+              "rows": 2900
+            },
+            {
+              "value": "Catalog Data Center",
+              "rows": 575
+            }
+          ]
+        },
+        "MachineHardware": {
+          "type": "Nullable(String)",
+          "distinct": 9,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "4GB DDR2 Memory; 250GB Hard Drives",
+              "rows": 3040
+            },
+            {
+              "value": "15\" LCD screen; 4 USB ports (USB 1.0)",
+              "rows": 1945
+            },
+            {
+              "value": "Dual 2.33GHz Core Processor; 8GB DDR2 667MHz PC5400 Memory;",
+              "rows": 1060
+            },
+            {
+              "value": "7-Port (each port can be used as either an RJ-45 10/100 port)",
+              "rows": 460
+            },
+            {
+              "value": "15\" LCD screen;Cash Drawer, Barcode Scanner, Receipt Printer",
+              "rows": 383
+            },
+            {
+              "value": "15\" LCD screen;1 cash drawer port;5 USB ports (USB 2.0)",
+              "rows": 359
+            },
+            {
+              "value": "Contoso 2.00GHz Core Processors; 4GB Memory; 250GB Hard Drives",
+              "rows": 346
+            },
+            {
+              "value": "15\" LCD screen;Cash Drawer, Barcode Scanner,Receipt Printer,Power Supply, Magstripe Reader",
+              "rows": 213
+            },
+            {
+              "value": "4-port (Wireless Cable/DSL access point)",
+              "rows": 10
+            }
+          ]
+        },
+        "MachineSoftware": {
+          "type": "Nullable(String)",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Windows Server 2003",
+              "rows": 3386
+            },
+            {
+              "value": "Linux2.6",
+              "rows": 2304
+            },
+            {
+              "value": "Windows Server 2008",
+              "rows": 1060
+            },
+            {
+              "value": "UNKNOWN",
+              "rows": 460
+            },
+            {
+              "value": "Windows Embedded for Point of Service",
+              "rows": 383
+            },
+            {
+              "value": "Windows Embedded POSReady 2009",
+              "rows": 213
+            },
+            {
+              "value": "Router OS; NAT and SPI firewall",
+              "rows": 10
+            }
+          ]
+        },
+        "Status": {
+          "type": "Nullable(String)",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Used",
+              "rows": 7816
+            }
+          ]
+        },
+        "ServiceStartDate": {
+          "type": "Nullable(String)",
+          "distinct": 160,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2004-08-25 00:00:00.000",
+            "2004-10-26 00:00:00.000",
+            "2004-02-18 00:00:00.000",
+            "2004-07-02 00:00:00.000",
+            "2004-02-19 00:00:00.000"
+          ]
+        },
+        "DecommissionDate": {
+          "type": "Nullable(String)",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "2011-06-17 00:00:00.000",
+              "rows": 1098
+            },
+            {
+              "value": "2013-06-16 00:00:00.000",
+              "rows": 805
+            },
+            {
+              "value": "2013-06-17 00:00:00.000",
+              "rows": 805
+            },
+            {
+              "value": "2014-06-16 00:00:00.000",
+              "rows": 781
+            },
+            {
+              "value": "2012-06-16 00:00:00.000",
+              "rows": 717
+            },
+            {
+              "value": "2012-06-17 00:00:00.000",
+              "rows": 683
+            },
+            {
+              "value": "2010-06-16 00:00:00.000",
+              "rows": 673
+            },
+            {
+              "value": "2011-06-16 00:00:00.000",
+              "rows": 414
+            },
+            {
+              "value": "2013-06-18 00:00:00.000",
+              "rows": 396
+            },
+            {
+              "value": "2012-06-18 00:00:00.000",
+              "rows": 356
+            },
+            {
+              "value": "2015-01-01 00:00:00.000",
+              "rows": 277
+            },
+            {
+              "value": "2011-06-18 00:00:00.000",
+              "rows": 208
+            },
+            {
+              "value": "2014-06-17 00:00:00.000",
+              "rows": 101
+            },
+            {
+              "value": "2012-07-10 00:00:00.000",
+              "rows": 88
+            },
+            {
+              "value": "2016-06-16 00:00:00.000",
+              "rows": 81
+            },
+            {
+              "value": "2016-06-17 00:00:00.000",
+              "rows": 81
+            },
+            {
+              "value": "2012-07-06 00:00:00.000",
+              "rows": 49
+            },
+            {
+              "value": "2014-06-18 00:00:00.000",
+              "rows": 44
+            },
+            {
+              "value": "2016-06-18 00:00:00.000",
+              "rows": 41
+            },
+            {
+              "value": "2015-06-16 00:00:00.000",
+              "rows": 28
+            },
+            {
+              "value": "2015-06-17 00:00:00.000",
+              "rows": 28
+            },
+            {
+              "value": "2015-06-18 00:00:00.000",
+              "rows": 13
+            },
+            {
+              "value": "2012-03-15 00:00:00.000",
+              "rows": 10
+            },
+            {
+              "value": "2012-06-07 00:00:00.000",
+              "rows": 10
+            },
+            {
+              "value": "2014-07-10 00:00:00.000",
+              "rows": 9
+            },
+            {
+              "value": "2012-09-19 00:00:00.000",
+              "rows": 8
+            },
+            {
+              "value": "2012-09-20 00:00:00.000",
+              "rows": 8
+            },
+            {
+              "value": "2014-07-06 00:00:00.000",
+              "rows": 4
+            }
+          ]
+        },
+        "LastModifiedDate": {
+          "type": "Nullable(String)",
+          "distinct": 9,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "2009-06-16 00:00:00.000",
+              "rows": 2733
+            },
+            {
+              "value": "2009-06-17 00:00:00.000",
+              "rows": 2170
+            },
+            {
+              "value": "2009-07-10 00:00:00.000",
+              "rows": 1413
+            },
+            {
+              "value": "2009-06-18 00:00:00.000",
+              "rows": 822
+            },
+            {
+              "value": "2009-07-06 00:00:00.000",
+              "rows": 629
+            },
+            {
+              "value": "2009-07-17 00:00:00.000",
+              "rows": 40
+            },
+            {
+              "value": "2008-12-10 00:00:00.000",
+              "rows": 4
+            },
+            {
+              "value": "2009-05-10 00:00:00.000",
+              "rows": 3
+            },
+            {
+              "value": "2008-01-01 00:00:00.000",
+              "rows": 2
+            }
+          ]
+        }
+      }
+    },
+    "DimOutage": {
+      "rows": 303,
+      "columns": {
+        "OutageKey": {
+          "type": "Int32",
+          "distinct": 303,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "293",
+          "max": "595"
+        },
+        "OutageName": {
+          "type": "String",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Move/Add/Change",
+              "rows": 47
+            },
+            {
+              "value": "Change Management",
+              "rows": 42
+            },
+            {
+              "value": "Hardware",
+              "rows": 30
+            },
+            {
+              "value": "Incident",
+              "rows": 30
+            },
+            {
+              "value": "Deployment",
+              "rows": 24
+            },
+            {
+              "value": "Security",
+              "rows": 24
+            },
+            {
+              "value": "Request",
+              "rows": 21
+            },
+            {
+              "value": "Network Device",
+              "rows": 14
+            },
+            {
+              "value": "Change/Maintenance",
+              "rows": 12
+            },
+            {
+              "value": "Network Configuration",
+              "rows": 7
+            },
+            {
+              "value": "Network Capacity",
+              "rows": 6
+            },
+            {
+              "value": "Maintenance",
+              "rows": 5
+            },
+            {
+              "value": "Investigation",
+              "rows": 4
+            },
+            {
+              "value": "Network",
+              "rows": 4
+            },
+            {
+              "value": "Network error",
+              "rows": 4
+            },
+            {
+              "value": "CPU Failure",
+              "rows": 3
+            },
+            {
+              "value": "Disk Failure",
+              "rows": 3
+            },
+            {
+              "value": "Motherboard Failure",
+              "rows": 3
+            },
+            {
+              "value": "Network Adapter Failure",
+              "rows": 3
+            },
+            {
+              "value": "OS Failed",
+              "rows": 3
+            },
+            {
+              "value": "RAM Failure",
+              "rows": 3
+            },
+            {
+              "value": "Software",
+              "rows": 3
+            },
+            {
+              "value": "Database Error",
+              "rows": 2
+            },
+            {
+              "value": "HM-Network",
+              "rows": 2
+            },
+            {
+              "value": "Hub Port light is blinking",
+              "rows": 1
+            },
+            {
+              "value": "Hub Power Down",
+              "rows": 1
+            },
+            {
+              "value": "Infrastructure",
+              "rows": 1
+            },
+            {
+              "value": "Network HW Failure-test",
+              "rows": 1
+            }
+          ]
+        },
+        "OutageType": {
+          "type": "String",
+          "distinct": 55,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Hardware",
+            "Software",
+            "Network",
+            "Configuration Management",
+            "OS"
+          ]
+        },
+        "OutageTypeDescription": {
+          "type": "Nullable(String)",
+          "distinct": 53,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Hardware",
+            "Crash",
+            "Software",
+            "Network",
+            "Configuration Management"
+          ]
+        },
+        "OutageSubType": {
+          "type": "Nullable(String)",
+          "distinct": 159,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Upgrade",
+            "Other",
+            "Install/Update Software",
+            "Memory",
+            "Vulnerability"
+          ]
+        }
+      }
+    },
+    "DimProduct": {
+      "rows": 2233,
+      "columns": {
+        "ProductKey": {
+          "type": "Int32",
+          "distinct": 2233,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "2517"
+        },
+        "ProductName": {
+          "type": "String",
+          "distinct": 2233,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Contoso SLR Camera X144 Silver Grey",
+            "Fabrikam SLR Camera 35\" X358 Grey",
+            "Litware Desktop Wind Tower Oscillating Fan E1201 Brown",
+            "Litware Home Theater System 5.1 Channel M515 Black",
+            "Adventure Works Coffee Maker 5C E090 Black"
+          ]
+        },
+        "ProductDescription": {
+          "type": "Nullable(String)",
+          "distinct": 653,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "1080i/p or 720p high definition or standard definition",
+            "6-hour rechargeable battery, 180-degree swivel and flip screen",
+            "Store your CDs or DVDs in these beautiful binders, designed to look like books",
+            "Digital camera - SLR with live view mode",
+            "Collapsible rectangular natural silk shade, walnut box frame, 1 x 150 Watt"
+          ]
+        },
+        "ProductSubcategoryKey": {
+          "type": "Nullable(Float64)",
+          "distinct": 30,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "48",
+          "values": [
+            {
+              "value": "1",
+              "rows": 45
+            },
+            {
+              "value": "4",
+              "rows": 20
+            },
+            {
+              "value": "6",
+              "rows": 50
+            },
+            {
+              "value": "9",
+              "rows": 50
+            },
+            {
+              "value": "10",
+              "rows": 26
+            },
+            {
+              "value": "11",
+              "rows": 100
+            },
+            {
+              "value": "13",
+              "rows": 46
+            },
+            {
+              "value": "15",
+              "rows": 78
+            },
+            {
+              "value": "18",
+              "rows": 78
+            },
+            {
+              "value": "19",
+              "rows": 103
+            },
+            {
+              "value": "20",
+              "rows": 101
+            },
+            {
+              "value": "22",
+              "rows": 99
+            },
+            {
+              "value": "23",
+              "rows": 100
+            },
+            {
+              "value": "24",
+              "rows": 100
+            },
+            {
+              "value": "27",
+              "rows": 103
+            },
+            {
+              "value": "28",
+              "rows": 55
+            },
+            {
+              "value": "29",
+              "rows": 92
+            },
+            {
+              "value": "31",
+              "rows": 62
+            },
+            {
+              "value": "32",
+              "rows": 101
+            },
+            {
+              "value": "33",
+              "rows": 27
+            },
+            {
+              "value": "35",
+              "rows": 90
+            },
+            {
+              "value": "38",
+              "rows": 46
+            },
+            {
+              "value": "41",
+              "rows": 70
+            },
+            {
+              "value": "42",
+              "rows": 86
+            },
+            {
+              "value": "43",
+              "rows": 102
+            },
+            {
+              "value": "44",
+              "rows": 31
+            },
+            {
+              "value": "45",
+              "rows": 74
+            },
+            {
+              "value": "46",
+              "rows": 158
+            },
+            {
+              "value": "47",
+              "rows": 62
+            },
+            {
+              "value": "48",
+              "rows": 78
+            }
+          ]
+        },
+        "Manufacturer": {
+          "type": "Nullable(String)",
+          "distinct": 11,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Contoso, Ltd",
+              "rows": 644
+            },
+            {
+              "value": "Fabrikam, Inc.",
+              "rows": 267
+            },
+            {
+              "value": "Litware, Inc.",
+              "rows": 264
+            },
+            {
+              "value": "Proseware, Inc.",
+              "rows": 244
+            },
+            {
+              "value": "Adventure Works",
+              "rows": 170
+            },
+            {
+              "value": "The Phone Company",
+              "rows": 152
+            },
+            {
+              "value": "Wide World Importers",
+              "rows": 150
+            },
+            {
+              "value": "Southridge Video",
+              "rows": 139
+            },
+            {
+              "value": "A. Datum Corporation",
+              "rows": 132
+            },
+            {
+              "value": "Northwind Traders",
+              "rows": 47
+            },
+            {
+              "value": "Tailspin Toys",
+              "rows": 24
+            }
+          ]
+        },
+        "BrandName": {
+          "type": "Nullable(String)",
+          "distinct": 11,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Contoso",
+              "rows": 644
+            },
+            {
+              "value": "Fabrikam",
+              "rows": 267
+            },
+            {
+              "value": "Litware",
+              "rows": 264
+            },
+            {
+              "value": "Proseware",
+              "rows": 244
+            },
+            {
+              "value": "Adventure Works",
+              "rows": 170
+            },
+            {
+              "value": "The Phone Company",
+              "rows": 152
+            },
+            {
+              "value": "Wide World Importers",
+              "rows": 150
+            },
+            {
+              "value": "Southridge Video",
+              "rows": 139
+            },
+            {
+              "value": "A. Datum",
+              "rows": 132
+            },
+            {
+              "value": "Northwind Traders",
+              "rows": 47
+            },
+            {
+              "value": "Tailspin Toys",
+              "rows": 24
+            }
+          ]
+        },
+        "ClassID": {
+          "type": "Nullable(Float64)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "3",
+          "values": [
+            {
+              "value": "1",
+              "rows": 718
+            },
+            {
+              "value": "2",
+              "rows": 1189
+            },
+            {
+              "value": "3",
+              "rows": 326
+            }
+          ]
+        },
+        "ClassName": {
+          "type": "Nullable(String)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Regular",
+              "rows": 1189
+            },
+            {
+              "value": "Economy",
+              "rows": 718
+            },
+            {
+              "value": "Deluxe",
+              "rows": 326
+            }
+          ]
+        },
+        "StyleID": {
+          "type": "Nullable(Float64)",
+          "distinct": 16,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "16",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1136
+            },
+            {
+              "value": "2",
+              "rows": 224
+            },
+            {
+              "value": "3",
+              "rows": 475
+            },
+            {
+              "value": "4",
+              "rows": 126
+            },
+            {
+              "value": "5",
+              "rows": 261
+            },
+            {
+              "value": "6",
+              "rows": 1
+            },
+            {
+              "value": "7",
+              "rows": 1
+            },
+            {
+              "value": "8",
+              "rows": 1
+            },
+            {
+              "value": "9",
+              "rows": 1
+            },
+            {
+              "value": "10",
+              "rows": 1
+            },
+            {
+              "value": "11",
+              "rows": 1
+            },
+            {
+              "value": "12",
+              "rows": 1
+            },
+            {
+              "value": "13",
+              "rows": 1
+            },
+            {
+              "value": "14",
+              "rows": 1
+            },
+            {
+              "value": "15",
+              "rows": 1
+            },
+            {
+              "value": "16",
+              "rows": 1
+            }
+          ]
+        },
+        "StyleName": {
+          "type": "Nullable(String)",
+          "distinct": 2233,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Product0501042",
+            "Product0602089",
+            "Product0501023",
+            "Product0501080",
+            "Product0205043"
+          ]
+        },
+        "ColorID": {
+          "type": "Nullable(Float64)",
+          "distinct": 16,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "16",
+          "values": [
+            {
+              "value": "1",
+              "rows": 14
+            },
+            {
+              "value": "2",
+              "rows": 540
+            },
+            {
+              "value": "3",
+              "rows": 150
+            },
+            {
+              "value": "4",
+              "rows": 66
+            },
+            {
+              "value": "5",
+              "rows": 4
+            },
+            {
+              "value": "6",
+              "rows": 96
+            },
+            {
+              "value": "7",
+              "rows": 357
+            },
+            {
+              "value": "8",
+              "rows": 454
+            },
+            {
+              "value": "9",
+              "rows": 53
+            },
+            {
+              "value": "10",
+              "rows": 63
+            },
+            {
+              "value": "11",
+              "rows": 271
+            },
+            {
+              "value": "12",
+              "rows": 14
+            },
+            {
+              "value": "13",
+              "rows": 29
+            },
+            {
+              "value": "14",
+              "rows": 72
+            },
+            {
+              "value": "15",
+              "rows": 49
+            },
+            {
+              "value": "16",
+              "rows": 1
+            }
+          ]
+        },
+        "ColorName": {
+          "type": "Nullable(String)",
+          "distinct": 17,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Black",
+              "rows": 540
+            },
+            {
+              "value": "White",
+              "rows": 454
+            },
+            {
+              "value": "Silver",
+              "rows": 357
+            },
+            {
+              "value": "Grey",
+              "rows": 271
+            },
+            {
+              "value": "Blue",
+              "rows": 148
+            },
+            {
+              "value": "Red",
+              "rows": 96
+            },
+            {
+              "value": "Green",
+              "rows": 72
+            },
+            {
+              "value": "Brown",
+              "rows": 66
+            },
+            {
+              "value": "Pink",
+              "rows": 63
+            },
+            {
+              "value": "Orange",
+              "rows": 53
+            },
+            {
+              "value": "Gold",
+              "rows": 49
+            },
+            {
+              "value": "Yellow",
+              "rows": 29
+            },
+            {
+              "value": "Azure",
+              "rows": 14
+            },
+            {
+              "value": "Silver Grey",
+              "rows": 14
+            },
+            {
+              "value": "Purple",
+              "rows": 4
+            },
+            {
+              "value": "blue",
+              "rows": 2
+            },
+            {
+              "value": "Transparent",
+              "rows": 1
+            }
+          ]
+        },
+        "Weight": {
+          "type": "Nullable(Float64)",
+          "distinct": 296,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.17",
+          "max": "239"
+        },
+        "WeightUnitMeasureID": {
+          "type": "Nullable(String)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "pounds",
+              "rows": 1822
+            },
+            {
+              "value": "ounces",
+              "rows": 401
+            },
+            {
+              "value": "grams",
+              "rows": 10
+            }
+          ]
+        },
+        "UnitOfMeasureID": {
+          "type": "Nullable(Float64)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "2",
+          "values": [
+            {
+              "value": "1",
+              "rows": 2221
+            },
+            {
+              "value": "2",
+              "rows": 12
+            }
+          ]
+        },
+        "UnitOfMeasureName": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "inches",
+              "rows": 2221
+            },
+            {
+              "value": "mm",
+              "rows": 12
+            }
+          ]
+        },
+        "StockTypeID": {
+          "type": "Nullable(Float64)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "3",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1314
+            },
+            {
+              "value": "2",
+              "rows": 658
+            },
+            {
+              "value": "3",
+              "rows": 261
+            }
+          ]
+        },
+        "StockTypeName": {
+          "type": "Nullable(String)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "High",
+              "rows": 1314
+            },
+            {
+              "value": "Mid",
+              "rows": 658
+            },
+            {
+              "value": "Low",
+              "rows": 261
+            }
+          ]
+        },
+        "UnitCost": {
+          "type": "Nullable(Float64)",
+          "distinct": 424,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1.5",
+          "max": "1060.22"
+        },
+        "UnitPrice": {
+          "type": "Nullable(Float64)",
+          "distinct": 376,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2.94",
+          "max": "3199.99"
+        },
+        "AvailableForSaleDate": {
+          "type": "Nullable(String)",
+          "distinct": 332,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2008-01-04",
+            "2005-02-09",
+            "2006-03-08",
+            "2007-03-08",
+            "2006-02-09"
+          ]
+        },
+        "Status": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "On",
+              "rows": 1938
+            },
+            {
+              "value": "Off",
+              "rows": 295
+            }
+          ]
+        }
+      }
+    },
+    "DimProductCategory": {
+      "rows": 8,
+      "columns": {
+        "ProductCategoryKey": {
+          "type": "Int32",
+          "distinct": 8,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "8",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 1
+            },
+            {
+              "value": "4",
+              "rows": 1
+            },
+            {
+              "value": "5",
+              "rows": 1
+            },
+            {
+              "value": "6",
+              "rows": 1
+            },
+            {
+              "value": "7",
+              "rows": 1
+            },
+            {
+              "value": "8",
+              "rows": 1
+            }
+          ]
+        },
+        "ProductCategoryName": {
+          "type": "String",
+          "distinct": 8,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Audio",
+              "rows": 1
+            },
+            {
+              "value": "Cameras and camcorders",
+              "rows": 1
+            },
+            {
+              "value": "Cell phones",
+              "rows": 1
+            },
+            {
+              "value": "Computers",
+              "rows": 1
+            },
+            {
+              "value": "Games and Toys",
+              "rows": 1
+            },
+            {
+              "value": "Home Appliances",
+              "rows": 1
+            },
+            {
+              "value": "Music, Movies and Audio Books",
+              "rows": 1
+            },
+            {
+              "value": "TV and Video",
+              "rows": 1
+            }
+          ]
+        }
+      }
+    },
+    "DimProductSubcategory": {
+      "rows": 44,
+      "columns": {
+        "ProductSubcategoryKey": {
+          "type": "Int32",
+          "distinct": 44,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "48",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 1
+            },
+            {
+              "value": "4",
+              "rows": 1
+            },
+            {
+              "value": "5",
+              "rows": 1
+            },
+            {
+              "value": "6",
+              "rows": 1
+            },
+            {
+              "value": "7",
+              "rows": 1
+            },
+            {
+              "value": "8",
+              "rows": 1
+            },
+            {
+              "value": "9",
+              "rows": 1
+            },
+            {
+              "value": "10",
+              "rows": 1
+            },
+            {
+              "value": "11",
+              "rows": 1
+            },
+            {
+              "value": "13",
+              "rows": 1
+            },
+            {
+              "value": "14",
+              "rows": 1
+            },
+            {
+              "value": "15",
+              "rows": 1
+            },
+            {
+              "value": "16",
+              "rows": 1
+            },
+            {
+              "value": "17",
+              "rows": 1
+            },
+            {
+              "value": "18",
+              "rows": 1
+            },
+            {
+              "value": "19",
+              "rows": 1
+            },
+            {
+              "value": "20",
+              "rows": 1
+            },
+            {
+              "value": "21",
+              "rows": 1
+            },
+            {
+              "value": "22",
+              "rows": 1
+            },
+            {
+              "value": "23",
+              "rows": 1
+            },
+            {
+              "value": "24",
+              "rows": 1
+            },
+            {
+              "value": "25",
+              "rows": 1
+            },
+            {
+              "value": "27",
+              "rows": 1
+            },
+            {
+              "value": "28",
+              "rows": 1
+            },
+            {
+              "value": "29",
+              "rows": 1
+            },
+            {
+              "value": "31",
+              "rows": 1
+            },
+            {
+              "value": "32",
+              "rows": 1
+            },
+            {
+              "value": "33",
+              "rows": 1
+            },
+            {
+              "value": "34",
+              "rows": 1
+            },
+            {
+              "value": "35",
+              "rows": 1
+            },
+            {
+              "value": "36",
+              "rows": 1
+            },
+            {
+              "value": "38",
+              "rows": 1
+            },
+            {
+              "value": "39",
+              "rows": 1
+            },
+            {
+              "value": "40",
+              "rows": 1
+            },
+            {
+              "value": "41",
+              "rows": 1
+            },
+            {
+              "value": "42",
+              "rows": 1
+            },
+            {
+              "value": "43",
+              "rows": 1
+            },
+            {
+              "value": "44",
+              "rows": 1
+            },
+            {
+              "value": "45",
+              "rows": 1
+            },
+            {
+              "value": "46",
+              "rows": 1
+            },
+            {
+              "value": "47",
+              "rows": 1
+            },
+            {
+              "value": "48",
+              "rows": 1
+            }
+          ]
+        },
+        "ProductSubcategoryName": {
+          "type": "String",
+          "distinct": 44,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Air Conditioners",
+              "rows": 1
+            },
+            {
+              "value": "Audio Accessories",
+              "rows": 1
+            },
+            {
+              "value": "Audio Books",
+              "rows": 1
+            },
+            {
+              "value": "Bluetooth Headphones",
+              "rows": 1
+            },
+            {
+              "value": "Boxed Games",
+              "rows": 1
+            },
+            {
+              "value": "Camcorders",
+              "rows": 1
+            },
+            {
+              "value": "Cameras & Camcorders Accessories",
+              "rows": 1
+            },
+            {
+              "value": "Car Video",
+              "rows": 1
+            },
+            {
+              "value": "Cell phones Accessories",
+              "rows": 1
+            },
+            {
+              "value": "Coffee Machines",
+              "rows": 1
+            },
+            {
+              "value": "Computer Setup & Service",
+              "rows": 1
+            },
+            {
+              "value": "Computers Accessories",
+              "rows": 1
+            },
+            {
+              "value": "Desktops",
+              "rows": 1
+            },
+            {
+              "value": "Digital Cameras",
+              "rows": 1
+            },
+            {
+              "value": "Digital SLR Cameras",
+              "rows": 1
+            },
+            {
+              "value": "Download Games",
+              "rows": 1
+            },
+            {
+              "value": "Fans",
+              "rows": 1
+            },
+            {
+              "value": "Film Cameras",
+              "rows": 1
+            },
+            {
+              "value": "Games Accessories",
+              "rows": 1
+            },
+            {
+              "value": "Headphones",
+              "rows": 1
+            },
+            {
+              "value": "Home & Office Phones",
+              "rows": 1
+            },
+            {
+              "value": "Home Theater System",
+              "rows": 1
+            },
+            {
+              "value": "Lamps",
+              "rows": 1
+            },
+            {
+              "value": "Laptops",
+              "rows": 1
+            },
+            {
+              "value": "MP4&MP3",
+              "rows": 1
+            },
+            {
+              "value": "Microwaves",
+              "rows": 1
+            },
+            {
+              "value": "Monitors",
+              "rows": 1
+            },
+            {
+              "value": "Movie DVD",
+              "rows": 1
+            },
+            {
+              "value": "Music CD",
+              "rows": 1
+            },
+            {
+              "value": "Netbooks",
+              "rows": 1
+            },
+            {
+              "value": "Printers, Scanners & Fax",
+              "rows": 1
+            },
+            {
+              "value": "Projectors & Screens",
+              "rows": 1
+            },
+            {
+              "value": "Radio",
+              "rows": 1
+            },
+            {
+              "value": "Recorder",
+              "rows": 1
+            },
+            {
+              "value": "Recording Pen",
+              "rows": 1
+            },
+            {
+              "value": "Refrigerators",
+              "rows": 1
+            },
+            {
+              "value": "Smart phones & PDAs",
+              "rows": 1
+            },
+            {
+              "value": "Speakers",
+              "rows": 1
+            },
+            {
+              "value": "TV & Video Accessories",
+              "rows": 1
+            },
+            {
+              "value": "Televisions",
+              "rows": 1
+            },
+            {
+              "value": "Touch Screen Phones",
+              "rows": 1
+            },
+            {
+              "value": "VCD & DVD",
+              "rows": 1
+            },
+            {
+              "value": "Washers & Dryers",
+              "rows": 1
+            },
+            {
+              "value": "Water Heaters",
+              "rows": 1
+            }
+          ]
+        },
+        "ProductCategoryKey": {
+          "type": "Int32",
+          "distinct": 8,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "8",
+          "values": [
+            {
+              "value": "1",
+              "rows": 8
+            },
+            {
+              "value": "2",
+              "rows": 5
+            },
+            {
+              "value": "3",
+              "rows": 8
+            },
+            {
+              "value": "4",
+              "rows": 5
+            },
+            {
+              "value": "5",
+              "rows": 4
+            },
+            {
+              "value": "6",
+              "rows": 3
+            },
+            {
+              "value": "7",
+              "rows": 3
+            },
+            {
+              "value": "8",
+              "rows": 8
+            }
+          ]
+        }
+      }
+    },
+    "DimPromotion": {
+      "rows": 28,
+      "columns": {
+        "PromotionKey": {
+          "type": "Int32",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "28",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 1
+            },
+            {
+              "value": "4",
+              "rows": 1
+            },
+            {
+              "value": "5",
+              "rows": 1
+            },
+            {
+              "value": "6",
+              "rows": 1
+            },
+            {
+              "value": "7",
+              "rows": 1
+            },
+            {
+              "value": "8",
+              "rows": 1
+            },
+            {
+              "value": "9",
+              "rows": 1
+            },
+            {
+              "value": "10",
+              "rows": 1
+            },
+            {
+              "value": "11",
+              "rows": 1
+            },
+            {
+              "value": "12",
+              "rows": 1
+            },
+            {
+              "value": "13",
+              "rows": 1
+            },
+            {
+              "value": "14",
+              "rows": 1
+            },
+            {
+              "value": "15",
+              "rows": 1
+            },
+            {
+              "value": "16",
+              "rows": 1
+            },
+            {
+              "value": "17",
+              "rows": 1
+            },
+            {
+              "value": "18",
+              "rows": 1
+            },
+            {
+              "value": "19",
+              "rows": 1
+            },
+            {
+              "value": "20",
+              "rows": 1
+            },
+            {
+              "value": "21",
+              "rows": 1
+            },
+            {
+              "value": "22",
+              "rows": 1
+            },
+            {
+              "value": "23",
+              "rows": 1
+            },
+            {
+              "value": "24",
+              "rows": 1
+            },
+            {
+              "value": "25",
+              "rows": 1
+            },
+            {
+              "value": "26",
+              "rows": 1
+            },
+            {
+              "value": "27",
+              "rows": 1
+            },
+            {
+              "value": "28",
+              "rows": 1
+            }
+          ]
+        },
+        "PromotionName": {
+          "type": "String",
+          "distinct": 10,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Asian Holiday Promotion",
+              "rows": 3
+            },
+            {
+              "value": "Asian Spring Promotion",
+              "rows": 3
+            },
+            {
+              "value": "Asian Summer Promotion",
+              "rows": 3
+            },
+            {
+              "value": "European Back-to-Scholl Promotion",
+              "rows": 3
+            },
+            {
+              "value": "European Holiday Promotion",
+              "rows": 3
+            },
+            {
+              "value": "European Spring Promotion",
+              "rows": 3
+            },
+            {
+              "value": "North America Back-to-School Promotion",
+              "rows": 3
+            },
+            {
+              "value": "North America Holiday Promotion",
+              "rows": 3
+            },
+            {
+              "value": "North America Spring Promotion",
+              "rows": 3
+            },
+            {
+              "value": "No Discount",
+              "rows": 1
+            }
+          ]
+        },
+        "DiscountPercent": {
+          "type": "Nullable(Float64)",
+          "distinct": 6,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "0.2",
+          "values": [
+            {
+              "value": "0",
+              "rows": 1
+            },
+            {
+              "value": "0.05",
+              "rows": 3
+            },
+            {
+              "value": "0.07",
+              "rows": 3
+            },
+            {
+              "value": "0.1",
+              "rows": 9
+            },
+            {
+              "value": "0.15",
+              "rows": 3
+            },
+            {
+              "value": "0.2",
+              "rows": 9
+            }
+          ]
+        },
+        "PromotionType": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Seasonal Discount",
+              "rows": 27
+            },
+            {
+              "value": "No Discount",
+              "rows": 1
+            }
+          ]
+        },
+        "PromotionCategory": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Store",
+              "rows": 27
+            },
+            {
+              "value": "No Discount",
+              "rows": 1
+            }
+          ]
+        }
+      }
+    },
+    "DimSalesTerritory": {
+      "rows": 265,
+      "columns": {
+        "SalesTerritoryKey": {
+          "type": "Int32",
+          "distinct": 265,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "274"
+        },
+        "GeographyKey": {
+          "type": "Int32",
+          "distinct": 265,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "424",
+          "max": "952"
+        },
+        "SalesTerritoryName": {
+          "type": "String",
+          "distinct": 265,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Fort Worth",
+            "Queens",
+            "Guangzhou",
+            "Hingham",
+            "Taipei"
+          ]
+        },
+        "SalesTerritoryRegion": {
+          "type": "Nullable(String)",
+          "distinct": 80,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Texas",
+            "Colorado",
+            "Massachusetts",
+            "Washington",
+            "Wisconsin"
+          ]
+        },
+        "SalesTerritoryCountry": {
+          "type": "Nullable(String)",
+          "distinct": 33,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "United States",
+              "rows": 179
+            },
+            {
+              "value": "UK",
+              "rows": 14
+            },
+            {
+              "value": "Germany",
+              "rows": 11
+            },
+            {
+              "value": "France",
+              "rows": 7
+            },
+            {
+              "value": "Japan",
+              "rows": 7
+            },
+            {
+              "value": "Greater China",
+              "rows": 6
+            },
+            {
+              "value": "Canada",
+              "rows": 5
+            },
+            {
+              "value": "Italy",
+              "rows": 5
+            },
+            {
+              "value": "India",
+              "rows": 3
+            },
+            {
+              "value": "Russia",
+              "rows": 3
+            },
+            {
+              "value": "Australia",
+              "rows": 2
+            },
+            {
+              "value": "South Korea",
+              "rows": 2
+            },
+            {
+              "value": "Armenia",
+              "rows": 1
+            },
+            {
+              "value": "Bhutan",
+              "rows": 1
+            },
+            {
+              "value": "Denmark",
+              "rows": 1
+            },
+            {
+              "value": "Greece",
+              "rows": 1
+            },
+            {
+              "value": "Iran",
+              "rows": 1
+            },
+            {
+              "value": "Ireland",
+              "rows": 1
+            },
+            {
+              "value": "Kyrgyzstan",
+              "rows": 1
+            },
+            {
+              "value": "Malta",
+              "rows": 1
+            },
+            {
+              "value": "Pakistan",
+              "rows": 1
+            },
+            {
+              "value": "Poland",
+              "rows": 1
+            },
+            {
+              "value": "Portugal",
+              "rows": 1
+            },
+            {
+              "value": "Romania",
+              "rows": 1
+            },
+            {
+              "value": "Singapore",
+              "rows": 1
+            },
+            {
+              "value": "Slovenia",
+              "rows": 1
+            },
+            {
+              "value": "Spain",
+              "rows": 1
+            },
+            {
+              "value": "Sweden",
+              "rows": 1
+            },
+            {
+              "value": "Switzerland",
+              "rows": 1
+            },
+            {
+              "value": "Syria",
+              "rows": 1
+            },
+            {
+              "value": "Thailand",
+              "rows": 1
+            },
+            {
+              "value": "Turkmenistan",
+              "rows": 1
+            },
+            {
+              "value": "the Netherlands",
+              "rows": 1
+            }
+          ]
+        },
+        "SalesTerritoryGroup": {
+          "type": "Nullable(String)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "North America",
+              "rows": 184
+            },
+            {
+              "value": "Europe",
+              "rows": 52
+            },
+            {
+              "value": "Asia",
+              "rows": 29
+            }
+          ]
+        },
+        "SalesTerritoryLevel": {
+          "type": "Nullable(String)",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "4",
+              "rows": 265
+            }
+          ]
+        },
+        "SalesTerritoryManager": {
+          "type": "Nullable(String)",
+          "distinct": 264,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "66",
+            "122",
+            "130",
+            "138",
+            "180"
+          ]
+        },
+        "Status": {
+          "type": "Nullable(String)",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Current",
+              "rows": 265
+            }
+          ]
+        },
+        "EmployeeKey": {
+          "type": "Nullable(Float64)",
+          "distinct": 264,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "14",
+          "max": "296"
+        }
+      }
+    },
+    "DimScenario": {
+      "rows": 3,
+      "columns": {
+        "ScenarioKey": {
+          "type": "Int32",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "3",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1
+            },
+            {
+              "value": "2",
+              "rows": 1
+            },
+            {
+              "value": "3",
+              "rows": 1
+            }
+          ]
+        },
+        "ScenarioName": {
+          "type": "String",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Actual",
+              "rows": 1
+            },
+            {
+              "value": "Budget",
+              "rows": 1
+            },
+            {
+              "value": "Forecast",
+              "rows": 1
+            }
+          ]
+        }
+      }
+    },
+    "DimStore": {
+      "rows": 306,
+      "columns": {
+        "StoreKey": {
+          "type": "Int32",
+          "distinct": 306,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "310"
+        },
+        "GeographyKey": {
+          "type": "Int32",
+          "distinct": 263,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "424",
+          "max": "952"
+        },
+        "StoreManager": {
+          "type": "Nullable(String)",
+          "distinct": 262,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "88",
+            "75",
+            "292",
+            "65",
+            "35"
+          ]
+        },
+        "StoreType": {
+          "type": "Nullable(String)",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Store",
+              "rows": 299
+            },
+            {
+              "value": "Online",
+              "rows": 3
+            },
+            {
+              "value": "Reseller",
+              "rows": 3
+            },
+            {
+              "value": "Catalog",
+              "rows": 1
+            }
+          ]
+        },
+        "StoreName": {
+          "type": "String",
+          "distinct": 306,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "Contoso Alexandria Store",
+            "Contoso Damascus No.1 Store",
+            "Contoso Attleboro Store",
+            "Contoso Tokyo No.1 Store",
+            "Contoso Berlin Store"
+          ]
+        },
+        "Status": {
+          "type": "Nullable(String)",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "On",
+              "rows": 294
+            },
+            {
+              "value": "Off",
+              "rows": 12
+            }
+          ]
+        },
+        "OpenDate": {
+          "type": "Nullable(String)",
+          "distinct": 165,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2004-02-18",
+            "2004-07-02",
+            "2004-04-20",
+            "2004-02-19",
+            "2004-08-25"
+          ]
+        },
+        "CloseDate": {
+          "type": "Nullable(String)",
+          "distinct": 8,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "2090-12-31",
+              "rows": 294
+            },
+            {
+              "value": "2009-07-12",
+              "rows": 5
+            },
+            {
+              "value": "2009-05-12",
+              "rows": 2
+            },
+            {
+              "value": "2008-09-22",
+              "rows": 1
+            },
+            {
+              "value": "2008-12-12",
+              "rows": 1
+            },
+            {
+              "value": "2009-02-12",
+              "rows": 1
+            },
+            {
+              "value": "2009-04-12",
+              "rows": 1
+            },
+            {
+              "value": "2009-07-02",
+              "rows": 1
+            }
+          ]
+        },
+        "EntityKey": {
+          "type": "Nullable(Float64)",
+          "distinct": 306,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "58",
+          "max": "949"
+        },
+        "StorePhone": {
+          "type": "Nullable(String)",
+          "distinct": 295,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "1 (11) 500 555-",
+            "210-555-0193",
+            "612-555-0100",
+            "208-555-0114",
+            "913-555-0172"
+          ]
+        },
+        "StoreFax": {
+          "type": "Nullable(String)",
+          "distinct": 295,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "1 (11) 500 555",
+            "210-555-0193",
+            "612-555-0100",
+            "913-555-0172",
+            "208-555-0114"
+          ]
+        },
+        "CloseReason": {
+          "type": "Nullable(String)",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Not Yet Closed",
+              "rows": 294
+            },
+            {
+              "value": "Relocation",
+              "rows": 10
+            },
+            {
+              "value": "Store",
+              "rows": 2
+            }
+          ]
+        },
+        "EmployeeCount": {
+          "type": "Nullable(Float64)",
+          "distinct": 46,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "7",
+          "max": "325",
+          "values": [
+            {
+              "value": "7",
+              "rows": 1
+            },
+            {
+              "value": "8",
+              "rows": 1
+            },
+            {
+              "value": "10",
+              "rows": 1
+            },
+            {
+              "value": "11",
+              "rows": 3
+            },
+            {
+              "value": "12",
+              "rows": 2
+            },
+            {
+              "value": "13",
+              "rows": 3
+            },
+            {
+              "value": "15",
+              "rows": 7
+            },
+            {
+              "value": "17",
+              "rows": 29
+            },
+            {
+              "value": "18",
+              "rows": 2
+            },
+            {
+              "value": "19",
+              "rows": 26
+            },
+            {
+              "value": "20",
+              "rows": 1
+            },
+            {
+              "value": "21",
+              "rows": 1
+            },
+            {
+              "value": "22",
+              "rows": 25
+            },
+            {
+              "value": "23",
+              "rows": 3
+            },
+            {
+              "value": "24",
+              "rows": 3
+            },
+            {
+              "value": "25",
+              "rows": 42
+            },
+            {
+              "value": "26",
+              "rows": 33
+            },
+            {
+              "value": "27",
+              "rows": 1
+            },
+            {
+              "value": "28",
+              "rows": 2
+            },
+            {
+              "value": "29",
+              "rows": 2
+            },
+            {
+              "value": "32",
+              "rows": 2
+            },
+            {
+              "value": "33",
+              "rows": 27
+            },
+            {
+              "value": "34",
+              "rows": 1
+            },
+            {
+              "value": "35",
+              "rows": 8
+            },
+            {
+              "value": "36",
+              "rows": 2
+            },
+            {
+              "value": "42",
+              "rows": 1
+            },
+            {
+              "value": "43",
+              "rows": 1
+            },
+            {
+              "value": "45",
+              "rows": 1
+            },
+            {
+              "value": "47",
+              "rows": 25
+            },
+            {
+              "value": "50",
+              "rows": 7
+            },
+            {
+              "value": "53",
+              "rows": 1
+            },
+            {
+              "value": "55",
+              "rows": 1
+            },
+            {
+              "value": "62",
+              "rows": 1
+            },
+            {
+              "value": "64",
+              "rows": 1
+            },
+            {
+              "value": "65",
+              "rows": 1
+            },
+            {
+              "value": "68",
+              "rows": 3
+            },
+            {
+              "value": "71",
+              "rows": 1
+            },
+            {
+              "value": "77",
+              "rows": 1
+            },
+            {
+              "value": "78",
+              "rows": 1
+            },
+            {
+              "value": "80",
+              "rows": 1
+            },
+            {
+              "value": "86",
+              "rows": 1
+            },
+            {
+              "value": "90",
+              "rows": 1
+            },
+            {
+              "value": "95",
+              "rows": 26
+            },
+            {
+              "value": "120",
+              "rows": 1
+            },
+            {
+              "value": "131",
+              "rows": 1
+            },
+            {
+              "value": "325",
+              "rows": 1
+            }
+          ]
+        },
+        "SellingAreaSize": {
+          "type": "Nullable(Float64)",
+          "distinct": 15,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "450",
+          "max": "93800",
+          "values": [
+            {
+              "value": "450",
+              "rows": 1
+            },
+            {
+              "value": "455",
+              "rows": 26
+            },
+            {
+              "value": "460",
+              "rows": 10
+            },
+            {
+              "value": "462",
+              "rows": 19
+            },
+            {
+              "value": "480",
+              "rows": 54
+            },
+            {
+              "value": "490",
+              "rows": 1
+            },
+            {
+              "value": "500",
+              "rows": 42
+            },
+            {
+              "value": "551",
+              "rows": 1
+            },
+            {
+              "value": "560",
+              "rows": 26
+            },
+            {
+              "value": "630",
+              "rows": 1
+            },
+            {
+              "value": "680",
+              "rows": 60
+            },
+            {
+              "value": "700",
+              "rows": 37
+            },
+            {
+              "value": "1000",
+              "rows": 1
+            },
+            {
+              "value": "1125",
+              "rows": 25
+            },
+            {
+              "value": "93800",
+              "rows": 2
+            }
+          ]
+        },
+        "LastRemodelDate": {
+          "type": "Nullable(String)",
+          "distinct": 29,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "2009-06-17 00:00:00",
+              "rows": 111
+            },
+            {
+              "value": "2009-06-16 00:00:00",
+              "rows": 107
+            },
+            {
+              "value": "2009-06-18 00:00:00",
+              "rows": 61
+            },
+            {
+              "value": "2008-06-05 00:00:00",
+              "rows": 2
+            },
+            {
+              "value": "2008-11-05 00:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 01:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 02:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 03:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 04:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 05:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 06:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 07:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 08:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 09:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 10:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 11:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 12:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 13:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 14:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 15:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 16:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 17:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 18:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 19:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 20:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 21:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-18 22:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-19 00:00:00",
+              "rows": 1
+            },
+            {
+              "value": "2009-06-20 00:00:00",
+              "rows": 1
+            }
+          ]
+        },
+        "EmployeeKey": {
+          "type": "Nullable(Float64)",
+          "distinct": 262,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "14",
+          "max": "296"
+        }
+      }
+    },
+    "FactExchangeRate": {
+      "rows": 773,
+      "columns": {
+        "ExchangeRateKey": {
+          "type": "Int32",
+          "distinct": 773,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "774"
+        },
+        "CurrencyKey": {
+          "type": "Int32",
+          "distinct": 25,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "26",
+          "values": [
+            {
+              "value": "1",
+              "rows": 31
+            },
+            {
+              "value": "2",
+              "rows": 31
+            },
+            {
+              "value": "3",
+              "rows": 31
+            },
+            {
+              "value": "4",
+              "rows": 31
+            },
+            {
+              "value": "5",
+              "rows": 31
+            },
+            {
+              "value": "6",
+              "rows": 31
+            },
+            {
+              "value": "7",
+              "rows": 31
+            },
+            {
+              "value": "8",
+              "rows": 31
+            },
+            {
+              "value": "9",
+              "rows": 31
+            },
+            {
+              "value": "10",
+              "rows": 31
+            },
+            {
+              "value": "11",
+              "rows": 31
+            },
+            {
+              "value": "12",
+              "rows": 31
+            },
+            {
+              "value": "13",
+              "rows": 31
+            },
+            {
+              "value": "15",
+              "rows": 31
+            },
+            {
+              "value": "16",
+              "rows": 31
+            },
+            {
+              "value": "17",
+              "rows": 31
+            },
+            {
+              "value": "18",
+              "rows": 31
+            },
+            {
+              "value": "19",
+              "rows": 31
+            },
+            {
+              "value": "20",
+              "rows": 31
+            },
+            {
+              "value": "21",
+              "rows": 31
+            },
+            {
+              "value": "22",
+              "rows": 31
+            },
+            {
+              "value": "23",
+              "rows": 30
+            },
+            {
+              "value": "24",
+              "rows": 30
+            },
+            {
+              "value": "25",
+              "rows": 31
+            },
+            {
+              "value": "26",
+              "rows": 31
+            }
+          ]
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 31,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-01",
+          "max": "2009-07-01"
+        },
+        "AverageRate": {
+          "type": "Float64",
+          "distinct": 638,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.21338",
+          "max": "10114.86"
+        },
+        "EndOfDayRate": {
+          "type": "Float64",
+          "distinct": 609,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.2885",
+          "max": "10199"
+        }
+      }
+    },
+    "FactITMachine": {
+      "rows": 23283,
+      "columns": {
+        "ITMachinekey": {
+          "type": "Int32",
+          "distinct": 23283,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "23283"
+        },
+        "MachineKey": {
+          "type": "Int32",
+          "distinct": 7816,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "7816"
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-01",
+          "max": "2009-01-01"
+        },
+        "CostAmount": {
+          "type": "Float64",
+          "distinct": 23,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "390",
+          "max": "18499",
+          "values": [
+            {
+              "value": "390",
+              "rows": 102
+            },
+            {
+              "value": "400",
+              "rows": 73
+            },
+            {
+              "value": "500",
+              "rows": 2679
+            },
+            {
+              "value": "700",
+              "rows": 2679
+            },
+            {
+              "value": "900",
+              "rows": 102
+            },
+            {
+              "value": "975",
+              "rows": 46
+            },
+            {
+              "value": "1095",
+              "rows": 73
+            },
+            {
+              "value": "1200",
+              "rows": 2679
+            },
+            {
+              "value": "1425",
+              "rows": 102
+            },
+            {
+              "value": "12600",
+              "rows": 460
+            },
+            {
+              "value": "13470",
+              "rows": 1060
+            },
+            {
+              "value": "13550",
+              "rows": 460
+            },
+            {
+              "value": "13700",
+              "rows": 346
+            },
+            {
+              "value": "14820",
+              "rows": 10
+            },
+            {
+              "value": "14930",
+              "rows": 3040
+            },
+            {
+              "value": "15335",
+              "rows": 1060
+            },
+            {
+              "value": "15632",
+              "rows": 3040
+            },
+            {
+              "value": "15777",
+              "rows": 10
+            },
+            {
+              "value": "16300",
+              "rows": 346
+            },
+            {
+              "value": "16553",
+              "rows": 460
+            },
+            {
+              "value": "16600",
+              "rows": 1060
+            },
+            {
+              "value": "17700",
+              "rows": 356
+            },
+            {
+              "value": "18499",
+              "rows": 3040
+            }
+          ]
+        },
+        "CostType": {
+          "type": "String",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "values": [
+            {
+              "value": "Annual Maintenance Cost",
+              "rows": 23062
+            },
+            {
+              "value": "Equipment Costs",
+              "rows": 221
+            }
+          ]
+        }
+      }
+    },
+    "FactITSLA": {
+      "rows": 4925,
+      "columns": {
+        "ITSLAkey": {
+          "type": "Int32",
+          "distinct": 4925,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "4925"
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 1046,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-01",
+          "max": "2009-12-31"
+        },
+        "StoreKey": {
+          "type": "Int32",
+          "distinct": 299,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "307"
+        },
+        "MachineKey": {
+          "type": "Int32",
+          "distinct": 2553,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2",
+          "max": "7808"
+        },
+        "OutageKey": {
+          "type": "Int32",
+          "distinct": 294,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "293",
+          "max": "595"
+        },
+        "OutageStartTime": {
+          "type": "Nullable(String)",
+          "distinct": 4915,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2008-03-12 05:15:00",
+            "2008-09-08 04:24:00",
+            "2007-05-18 06:31:00",
+            "2008-07-09 07:28:00",
+            "2009-05-12 02:15:00"
+          ]
+        },
+        "OutageEndTime": {
+          "type": "Nullable(String)",
+          "distinct": 4908,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "2009-06-20 16:22:00",
+            "2008-12-24 21:31:00",
+            "2008-08-23 20:19:00",
+            "2008-12-29 08:32:00",
+            "2009-05-27 17:05:00"
+          ]
+        },
+        "DownTime": {
+          "type": "Nullable(Float64)",
+          "distinct": 364,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "1433"
+        }
+      }
+    },
+    "FactInventory": {
+      "rows": 8013099,
+      "columns": {
+        "InventoryKey": {
+          "type": "Int32",
+          "distinct": 8013099,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "8013099"
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 156,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-06",
+          "max": "2009-12-26"
+        },
+        "StoreKey": {
+          "type": "Int32",
+          "distinct": 306,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "310"
+        },
+        "ProductKey": {
+          "type": "Int32",
+          "distinct": 2516,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "2517"
+        },
+        "CurrencyKey": {
+          "type": "Int32",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "1",
+          "values": [
+            {
+              "value": "1",
+              "rows": 8013099
+            }
+          ]
+        },
+        "OnHandQuantity": {
+          "type": "Int32",
+          "distinct": 1541,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "5517"
+        },
+        "OnOrderQuantity": {
+          "type": "Int32",
+          "distinct": 810,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "2770"
+        },
+        "SafetyStockQuantity": {
+          "type": "Int32",
+          "distinct": 483,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "3",
+          "max": "3228"
+        },
+        "UnitCost": {
+          "type": "Float64",
+          "distinct": 480,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.48",
+          "max": "1060.22"
+        },
+        "DaysInStock": {
+          "type": "Nullable(Float64)",
+          "distinct": 115,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "5",
+          "max": "119"
+        },
+        "MinDayInStock": {
+          "type": "Nullable(Float64)",
+          "distinct": 55,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "5",
+          "max": "59"
+        },
+        "MaxDayInStock": {
+          "type": "Nullable(Float64)",
+          "distinct": 60,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "60",
+          "max": "119"
+        },
+        "Aging": {
+          "type": "Nullable(Float64)",
+          "distinct": 7,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "7",
+          "values": [
+            {
+              "value": "1",
+              "rows": 121
+            },
+            {
+              "value": "2",
+              "rows": 943
+            },
+            {
+              "value": "3",
+              "rows": 18037
+            },
+            {
+              "value": "4",
+              "rows": 9960
+            },
+            {
+              "value": "5",
+              "rows": 362428
+            },
+            {
+              "value": "6",
+              "rows": 2357475
+            },
+            {
+              "value": "7",
+              "rows": 5264135
+            }
+          ]
+        }
+      }
+    },
+    "FactOnlineSales": {
+      "rows": 12627608,
+      "columns": {
+        "OnlineSalesKey": {
+          "type": "Int64",
+          "distinct": 12627608,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "19560484",
+          "max": "32188091"
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 1096,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-01",
+          "max": "2009-12-31"
+        },
+        "StoreKey": {
+          "type": "Int32",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "199",
+          "max": "307",
+          "values": [
+            {
+              "value": "199",
+              "rows": 4645792
+            },
+            {
+              "value": "306",
+              "rows": 3847281
+            },
+            {
+              "value": "307",
+              "rows": 4134535
+            }
+          ]
+        },
+        "ProductKey": {
+          "type": "Int32",
+          "distinct": 2516,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "2517"
+        },
+        "PromotionKey": {
+          "type": "Int32",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "28",
+          "values": [
+            {
+              "value": "1",
+              "rows": 3899892
+            },
+            {
+              "value": "2",
+              "rows": 391375
+            },
+            {
+              "value": "3",
+              "rows": 415119
+            },
+            {
+              "value": "4",
+              "rows": 284483
+            },
+            {
+              "value": "5",
+              "rows": 407124
+            },
+            {
+              "value": "6",
+              "rows": 221509
+            },
+            {
+              "value": "7",
+              "rows": 199501
+            },
+            {
+              "value": "8",
+              "rows": 412848
+            },
+            {
+              "value": "9",
+              "rows": 189706
+            },
+            {
+              "value": "10",
+              "rows": 459408
+            },
+            {
+              "value": "11",
+              "rows": 248253
+            },
+            {
+              "value": "12",
+              "rows": 371207
+            },
+            {
+              "value": "13",
+              "rows": 268960
+            },
+            {
+              "value": "14",
+              "rows": 409501
+            },
+            {
+              "value": "15",
+              "rows": 250752
+            },
+            {
+              "value": "16",
+              "rows": 225364
+            },
+            {
+              "value": "17",
+              "rows": 309133
+            },
+            {
+              "value": "18",
+              "rows": 176053
+            },
+            {
+              "value": "19",
+              "rows": 325569
+            },
+            {
+              "value": "20",
+              "rows": 336441
+            },
+            {
+              "value": "21",
+              "rows": 489743
+            },
+            {
+              "value": "22",
+              "rows": 343276
+            },
+            {
+              "value": "23",
+              "rows": 370997
+            },
+            {
+              "value": "24",
+              "rows": 358538
+            },
+            {
+              "value": "25",
+              "rows": 327442
+            },
+            {
+              "value": "26",
+              "rows": 370337
+            },
+            {
+              "value": "27",
+              "rows": 240468
+            },
+            {
+              "value": "28",
+              "rows": 324609
+            }
+          ]
+        },
+        "CurrencyKey": {
+          "type": "Int32",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "1",
+          "values": [
+            {
+              "value": "1",
+              "rows": 12627608
+            }
+          ]
+        },
+        "CustomerKey": {
+          "type": "Int32",
+          "distinct": 18869,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "19145"
+        },
+        "SalesOrderNumber": {
+          "type": "String",
+          "distinct": 1674320,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "top_values": [
+            "200912105CS943",
+            "200905145CS713",
+            "200911175CS932",
+            "200906175CS751",
+            "200911015CS729"
+          ]
+        },
+        "SalesOrderLineNumber": {
+          "type": "Int32",
+          "distinct": 4972,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "4972"
+        },
+        "SalesQuantity": {
+          "type": "Int32",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "1",
+          "values": [
+            {
+              "value": "0",
+              "rows": 100166
+            },
+            {
+              "value": "1",
+              "rows": 12527442
+            }
+          ]
+        },
+        "SalesAmount": {
+          "type": "Float64",
+          "distinct": 2470,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "3199.99"
+        },
+        "ReturnQuantity": {
+          "type": "Int32",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "1",
+          "values": [
+            {
+              "value": "0",
+              "rows": 12527442
+            },
+            {
+              "value": "1",
+              "rows": 100166
+            }
+          ]
+        },
+        "ReturnAmount": {
+          "type": "Float64",
+          "distinct": 2447,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "3199.99"
+        },
+        "DiscountQuantity": {
+          "type": "Int32",
+          "distinct": 2,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "1",
+          "values": [
+            {
+              "value": "0",
+              "rows": 3899892
+            },
+            {
+              "value": "1",
+              "rows": 8727716
+            }
+          ]
+        },
+        "DiscountAmount": {
+          "type": "Float64",
+          "distinct": 1906,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "639.998"
+        },
+        "TotalCost": {
+          "type": "Float64",
+          "distinct": 481,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.48",
+          "max": "1060.22"
+        },
+        "UnitCost": {
+          "type": "Float64",
+          "distinct": 480,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.48",
+          "max": "1060.22"
+        },
+        "UnitPrice": {
+          "type": "Float64",
+          "distinct": 426,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.95",
+          "max": "3199.99"
+        }
+      }
+    },
+    "FactSales": {
+      "rows": 3406089,
+      "columns": {
+        "SalesKey": {
+          "type": "Int64",
+          "distinct": 3406089,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "3406089"
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 1096,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-01",
+          "max": "2009-12-31"
+        },
+        "channelKey": {
+          "type": "Int32",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "4",
+          "values": [
+            {
+              "value": "1",
+              "rows": 2173872
+            },
+            {
+              "value": "2",
+              "rows": 629223
+            },
+            {
+              "value": "3",
+              "rows": 194976
+            },
+            {
+              "value": "4",
+              "rows": 408018
+            }
+          ]
+        },
+        "StoreKey": {
+          "type": "Int32",
+          "distinct": 306,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "310"
+        },
+        "ProductKey": {
+          "type": "Int32",
+          "distinct": 2516,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "2517"
+        },
+        "PromotionKey": {
+          "type": "Int32",
+          "distinct": 28,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "28",
+          "values": [
+            {
+              "value": "1",
+              "rows": 1166300
+            },
+            {
+              "value": "2",
+              "rows": 201246
+            },
+            {
+              "value": "3",
+              "rows": 199968
+            },
+            {
+              "value": "4",
+              "rows": 137721
+            },
+            {
+              "value": "5",
+              "rows": 69829
+            },
+            {
+              "value": "6",
+              "rows": 52641
+            },
+            {
+              "value": "7",
+              "rows": 36286
+            },
+            {
+              "value": "8",
+              "rows": 80329
+            },
+            {
+              "value": "9",
+              "rows": 55515
+            },
+            {
+              "value": "10",
+              "rows": 132984
+            },
+            {
+              "value": "11",
+              "rows": 150031
+            },
+            {
+              "value": "12",
+              "rows": 154272
+            },
+            {
+              "value": "13",
+              "rows": 102644
+            },
+            {
+              "value": "14",
+              "rows": 58931
+            },
+            {
+              "value": "15",
+              "rows": 57652
+            },
+            {
+              "value": "16",
+              "rows": 37263
+            },
+            {
+              "value": "17",
+              "rows": 47284
+            },
+            {
+              "value": "18",
+              "rows": 35343
+            },
+            {
+              "value": "19",
+              "rows": 65275
+            },
+            {
+              "value": "20",
+              "rows": 112819
+            },
+            {
+              "value": "21",
+              "rows": 119447
+            },
+            {
+              "value": "22",
+              "rows": 79349
+            },
+            {
+              "value": "23",
+              "rows": 42235
+            },
+            {
+              "value": "24",
+              "rows": 58693
+            },
+            {
+              "value": "25",
+              "rows": 39880
+            },
+            {
+              "value": "26",
+              "rows": 38115
+            },
+            {
+              "value": "27",
+              "rows": 28958
+            },
+            {
+              "value": "28",
+              "rows": 45079
+            }
+          ]
+        },
+        "CurrencyKey": {
+          "type": "Int32",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "1",
+          "values": [
+            {
+              "value": "1",
+              "rows": 3406089
+            }
+          ]
+        },
+        "UnitCost": {
+          "type": "Float64",
+          "distinct": 480,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.48",
+          "max": "1060.22"
+        },
+        "UnitPrice": {
+          "type": "Float64",
+          "distinct": 426,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.95",
+          "max": "3199.99"
+        },
+        "SalesQuantity": {
+          "type": "Int32",
+          "distinct": 139,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2",
+          "max": "2880"
+        },
+        "ReturnQuantity": {
+          "type": "Int32",
+          "distinct": 6,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "5",
+          "values": [
+            {
+              "value": "0",
+              "rows": 2925146
+            },
+            {
+              "value": "1",
+              "rows": 468730
+            },
+            {
+              "value": "2",
+              "rows": 11807
+            },
+            {
+              "value": "3",
+              "rows": 382
+            },
+            {
+              "value": "4",
+              "rows": 23
+            },
+            {
+              "value": "5",
+              "rows": 1
+            }
+          ]
+        },
+        "ReturnAmount": {
+          "type": "Float64",
+          "distinct": 977,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "9996"
+        },
+        "DiscountQuantity": {
+          "type": "Int32",
+          "distinct": 25,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "24",
+          "values": [
+            {
+              "value": "0",
+              "rows": 1612977
+            },
+            {
+              "value": "1",
+              "rows": 398997
+            },
+            {
+              "value": "2",
+              "rows": 408077
+            },
+            {
+              "value": "3",
+              "rows": 419529
+            },
+            {
+              "value": "4",
+              "rows": 430871
+            },
+            {
+              "value": "5",
+              "rows": 43543
+            },
+            {
+              "value": "6",
+              "rows": 34973
+            },
+            {
+              "value": "7",
+              "rows": 26040
+            },
+            {
+              "value": "8",
+              "rows": 16603
+            },
+            {
+              "value": "9",
+              "rows": 5680
+            },
+            {
+              "value": "10",
+              "rows": 3946
+            },
+            {
+              "value": "11",
+              "rows": 2391
+            },
+            {
+              "value": "12",
+              "rows": 1285
+            },
+            {
+              "value": "13",
+              "rows": 505
+            },
+            {
+              "value": "14",
+              "rows": 335
+            },
+            {
+              "value": "15",
+              "rows": 170
+            },
+            {
+              "value": "16",
+              "rows": 83
+            },
+            {
+              "value": "17",
+              "rows": 41
+            },
+            {
+              "value": "18",
+              "rows": 11
+            },
+            {
+              "value": "19",
+              "rows": 16
+            },
+            {
+              "value": "20",
+              "rows": 6
+            },
+            {
+              "value": "21",
+              "rows": 4
+            },
+            {
+              "value": "22",
+              "rows": 3
+            },
+            {
+              "value": "23",
+              "rows": 1
+            },
+            {
+              "value": "24",
+              "rows": 2
+            }
+          ]
+        },
+        "DiscountAmount": {
+          "type": "Float64",
+          "distinct": 10739,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0",
+          "max": "7958.7"
+        },
+        "TotalCost": {
+          "type": "Float64",
+          "distinct": 17221,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1.92",
+          "max": "137117.76"
+        },
+        "SalesAmount": {
+          "type": "Float64",
+          "distinct": 68708,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "3.04",
+          "max": "408016.02"
+        }
+      }
+    },
+    "FactSalesQuota": {
+      "rows": 7465911,
+      "columns": {
+        "SalesQuotaKey": {
+          "type": "Int32",
+          "distinct": 7465911,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "7465911"
+        },
+        "ChannelKey": {
+          "type": "Int32",
+          "distinct": 4,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "4",
+          "values": [
+            {
+              "value": "1",
+              "rows": 6086478
+            },
+            {
+              "value": "2",
+              "rows": 617448
+            },
+            {
+              "value": "3",
+              "rows": 206361
+            },
+            {
+              "value": "4",
+              "rows": 555624
+            }
+          ]
+        },
+        "StoreKey": {
+          "type": "Int32",
+          "distinct": 306,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "310"
+        },
+        "ProductKey": {
+          "type": "Int32",
+          "distinct": 2516,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "2517"
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 36,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-01",
+          "max": "2009-12-01"
+        },
+        "CurrencyKey": {
+          "type": "Int32",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "1",
+          "values": [
+            {
+              "value": "1",
+              "rows": 7465911
+            }
+          ]
+        },
+        "ScenarioKey": {
+          "type": "Int32",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "3",
+          "values": [
+            {
+              "value": "1",
+              "rows": 2488637
+            },
+            {
+              "value": "2",
+              "rows": 2488637
+            },
+            {
+              "value": "3",
+              "rows": 2488637
+            }
+          ]
+        },
+        "SalesQuantityQuota": {
+          "type": "Nullable(Float64)",
+          "distinct": 1101,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "6264"
+        },
+        "SalesAmountQuota": {
+          "type": "Nullable(Float64)",
+          "distinct": 613799,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2.9684",
+          "max": "1142709.2197"
+        },
+        "GrossMarginQuota": {
+          "type": "Nullable(Float64)",
+          "distinct": 944795,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "-1620.9545",
+          "max": "736727.1041"
+        }
+      }
+    },
+    "FactStrategyPlan": {
+      "rows": 2750628,
+      "columns": {
+        "StrategyPlanKey": {
+          "type": "Int32",
+          "distinct": 2750628,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "3181386"
+        },
+        "DateKey": {
+          "type": "Date",
+          "distinct": 36,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "2007-01-01",
+          "max": "2009-12-01"
+        },
+        "EntityKey": {
+          "type": "Int32",
+          "distinct": 306,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "58",
+          "max": "949"
+        },
+        "ScenarioKey": {
+          "type": "Int32",
+          "distinct": 3,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "3",
+          "values": [
+            {
+              "value": "1",
+              "rows": 916876
+            },
+            {
+              "value": "2",
+              "rows": 916876
+            },
+            {
+              "value": "3",
+              "rows": 916876
+            }
+          ]
+        },
+        "AccountKey": {
+          "type": "Int32",
+          "distinct": 17,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "4",
+          "max": "23",
+          "values": [
+            {
+              "value": "4",
+              "rows": 253722
+            },
+            {
+              "value": "5",
+              "rows": 253722
+            },
+            {
+              "value": "7",
+              "rows": 259800
+            },
+            {
+              "value": "8",
+              "rows": 259800
+            },
+            {
+              "value": "9",
+              "rows": 259800
+            },
+            {
+              "value": "10",
+              "rows": 259800
+            },
+            {
+              "value": "11",
+              "rows": 259800
+            },
+            {
+              "value": "12",
+              "rows": 82056
+            },
+            {
+              "value": "15",
+              "rows": 85944
+            },
+            {
+              "value": "16",
+              "rows": 129456
+            },
+            {
+              "value": "17",
+              "rows": 64440
+            },
+            {
+              "value": "18",
+              "rows": 64728
+            },
+            {
+              "value": "19",
+              "rows": 259800
+            },
+            {
+              "value": "20",
+              "rows": 64440
+            },
+            {
+              "value": "21",
+              "rows": 64440
+            },
+            {
+              "value": "22",
+              "rows": 64440
+            },
+            {
+              "value": "23",
+              "rows": 64440
+            }
+          ]
+        },
+        "CurrencyKey": {
+          "type": "Int32",
+          "distinct": 1,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "1",
+          "values": [
+            {
+              "value": "1",
+              "rows": 2750628
+            }
+          ]
+        },
+        "ProductCategoryKey": {
+          "type": "Int32",
+          "distinct": 8,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "1",
+          "max": "8",
+          "values": [
+            {
+              "value": "1",
+              "rows": 343776
+            },
+            {
+              "value": "2",
+              "rows": 344088
+            },
+            {
+              "value": "3",
+              "rows": 345348
+            },
+            {
+              "value": "4",
+              "rows": 344094
+            },
+            {
+              "value": "5",
+              "rows": 344088
+            },
+            {
+              "value": "6",
+              "rows": 343800
+            },
+            {
+              "value": "7",
+              "rows": 341340
+            },
+            {
+              "value": "8",
+              "rows": 344094
+            }
+          ]
+        },
+        "Amount": {
+          "type": "Float64",
+          "distinct": 2042832,
+          "nulls": 0,
+          "null_rate": 0.0,
+          "min": "0.324",
+          "max": "25931992.5114"
+        }
+      }
+    }
+  }
+}

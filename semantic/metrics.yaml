@@ -1,0 +1,626 @@
+# L2 指标清单（可调用的指标）
+#
+# 这一节把 source.yaml 的**文字口径**做成可调用对象：DAX 度量值和 Cube 指标。
+# 按设计规矩 3，这里**只包含 source.yaml 里已有文字口径的指标，不多不少**——
+# L2 与 L1 之差只来自「编码了多少」，不是多写了口径。
+# semantic/schema/validate.py 的第 4 项校验这条（名字集合双向相等、可加性一致）。
+#
+# 每个指标给出：
+#   name          指标名（与 source.yaml 完全一致，是两边的连接键）
+#   definition    文字口径（与 source.yaml 一致；L2 里文字保留为描述）
+#   additivity    可加性：可加 / 比率 / 半可加 / 去重
+#   dax_measure   Power BI 里的度量值名，agent 在 DAX 里写这个名字
+#   cube_member   Cube 里的成员名（<cube>.<measure>），agent 在 SQL 接口里写
+#                 MEASURE(<cube>.<measure>)、在 JSON 接口里写这个名字
+#
+# 实现上的限制（第一期已知，T16 / T17 落地时再处理，不在本卡范围）：
+#   - Cube 不能在指标结果上再算一步，所以「销售额占比」「销售额环比增长率」这类
+#     需要可变分母或时间偏移的指标，在 JSON 接口上可能要由调用方再算一次。
+#   - DAX 的关系模型里两张表之间只能有一条激活的关系，客户地理与门店地理这两条路
+#     不能同时激活（见 source.yaml 的 multi_path_defaults）。
+#   - 跨表指标（目标达成率、目标差异、库存周转率）的分子分母在不同事实表上，
+#     两边的时间粒度要先对齐（目标和计划是月粒度）。
+#
+# 冻结：G1 打 tag `semantic-v1` 之后不得再改。
+
+version: 1
+source: semantic/source.yaml
+naming:
+  dax: "英文方括号名，如 [Sales Amount]；与 Power BI 的习惯一致"
+  cube: "<cube>.<measure> 小写蛇形名，如 sales.sales_amount"
+  cubes: ["sales（全渠道销售）", "online_sales（线上销售）", "product（产品）", "inventory（库存）", "sales_quota（销售目标）", "strategy_plan（战略计划）", "it_machine（IT 成本）", "it_sla（IT 故障）"]
+
+metrics:
+  - name: "销售额"
+    definition: "销售金额合计，已扣折扣、未扣退货（约定 7）。"
+    additivity: 可加
+    dax_measure: "[Sales Amount]"
+    cube_member: "sales.sales_amount"
+    unit: "USD"
+    default_filters:
+      - "未说明渠道时用线上销售（约定 1）；以门店为对象时用全渠道销售（约定 2）"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "销售数量"
+    definition: "销售数量合计。"
+    additivity: 可加
+    dax_measure: "[Sales Quantity]"
+    cube_member: "sales.sales_quantity"
+    unit: "件"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "总成本"
+    definition: "销售行的总成本合计。"
+    additivity: 可加
+    dax_measure: "[Total Cost]"
+    cube_member: "sales.total_cost"
+    unit: "USD"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "平均单价"
+    definition: "销售额 ÷ 销售数量。"
+    additivity: 比率
+    dax_measure: "[Average Unit Price]"
+    cube_member: "sales.average_unit_price"
+    unit: "USD"
+    numerator: "销售额"
+    denominator: "销售数量"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "退货金额"
+    definition: "退货金额合计。"
+    additivity: 可加
+    dax_measure: "[Return Amount]"
+    cube_member: "sales.return_amount"
+    unit: "USD"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "退货数量"
+    definition: "退货数量合计。"
+    additivity: 可加
+    dax_measure: "[Return Quantity]"
+    cube_member: "sales.return_quantity"
+    unit: "件"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "净销售额"
+    definition: "销售金额 − 退货金额（约定 7）。"
+    additivity: 可加
+    dax_measure: "[Net Sales Amount]"
+    cube_member: "sales.net_sales_amount"
+    unit: "USD"
+    numerator: "销售额 − 退货金额"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "退货率"
+    definition: "退货数量 ÷ 销售数量（约定 7）。注意分子分母都是**数量**，不是金额。"
+    additivity: 比率
+    dax_measure: "[Return Rate]"
+    cube_member: "sales.return_rate"
+    numerator: "退货数量"
+    denominator: "销售数量"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "折扣金额"
+    definition: "折扣金额合计。按约定 10，问折扣金额时不计无折扣交易（PromotionKey = 1）。"
+    additivity: 可加
+    dax_measure: "[Discount Amount]"
+    cube_member: "sales.discount_amount"
+    unit: "USD"
+    default_filters:
+      - "PromotionKey != 1（约定 10）"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "折扣数量"
+    definition: "参与折扣的数量合计。"
+    additivity: 可加
+    dax_measure: "[Discount Quantity]"
+    cube_member: "sales.discount_quantity"
+    unit: "件"
+    default_filters:
+      - "PromotionKey != 1（约定 10）"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "折扣前原价"
+    definition: "销售额 + 折扣金额。因为 SalesAmount 已经扣掉折扣，加回折扣就得到折前金额 （全渠道销售 3,406,089 行全部满足 SalesAmount = UnitPrice × SalesQuantity − DiscountAmount）。"
+    additivity: 可加
+    dax_measure: "[List Amount Before Discount]"
+    cube_member: "sales.list_amount_before_discount"
+    unit: "USD"
+    numerator: "销售额 + 折扣金额"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "折扣率"
+    definition: "折扣金额 ÷ 折扣前原价。"
+    additivity: 比率
+    dax_measure: "[Discount Rate]"
+    cube_member: "sales.discount_rate"
+    numerator: "折扣金额"
+    denominator: "折扣前原价"
+    default_filters:
+      - "PromotionKey != 1（约定 10）"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "打折销售额"
+    definition: "促销键不等于 1 的交易的销售额合计（约定 10）。"
+    additivity: 可加
+    dax_measure: "[Discounted Sales Amount]"
+    cube_member: "sales.discounted_sales_amount"
+    unit: "USD"
+    numerator: "销售额，筛 PromotionKey != 1"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "打折销售额占比"
+    definition: "打折销售额 ÷ 销售额（分母含无折扣交易）。"
+    additivity: 比率
+    dax_measure: "[Discounted Sales Share]"
+    cube_member: "sales.discounted_sales_share"
+    numerator: "打折销售额"
+    denominator: "销售额"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "毛利"
+    definition: "销售金额 − 总成本（约定 7）。"
+    additivity: 可加
+    dax_measure: "[Gross Margin]"
+    cube_member: "sales.gross_margin"
+    unit: "USD"
+    numerator: "销售额 − 总成本"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "毛利率"
+    definition: "毛利 ÷ 销售金额（约定 7）。"
+    additivity: 比率
+    dax_measure: "[Gross Margin %]"
+    cube_member: "sales.gross_margin_pct"
+    numerator: "毛利"
+    denominator: "销售额"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  - name: "订单数"
+    definition: "去重的线上订单号个数（约定 8）。"
+    additivity: 去重
+    dax_measure: "[Order Count]"
+    cube_member: "online_sales.order_count"
+    dataset: FactOnlineSales
+
+  - name: "订单行数"
+    definition: "线上销售的行数。"
+    additivity: 可加
+    dax_measure: "[Order Line Count]"
+    cube_member: "online_sales.order_line_count"
+    dataset: FactOnlineSales
+
+  - name: "每单行数"
+    definition: "订单行数 ÷ 订单数。"
+    additivity: 比率
+    dax_measure: "[Lines per Order]"
+    cube_member: "online_sales.lines_per_order"
+    numerator: "订单行数"
+    denominator: "订单数"
+    dataset: FactOnlineSales
+
+  - name: "客单价"
+    definition: "销售额 ÷ 去重订单数（约定 8）。"
+    additivity: 比率
+    dax_measure: "[Average Order Value]"
+    cube_member: "online_sales.average_order_value"
+    unit: "USD"
+    numerator: "销售额"
+    denominator: "订单数"
+    dataset: FactOnlineSales
+
+  - name: "客户数"
+    definition: "去重的客户键个数。"
+    additivity: 去重
+    dax_measure: "[Customer Count]"
+    cube_member: "online_sales.customer_count"
+    dataset: FactOnlineSales
+
+  - name: "客均销售额"
+    definition: "销售额 ÷ 客户数。"
+    additivity: 比率
+    dax_measure: "[Sales per Customer]"
+    cube_member: "online_sales.sales_per_customer"
+    unit: "USD"
+    numerator: "销售额"
+    denominator: "客户数"
+    dataset: FactOnlineSales
+
+  - name: "客均订单数"
+    definition: "订单数 ÷ 客户数。"
+    additivity: 比率
+    dax_measure: "[Orders per Customer]"
+    cube_member: "online_sales.orders_per_customer"
+    numerator: "订单数"
+    denominator: "客户数"
+    dataset: FactOnlineSales
+
+  - name: "客户最近购买月数"
+    definition: "从该客户最后一次购买日到 2009-12-31 的整月数（约定 13 的分层依据）。 按客户算，不是聚合指标。"
+    additivity: 比率
+    dax_measure: "[Customer Recency Months]"
+    cube_member: "online_sales.customer_recency_months"
+    unit: "月"
+    dataset: FactOnlineSales
+
+  - name: "活跃客户数"
+    definition: "最近购买月数 ≤ 6 的去重客户数（约定 13）。"
+    additivity: 去重
+    dax_measure: "[Active Customer Count]"
+    cube_member: "online_sales.active_customer_count"
+    numerator: "客户数，筛 客户最近购买月数 <= 6"
+    dataset: FactOnlineSales
+
+  - name: "有流失风险客户数"
+    definition: "最近购买月数在 7 ~ 12 之间的去重客户数（约定 13）。"
+    additivity: 去重
+    dax_measure: "[At Risk Customer Count]"
+    cube_member: "online_sales.at_risk_customer_count"
+    numerator: "客户数，筛 7 <= 客户最近购买月数 <= 12"
+    dataset: FactOnlineSales
+
+  - name: "已流失客户数"
+    definition: "最近购买月数 > 12 的去重客户数（约定 13）。"
+    additivity: 去重
+    dax_measure: "[Churned Customer Count]"
+    cube_member: "online_sales.churned_customer_count"
+    numerator: "客户数，筛 客户最近购买月数 > 12"
+    dataset: FactOnlineSales
+
+  - name: "新客数"
+    definition: "首次购买日落在截止日前 90 天内的去重客户数；首次购买指该客户有史以来第一次购买； 截止日由时间窗口决定，按月看就是每个月的最后一天（约定 14）。"
+    additivity: 去重
+    dax_measure: "[New Customer Count]"
+    cube_member: "online_sales.new_customer_count"
+    numerator: "客户数，筛 首次购买日 在 [截止日 − 89 天, 截止日] 内"
+    dataset: FactOnlineSales
+
+  - name: "新客销售额"
+    definition: "新客（按约定 14 判定）在窗口内的销售额合计。"
+    additivity: 可加
+    dax_measure: "[New Customer Sales Amount]"
+    cube_member: "online_sales.new_customer_sales_amount"
+    unit: "USD"
+    numerator: "销售额，筛 客户属于新客"
+    dataset: FactOnlineSales
+
+  - name: "新客销售额占比"
+    definition: "新客销售额 ÷ 销售额。"
+    additivity: 比率
+    dax_measure: "[New Customer Sales Share]"
+    cube_member: "online_sales.new_customer_sales_share"
+    numerator: "新客销售额"
+    denominator: "销售额"
+    dataset: FactOnlineSales
+
+  - name: "有销售天数"
+    definition: "去重的有销售日期个数。"
+    additivity: 去重
+    dax_measure: "[Selling Day Count]"
+    cube_member: "sales.selling_day_count"
+    unit: "天"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+
+  - name: "日均销售额"
+    definition: "先按天汇总销售额，再对天数求平均（约定 4）。等价于 销售额 ÷ 有销售天数。 比较节假日与平日、周末与工作日、季节时用这个，不要直接比销售额合计。"
+    additivity: 比率
+    dax_measure: "[Average Daily Sales Amount]"
+    cube_member: "sales.average_daily_sales_amount"
+    unit: "USD"
+    numerator: "销售额"
+    denominator: "有销售天数"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+
+  - name: "日均销售数量"
+    definition: "先按天汇总销售数量，再对天数求平均。等价于 销售数量 ÷ 有销售天数。"
+    additivity: 比率
+    dax_measure: "[Average Daily Sales Quantity]"
+    cube_member: "sales.average_daily_sales_quantity"
+    unit: "件"
+    numerator: "销售数量"
+    denominator: "有销售天数"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+
+  - name: "门店数"
+    definition: "去重的门店个数。"
+    additivity: 去重
+    dax_measure: "[Store Count]"
+    cube_member: "sales.store_count"
+    unit: "家"
+    dataset: FactSales
+
+  - name: "产品数"
+    definition: "去重的产品个数。"
+    additivity: 去重
+    dax_measure: "[Product Count]"
+    cube_member: "sales.product_count"
+    unit: "个"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+
+  - name: "店均销售额"
+    definition: "销售额 ÷ 门店数。"
+    additivity: 比率
+    dax_measure: "[Sales per Store]"
+    cube_member: "sales.sales_per_store"
+    unit: "USD"
+    numerator: "销售额"
+    denominator: "门店数"
+    dataset: FactSales
+
+  - name: "坪效"
+    definition: "销售额 ÷ 门店营业面积合计（DimStore.SellingAreaSize）。只对实体店有意义。"
+    additivity: 比率
+    dax_measure: "[Sales per Selling Area]"
+    cube_member: "sales.sales_per_selling_area"
+    unit: "USD"
+    numerator: "销售额"
+    denominator: "门店营业面积合计"
+    dataset: FactSales
+
+  - name: "门店人均销售额"
+    definition: "销售额 ÷ 门店员工数合计（DimStore.EmployeeCount）。"
+    additivity: 比率
+    dax_measure: "[Sales per Store Employee]"
+    cube_member: "sales.sales_per_store_employee"
+    unit: "USD"
+    numerator: "销售额"
+    denominator: "门店员工数合计"
+    dataset: FactSales
+
+  - name: "销售额同比增长率"
+    definition: "（本期销售额 − 去年同期销售额）÷ 去年同期销售额。以 2009 年为今年、2008 年为去年（约定 3）。"
+    additivity: 比率
+    dax_measure: "[Sales Amount YoY %]"
+    cube_member: "sales.sales_amount_yoy_pct"
+    numerator: "本期销售额 − 去年同期销售额"
+    denominator: "去年同期销售额"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+
+  - name: "销售额环比增长率"
+    definition: "（本期销售额 − 上一期销售额）÷ 上一期销售额。期的长度由问题的粒度决定（月、季）。"
+    additivity: 比率
+    dax_measure: "[Sales Amount MoM %]"
+    cube_member: "sales.sales_amount_mom_pct"
+    numerator: "本期销售额 − 上一期销售额"
+    denominator: "上一期销售额"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+
+  - name: "销售额占比"
+    definition: "某一组的销售额 ÷ 对应范围内的销售额合计。分母的范围由问题决定（全公司、某渠道、某品类内）。"
+    additivity: 比率
+    dax_measure: "[Sales Amount Share]"
+    cube_member: "sales.sales_amount_share"
+    numerator: "该组销售额"
+    denominator: "范围内销售额合计"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+
+  - name: "同店销售额"
+    definition: "只统计两个对比年份都有销售的门店的销售额（约定 15）。按约定 2 走全渠道销售。"
+    additivity: 可加
+    dax_measure: "[Same Store Sales Amount]"
+    cube_member: "sales.same_store_sales_amount"
+    unit: "USD"
+    numerator: "销售额，筛 门店在两个对比年份都有销售"
+    dataset: FactSales
+
+  - name: "同店销售额增长率"
+    definition: "（同店本年销售额 − 同店去年销售额）÷ 同店去年销售额（约定 15）。"
+    additivity: 比率
+    dax_measure: "[Same Store Sales Growth %]"
+    cube_member: "sales.same_store_sales_growth_pct"
+    numerator: "同店本年销售额 − 同店去年销售额"
+    denominator: "同店去年销售额"
+    dataset: FactSales
+
+  - name: "产品标价"
+    definition: "DimProduct.UnitPrice。问「最贵的产品」用这一列，不用成交价（约定 9）。"
+    additivity: 比率
+    dax_measure: "[Product List Price]"
+    cube_member: "product.list_price"
+    unit: "USD"
+    dataset: DimProduct
+
+  - name: "产品单位成本"
+    definition: "DimProduct.UnitCost（约定 9）。"
+    additivity: 比率
+    dax_measure: "[Product Unit Cost]"
+    cube_member: "product.unit_cost"
+    unit: "USD"
+    dataset: DimProduct
+
+  - name: "产品利润率"
+    definition: "（产品标价 − 产品单位成本）÷ 产品标价，用产品表的标价和成本，不用成交价推算（约定 9）。"
+    additivity: 比率
+    dax_measure: "[Product Margin %]"
+    cube_member: "product.margin_pct"
+    numerator: "产品标价 − 产品单位成本"
+    denominator: "产品标价"
+    dataset: DimProduct
+
+  - name: "当前在手库存数量"
+    definition: "每个门店 × 产品最近一次快照的在手数量之和（约定 11）。 「最近一次」按门店 × 产品各自取最大快照日，不是取全局最后一个快照日。"
+    additivity: 半可加
+    dax_measure: "[Current On Hand Quantity]"
+    cube_member: "inventory.current_on_hand_quantity"
+    unit: "件"
+    dataset: FactInventory
+
+  - name: "当前在手库存金额"
+    definition: "每个门店 × 产品最近一次快照的 在手数量 × 单位成本 之和（约定 11）。"
+    additivity: 半可加
+    dax_measure: "[Current On Hand Value]"
+    cube_member: "inventory.current_on_hand_value"
+    unit: "USD"
+    dataset: FactInventory
+
+  - name: "当前在订库存数量"
+    definition: "每个门店 × 产品最近一次快照的在订数量之和（已下采购单未到货）。"
+    additivity: 半可加
+    dax_measure: "[Current On Order Quantity]"
+    cube_member: "inventory.current_on_order_quantity"
+    unit: "件"
+    dataset: FactInventory
+
+  - name: "当前安全库存数量"
+    definition: "每个门店 × 产品最近一次快照的安全库存水位之和。"
+    additivity: 半可加
+    dax_measure: "[Current Safety Stock Quantity]"
+    cube_member: "inventory.current_safety_stock_quantity"
+    unit: "件"
+    dataset: FactInventory
+
+  - name: "低于安全库存的门店产品数"
+    definition: "最近一次快照里 在手数量 < 安全库存水位 的门店 × 产品组合个数。"
+    additivity: 去重
+    dax_measure: "[Below Safety Stock Count]"
+    cube_member: "inventory.below_safety_stock_count"
+    unit: "个"
+    dataset: FactInventory
+
+  - name: "快照日在手库存金额"
+    definition: "某一个快照日的 在手数量 × 单位成本 之和。与「当前在手库存金额」的区别是它固定在 一个快照日上，用来看库存的时间趋势。"
+    additivity: 半可加
+    dax_measure: "[Snapshot On Hand Value]"
+    cube_member: "inventory.snapshot_on_hand_value"
+    unit: "USD"
+    dataset: FactInventory
+
+  - name: "平均在手库存金额"
+    definition: "各快照日的在手库存金额的平均（先按快照日汇总，再对快照日求平均）。"
+    additivity: 比率
+    dax_measure: "[Average On Hand Value]"
+    cube_member: "inventory.average_on_hand_value"
+    unit: "USD"
+    numerator: "快照日在手库存金额合计"
+    denominator: "快照日个数"
+    dataset: FactInventory
+
+  - name: "库存周转率"
+    definition: "期间总成本 ÷ 平均在手库存金额。分子取全渠道销售的总成本。"
+    additivity: 比率
+    dax_measure: "[Inventory Turnover]"
+    cube_member: "inventory.inventory_turnover"
+    numerator: "总成本（全渠道销售）"
+    denominator: "平均在手库存金额"
+    dataset: FactInventory
+
+  - name: "目标销售额"
+    definition: "销售目标表的目标销售额合计，默认取预算场景（约定 12）。"
+    additivity: 可加
+    dax_measure: "[Sales Amount Quota]"
+    cube_member: "sales_quota.sales_amount_quota"
+    unit: "USD"
+    default_filters:
+      - "ScenarioName = Budget（约定 12：正式目标看预算场景）"
+    dataset: FactSalesQuota
+
+  - name: "目标销量"
+    definition: "销售目标表的目标销量合计，默认取预算场景（约定 12）。"
+    additivity: 可加
+    dax_measure: "[Sales Quantity Quota]"
+    cube_member: "sales_quota.sales_quantity_quota"
+    unit: "件"
+    default_filters:
+      - "ScenarioName = Budget"
+    dataset: FactSalesQuota
+
+  - name: "目标毛利"
+    definition: "销售目标表的目标毛利合计，默认取预算场景。"
+    additivity: 可加
+    dax_measure: "[Gross Margin Quota]"
+    cube_member: "sales_quota.gross_margin_quota"
+    unit: "USD"
+    default_filters:
+      - "ScenarioName = Budget"
+    dataset: FactSalesQuota
+
+  - name: "目标达成率"
+    definition: "全渠道实际销售额 ÷ 预算场景的目标销售额（约定 12）。"
+    additivity: 比率
+    dax_measure: "[Quota Attainment %]"
+    cube_member: "sales_quota.quota_attainment_pct"
+    numerator: "销售额（全渠道销售）"
+    denominator: "目标销售额（预算场景）"
+    default_filters:
+      - "分母筛 ScenarioName = Budget（约定 12）"
+    dataset: FactSales
+    denominator_dataset: FactSalesQuota
+
+  - name: "目标差异"
+    definition: "全渠道实际销售额 − 预算场景的目标销售额。"
+    additivity: 可加
+    dax_measure: "[Quota Variance]"
+    cube_member: "sales_quota.quota_variance"
+    unit: "USD"
+    numerator: "销售额（全渠道销售） − 目标销售额（预算场景）"
+    dataset: FactSales
+    denominator_dataset: FactSalesQuota
+
+  - name: "计划金额"
+    definition: "战略计划表的科目金额合计。**必须同时筛场景和科目**，否则会把三个场景、 以及收入与各类费用加在一起（约定 12）。"
+    additivity: 可加
+    dax_measure: "[Plan Amount]"
+    cube_member: "strategy_plan.plan_amount"
+    unit: "USD"
+    default_filters:
+      - "必须指定 ScenarioName 与 AccountName；科目有父子关系，父子一起求和会重复计算"
+    dataset: FactStrategyPlan
+
+  - name: "计划收入"
+    definition: "战略计划表里 AccountName = Sale Revenue 的金额合计（约定 12 的「收入」）。默认取预算场景。"
+    additivity: 可加
+    dax_measure: "[Plan Revenue]"
+    cube_member: "strategy_plan.plan_revenue"
+    unit: "USD"
+    numerator: "计划金额，筛 AccountName = Sale Revenue"
+    default_filters:
+      - "AccountName = Sale Revenue；ScenarioName = Budget"
+    dataset: FactStrategyPlan
+
+  - name: "IT 成本"
+    definition: "门店 IT 设备的成本金额合计。"
+    additivity: 可加
+    dax_measure: "[IT Cost]"
+    cube_member: "it_machine.it_cost"
+    unit: "USD"
+    dataset: FactITMachine
+
+  - name: "停机时长"
+    definition: "IT 故障的停机时长合计。"
+    additivity: 可加
+    dax_measure: "[Down Time]"
+    cube_member: "it_sla.down_time"
+    unit: "分钟"
+    dataset: FactITSLA
+
+  - name: "故障次数"
+    definition: "IT 故障事件的行数。"
+    additivity: 可加
+    dax_measure: "[Outage Count]"
+    cube_member: "it_sla.outage_count"
+    unit: "次"
+    dataset: FactITSLA

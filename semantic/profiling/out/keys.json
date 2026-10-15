@@ -1,0 +1,873 @@
+{
+  "relationships": [
+    {
+      "child": "DimAccount",
+      "child_column": "ParentAccountKey",
+      "parent": "DimAccount",
+      "parent_column": "AccountKey",
+      "child_rows": 24,
+      "child_nulls": 0,
+      "child_distinct_keys": 7,
+      "parent_rows": 24,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.291667
+    },
+    {
+      "child": "DimCustomer",
+      "child_column": "GeographyKey",
+      "parent": "DimGeography",
+      "parent_column": "GeographyKey",
+      "child_rows": 18869,
+      "child_nulls": 0,
+      "child_distinct_keys": 476,
+      "parent_rows": 674,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.706231
+    },
+    {
+      "child": "DimEmployee",
+      "child_column": "ParentEmployeeKey",
+      "parent": "DimEmployee",
+      "parent_column": "EmployeeKey",
+      "child_rows": 293,
+      "child_nulls": 0,
+      "child_distinct_keys": 11,
+      "parent_rows": 293,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.037543
+    },
+    {
+      "child": "DimEntity",
+      "child_column": "ParentEntityKey",
+      "parent": "DimEntity",
+      "parent_column": "EntityKey",
+      "child_rows": 421,
+      "child_nulls": 0,
+      "child_distinct_keys": 114,
+      "parent_rows": 421,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.270784
+    },
+    {
+      "child": "DimMachine",
+      "child_column": "StoreKey",
+      "parent": "DimStore",
+      "parent_column": "StoreKey",
+      "child_rows": 7816,
+      "child_nulls": 0,
+      "child_distinct_keys": 303,
+      "parent_rows": 306,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.990196
+    },
+    {
+      "child": "DimProduct",
+      "child_column": "ProductSubcategoryKey",
+      "parent": "DimProductSubcategory",
+      "parent_column": "ProductSubcategoryKey",
+      "child_rows": 2233,
+      "child_nulls": 0,
+      "child_distinct_keys": 30,
+      "parent_rows": 44,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.681818
+    },
+    {
+      "child": "DimProductSubcategory",
+      "child_column": "ProductCategoryKey",
+      "parent": "DimProductCategory",
+      "parent_column": "ProductCategoryKey",
+      "child_rows": 44,
+      "child_nulls": 0,
+      "child_distinct_keys": 8,
+      "parent_rows": 8,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "DimSalesTerritory",
+      "child_column": "GeographyKey",
+      "parent": "DimGeography",
+      "parent_column": "GeographyKey",
+      "child_rows": 265,
+      "child_nulls": 0,
+      "child_distinct_keys": 265,
+      "parent_rows": 674,
+      "orphan_rows": 0,
+      "cardinality": "一对一",
+      "coverage": 0.393175
+    },
+    {
+      "child": "DimSalesTerritory",
+      "child_column": "EmployeeKey",
+      "parent": "DimEmployee",
+      "parent_column": "EmployeeKey",
+      "child_rows": 265,
+      "child_nulls": 0,
+      "child_distinct_keys": 264,
+      "parent_rows": 293,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.901024
+    },
+    {
+      "child": "DimStore",
+      "child_column": "GeographyKey",
+      "parent": "DimGeography",
+      "parent_column": "GeographyKey",
+      "child_rows": 306,
+      "child_nulls": 0,
+      "child_distinct_keys": 263,
+      "parent_rows": 674,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.390208
+    },
+    {
+      "child": "DimStore",
+      "child_column": "EntityKey",
+      "parent": "DimEntity",
+      "parent_column": "EntityKey",
+      "child_rows": 306,
+      "child_nulls": 0,
+      "child_distinct_keys": 306,
+      "parent_rows": 421,
+      "orphan_rows": 0,
+      "cardinality": "一对一",
+      "coverage": 0.726841
+    },
+    {
+      "child": "DimStore",
+      "child_column": "EmployeeKey",
+      "parent": "DimEmployee",
+      "parent_column": "EmployeeKey",
+      "child_rows": 306,
+      "child_nulls": 0,
+      "child_distinct_keys": 262,
+      "parent_rows": 293,
+      "orphan_rows": 1,
+      "cardinality": "多对一",
+      "coverage": 0.894198
+    },
+    {
+      "child": "FactExchangeRate",
+      "child_column": "CurrencyKey",
+      "parent": "DimCurrency",
+      "parent_column": "CurrencyKey",
+      "child_rows": 773,
+      "child_nulls": 0,
+      "child_distinct_keys": 25,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.892857
+    },
+    {
+      "child": "FactExchangeRate",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 773,
+      "child_nulls": 0,
+      "child_distinct_keys": 31,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.012128
+    },
+    {
+      "child": "FactITMachine",
+      "child_column": "MachineKey",
+      "parent": "DimMachine",
+      "parent_column": "MachineKey",
+      "child_rows": 23283,
+      "child_nulls": 0,
+      "child_distinct_keys": 7816,
+      "parent_rows": 7816,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactITMachine",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 23283,
+      "child_nulls": 0,
+      "child_distinct_keys": 3,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.001174
+    },
+    {
+      "child": "FactITSLA",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 4925,
+      "child_nulls": 0,
+      "child_distinct_keys": 1046,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.409233
+    },
+    {
+      "child": "FactITSLA",
+      "child_column": "StoreKey",
+      "parent": "DimStore",
+      "parent_column": "StoreKey",
+      "child_rows": 4925,
+      "child_nulls": 0,
+      "child_distinct_keys": 299,
+      "parent_rows": 306,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.977124
+    },
+    {
+      "child": "FactITSLA",
+      "child_column": "MachineKey",
+      "parent": "DimMachine",
+      "parent_column": "MachineKey",
+      "child_rows": 4925,
+      "child_nulls": 0,
+      "child_distinct_keys": 2553,
+      "parent_rows": 7816,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.326638
+    },
+    {
+      "child": "FactITSLA",
+      "child_column": "OutageKey",
+      "parent": "DimOutage",
+      "parent_column": "OutageKey",
+      "child_rows": 4925,
+      "child_nulls": 0,
+      "child_distinct_keys": 294,
+      "parent_rows": 303,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.970297
+    },
+    {
+      "child": "FactInventory",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 8013099,
+      "child_nulls": 0,
+      "child_distinct_keys": 156,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.061033
+    },
+    {
+      "child": "FactInventory",
+      "child_column": "StoreKey",
+      "parent": "DimStore",
+      "parent_column": "StoreKey",
+      "child_rows": 8013099,
+      "child_nulls": 0,
+      "child_distinct_keys": 306,
+      "parent_rows": 306,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactInventory",
+      "child_column": "ProductKey",
+      "parent": "DimProduct",
+      "parent_column": "ProductKey",
+      "child_rows": 8013099,
+      "child_nulls": 0,
+      "child_distinct_keys": 2516,
+      "parent_rows": 2233,
+      "orphan_rows": 533358,
+      "cardinality": "多对一",
+      "coverage": 1.126735
+    },
+    {
+      "child": "FactInventory",
+      "child_column": "CurrencyKey",
+      "parent": "DimCurrency",
+      "parent_column": "CurrencyKey",
+      "child_rows": 8013099,
+      "child_nulls": 0,
+      "child_distinct_keys": 1,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.035714
+    },
+    {
+      "child": "FactOnlineSales",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 12627608,
+      "child_nulls": 0,
+      "child_distinct_keys": 1096,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.428795
+    },
+    {
+      "child": "FactOnlineSales",
+      "child_column": "StoreKey",
+      "parent": "DimStore",
+      "parent_column": "StoreKey",
+      "child_rows": 12627608,
+      "child_nulls": 0,
+      "child_distinct_keys": 3,
+      "parent_rows": 306,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.009804
+    },
+    {
+      "child": "FactOnlineSales",
+      "child_column": "ProductKey",
+      "parent": "DimProduct",
+      "parent_column": "ProductKey",
+      "child_rows": 12627608,
+      "child_nulls": 0,
+      "child_distinct_keys": 2516,
+      "parent_rows": 2233,
+      "orphan_rows": 1715380,
+      "cardinality": "多对一",
+      "coverage": 1.126735
+    },
+    {
+      "child": "FactOnlineSales",
+      "child_column": "PromotionKey",
+      "parent": "DimPromotion",
+      "parent_column": "PromotionKey",
+      "child_rows": 12627608,
+      "child_nulls": 0,
+      "child_distinct_keys": 28,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactOnlineSales",
+      "child_column": "CurrencyKey",
+      "parent": "DimCurrency",
+      "parent_column": "CurrencyKey",
+      "child_rows": 12627608,
+      "child_nulls": 0,
+      "child_distinct_keys": 1,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.035714
+    },
+    {
+      "child": "FactOnlineSales",
+      "child_column": "CustomerKey",
+      "parent": "DimCustomer",
+      "parent_column": "CustomerKey",
+      "child_rows": 12627608,
+      "child_nulls": 0,
+      "child_distinct_keys": 18869,
+      "parent_rows": 18869,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactSales",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 3406089,
+      "child_nulls": 0,
+      "child_distinct_keys": 1096,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.428795
+    },
+    {
+      "child": "FactSales",
+      "child_column": "channelKey",
+      "parent": "DimChannel",
+      "parent_column": "ChannelKey",
+      "child_rows": 3406089,
+      "child_nulls": 0,
+      "child_distinct_keys": 4,
+      "parent_rows": 4,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactSales",
+      "child_column": "StoreKey",
+      "parent": "DimStore",
+      "parent_column": "StoreKey",
+      "child_rows": 3406089,
+      "child_nulls": 0,
+      "child_distinct_keys": 306,
+      "parent_rows": 306,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactSales",
+      "child_column": "ProductKey",
+      "parent": "DimProduct",
+      "parent_column": "ProductKey",
+      "child_rows": 3406089,
+      "child_nulls": 0,
+      "child_distinct_keys": 2516,
+      "parent_rows": 2233,
+      "orphan_rows": 338898,
+      "cardinality": "多对一",
+      "coverage": 1.126735
+    },
+    {
+      "child": "FactSales",
+      "child_column": "PromotionKey",
+      "parent": "DimPromotion",
+      "parent_column": "PromotionKey",
+      "child_rows": 3406089,
+      "child_nulls": 0,
+      "child_distinct_keys": 28,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactSales",
+      "child_column": "CurrencyKey",
+      "parent": "DimCurrency",
+      "parent_column": "CurrencyKey",
+      "child_rows": 3406089,
+      "child_nulls": 0,
+      "child_distinct_keys": 1,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.035714
+    },
+    {
+      "child": "FactSalesQuota",
+      "child_column": "ChannelKey",
+      "parent": "DimChannel",
+      "parent_column": "ChannelKey",
+      "child_rows": 7465911,
+      "child_nulls": 0,
+      "child_distinct_keys": 4,
+      "parent_rows": 4,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactSalesQuota",
+      "child_column": "StoreKey",
+      "parent": "DimStore",
+      "parent_column": "StoreKey",
+      "child_rows": 7465911,
+      "child_nulls": 0,
+      "child_distinct_keys": 306,
+      "parent_rows": 306,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactSalesQuota",
+      "child_column": "ProductKey",
+      "parent": "DimProduct",
+      "parent_column": "ProductKey",
+      "child_rows": 7465911,
+      "child_nulls": 0,
+      "child_distinct_keys": 2516,
+      "parent_rows": 2233,
+      "orphan_rows": 521121,
+      "cardinality": "多对一",
+      "coverage": 1.126735
+    },
+    {
+      "child": "FactSalesQuota",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 7465911,
+      "child_nulls": 0,
+      "child_distinct_keys": 36,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.014085
+    },
+    {
+      "child": "FactSalesQuota",
+      "child_column": "CurrencyKey",
+      "parent": "DimCurrency",
+      "parent_column": "CurrencyKey",
+      "child_rows": 7465911,
+      "child_nulls": 0,
+      "child_distinct_keys": 1,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.035714
+    },
+    {
+      "child": "FactSalesQuota",
+      "child_column": "ScenarioKey",
+      "parent": "DimScenario",
+      "parent_column": "ScenarioKey",
+      "child_rows": 7465911,
+      "child_nulls": 0,
+      "child_distinct_keys": 3,
+      "parent_rows": 3,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactStrategyPlan",
+      "child_column": "DateKey",
+      "parent": "DimDate",
+      "parent_column": "DateKey",
+      "child_rows": 2750628,
+      "child_nulls": 0,
+      "child_distinct_keys": 36,
+      "parent_rows": 2556,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.014085
+    },
+    {
+      "child": "FactStrategyPlan",
+      "child_column": "EntityKey",
+      "parent": "DimEntity",
+      "parent_column": "EntityKey",
+      "child_rows": 2750628,
+      "child_nulls": 0,
+      "child_distinct_keys": 306,
+      "parent_rows": 421,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.726841
+    },
+    {
+      "child": "FactStrategyPlan",
+      "child_column": "ScenarioKey",
+      "parent": "DimScenario",
+      "parent_column": "ScenarioKey",
+      "child_rows": 2750628,
+      "child_nulls": 0,
+      "child_distinct_keys": 3,
+      "parent_rows": 3,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    },
+    {
+      "child": "FactStrategyPlan",
+      "child_column": "AccountKey",
+      "parent": "DimAccount",
+      "parent_column": "AccountKey",
+      "child_rows": 2750628,
+      "child_nulls": 0,
+      "child_distinct_keys": 17,
+      "parent_rows": 24,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.708333
+    },
+    {
+      "child": "FactStrategyPlan",
+      "child_column": "CurrencyKey",
+      "parent": "DimCurrency",
+      "parent_column": "CurrencyKey",
+      "child_rows": 2750628,
+      "child_nulls": 0,
+      "child_distinct_keys": 1,
+      "parent_rows": 28,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 0.035714
+    },
+    {
+      "child": "FactStrategyPlan",
+      "child_column": "ProductCategoryKey",
+      "parent": "DimProductCategory",
+      "parent_column": "ProductCategoryKey",
+      "child_rows": 2750628,
+      "child_nulls": 0,
+      "child_distinct_keys": 8,
+      "parent_rows": 8,
+      "orphan_rows": 0,
+      "cardinality": "多对一",
+      "coverage": 1.0
+    }
+  ],
+  "grains": [
+    {
+      "table": "DimAccount",
+      "columns": [
+        "AccountKey"
+      ],
+      "rows": 24,
+      "distinct": 24,
+      "unique": true
+    },
+    {
+      "table": "DimChannel",
+      "columns": [
+        "ChannelKey"
+      ],
+      "rows": 4,
+      "distinct": 4,
+      "unique": true
+    },
+    {
+      "table": "DimCurrency",
+      "columns": [
+        "CurrencyKey"
+      ],
+      "rows": 28,
+      "distinct": 28,
+      "unique": true
+    },
+    {
+      "table": "DimCustomer",
+      "columns": [
+        "CustomerKey"
+      ],
+      "rows": 18869,
+      "distinct": 18869,
+      "unique": true
+    },
+    {
+      "table": "DimDate",
+      "columns": [
+        "DateKey"
+      ],
+      "rows": 2556,
+      "distinct": 2556,
+      "unique": true
+    },
+    {
+      "table": "DimEmployee",
+      "columns": [
+        "EmployeeKey"
+      ],
+      "rows": 293,
+      "distinct": 293,
+      "unique": true
+    },
+    {
+      "table": "DimEntity",
+      "columns": [
+        "EntityKey"
+      ],
+      "rows": 421,
+      "distinct": 421,
+      "unique": true
+    },
+    {
+      "table": "DimGeography",
+      "columns": [
+        "GeographyKey"
+      ],
+      "rows": 674,
+      "distinct": 674,
+      "unique": true
+    },
+    {
+      "table": "DimMachine",
+      "columns": [
+        "MachineKey"
+      ],
+      "rows": 7816,
+      "distinct": 7816,
+      "unique": true
+    },
+    {
+      "table": "DimOutage",
+      "columns": [
+        "OutageKey"
+      ],
+      "rows": 303,
+      "distinct": 303,
+      "unique": true
+    },
+    {
+      "table": "DimProduct",
+      "columns": [
+        "ProductKey"
+      ],
+      "rows": 2233,
+      "distinct": 2233,
+      "unique": true
+    },
+    {
+      "table": "DimProductCategory",
+      "columns": [
+        "ProductCategoryKey"
+      ],
+      "rows": 8,
+      "distinct": 8,
+      "unique": true
+    },
+    {
+      "table": "DimProductSubcategory",
+      "columns": [
+        "ProductSubcategoryKey"
+      ],
+      "rows": 44,
+      "distinct": 44,
+      "unique": true
+    },
+    {
+      "table": "DimPromotion",
+      "columns": [
+        "PromotionKey"
+      ],
+      "rows": 28,
+      "distinct": 28,
+      "unique": true
+    },
+    {
+      "table": "DimSalesTerritory",
+      "columns": [
+        "SalesTerritoryKey"
+      ],
+      "rows": 265,
+      "distinct": 265,
+      "unique": true
+    },
+    {
+      "table": "DimScenario",
+      "columns": [
+        "ScenarioKey"
+      ],
+      "rows": 3,
+      "distinct": 3,
+      "unique": true
+    },
+    {
+      "table": "DimStore",
+      "columns": [
+        "StoreKey"
+      ],
+      "rows": 306,
+      "distinct": 306,
+      "unique": true
+    },
+    {
+      "table": "FactExchangeRate",
+      "columns": [
+        "DateKey",
+        "CurrencyKey"
+      ],
+      "rows": 773,
+      "distinct": 773,
+      "unique": true
+    },
+    {
+      "table": "FactITMachine",
+      "columns": [
+        "MachineKey",
+        "DateKey",
+        "CostType"
+      ],
+      "rows": 23283,
+      "distinct": 23283,
+      "unique": true
+    },
+    {
+      "table": "FactITSLA",
+      "columns": [
+        "ITSLAkey"
+      ],
+      "rows": 4925,
+      "distinct": 4925,
+      "unique": true
+    },
+    {
+      "table": "FactInventory",
+      "columns": [
+        "DateKey",
+        "StoreKey",
+        "ProductKey"
+      ],
+      "rows": 8013099,
+      "distinct": 8013099,
+      "unique": true
+    },
+    {
+      "table": "FactOnlineSales",
+      "columns": [
+        "SalesOrderNumber",
+        "SalesOrderLineNumber"
+      ],
+      "rows": 12627608,
+      "distinct": 12627608,
+      "unique": true
+    },
+    {
+      "table": "FactSales",
+      "columns": [
+        "DateKey",
+        "channelKey",
+        "StoreKey",
+        "ProductKey",
+        "PromotionKey"
+      ],
+      "rows": 3406089,
+      "distinct": 3406089,
+      "unique": true
+    },
+    {
+      "table": "FactSalesQuota",
+      "columns": [
+        "DateKey",
+        "ChannelKey",
+        "StoreKey",
+        "ProductKey",
+        "ScenarioKey"
+      ],
+      "rows": 7465911,
+      "distinct": 7465911,
+      "unique": true
+    },
+    {
+      "table": "FactStrategyPlan",
+      "columns": [
+        "DateKey",
+        "EntityKey",
+        "ScenarioKey",
+        "AccountKey",
+        "ProductCategoryKey"
+      ],
+      "rows": 2750628,
+      "distinct": 2750628,
+      "unique": true
+    }
+  ]
+}
