@@ -50,6 +50,7 @@ def test_global_unit_rules_and_cross_engine_tie_quantization() -> None:
     assert infer_value_kind('gross_margin_pct') == 'percentage'
     assert infer_value_kind('promo_to_fullprice_ratio') == 'ratio'
     assert infer_value_kind('total_sales', 'UInt64') == 'count'
+    assert infer_value_kind('total_sales', 'int64') == 'count'
     assert infer_value_kind('sum(SalesAmount)', 'Float64') == 'amount'
     assert infer_value_kind('month','UInt8') == 'other'
     assert quantize_tie(Decimal('10.23000000001'),'amount') == quantize_tie(Decimal('10.22999999999'),'amount')

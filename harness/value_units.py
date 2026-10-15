@@ -25,7 +25,7 @@ def infer_value_kind(column_name: str, column_type: str = "") -> ValueKind:
     if (tokens & {"count", "countdistinct", "num", "n", "customers", "orders", "stores", "brands", "employees", "observations", "reports", "units", "returns"}
             or {"cohort", "size"} <= tokens or "returned" in tokens):
         return "count"
-    if re.search(r"\bU?Int\d+\b", column_type) and "sales" in tokens and not tokens & {"amount", "price", "revenue"}:
+    if re.search(r"\bU?Int\d+\b", column_type, re.IGNORECASE) and "sales" in tokens and not tokens & {"amount", "price", "revenue"}:
         return "count"
     if tokens & {"amount", "amt", "revenue", "sales", "spend", "spent", "cost", "cogs", "price", "profit", "income", "budget", "quota", "ltv", "dollars", "discount", "margin"} or {"lifetime", "value"} <= tokens:
         return "amount"
