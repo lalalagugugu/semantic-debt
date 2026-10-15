@@ -6,9 +6,12 @@
 
 | 模块 | 卡 | 作用 |
 |---|---|---|
-| `client.py` | T11 | DeepSeek 官方 API（OpenAI 兼容）。key 只从 `DEEPSEEK_API_KEY` 读；思考模式开启，**不要设 temperature** |
-| `exec_sql.py` | T11 | chDB 只读执行 |
-| `run_direct.py` | T11 | 直答：一次调用写出查询；执行报错时发回报错、固定修一次 |
+| `client.py` | T11 | DeepSeek 官方 API（OpenAI 兼容，标准库 urllib）。key 只从 `DEEPSEEK_API_KEY` 读；思考模式开启（`reasoning_effort=high`），**不设 temperature**；429/5xx/网络错误指数退避，次数入日志。另有 `MockClient` 供离线测试 |
+| `executors.py` | T11 | 统一接口 `execute(query) -> ExecResult`。`ChdbExecutor`：只读、单条 SELECT、**按单元的允许库静态拒绝越界查询**（`EXPLAIN AST` 解析表名，`error_class=scope_violation`）、超时与结果行数上限可配、报错后重新同步 session（见 open question T11-2）。Cube SQL / Cube JSON / DAX 留了同名接口的占位 |
+| `cells.py` | T11 | 单元清单（与 BOARD 一致）、每单元允许的库、上下文来源、价格表、默认超时 |
+| `prompt.py` | T11 | 系统提示（`harness-v1` 冻结范围）、稳定前缀的拼装（系统提示 → 语义上下文 → 语法说明；用户消息只放题目）、响应解析 |
+| `questions.py` | T11 | 从 `$SEMDEBT_EVAL_DIR/questions/` 读题；`rules` 原样透传给评分器 |
+| `run_direct.py` | T11 | 直答：一次调用写出查询；执行报错时发回报错、固定修一次。日志、断点续跑、`--dry-run`、并发 |
 | `run_agent.py` | T15 | 探查 agent（-E）：多一个只读工具 `run_sql`，最多 8 步 |
 | `scorer.py` | T02（Codex 写） | 确定性结果集评分器（纯函数，不执行查询） |
 | `exec_dax.py` | T17 | Windows 上经 ADOMD.NET 执行 DAX |

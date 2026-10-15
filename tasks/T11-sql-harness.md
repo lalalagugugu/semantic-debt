@@ -1,6 +1,6 @@
 # T11 SQL harness
 
-- 状态：未开始
+- 状态：进行中（代码与离线验收完成；真实题目加载与真实 API 冒烟待用户放行，见记录）
 - 负责：Claude Code
 - 模式：普通（G1 之后，`scripts/start-card.sh T11`）
 - 依赖：G1、T02（评分器）
@@ -71,6 +71,18 @@ L1.5S 的列描述里保留了血缘注记（提到明细表名），这是**有
 
 ## 记录（完成后填写）
 
-- 产出：
+- 产出（2026-10-16，第一段）：
+  - `harness/executors.py`、`cells.py`、`prompt.py`、`client.py`、`questions.py`、`run_direct.py`；`tests/test_harness.py`（34 条）、`tests/test_harness_e2e.py`（mock 端到端）。全仓 `uv run pytest`：196 过、1 跳过。
+  - 库级范围：`EXPLAIN AST` 取表名静态比对，L1.5S 查 `retail.*`（含子查询、CTE、`IN 表`）、`dwd.*`、`system.*`、`file()` 一律 `scope_violation`，作为普通执行报错发回模型；有测试。
+  - mock 端到端（5 道自造题，真 chDB、真评分器）：对、修一次后对、错、拒答、越界各一条，日志无题目原文，缓存命中 token 有记录。
+  - `--dry-run`：按 BOARD 的 SQL 直答与英文锚点共 10 个单元列出作答次数、调用次数和费用；`--budget` 超限、DeepSeek 高峰时段（无 `--allow-peak`）拒绝开跑。
+- 未完成（阻塞，需要用户）：
+  1. 读题库被自动模式拦下（读 `$SEMDEBT_EVAL_DIR/README.md` 与列 `questions/` 时被判为「PII」拒绝）。因此 `harness/questions.py` 的字段映射是**按契约推测**的，未对照真实题目；L1c 与两个英文锚点的上下文（外部基准文档原样）也还没接。用真实题目跑 mock 5 题、`--dry-run` 的真实题数、冒烟测试都卡在这里。
+  2. 本会话环境里没有 `DEEPSEEK_API_KEY`，冒烟测试（2 题 × 1 单元，预算 2 元）尚未跑。
 - 偏离与理由：
-- 工时：
+  - prompt 顺序按「硬要求二」：系统提示 → 语义上下文 → 语法说明全部放在 system 消息，user 消息只放题目。规格第 1 条把语法说明归在系统提示里，两者都在稳定前缀内，对缓存等价；按后写、更具体的硬要求执行。
+  - 响应里没有代码块、也不是 `CANNOT_ANSWER` 的，记 `exec_error` / `error_class=no_query`，**不**发回修正（它不是执行报错，规格只允许执行报错修一次）。
+  - API 传输失败（退避用尽）记 `status=api_error` 行保留在日志里，续跑时该 (题, 次) 重跑；报告只取 `status=done` 的行。
+  - 超时默认 120 秒，待裁决（open question T11-1）。
+  - 新发现 chDB 失败查询残留输出问题（open question T11-2），harness 已规避。
+- 工时：约 2.5 小时（至第一段）。
