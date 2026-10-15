@@ -197,3 +197,40 @@ def test_sensitivity_top_n_keeps_boundary_contract() -> None:
     refs = [[("A", 10), ("B", 9), ("C", 9)]]
     assert score_detailed([("X", 10), ("Y", 9)], refs, rules).sensitivity == "string_or_label_only"
     assert score_detailed(refs[0], refs, rules).sensitivity == "structure_mismatch"
+
+
+@pytest.mark.parametrize(('kind','candidate','reference'), [('ratio',0.0008,0.0007),('percentage',0.08,0.07),('amount',0.009,0.0)])
+def test_unit_absolute_floor_accepts_near_zero(kind, candidate, reference) -> None:
+    rules = {**UNORDERED, 'value_kinds':[kind]}
+    assert score([(candidate,)], [[(reference,)]], rules) == 'correct'
+    assert score([(candidate,)], [[(reference,)]], {**rules,'use_absolute_tolerance':False}) == 'wrong'
+
+
+@pytest.mark.parametrize(('kind','candidate'), [('ratio',0.0001001),('percentage',0.01001),('amount',0.01001),('other',0.00001)])
+def test_unit_absolute_floor_rejects_outside_bound(kind, candidate) -> None:
+    assert score([(candidate,)], [[(0.0,)]], {**UNORDERED,'value_kinds':[kind]}) == 'wrong'
+
+
+def test_percentage_floor_normalizes_mixed_units() -> None:
+    assert score([(0.0008,)], [[(0.07,)]], {**UNORDERED,'value_kinds':['percentage']}) == 'correct'
+    assert score([(0.08,)], [[(0.0007,)]], {**UNORDERED,'value_kinds':['ratio']}) == 'correct'
+
+
+def test_absolute_tolerance_does_not_merge_money_ties() -> None:
+    rules = {'ordered':True,'top_n':1,'tie_columns':[1],'value_kinds':['other','amount']}
+    assert score([('B',0.009)], [[('A',0.01),('B',0.009)]], rules) == 'correct'
+    with pytest.raises(ValueError, match='below the complete boundary'):
+        score([('B',0.0)], [[('A',0.01),('B',0.0)]], rules)
+
+
+def test_count_exactness_is_counterfactual_only() -> None:
+    rules = {**UNORDERED,'value_kinds':['count']}
+    assert score([(10040,)], [[(10000,)]], rules) == 'correct'
+    assert score([(10040,)], [[(10000,)]], {**rules,'exact_counts':True}) == 'wrong'
+    assert score([(10000,)], [[(10000,)]], {**rules,'exact_counts':True}) == 'correct'
+
+
+def test_unit_metadata_tracks_reference_columns_after_permutation() -> None:
+    rules={**UNORDERED,'value_kinds':['amount','count']}
+    assert score([(10000,0.009)], [[(0.0,10000)]], rules) == 'correct'
+    assert score([(10040,0.009)], [[(0.0,10000)]], {**rules,'exact_counts':True}) == 'wrong'

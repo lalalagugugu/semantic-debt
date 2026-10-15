@@ -8,6 +8,8 @@ diagnostic codes.  Questions and SQL remain in ``SEMDEBT_EVAL_DIR``.
 from __future__ import annotations
 
 import argparse
+import subprocess
+import types
 import hashlib
 from collections import Counter
 from datetime import datetime
@@ -23,6 +25,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 from harness.scorer import ExecError, score_detailed  # noqa: E402
+from harness.value_units import infer_value_kind, quantize_tie  # noqa: E402
 
 
 RUN_ID = "paper-2026-04-22"
@@ -98,6 +101,9 @@ def extend_boundary_ties(sql: str, question_id: int) -> str:
 def complete_boundary(rows: list[list[object]], rules: dict[str, object], descending: bool) -> list[list[object]]:
     top_n = rules["top_n"]
     columns = rules["tie_columns"]
+    kinds = rules.get("value_kinds", ())
+    def tie_key(row):
+        return tuple(quantize_tie(row[i], kinds[i] if kinds else "other") for i in columns)
     if top_n is None:
         return rows
     if len(rows) < top_n:
@@ -105,10 +111,10 @@ def complete_boundary(rows: list[list[object]], rules: dict[str, object], descen
     # Use the reference's projected values, including its existing ROUND precision.
     # The row encoding breaks ties reproducibly without discarding tied members.
     ordered = sorted(rows, key=lambda row: json.dumps(row, ensure_ascii=False))
-    ordered.sort(key=lambda row: tuple(row[i] for i in columns), reverse=descending)
-    boundary = tuple(ordered[top_n - 1][i] for i in columns)
+    ordered.sort(key=tie_key, reverse=descending)
+    boundary = tie_key(ordered[top_n - 1])
     end = top_n
-    while end < len(ordered) and tuple(ordered[end][i] for i in columns) == boundary:
+    while end < len(ordered) and tie_key(ordered[end]) == boundary:
         end += 1
     return ordered[:end]
 
@@ -122,14 +128,32 @@ def verify_reference_digests(digests: list[str], question_id: int) -> None:
         raise RuntimeError(f"q{question_id:02d}: reference boundary is not reproducible")
 
 
-def stable_reference(sess: Any, sql: str, question_id: int, rules: dict[str, object]) -> tuple[list[list[object]], dict[str, object] | None]:
+def reference_value_kinds(sql: str, columns: list[dict[str, str]]) -> list[str]:
+    # Only a complete COUNT select item supplies count provenance. A denominator
+    # ending in count() must not reclassify an AOV/percentage expression as count.
+    pattern = r"(?:\bSELECT\s+|,)\s*(?:count|countDistinct|countIf|uniqExact)\s*\([^)]*\)\s+(?:AS\s+)?([A-Za-z_]\w*)"
+    count_aliases = {match.group(1).lower() for match in re.finditer(pattern, sql, re.IGNORECASE)}
+    return ["count" if column["name"].lower() in count_aliases else infer_value_kind(column["name"], column["type"]) for column in columns]
+
+
+def stable_reference(sess: Any, sql: str, question_id: int, rules: dict[str, object]) -> tuple[list[list[object]], dict[str, object] | None, list[list[object]]]:
     expanded = extend_boundary_ties(sql, question_id)
-    rows = execute_rows(sess, expanded)
+    payload = json.loads(str(sess.query(expanded, "JSONCompact")))
+    rows = payload["data"]
+    rules["value_kinds"] = reference_value_kinds(sql, payload["meta"])
     if isinstance(rows, ExecError):
         raise RuntimeError(f"q{question_id:02d} reference failed: {rows.message}")
     if rules["top_n"] is None:
-        return rows, None
+        return rows, None, rows
     descending = not bool(re.search(r"\bASC\s*$", final_order_clause(sql) or "", re.IGNORECASE))
+    legacy = sorted(rows, key=lambda row: json.dumps(row, ensure_ascii=False))
+    legacy.sort(key=lambda row: tuple(row[i] for i in rules["tie_columns"]), reverse=descending)
+    n = rules["top_n"]
+    key = tuple(legacy[n - 1][i] for i in rules["tie_columns"])
+    end = n
+    while end < len(legacy) and tuple(legacy[end][i] for i in rules["tie_columns"]) == key:
+        end += 1
+    legacy = legacy[:end]
     rows = complete_boundary(rows, rules, descending)
     digests = [reference_digest(rows)]
     for _ in range(2):
@@ -138,7 +162,7 @@ def stable_reference(sess: Any, sql: str, question_id: int, rules: dict[str, obj
             raise RuntimeError(f"q{question_id:02d} repeated reference failed: {repeated.message}")
         digests.append(reference_digest(complete_boundary(repeated, rules, descending)))
     verify_reference_digests(digests, question_id)
-    return rows, {"question_id": question_id, "row_count": len(rows), "sha256": digests[0], "repeat_checks": 3, "tie_columns": rules["tie_columns"], "descending": descending, "criterion": "exact projected reference values"}
+    return rows, {"question_id": question_id, "row_count": len(rows), "sha256": digests[0], "repeat_checks": 3, "tie_columns": rules["tie_columns"], "descending": descending, "criterion": "Decimal ROUND_HALF_EVEN: amount=2 digits; ratio/fraction=6; other=6", "value_kinds": rules["value_kinds"]}, legacy
 
 
 def execute_rows(sess: Any, sql: str) -> list[list[object]] | ExecError:
@@ -189,7 +213,9 @@ def report_from_results(output: dict[str, Any], path: Path) -> None:
             continue
         label = SYSTEM_LABELS[record["system"]]
         key = (label, record["question_id"])
-        if key in INTENTIONAL_BROADER:
+        if record.get("relative_only_outcome") == "wrong" and record["our_outcome"] == "correct":
+            category, notes = "量纲绝对容差", "2026-10-15规则第2条A裁决；量纲由全局参考列名称/类型规则自动识别。"
+        elif key in INTENTIONAL_BROADER:
             category, notes = INTENTIONAL_BROADER[key], "冻结规则第4/5/2条有意更宽（按类别）。"
         elif key in reviewed:
             category, notes = reviewed[key]
@@ -197,11 +223,11 @@ def report_from_results(output: dict[str, Any], path: Path) -> None:
             unexplained.append(key)
             category, notes = "原因不明", "需要逐条复核，不能标记完成。"
         differences.append({**record, "label": label, "category": category, "notes": notes})
-    broad = sum((r["label"], r["question_id"]) in INTENTIONAL_BROADER for r in differences)
+    broad = sum((r["label"], r["question_id"]) in INTENTIONAL_BROADER or r["category"] == "量纲绝对容差" for r in differences)
     correct = sum(r["our_outcome"] == "correct" for r in comparable)
     format_only = sum(r["our_outcome"] == "wrong" and r["sensitivity"] == "string_or_label_only" for r in comparable)
     wrong_tags = Counter(r["sensitivity"] for r in comparable if r["our_outcome"] == "wrong")
-    current_counts = Counter(r["category"] for r in differences if (r["label"], r["question_id"]) not in INTENTIONAL_BROADER)
+    current_counts = Counter(r["category"] for r in differences if (r["label"], r["question_id"]) not in INTENTIONAL_BROADER and r["category"] != "量纲绝对容差")
     strict_agreements = output["strict_agreements"]
     total = len(comparable)
     date = datetime.now(ZoneInfo("Asia/Singapore")).date()
@@ -212,11 +238,11 @@ def report_from_results(output: dict[str, Any], path: Path) -> None:
         wider = sum(r["our_outcome"] == "correct" and r["strict"] != "pass" for r in group)
         stricter = sum(r["our_outcome"] != "correct" and r["strict"] == "pass" for r in group)
         lines.append(f"| {label} | {len(group)} | {agreed} | {wider} | {stricter} |")
-    lines += ["", "## 三条缺陷的修复证据", "", "1. `ordered` 要求元数据与最终外层 ORDER BY 同时成立；窗口/子查询的排序不作为最终排序。O-R/O-S Q22现按无序完整行集比较，结果见全量表。", "2. 固定单线程运行，Top-N从完整排序域构造参考。使用参考已投影的排序值精确识别并列；Q88沿用其已有两位小数，排除未舍入浮点排序边界的不稳定。行编码固定同值前缀行序，每个参考三次成员哈希必须一致，否则报错停止。0.5%结果容差不再扩大并列组。", "3. 舍入差异实测：S-S Q24约0.70%/0.53%；O-S Q90最高约2.10%；G-S Q29约12.40%；S-S Q99最高约17.13%。不能统称小于1%。待裁决问题#7（近零量容差）仍待用户决定，未改冻结第2条。", "", f"运行条件：`{output['runtime']}`。", "", "| 题号 | 完整边界参考行数 | 三次哈希一致 | SHA256 |", "|---|---:|---|---|"]
+    lines += ["", "## 三条缺陷的修复证据", "", "1. `ordered` 要求元数据与最终外层 ORDER BY 同时成立；窗口/子查询的排序不作为最终排序。O-R/O-S Q22现按无序完整行集比较，结果见全量表。", "2. 固定单线程运行，Top-N从完整排序域构造参考。使用按全局固定精度量化的参考排序值识别并列；所有题统一使用量纲量化规则，不采用Q88特例。行编码固定同值前缀行序，每个参考三次成员哈希必须一致，否则报错停止。0.5%结果容差不再扩大并列组。", "3. 舍入差异实测：S-S Q24约0.70%/0.53%；O-S Q90最高约2.10%；G-S Q29约12.40%；S-S Q99最高约17.13%。不能统称小于1%。问题#7已裁决A，本次应用量纲绝对下限；历史实测偏差保留用于解释。", "", f"运行条件：`{output['runtime']}`。", "", "| 题号 | 完整边界参考行数 | 三次哈希一致 | SHA256 |", "|---|---:|---|---|"]
     for check in output["boundary_checks"]:
         lines.append(f"| Q{check['question_id']:02} | {check['row_count']} | 是（{check['repeat_checks']}次） | `{check['sha256']}` |")
     lines += ["", "## 本次剩余主分类与系统性影响", "", "主分类按裁决后的68条逐项账本固定，先记录具名主因，再保留复合次因；不是机械按评分器首个失败码归类。历史Q22问题修复后如已一致，移出本次差异但保留历史账本。", "", "| 类别 | 本次条数 | 系统性影响/规则依据 |", "|---|---:|---|"]
-    impacts = {"参考列缺失": "第3条：所有单元缺参考列均判错，包含问句未要求的辅助列；会系统性降低输出较简洁单元的严格准确率。", "标签或列组合": "第2/3条：只去字符串首尾空格，不拼姓名、不翻译标签；对所有单元施加格式敏感性。", "额外候选行": "第1/4条：完整结果集与Top-N行数约束；输出超集的单元均受罚，缺列等复合次因另记。", "公开工件/重执行差异": "属于外部基线的抽样/执行差异，不是全部单元的评分规则变化；六条Q14已由抽样解释，只有G-R Q30根因交T03跟进。", "舍入/相对误差": "第2条：0.5%相对误差在近零量放大舍入差异，会给全部单元引入与语义层无关的测量噪声；待裁决，不改判定。", "行序与验证流程": "第4条：修掉任意参考物理行序；同值前缀的严格行序仍可能影响所有Top-N单元，边界成员按确定性精确并列组验证。", "执行环境不兼容": "按本地执行态记exec_error；特定函数生成风格的单元会受本地能力限制，T11/T19须单列环境不兼容。", "参考度量缺失": "第3条：额外派生量不能替代参考度量；各单元必须输出全部参考度量。"}
+    impacts = {"参考列缺失": "第3条：所有单元缺参考列均判错，包含问句未要求的辅助列；会系统性降低输出较简洁单元的严格准确率。", "标签或列组合": "第2/3条：只去字符串首尾空格，不拼姓名、不翻译标签；对所有单元施加格式敏感性。", "额外候选行": "第1/4条：完整结果集与Top-N行数约束；输出超集的单元均受罚，缺列等复合次因另记。", "公开工件/重执行差异": "属于外部基线的抽样/执行差异，不是全部单元的评分规则变化；六条Q14已由抽样解释，只有G-R Q30根因交T03跟进。", "舍入/相对误差": "第2条：按已裁决A口径增加量纲绝对下限，未被下限覆盖的舍入差异仍可能影响全部单元。", "行序与验证流程": "第4条：修掉任意参考物理行序；同值前缀的严格行序仍可能影响所有Top-N单元，边界成员按确定性精确并列组验证。", "执行环境不兼容": "按本地执行态记exec_error；特定函数生成风格的单元会受本地能力限制，T11/T19须单列环境不兼容。", "参考度量缺失": "第3条：额外派生量不能替代参考度量；各单元必须输出全部参考度量。"}
     for category, impact in impacts.items():
         lines.append(f"| {category} | {current_counts[category]} | {impact} |")
     lines += ["", "## 格式敏感性（不改变判定）", "", f"严格准确率为 **{correct}/{total}（{correct / total:.1%}）**；加上数值投影匹配的 {format_only} 条判错结果，格式敏感性上界为 **{correct + format_only}/{total}（{(correct + format_only) / total:.1%}）**。这不是与外部judge的一致率。", "", f"wrong标记计数：`{dict(wrong_tags)}`。exec_error/refused/excluded不被格式放宽挽回。", "", "数值投影保留联合行匹配、完整行数、NULL、排序、Top-N及每一数值参考列；删除非数值列只产生报告层上界，不证明标签指向同一实体。数字编码的维度（如月份）也视为数值列：改成文字时保守地不算纯格式挽回；没有角色元数据时不猜业务含义。纯文本参考标为no_numeric_reference，结构不符单列，不当作数值计算错。", "", "## 全部strict差异与次因", "", "| 系统 | 题号 | 我们 | strict | 主分类 | 说明/次因 |", "|---|---|---|---|---|---|"]
@@ -226,6 +252,21 @@ def report_from_results(output: dict[str, Any], path: Path) -> None:
     for r in records:
         lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | {r['our_outcome']} | {r['strict']} | {r['analytical']} | {r['our_reason'] or 'matched'} | {r['sensitivity'] or '—'} |")
     lines += ["", "## 复现与验收边界", "", "```bash", "uv run pytest", "uv run python scripts/validate_scorer.py --output /tmp/t02-scorer-check-ruling.json --report reports/validation/scorer_check.md", "```", "", "运行前设置SEMDEBT_EVAL_DIR、SEMDEBT_DATA_DIR；固定本报告的运行版本，单进程独占chdb-eval。所有候选原样执行，重执行或参考失败不静默重试。", "", "T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落实跨执行器可复现边界组要求，不能用本卡三次SQL重复取代跨厂商独立重算。G0/G4须同时披露历史低一致率、当前数字、系统性影响和敏感性上界，不能声称跨厂商独立核对已完成。"]
+    flipped = [r for r in comparable if r.get("baseline_outcome") == "wrong" and r["our_outcome"] == "correct"]
+    atol_flipped = [r for r in comparable if r.get("relative_only_outcome") == "wrong" and r["our_outcome"] == "correct"]
+    count_flipped = [r for r in comparable if r["our_outcome"] == "correct" and r.get("exact_count_outcome") == "wrong"]
+    lines += ["", "## 2026-10-15 A裁决：放宽翻转与#8估算", "", f"旧提交{output.get('baseline_ref')}到本次wrong→correct：{len(flipped)}条；固定本次并列参考、仅加atol的wrong→correct：{len(atol_flipped)}条；反向翻转0条（运行时强制检查）。", "", "| 系统 | 题号 | 旧判定 | 新判定 | 量纲向量 |", "|---|---|---|---|---|"]
+    for r in flipped:
+        lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | wrong | correct | {r['value_kinds']} |")
+    lines += ["", f"#8反事实：在新规则正确结果中，仅将自动标为count的参考列改成精确相等，有 **{len(count_flipped)} 条correct→wrong**。这是估算，不进入正式判定；没有手工按题号选计数列。识别依赖名称/类型契约，未知单位列保守按other，不纳入count反事实。", "", "| 系统 | 题号 | 正式 | 计数精确反事实 |", "|---|---|---|---|"]
+    for r in count_flipped:
+        lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | correct | wrong |")
+    lines += ["", "## 自动量纲与并列量化契约", "", "参考列名按CamelCase/下划线拆词、忽略大小写，固定优先级：百分比(pct/percent/percentage/percentile/pp) → 比率(ratio/rate/correlation/corr) → 计数(count/countDistinct/num/n/customers/orders/stores/brands/employees/observations/reports/units/returns、cohort size、returned) → 金额(amount/amt/revenue/sales/spend/spent/cost/cogs/price/profit/income/budget/quota/ltv/dollars/discount/margin、lifetime value) → other。整数类型的sales聚合且名称不含amount/price/revenue时归count。不读取候选列名，COUNT/countDistinct/countIf/uniqExact表达式的输出别名优先标为count；不按数值大小或题号猜单位；别名必须表达单位，不能识别时atol=0。未来harness透传同样自动生成的value_kinds。", "", "比率atol=1e-4；百分比按小数形式归一后atol=1e-4（原百分比数值单位相当于0.01）；金额atol=0.01；其余0。只增加结果匹配边，不进入并列键。金额并列键Decimal保留2位、比率小数形式6位、其他数值6位；ROUND_HALF_EVEN一次固定，不逐题指定。名称推断有覆盖边界：不是语义证明，未知列不享受额外容差。", "", "| 题号 | 自动参考列量纲（顺序对应参考列） |", "|---|---|"]
+    seen = set()
+    for r in records:
+        if r['question_id'] not in seen:
+            lines.append(f"| Q{r['question_id']:02} | {r.get('value_kinds', [])} |")
+            seen.add(r['question_id'])
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     if unexplained:
@@ -251,6 +292,12 @@ def main(argv: list[str] | None = None) -> int:
     sess = session.Session(str(args.db_dir))
     records: list[dict[str, object]] = []
     references: dict[int, list[list[object]] | ExecError] = {}
+    legacy_references = {}
+    baseline_ref = "ad0b767"
+    baseline_source = subprocess.run(["git", "show", f"{baseline_ref}:harness/scorer.py"], cwd=REPO, check=True, capture_output=True, text=True).stdout
+    baseline = types.ModuleType("_t02_baseline")
+    sys.modules[baseline.__name__] = baseline
+    exec(compile(baseline_source, "<baseline scorer>", "exec"), baseline.__dict__)
     rules_by_id = {qid: question_rules(qid, q["expected_sql"]) for qid, q in questions.items()}
     boundary_checks = []
     try:
@@ -261,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
             if question_id in EXCLUDED_QUESTION_IDS:
                 references[question_id] = ExecError("published reference excluded")
                 continue
-            references[question_id], check = stable_reference(sess, question["expected_sql"], question_id, rules_by_id[question_id])
+            references[question_id], check, legacy_references[question_id] = stable_reference(sess, question["expected_sql"], question_id, rules_by_id[question_id])
             if check is not None:
                 boundary_checks.append(check)
 
@@ -279,10 +326,18 @@ def main(argv: list[str] | None = None) -> int:
                     result_reason = "published_reference_unavailable"
                     reference_count = None
                     sensitivity = None
+                    old_outcome = exact_outcome = tolerance_baseline = "excluded"
                 elif isinstance(reference, ExecError):
                     raise AssertionError("unexpected reference error")
                 else:
-                    result = score_detailed(candidate, [reference], rules_by_id[question_id])
+                    rules = rules_by_id[question_id]
+                    old_candidate = baseline.ExecError(candidate.message) if isinstance(candidate, ExecError) else candidate
+                    old_outcome = baseline.score(old_candidate, [legacy_references[question_id]], rules)
+                    tolerance_baseline = score_detailed(candidate, [reference], {**rules, "use_absolute_tolerance": False}).outcome
+                    result = score_detailed(candidate, [reference], rules)
+                    exact_outcome = score_detailed(candidate, [reference], {**rules, "exact_counts": True}).outcome
+                    if (old_outcome == "correct" or tolerance_baseline == "correct") and result.outcome != "correct":
+                        raise RuntimeError(f"q{question_id:02d} {system}: reverse flip from correct")
                     result_outcome = result.outcome
                     result_reason = ("execution_environment_incompatible" if "UNKNOWN_FUNCTION" in candidate.message else "execution_error") if isinstance(candidate, ExecError) else result.reason
                     reference_count = len(reference)
@@ -295,6 +350,10 @@ def main(argv: list[str] | None = None) -> int:
                         "our_outcome": result_outcome,
                         "our_reason": result_reason,
                         "sensitivity": sensitivity,
+                        "baseline_outcome": old_outcome,
+                        "relative_only_outcome": tolerance_baseline,
+                        "exact_count_outcome": exact_outcome,
+                        "value_kinds": rules_by_id[question_id].get("value_kinds", []),
                         "ordered": rules_by_id[question_id]["ordered"],
                         "strict": strict_record["verdict"],
                         "analytical": strict_record["analytical_verdict"],
@@ -320,6 +379,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     output = {
         "run_id": RUN_ID,
+        "baseline_ref": baseline_ref,
         "runtime": {"version": runtime_version, "max_threads": 1, "max_execution_time": 30},
         "boundary_checks": boundary_checks,
         "systems": systems,

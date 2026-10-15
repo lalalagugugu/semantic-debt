@@ -11,25 +11,25 @@
 
 ## 本次结果
 
-- strict 一致：**519/594（87.4%）**。
-- 排除本次仍存在的 9 条有意更宽差异：**519/585（88.7%）**。
-- analytical 一致：479/594（80.6%）。
+- strict 一致：**520/594（87.5%）**。
+- 排除本次仍存在的 12 条有意更宽差异：**520/582（89.3%）**。
+- analytical 一致：486/594（81.8%）。
 - 原因不明：0。
 
 | 系统 | 可比较 | strict一致 | 我们更宽 | 我们更严 |
 |---|---:|---:|---:|---:|
 | O-R | 99 | 91 | 2 | 6 |
-| O-S | 99 | 85 | 2 | 12 |
+| O-S | 99 | 85 | 3 | 11 |
 | S-R | 99 | 91 | 2 | 6 |
-| S-S | 99 | 85 | 3 | 11 |
-| G-R | 99 | 86 | 4 | 9 |
-| G-S | 99 | 81 | 3 | 15 |
+| S-S | 99 | 86 | 4 | 9 |
+| G-R | 99 | 85 | 5 | 9 |
+| G-S | 99 | 82 | 3 | 14 |
 
 ## 三条缺陷的修复证据
 
 1. `ordered` 要求元数据与最终外层 ORDER BY 同时成立；窗口/子查询的排序不作为最终排序。O-R/O-S Q22现按无序完整行集比较，结果见全量表。
-2. 固定单线程运行，Top-N从完整排序域构造参考。使用参考已投影的排序值精确识别并列；Q88沿用其已有两位小数，排除未舍入浮点排序边界的不稳定。行编码固定同值前缀行序，每个参考三次成员哈希必须一致，否则报错停止。0.5%结果容差不再扩大并列组。
-3. 舍入差异实测：S-S Q24约0.70%/0.53%；O-S Q90最高约2.10%；G-S Q29约12.40%；S-S Q99最高约17.13%。不能统称小于1%。待裁决问题#7（近零量容差）仍待用户决定，未改冻结第2条。
+2. 固定单线程运行，Top-N从完整排序域构造参考。使用按全局固定精度量化的参考排序值识别并列；所有题统一使用量纲量化规则，不采用Q88特例。行编码固定同值前缀行序，每个参考三次成员哈希必须一致，否则报错停止。0.5%结果容差不再扩大并列组。
+3. 舍入差异实测：S-S Q24约0.70%/0.53%；O-S Q90最高约2.10%；G-S Q29约12.40%；S-S Q99最高约17.13%。不能统称小于1%。问题#7已裁决A，本次应用量纲绝对下限；历史实测偏差保留用于解释。
 
 运行条件：`{'version': '"26.9.2.1"', 'max_threads': 1, 'max_execution_time': 30}`。
 
@@ -44,10 +44,6 @@
 | Q87 | 20 | 是（3次） | `6d284f5d7d261dc737ed1f4cfecc88e06dadd9071c3df185512d416bd48f995c` |
 | Q88 | 26 | 是（3次） | `1b8a8b82ce90d04bda6efcf14827d944f9329a1d0417ac9e848a1a8406e87c23` |
 
-两次独立会话均重跑600条；全部8个Top-N参考边界哈希跨会话一致。Q88每次均为26行，两次会话内各三次检查一致。首次运行用于复现核对；最终诊断代码的第二次运行作为本报告依据。
-
-修复后的判定变化：O-R/O-S Q22从wrong改为correct；O-S/S-S Q27因不再用0.5%容差合并不同排序值，从correct改为wrong。因此历史11条有意更宽差异在本次只剩9条，历史68条非有意放宽差异在本次只剩66条；不能为维持旧计数而保留已修复的问题。
-
 ## 本次剩余主分类与系统性影响
 
 主分类按裁决后的68条逐项账本固定，先记录具名主因，再保留复合次因；不是机械按评分器首个失败码归类。历史Q22问题修复后如已一致，移出本次差异但保留历史账本。
@@ -58,16 +54,16 @@
 | 标签或列组合 | 14 | 第2/3条：只去字符串首尾空格，不拼姓名、不翻译标签；对所有单元施加格式敏感性。 |
 | 额外候选行 | 9 | 第1/4条：完整结果集与Top-N行数约束；输出超集的单元均受罚，缺列等复合次因另记。 |
 | 公开工件/重执行差异 | 7 | 属于外部基线的抽样/执行差异，不是全部单元的评分规则变化；六条Q14已由抽样解释，只有G-R Q30根因交T03跟进。 |
-| 舍入/相对误差 | 4 | 第2条：0.5%相对误差在近零量放大舍入差异，会给全部单元引入与语义层无关的测量噪声；待裁决，不改判定。 |
+| 舍入/相对误差 | 0 | 第2条：按已裁决A口径增加量纲绝对下限，未被下限覆盖的舍入差异仍可能影响全部单元。 |
 | 行序与验证流程 | 1 | 第4条：修掉任意参考物理行序；同值前缀的严格行序仍可能影响所有Top-N单元，边界成员按确定性精确并列组验证。 |
 | 执行环境不兼容 | 2 | 按本地执行态记exec_error；特定函数生成风格的单元会受本地能力限制，T11/T19须单列环境不兼容。 |
 | 参考度量缺失 | 1 | 第3条：额外派生量不能替代参考度量；各单元必须输出全部参考度量。 |
 
 ## 格式敏感性（不改变判定）
 
-严格准确率为 **245/594（41.2%）**；加上数值投影匹配的 14 条判错结果，格式敏感性上界为 **259/594（43.6%）**。这不是与外部judge的一致率。
+严格准确率为 **252/594（42.4%）**；加上数值投影匹配的 15 条判错结果，格式敏感性上界为 **267/594（44.9%）**。这不是与外部judge的一致率。
 
-wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'string_or_label_only': 14, 'no_numeric_reference': 4}`。exec_error/refused/excluded不被格式放宽挽回。
+wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 143, 'string_or_label_only': 15, 'no_numeric_reference': 4}`。exec_error/refused/excluded不被格式放宽挽回。
 
 数值投影保留联合行匹配、完整行数、NULL、排序、Top-N及每一数值参考列；删除非数值列只产生报告层上界，不证明标签指向同一实体。数字编码的维度（如月份）也视为数值列：改成文字时保守地不算纯格式挽回；没有角色元数据时不猜业务含义。纯文本参考标为no_numeric_reference，结构不符单列，不当作数值计算错。
 
@@ -84,6 +80,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | O-R | Q88 | wrong | pass | 标签或列组合 | 值表示或姓名列组合不同；额外列不会恢复所需的原始参考列。 |
 | O-R | Q96 | correct | fail | 百分数等价 | 冻结规则第4/5/2条有意更宽（按类别）。 |
 | O-S | Q14 | correct | fail | 公开工件/重执行差异 | Q14：公开仅100行工件，本地完整18869行匹配；只能确认工件/抽样差异，不能断言底层数据漂移。 |
+| O-S | Q29 | correct | fail | 量纲绝对容差 | 2026-10-15规则第2条A裁决；量纲由全局参考列名称/类型规则自动识别。 |
 | O-S | Q32 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
 | O-S | Q35 | wrong | pass | 参考列缺失 | 同 O-R：参考职位列未输出。 |
 | O-S | Q45 | wrong | pass | 额外候选行 | 候选306行、参考10行；完整结果行数不符。 |
@@ -94,7 +91,6 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | O-S | Q81 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
 | O-S | Q83 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
 | O-S | Q88 | wrong | pass | 标签或列组合 | 值表示或姓名列组合不同；额外列不会恢复所需的原始参考列。 |
-| O-S | Q90 | wrong | pass | 舍入/相对误差 | 所有参考度量均在候选中；小幅 pp 值舍入导致最高约 2.10% 相对差异。 |
 | O-S | Q95 | wrong | pass | 参考度量缺失 | 参考比值列未输出，额外差值/增幅列不能替代。 |
 | O-S | Q96 | correct | fail | 百分数等价 | 冻结规则第4/5/2条有意更宽（按类别）。 |
 | S-R | Q14 | correct | fail | 公开工件/重执行差异 | Q14：公开仅100行工件，本地完整18869行匹配；只能确认工件/抽样差异，不能断言底层数据漂移。 |
@@ -106,7 +102,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | S-R | Q81 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
 | S-R | Q88 | wrong | pass | 行序与验证流程 | 候选姓名已拼接；严格前缀内同值成员顺序不同，边界成员也可不同；不属于姓名拆分。 |
 | S-S | Q14 | correct | fail | 公开工件/重执行差异 | Q14：公开仅100行工件，本地完整18869行匹配；只能确认工件/抽样差异，不能断言底层数据漂移。 |
-| S-S | Q24 | wrong | pass | 舍入/相对误差 | 舍入导致两处约0.70%和0.53%差异，超过0.5%。 |
+| S-S | Q29 | correct | fail | 量纲绝对容差 | 2026-10-15规则第2条A裁决；量纲由全局参考列名称/类型规则自动识别。 |
 | S-S | Q35 | wrong | pass | 标签或列组合 | 同 S-R：合并姓名导致列数减少，主因应是表示方式。 |
 | S-S | Q63 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
 | S-S | Q64 | correct | fail | 百分数等价 | 冻结规则第4/5/2条有意更宽（按类别）。 |
@@ -118,13 +114,13 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | S-S | Q83 | correct | fail | 数值容差 | 冻结规则第4/5/2条有意更宽（按类别）。 |
 | S-S | Q88 | wrong | pass | 标签或列组合 | 值表示或姓名列组合不同；额外列不会恢复所需的原始参考列。 |
 | S-S | Q92 | wrong | pass | 额外候选行 | 多行之外，缺参考百分比列，用成本列替代；不是单纯超集。 |
-| S-S | Q99 | wrong | pass | 舍入/相对误差 | 舍入分类成立，但不能声称均 <1%；近零值相对差异约17.13%。 |
 | G-R | Q07 | correct | fail | 边界并列 | 冻结规则第4/5/2条有意更宽（按类别）。 |
 | G-R | Q08 | exec_error | pass | 执行环境不兼容 | 独立重执行复现 UNKNOWN_FUNCTION；属于环境差异，不是结果比对器 bug。 |
 | G-R | Q14 | correct | fail | 公开工件/重执行差异 | Q14：公开仅100行工件，本地完整18869行匹配；只能确认工件/抽样差异，不能断言底层数据漂移。 |
 | G-R | Q22 | wrong | pass | 标签或列组合 | 姓名合并导致列减少；同时参考无最终排序，不能把物理行序作判据。 |
 | G-R | Q30 | correct | fail | 公开工件/重执行差异 | Q30：重执行全部31行相符，公开候选窗口值确实不同；根因尚不能仅凭工件断定。 |
 | G-R | Q32 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
+| G-R | Q37 | correct | fail | 量纲绝对容差 | 2026-10-15规则第2条A裁决；量纲由全局参考列名称/类型规则自动识别。 |
 | G-R | Q45 | wrong | pass | 额外候选行 | 候选306行、参考10行；完整结果行数不符。 |
 | G-R | Q59 | exec_error | pass | 执行环境不兼容 | 独立重执行复现 UNKNOWN_FUNCTION；属于环境差异，不是结果比对器 bug。 |
 | G-R | Q63 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
@@ -135,7 +131,6 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | G-S | Q14 | correct | fail | 公开工件/重执行差异 | Q14：公开仅100行工件，本地完整18869行匹配；只能确认工件/抽样差异，不能断言底层数据漂移。 |
 | G-S | Q23 | wrong | pass | 标签或列组合 | 值表示或姓名列组合不同；额外列不会恢复所需的原始参考列。 |
 | G-S | Q26 | wrong | pass | 标签或列组合 | 值表示或姓名列组合不同；额外列不会恢复所需的原始参考列。 |
-| G-S | Q29 | wrong | pass | 舍入/相对误差 | 舍入分类成立；相对差异约12.40%，并非 <1%。 |
 | G-S | Q63 | wrong | pass | 参考列缺失 | 参考至少一列缺失；列数与公开说明、本地输出支持该主因。 |
 | G-S | Q64 | correct | fail | 百分数等价 | 冻结规则第4/5/2条有意更宽（按类别）。 |
 | G-S | Q66 | wrong | pass | 参考列缺失 | 缺订单数之外，同时存在季度标签改写。 |
@@ -191,7 +186,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | O-R | Q34 | wrong | fail | fail | row_count | structure_mismatch |
 | O-R | Q35 | wrong | pass | pass | values | no_numeric_reference |
 | O-R | Q36 | wrong | fail | fail | row_count | structure_mismatch |
-| O-R | Q37 | wrong | fail | pass | values | numeric_mismatch |
+| O-R | Q37 | wrong | fail | pass | values | string_or_label_only |
 | O-R | Q38 | wrong | fail | fail | row_count | structure_mismatch |
 | O-R | Q39 | exec_error | fail | fail | execution_error | — |
 | O-R | Q40 | wrong | fail | fail | values | numeric_mismatch |
@@ -283,7 +278,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | O-S | Q26 | correct | pass | pass | matched | — |
 | O-S | Q27 | wrong | fail | fail | values | string_or_label_only |
 | O-S | Q28 | wrong | fail | fail | values | numeric_mismatch |
-| O-S | Q29 | wrong | fail | pass | values | numeric_mismatch |
+| O-S | Q29 | correct | fail | pass | matched | — |
 | O-S | Q30 | correct | pass | pass | matched | — |
 | O-S | Q31 | wrong | fail | fail | row_count | structure_mismatch |
 | O-S | Q32 | wrong | pass | pass | missing_columns | numeric_mismatch |
@@ -344,7 +339,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | O-S | Q87 | correct | pass | pass | matched | — |
 | O-S | Q88 | wrong | pass | pass | values | string_or_label_only |
 | O-S | Q89 | correct | pass | pass | matched | — |
-| O-S | Q90 | wrong | pass | pass | values | numeric_mismatch |
+| O-S | Q90 | correct | pass | pass | matched | — |
 | O-S | Q91 | wrong | fail | fail | row_count | structure_mismatch |
 | O-S | Q92 | wrong | fail | pass | row_count | structure_mismatch |
 | O-S | Q93 | wrong | fail | fail | row_count | structure_mismatch |
@@ -478,12 +473,12 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | S-S | Q21 | correct | pass | pass | matched | — |
 | S-S | Q22 | exec_error | fail | fail | execution_error | — |
 | S-S | Q23 | correct | pass | pass | matched | — |
-| S-S | Q24 | wrong | pass | pass | values | numeric_mismatch |
+| S-S | Q24 | correct | pass | pass | matched | — |
 | S-S | Q25 | correct | pass | pass | matched | — |
 | S-S | Q26 | correct | pass | pass | matched | — |
 | S-S | Q27 | wrong | fail | fail | values | string_or_label_only |
 | S-S | Q28 | wrong | fail | fail | values | numeric_mismatch |
-| S-S | Q29 | wrong | fail | pass | values | numeric_mismatch |
+| S-S | Q29 | correct | fail | pass | matched | — |
 | S-S | Q30 | correct | pass | pass | matched | — |
 | S-S | Q31 | wrong | fail | fail | row_count | structure_mismatch |
 | S-S | Q32 | wrong | fail | pass | missing_columns | numeric_mismatch |
@@ -553,7 +548,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | S-S | Q96 | correct | pass | pass | matched | — |
 | S-S | Q97 | wrong | fail | fail | row_count | structure_mismatch |
 | S-S | Q98 | exec_error | fail | fail | execution_error | — |
-| S-S | Q99 | wrong | pass | pass | values | numeric_mismatch |
+| S-S | Q99 | correct | pass | pass | matched | — |
 | S-S | Q100 | wrong | fail | pass | row_count | structure_mismatch |
 | G-R | Q01 | correct | pass | pass | matched | — |
 | G-R | Q02 | correct | pass | pass | matched | — |
@@ -591,7 +586,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | G-R | Q34 | wrong | fail | fail | row_count | structure_mismatch |
 | G-R | Q35 | exec_error | fail | fail | execution_error | — |
 | G-R | Q36 | wrong | fail | fail | row_count | structure_mismatch |
-| G-R | Q37 | wrong | fail | pass | values | numeric_mismatch |
+| G-R | Q37 | correct | fail | pass | matched | — |
 | G-R | Q38 | wrong | fail | fail | row_count | structure_mismatch |
 | G-R | Q39 | exec_error | fail | fail | execution_error | — |
 | G-R | Q40 | wrong | fail | fail | values | numeric_mismatch |
@@ -683,7 +678,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 151, 'strin
 | G-S | Q26 | wrong | pass | pass | values | numeric_mismatch |
 | G-S | Q27 | wrong | fail | fail | missing_columns | numeric_mismatch |
 | G-S | Q28 | wrong | fail | fail | values | numeric_mismatch |
-| G-S | Q29 | wrong | pass | pass | values | numeric_mismatch |
+| G-S | Q29 | correct | pass | pass | matched | — |
 | G-S | Q30 | correct | pass | pass | matched | — |
 | G-S | Q31 | wrong | fail | fail | row_count | structure_mismatch |
 | G-S | Q32 | wrong | fail | pass | missing_columns | numeric_mismatch |
@@ -766,3 +761,140 @@ uv run python scripts/validate_scorer.py --output /tmp/t02-scorer-check-ruling.j
 运行前设置SEMDEBT_EVAL_DIR、SEMDEBT_DATA_DIR；固定本报告的运行版本，单进程独占chdb-eval。所有候选原样执行，重执行或参考失败不静默重试。
 
 T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落实跨执行器可复现边界组要求，不能用本卡三次SQL重复取代跨厂商独立重算。G0/G4须同时披露历史低一致率、当前数字、系统性影响和敏感性上界，不能声称跨厂商独立核对已完成。
+
+## 2026-10-15 A裁决：放宽翻转与#8估算
+
+旧提交ad0b767到本次wrong→correct：7条；固定本次并列参考、仅加atol的wrong→correct：7条；反向翻转0条（运行时强制检查）。
+
+| 系统 | 题号 | 旧判定 | 新判定 | 量纲向量 |
+|---|---|---|---|---|
+| O-S | Q29 | wrong | correct | ['percentage'] |
+| O-S | Q90 | wrong | correct | ['other', 'percentage', 'percentage', 'percentage', 'percentage', 'percentage'] |
+| S-S | Q24 | wrong | correct | ['other', 'count', 'count', 'percentage'] |
+| S-S | Q29 | wrong | correct | ['percentage'] |
+| S-S | Q99 | wrong | correct | ['other', 'amount', 'amount', 'percentage'] |
+| G-R | Q37 | wrong | correct | ['other', 'amount', 'percentage'] |
+| G-S | Q29 | wrong | correct | ['percentage'] |
+
+#8反事实：在新规则正确结果中，仅将自动标为count的参考列改成精确相等，有 **1 条correct→wrong**。这是估算，不进入正式判定；没有手工按题号选计数列。识别依赖名称/类型契约，未知单位列保守按other，不纳入count反事实。
+
+| 系统 | 题号 | 正式 | 计数精确反事实 |
+|---|---|---|---|
+| S-S | Q83 | correct | wrong |
+
+## 自动量纲与并列量化契约
+
+参考列名按CamelCase/下划线拆词、忽略大小写，固定优先级：百分比(pct/percent/percentage/percentile/pp) → 比率(ratio/rate/correlation/corr) → 计数(count/countDistinct/num/n/customers/orders/stores/brands/employees/observations/reports/units/returns、cohort size、returned) → 金额(amount/amt/revenue/sales/spend/spent/cost/cogs/price/profit/income/budget/quota/ltv/dollars/discount/margin、lifetime value) → other。整数类型的sales聚合且名称不含amount/price/revenue时归count。不读取候选列名，COUNT/countDistinct/countIf/uniqExact表达式的输出别名优先标为count；不按数值大小或题号猜单位；别名必须表达单位，不能识别时atol=0。未来harness透传同样自动生成的value_kinds。
+
+比率atol=1e-4；百分比按小数形式归一后atol=1e-4（原百分比数值单位相当于0.01）；金额atol=0.01；其余0。只增加结果匹配边，不进入并列键。金额并列键Decimal保留2位、比率小数形式6位、其他数值6位；ROUND_HALF_EVEN一次固定，不逐题指定。名称推断有覆盖边界：不是语义证明，未知列不享受额外容差。
+
+| 题号 | 自动参考列量纲（顺序对应参考列） |
+|---|---|
+| Q01 | ['count'] |
+| Q02 | ['amount'] |
+| Q03 | ['count'] |
+| Q04 | ['other'] |
+| Q05 | ['other', 'count'] |
+| Q06 | ['amount'] |
+| Q07 | ['other', 'amount'] |
+| Q08 | ['other', 'other'] |
+| Q09 | ['amount'] |
+| Q10 | ['count'] |
+| Q11 | ['other', 'amount'] |
+| Q12 | ['other', 'amount'] |
+| Q13 | ['other', 'amount', 'other', 'count'] |
+| Q14 | ['other', 'other', 'amount'] |
+| Q15 | ['other', 'amount'] |
+| Q16 | ['other', 'amount'] |
+| Q17 | ['other', 'amount', 'percentage'] |
+| Q18 | ['other', 'amount'] |
+| Q19 | ['other', 'other'] |
+| Q20 | ['other', 'other', 'other'] |
+| Q21 | ['other', 'other', 'other'] |
+| Q22 | ['other', 'other', 'other', 'other', 'amount', 'other'] |
+| Q23 | ['other', 'amount', 'amount'] |
+| Q24 | ['other', 'count', 'count', 'percentage'] |
+| Q25 | ['other', 'amount'] |
+| Q26 | ['other', 'count'] |
+| Q27 | ['other', 'amount', 'amount', 'percentage'] |
+| Q28 | ['other', 'other'] |
+| Q29 | ['percentage'] |
+| Q30 | ['other', 'amount', 'other'] |
+| Q31 | ['other', 'other', 'amount'] |
+| Q32 | ['count', 'amount'] |
+| Q33 | [] |
+| Q34 | ['other', 'amount', 'other', 'ratio'] |
+| Q35 | ['other', 'other', 'other', 'other', 'other'] |
+| Q36 | ['other', 'count'] |
+| Q37 | ['other', 'amount', 'percentage'] |
+| Q38 | ['other', 'other', 'other', 'percentage'] |
+| Q39 | ['other', 'amount', 'amount'] |
+| Q40 | ['amount'] |
+| Q41 | ['amount'] |
+| Q42 | ['other', 'amount', 'other'] |
+| Q43 | ['other', 'amount'] |
+| Q44 | ['other', 'amount', 'percentage'] |
+| Q45 | ['other', 'amount', 'other', 'amount'] |
+| Q46 | ['other', 'amount'] |
+| Q47 | ['other', 'other'] |
+| Q48 | ['other', 'amount', 'count'] |
+| Q49 | ['other', 'amount'] |
+| Q50 | ['amount', 'amount', 'percentage'] |
+| Q51 | ['count'] |
+| Q52 | ['amount'] |
+| Q53 | ['count'] |
+| Q54 | ['amount'] |
+| Q55 | ['count'] |
+| Q56 | ['amount'] |
+| Q57 | ['count'] |
+| Q58 | ['amount'] |
+| Q59 | ['count'] |
+| Q60 | ['count'] |
+| Q61 | ['other', 'amount'] |
+| Q62 | ['other', 'amount', 'count'] |
+| Q63 | ['other', 'other', 'count'] |
+| Q64 | ['other', 'amount', 'percentage'] |
+| Q65 | ['other', 'other', 'amount'] |
+| Q66 | ['other', 'amount', 'count'] |
+| Q67 | ['other', 'amount', 'count'] |
+| Q68 | ['other', 'count', 'amount'] |
+| Q69 | ['other', 'amount', 'amount', 'percentage'] |
+| Q70 | ['other', 'amount', 'other', 'count'] |
+| Q71 | ['other', 'other', 'amount'] |
+| Q72 | ['other', 'other', 'amount', 'amount'] |
+| Q73 | ['other', 'other', 'other', 'other'] |
+| Q74 | ['other', 'other', 'amount', 'percentage'] |
+| Q75 | ['other', 'other', 'amount', 'amount', 'percentage'] |
+| Q76 | ['other', 'percentage'] |
+| Q77 | ['other', 'amount', 'amount', 'percentage'] |
+| Q78 | ['other', 'amount', 'other', 'percentage'] |
+| Q79 | ['other', 'amount', 'amount', 'percentage'] |
+| Q80 | ['other', 'count', 'other'] |
+| Q81 | ['other', 'count', 'amount', 'amount'] |
+| Q82 | ['other', 'other', 'count', 'other'] |
+| Q83 | ['count', 'count', 'percentage', 'count', 'percentage'] |
+| Q84 | ['other', 'count', 'amount', 'percentage'] |
+| Q85 | ['other', 'other', 'amount', 'amount', 'percentage'] |
+| Q86 | ['other', 'ratio', 'count'] |
+| Q87 | ['other', 'other', 'other', 'other'] |
+| Q88 | ['other', 'amount'] |
+| Q89 | ['other', 'count', 'amount', 'other'] |
+| Q90 | ['other', 'percentage', 'percentage', 'percentage', 'percentage', 'percentage'] |
+| Q91 | ['ratio', 'count'] |
+| Q92 | ['other', 'amount', 'amount', 'percentage'] |
+| Q93 | ['ratio', 'ratio', 'count'] |
+| Q94 | ['other', 'amount', 'amount', 'percentage'] |
+| Q95 | ['other', 'amount', 'amount', 'ratio', 'amount'] |
+| Q96 | ['other', 'count', 'count', 'percentage'] |
+| Q97 | ['other', 'amount', 'amount', 'percentage'] |
+| Q98 | ['other', 'percentage', 'other'] |
+| Q99 | ['other', 'amount', 'amount', 'percentage'] |
+| Q100 | ['other', 'count', 'other', 'amount'] |
+
+## 本轮运行记录
+
+- 首次预跑因COUNT表达式识别器的回归测试发现问题而主动中止，未作为验收结果。
+- 中止过程中旧查询尚未结束，首次重启被chdb-eval锁拒绝；确认旧进程退出并释放锁后才开始最终运行。该连接失败未混入候选结果。
+- 最终完整执行600条：correct=252、wrong=303、exec_error=39、Q33公开参考不可用而excluded=6。每个候选只执行一次；三份评分共用同一执行结果，不静默重试失败SQL。
+- A前基线ad0b767在同一批执行结果上正确245/594；新规则正确252/594（42.4%），增加7条。并列量化单独未引起判定翻转；全部8个参考边界组的成员行数及哈希也与上一轮一致。历史strict一致率519/594（87.4%）及排除有意更宽后519/585（88.7%）同时保留。
+- #8只改已自动识别的count列、其他规则固定：S-S Q83从correct变wrong，正确数252→251；其余593条可比较结果不变。此为反事实，未修改正式判定或将#8标记已裁决。
