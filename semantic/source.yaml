@@ -2842,6 +2842,48 @@ metrics:
     dataset: FactInventory
     conventions: [11]
     note: "全量值 89,591（占 600,241 个组合的 14.9%）。按门店 × 产品计数，不能跨行相加。"
+  - name: "快照日在手库存数量"
+    definition: >-
+      某一个快照日的在手库存数量之和。与「当前在手库存数量」的区别是它固定在一个快照日上，
+      用来看库存水位的时间趋势；「当前」那个取的是每个门店 × 产品各自最近的一次。
+    expression: "sum(OnHandQuantity)，按 DateKey 分组"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: "不同快照日之间不可相加（约定 11）。快照只落在周六，156 个日期。"
+  - name: "快照日在订库存数量"
+    definition: "某一个快照日的在订（已下采购单未到货）数量之和。"
+    expression: "sum(OnOrderQuantity)，按 DateKey 分组"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: "不同快照日之间不可相加。"
+  - name: "快照日安全库存数量"
+    definition: "某一个快照日的安全库存水位之和。"
+    expression: "sum(SafetyStockQuantity)，按 DateKey 分组"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: "不同快照日之间不可相加。"
+  - name: "快照日低于安全库存的门店产品数"
+    definition: "某一个快照日里 在手数量 < 安全库存水位 的门店 × 产品组合个数。"
+    expression: "countIf(OnHandQuantity < SafetyStockQuantity)，按 DateKey 分组"
+    additivity: 去重
+    unit: "个"
+    dataset: FactInventory
+    conventions: [11]
+    note: "按门店 × 产品计数，不能跨行相加；也不能跨快照日相加。"
+  - name: "门店产品组合数"
+    definition: >-
+      去重的门店 × 产品组合个数。缺货面的分母（低于安全库存的门店产品数 ÷ 门店产品组合数）。
+    expression: "uniqExact((StoreKey, ProductKey))"
+    additivity: 去重
+    unit: "个"
+    dataset: FactInventory
+    note: "**不能跨行相加**。全量值 600,241。"
   - name: "快照日在手库存金额"
     definition: >-
       某一个快照日的 在手数量 × 单位成本 之和。与「当前在手库存金额」的区别是它固定在

@@ -253,6 +253,41 @@ def check_summary_yaml(c: Checker, src: dict) -> None:
         print("   （summary.yaml 还不存在，跳过）")
         return
     names_src = source_metric_names(src)
+
+    # summary.yaml 必须覆盖 summary.sql 里真实建出来的每张表和每个列，
+    # 否则漏掉一列也没人发现（和宽表那一节同样的覆盖检查）。
+    import re
+
+    sql_path = SEMANTIC / "summary" / "summary.sql"
+    if sql_path.is_file():
+        sql = sql_path.read_text(encoding="utf-8")
+        in_sql = set(re.findall(r"CREATE TABLE\s+ads\.(\w+)", sql))
+        in_yaml = {x["name"] for x in sfile.get("tables", [])}
+        c.check(in_sql == in_yaml, "summary 节的汇总表与 summary.sql 一一对应",
+                f"只在 SQL：{sorted(in_sql - in_yaml)}；只在 YAML：{sorted(in_yaml - in_sql)}")
+        views_sql = set(re.findall(r"CREATE OR REPLACE VIEW\s+ads\.(\w+)", sql))
+        c.check(views_sql == set(sfile.get("dimension_views", [])),
+                "dimension_views 与 summary.sql 里的维度视图一一对应",
+                f"只在 SQL：{sorted(views_sql - set(sfile.get('dimension_views', [])))}")
+        for tbl in sfile.get("tables", []):
+            m = re.search(
+                rf"CREATE TABLE\s+ads\.{tbl['name']}\b.*?(?=DROP TABLE IF EXISTS|CREATE TABLE\s+ads\.|\Z)",
+                sql, re.S)
+            if not m:
+                continue
+            aliases = re.findall(r"AS\s+`([^`]+)`", m.group(0))
+            described = {col["name"] for col in tbl.get("columns", [])}
+            missing = sorted(set(aliases) - described)
+            c.check(not missing, f"汇总表 {tbl['name']} 的每个列都有说明",
+                    f"没有说明的列：{missing}")
+
+    for t in sfile.get("tables", []):
+        # 规矩：比率不存比率本身，只存分子和分母。所以不该有 additivity 为「比率」的列。
+        for col in t.get("columns", []):
+            c.check(col.get("additivity") != "比率",
+                    f"汇总表 {t.get('name')}.{col.get('name')} 不应是比率列"
+                    f"（规矩：比率只存分子和分母，比率本身现算）")
+
     for t in sfile.get("tables", []):
         c.check(has_text(t.get("grain"), 6), f"汇总表 {t.get('name')} 写明粒度")
         c.check(has_text(t.get("description"), 6), f"汇总表 {t.get('name')} 有描述")

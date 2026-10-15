@@ -1,0 +1,1021 @@
+# L1.5S 汇总层的列级说明
+#
+# 配套文件：
+#   semantic/summary/requirements.md  12 份常规经营报表的需求清单（用户已过目）
+#   semantic/summary/summary.sql      建表语句（物化在 chDB 的独立库 `ads`）
+#   render/build_summary.py           一条命令重建 + 可加指标合计对账
+#
+# 规矩（任务卡 T08）：
+#   * 每张汇总表对应需求清单里的一份或几份报表（serves_reports 那一行）。
+#   * 只汇总 source.yaml 已定义过的指标；每个指标列的 metric 指回 source.yaml 的指标名。
+#     semantic/schema/validate.py 的第 5 项校验这条。
+#   * 比率**不存比率本身**，只存分子和分母（毛利率存毛利和销售额；日均销售额存销售额和
+#     有销售天数；目标达成率存销售额和目标销售额；折扣率存折扣金额和折扣前原价；
+#     坪效存销售额和门店营业面积）。
+#   * 去重计数（additivity: 去重）的描述里都写明**不能跨行相加**。
+#   * 维度属性反范式化进汇总表（additivity: 维度）。
+#   * `ads` 库里没有任何明细事实表；build_summary.py 按「相对基表有没有真的聚合」自动查。
+#
+# 金额列都是 Decimal(38, 6)：事实表的金额是 Float64，直接 sum 的结果随分组顺序有末位
+# 差异，汇总表就对不上事实表的合计。逐行转定点数再求和才能逐位对上（和 T01 的校验报告
+# 用的是同一个口径 sum(toDecimal128(列, 6))）。
+#
+# 冻结：G1 打 tag `semantic-v1` 之后不得再改。
+
+version: 1
+database: ads
+source: semantic/source.yaml
+requirements: semantic/summary/requirements.md
+
+dimension_views:
+  - dim_account
+  - dim_channel
+  - dim_customer
+  - dim_date
+  - dim_product
+  - dim_product_category
+  - dim_promotion
+  - dim_scenario
+  - dim_store
+
+tables:
+  - name: ads_inventory_current_store_category
+    title: "当前库存底表"
+    serves_reports: [R11]
+    grain: "一行 = 一家门店 × 一个品类（取每个门店 × 产品最近一次快照后再汇总）。"
+    description: "约定 11 的「当前库存」口径已经编码进这张表：先按门店 × 产品各自取最大快照日（不是全局最后一个快照日），再汇总。不带日期维度——「当前」只有一个；各组合的最后一次快照不在同一天，用「最早 / 最晚快照日」说明覆盖区间。"
+    columns:
+      - name: "门店名"
+        description: "门店名。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店（3 线上 / 3 经销 / 1 目录）。"
+        additivity: 维度
+      - name: "门店类型"
+        description: "Store / Online / Catalog / Reseller，决定这家店属于哪个渠道。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "门店大洲"
+        description: "门店所在大洲：North America / Europe / Asia。"
+        additivity: 维度
+      - name: "品类"
+        description: "产品品类（8 个）。**「未知（产品维度缺行）」是一个真实的组**：产品维度缺 284 行而事实表引用了这些键，这一组把它们收进来，各组之和才等于大盘（data_quality / missing-products）。"
+        additivity: 维度
+      - name: "最早快照日"
+        description: "这一行汇总到的门店 × 产品里，最早的那个「最近一次快照」日期。各组合的最后一次快照不在同一天，用这一列和「最晚快照日」说明覆盖区间。"
+        additivity: 维度
+      - name: "最晚快照日"
+        description: "这一行汇总到的门店 × 产品里，最晚的那个「最近一次快照」日期。"
+        additivity: 维度
+      - name: "在手数量"
+        description: "在手库存数量合计（件）。**半可加**：在门店 / 品类等维度上可加，在**时间上不可加**——库存快照不能跨日期求和（约定 11）。"
+        additivity: 半可加
+        metric: "当前在手库存数量"
+      - name: "在手库存金额"
+        description: "在手数量 × 单位成本 的合计。**半可加**，同上不可跨快照日求和。"
+        additivity: 半可加
+        metric: "当前在手库存金额"
+      - name: "在订数量"
+        description: "已下采购单未到货的数量合计（件）。**半可加**。"
+        additivity: 半可加
+        metric: "当前在订库存数量"
+      - name: "安全库存数量"
+        description: "安全库存水位合计（件）。**半可加**。与「低于安全库存的门店产品数」一起看缺货面。"
+        additivity: 半可加
+        metric: "当前安全库存数量"
+      - name: "低于安全库存的门店产品数"
+        description: "在手数量 < 安全库存水位 的门店 × 产品组合个数。**不能跨行相加**，也不能跨快照日相加。"
+        additivity: 去重
+        metric: "低于安全库存的门店产品数"
+      - name: "门店产品组合数"
+        description: "这一行汇总到的门店 × 产品组合个数。**不能跨行相加**。它是缺货面的分母（低于安全库存的门店产品数 ÷ 门店产品组合数）。"
+        additivity: 去重
+        metric: "门店产品组合数"
+
+  - name: ads_inventory_week_store_category
+    title: "库存周报底表"
+    serves_reports: [R11]
+    grain: "一行 = 一个快照日 × 一家门店 × 一个品类。"
+    description: "逐周看库存水位和缺货面。所有库存指标**半可加**：不能跨快照日相加（约定 11）。快照每周六一次，156 个日期。"
+    columns:
+      - name: "快照日期"
+        description: "库存快照日。快照每周一次、全部落在周六，共 156 个日期（约定 11 写的是每日，与数据不符，见 source.yaml 的 data_quality / inventory-weekly）。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "门店名"
+        description: "门店名。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店（3 线上 / 3 经销 / 1 目录）。"
+        additivity: 维度
+      - name: "门店类型"
+        description: "Store / Online / Catalog / Reseller，决定这家店属于哪个渠道。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "品类"
+        description: "产品品类（8 个）。**「未知（产品维度缺行）」是一个真实的组**：产品维度缺 284 行而事实表引用了这些键，这一组把它们收进来，各组之和才等于大盘（data_quality / missing-products）。"
+        additivity: 维度
+      - name: "在手数量"
+        description: "在手库存数量合计（件）。**半可加**：在门店 / 品类等维度上可加，在**时间上不可加**——库存快照不能跨日期求和（约定 11）。"
+        additivity: 半可加
+        metric: "快照日在手库存数量"
+      - name: "在手库存金额"
+        description: "在手数量 × 单位成本 的合计。**半可加**，同上不可跨快照日求和。"
+        additivity: 半可加
+        metric: "快照日在手库存金额"
+      - name: "在订数量"
+        description: "已下采购单未到货的数量合计（件）。**半可加**。"
+        additivity: 半可加
+        metric: "快照日在订库存数量"
+      - name: "安全库存数量"
+        description: "安全库存水位合计（件）。**半可加**。与「低于安全库存的门店产品数」一起看缺货面。"
+        additivity: 半可加
+        metric: "快照日安全库存数量"
+      - name: "低于安全库存的门店产品数"
+        description: "在手数量 < 安全库存水位 的门店 × 产品组合个数。**不能跨行相加**，也不能跨快照日相加。"
+        additivity: 去重
+        metric: "快照日低于安全库存的门店产品数"
+
+  - name: ads_online_customer_month_tier
+    title: "电商客户月报底表"
+    serves_reports: [R08]
+    grain: "一行 = 一个月 × 一个客户分层 × 是否新客。"
+    description: "客户结构的月度变化。客户分层按约定 13（基准日 2009-12-31，客户的固定属性），是否新客按约定 14 逐月判定。活跃 / 有流失风险 / 已流失客户数由「客户分层」筛出来，新客数 / 新客销售额由「是否新客」筛出来，不另设列。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "客户分层"
+        description: "活跃 / 有流失风险 / 已流失，按约定 13（最近一次购买距 2009-12-31 的月数：≤6 / 7–12 / >12）。这是客户的固定属性，基准日是 2009-12-31，不随行所在的月份变。"
+        additivity: 维度
+      - name: "是否新客"
+        description: "按约定 14 逐月判定：该客户的首次购买日是否落在当月最后一天往前 90 天内。**这个库里几乎恒为假**（18,868/18,869 个客户首次购买都在 2007 年，见 open-questions 第 12 条），所以为真的行极少。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "净销售额"
+        description: "销售金额 − 退货金额（约定 7）。行级可加，直接存终值。"
+        additivity: 可加
+        metric: "净销售额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "订单行数"
+        description: "线上订单行数（事实表行数）。可加。注意它不是订单数——平均每单 7.5 行。"
+        additivity: 可加
+        metric: "订单行数"
+      - name: "订单数"
+        description: "去重的线上订单号个数（约定 8）。**不能跨行相加**——各行的订单数加起来不等于总体订单数（实测有 2,034 个订单号挂在多个客户上）。要总行就查 `ads_online_week_total`，那张表在全站粒度上重新算过。"
+        additivity: 去重
+        metric: "订单数"
+      - name: "客户数"
+        description: "去重的客户个数。**不能跨行相加**。只有线上销售有客户键。"
+        additivity: 去重
+        metric: "客户数"
+
+  - name: ads_online_customer_profile_quarter
+    title: "客户画像季报底表"
+    serves_reports: [R09]
+    grain: "一行 = 一个季 × 客户性别 × 婚姻状况 × 学历 × 职业 × 年收入档 × 客户大洲 × 客户国家。"
+    description: "按人口属性和地域看客群贡献。地理走**客户所在地**（约定 5 的默认分支）。"
+    columns:
+      - name: "季起始日"
+        description: "所属季度，取每季第一天。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "季"
+        description: "季度数字 1 ~ 4。"
+        additivity: 维度
+      - name: "客户性别"
+        description: "客户性别 M / F。源列是 Nullable 而 MergeTree 排序键不接受 Nullable，所以用 `coalesce(…, '未填写')` 兜底；实测空值率 0%，「未填写」这一组不会出现。"
+        additivity: 维度
+      - name: "客户婚姻状况"
+        description: "M = 已婚、S = 单身。同上用 '未填写' 兜底，实际不出现。"
+        additivity: 维度
+      - name: "客户学历"
+        description: "五档学历。同上用 '未填写' 兜底，实际不出现。"
+        additivity: 维度
+      - name: "客户职业"
+        description: "五类职业。同上用 '未填写' 兜底，实际不出现。"
+        additivity: 维度
+      - name: "客户年收入档"
+        description: "客户年收入（美元），17 个档。10,000,000 这一档有 385 人，是离群值，算平均收入时会被它拉偏。"
+        additivity: 维度
+      - name: "客户大洲"
+        description: "**客户所在**大洲（约定 5 的默认分支）。"
+        additivity: 维度
+      - name: "客户国家"
+        description: "客户所在国家 / 地区。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "订单行数"
+        description: "线上订单行数（事实表行数）。可加。注意它不是订单数——平均每单 7.5 行。"
+        additivity: 可加
+        metric: "订单行数"
+      - name: "订单数"
+        description: "去重的线上订单号个数（约定 8）。**不能跨行相加**——各行的订单数加起来不等于总体订单数（实测有 2,034 个订单号挂在多个客户上）。要总行就查 `ads_online_week_total`，那张表在全站粒度上重新算过。"
+        additivity: 去重
+        metric: "订单数"
+      - name: "客户数"
+        description: "去重的客户个数。**不能跨行相加**。只有线上销售有客户键。"
+        additivity: 去重
+        metric: "客户数"
+
+  - name: ads_online_week_store
+    title: "电商运营周报底表 · 按线上店"
+    serves_reports: [R07]
+    grain: "一行 = 一个周 × 一家线上店。"
+    description: "电商周报。订单数和客户数是去重计数，**三家线上店的值加起来不等于全站值**，全站行另见 `ads_online_week_total`。"
+    columns:
+      - name: "周起始日"
+        description: "所属周，取该周的周一（`toMonday`）。日历周的标签不带年份，所以用周一这个日期做键。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "线上店名"
+        description: "承接线上交易的虚拟店，只有北美 / 欧洲 / 亚洲三家。不是实体门店。"
+        additivity: 维度
+      - name: "线上店大洲"
+        description: "线上店所在大洲，用来区分三家线上店覆盖的区域。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "退货数量"
+        description: "退货数量合计（件）。"
+        additivity: 可加
+        metric: "退货数量"
+      - name: "净销售额"
+        description: "销售金额 − 退货金额（约定 7）。行级可加，直接存终值。"
+        additivity: 可加
+        metric: "净销售额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "折扣金额"
+        description: "折扣金额合计。"
+        additivity: 可加
+        metric: "折扣金额"
+      - name: "折扣前原价"
+        description: "销售额 + 折扣金额。**折扣率的分母**（折扣率 = 折扣金额 ÷ 折扣前原价），按「比率存分子分母」的规矩存下来。"
+        additivity: 可加
+        metric: "折扣前原价"
+      - name: "打折销售额"
+        description: "促销键不等于 1 的销售额合计（约定 10）。与「销售额」一起构成打折销售额占比的分子和分母。"
+        additivity: 可加
+        metric: "打折销售额"
+      - name: "订单行数"
+        description: "线上订单行数（事实表行数）。可加。注意它不是订单数——平均每单 7.5 行。"
+        additivity: 可加
+        metric: "订单行数"
+      - name: "订单数"
+        description: "去重的线上订单号个数（约定 8）。**不能跨行相加**——各行的订单数加起来不等于总体订单数（实测有 2,034 个订单号挂在多个客户上）。要总行就查 `ads_online_week_total`，那张表在全站粒度上重新算过。"
+        additivity: 去重
+        metric: "订单数"
+      - name: "客户数"
+        description: "去重的客户个数。**不能跨行相加**。只有线上销售有客户键。"
+        additivity: 去重
+        metric: "客户数"
+      - name: "有销售天数"
+        description: "去重的有销售日期个数。**不能跨行相加**。它是**日均销售额的分母**（日均销售额 = 销售额 ÷ 有销售天数，约定 4），按「比率存分子分母」的规矩存下来。"
+        additivity: 去重
+        metric: "有销售天数"
+
+  - name: ads_online_week_total
+    title: "电商运营周报底表 · 全站"
+    serves_reports: [R07]
+    grain: "一行 = 一个周（全站）。"
+    description: "专门为了去重计数而存在的一张表：订单数、客户数在全站粒度上重新算，供报表直接取总行，不要去加 `ads_online_week_store` 的分行。"
+    columns:
+      - name: "周起始日"
+        description: "所属周，取该周的周一（`toMonday`）。日历周的标签不带年份，所以用周一这个日期做键。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "退货数量"
+        description: "退货数量合计（件）。"
+        additivity: 可加
+        metric: "退货数量"
+      - name: "净销售额"
+        description: "销售金额 − 退货金额（约定 7）。行级可加，直接存终值。"
+        additivity: 可加
+        metric: "净销售额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "折扣金额"
+        description: "折扣金额合计。"
+        additivity: 可加
+        metric: "折扣金额"
+      - name: "订单行数"
+        description: "线上订单行数（事实表行数）。可加。注意它不是订单数——平均每单 7.5 行。"
+        additivity: 可加
+        metric: "订单行数"
+      - name: "订单数"
+        description: "去重的线上订单号个数（约定 8）。**不能跨行相加**——各行的订单数加起来不等于总体订单数（实测有 2,034 个订单号挂在多个客户上）。要总行就查 `ads_online_week_total`，那张表在全站粒度上重新算过。"
+        additivity: 去重
+        metric: "订单数"
+      - name: "客户数"
+        description: "去重的客户个数。**不能跨行相加**。只有线上销售有客户键。"
+        additivity: 去重
+        metric: "客户数"
+      - name: "有销售天数"
+        description: "去重的有销售日期个数。**不能跨行相加**。它是**日均销售额的分母**（日均销售额 = 销售额 ÷ 有销售天数，约定 4），按「比率存分子分母」的规矩存下来。"
+        additivity: 去重
+        metric: "有销售天数"
+
+  - name: ads_plan_month_category_account
+    title: "预算执行月报底表 · 按品类"
+    serves_reports: [R03]
+    grain: "一行 = 一个月 × 一个品类 × 一个科目 × 一个场景。"
+    description: "集团层面按品类看损益计划，不到门店。与按门店那张互补，两张的计划金额合计都等于事实表全量。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "场景"
+        description: "Actual / Budget / Forecast。**必须先筛**，不筛会把三份金额加在一起；正式目标 / 正式预算取 Budget（约定 12）。"
+        additivity: 维度
+      - name: "科目"
+        description: "会计科目名。**必须先筛**，不筛会把收入和各类费用加在一起。约定 12 的「收入」= Sale Revenue。"
+        additivity: 维度
+      - name: "科目方向"
+        description: "Income / Expense / Taxation。"
+        additivity: 维度
+      - name: "科目有父级"
+        description: "这个科目在科目树上有没有父级。为真的科目和它的父科目**不能一起求和**，会重复计算。"
+        additivity: 维度
+      - name: "品类"
+        description: "产品品类（8 个）。**「未知（产品维度缺行）」是一个真实的组**：产品维度缺 284 行而事实表引用了这些键，这一组把它们收进来，各组之和才等于大盘（data_quality / missing-products）。"
+        additivity: 维度
+      - name: "计划金额"
+        description: "战略计划的科目金额合计。含义随科目变：收入类科目是收入，费用类科目是费用，都记为正数。"
+        additivity: 可加
+        metric: "计划金额"
+
+  - name: ads_plan_month_store_account
+    title: "预算执行月报底表 · 按门店"
+    serves_reports: [R03]
+    grain: "一行 = 一个月 × 一家门店 × 一个科目 × 一个场景。"
+    description: "战略计划按门店 × 科目 × 场景汇总。**刻意不含品类**：计划事实表的粒度就是 月 × 实体 × 场景 × 科目 × 品类，而实体与门店一一对应，把品类留在粒度里这张表就和事实表一样是 2,750,628 行，那是明细表换了列名，违反「ads 里不得出现明细事实表」。品类视角见 `ads_plan_month_category_account`。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "场景"
+        description: "Actual / Budget / Forecast。**必须先筛**，不筛会把三份金额加在一起；正式目标 / 正式预算取 Budget（约定 12）。"
+        additivity: 维度
+      - name: "科目"
+        description: "会计科目名。**必须先筛**，不筛会把收入和各类费用加在一起。约定 12 的「收入」= Sale Revenue。"
+        additivity: 维度
+      - name: "科目方向"
+        description: "Income / Expense / Taxation。"
+        additivity: 维度
+      - name: "科目有父级"
+        description: "这个科目在科目树上有没有父级。为真的科目和它的父科目**不能一起求和**，会重复计算。"
+        additivity: 维度
+      - name: "门店名"
+        description: "门店名。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店（3 线上 / 3 经销 / 1 目录）。"
+        additivity: 维度
+      - name: "门店类型"
+        description: "Store / Online / Catalog / Reseller，决定这家店属于哪个渠道。"
+        additivity: 维度
+      - name: "门店所属上级"
+        description: "门店在计划实体树上的上级名字（门店级实体通常是州名；线上店和目录店的上级是国家）。按州看计划可以直接用这一列分组。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "门店大洲"
+        description: "门店所在大洲：North America / Europe / Asia。"
+        additivity: 维度
+      - name: "计划金额"
+        description: "战略计划的科目金额合计。含义随科目变：收入类科目是收入，费用类科目是费用，都记为正数。"
+        additivity: 可加
+        metric: "计划金额"
+
+  - name: ads_promotion_month_channel
+    title: "促销效果月报底表"
+    serves_reports: [R12]
+    grain: "一行 = 一个月 × 一个促销活动 × 一个渠道。"
+    description: "看各促销活动的拉动和让利。**无折扣那一档（促销键 1）刻意保留**作为对比基线，并由「是否打折促销」标出来：打折销售额占比的分母要含无折扣交易。筛选依据是促销键不是折扣金额（约定 10）。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "促销名"
+        description: "促销活动名。同一个促销名对应三个促销键（三个年份），所以粒度里要带年月才不会把三年合在一起。"
+        additivity: 维度
+      - name: "促销类型"
+        description: "Seasonal Discount（季节性折扣，27 个促销）或 No Discount（1 个）。"
+        additivity: 维度
+      - name: "名义折扣率"
+        description: "活动的名义折扣率（0.05 = 5%），不是实际成交折扣——实际看「折扣金额」。"
+        additivity: 维度
+      - name: "是否打折促销"
+        description: "促销键是否不等于 1（约定 10 的判定依据是促销键，不是折扣金额）。**无折扣那一档刻意保留在表里**做对比基线：打折销售额占比的分母要含无折扣交易，筛掉就算不出来了。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "折扣金额"
+        description: "折扣金额合计。"
+        additivity: 可加
+        metric: "折扣金额"
+      - name: "折扣数量"
+        description: "参与折扣的数量合计（件）。"
+        additivity: 可加
+        metric: "折扣数量"
+      - name: "折扣前原价"
+        description: "销售额 + 折扣金额。**折扣率的分母**（折扣率 = 折扣金额 ÷ 折扣前原价），按「比率存分子分母」的规矩存下来。"
+        additivity: 可加
+        metric: "折扣前原价"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+
+  - name: ads_quota_month_channel_store_category
+    title: "销售目标达成月报底表"
+    serves_reports: [R04]
+    grain: "一行 = 一个月 × 一个渠道 × 一家门店 × 一个品类。"
+    description: "把**实际**（全渠道销售）和**目标**（销售目标表的预算场景）放在同一张表上，目标达成率的分子分母都在，比率现算。用 FULL OUTER JOIN 合并两边，哪一边有行都不丢；两边都保留「未知（产品维度缺行）」组以保全总额。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "门店名"
+        description: "门店名。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店（3 线上 / 3 经销 / 1 目录）。"
+        additivity: 维度
+      - name: "门店类型"
+        description: "Store / Online / Catalog / Reseller，决定这家店属于哪个渠道。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "品类"
+        description: "产品品类（8 个）。**「未知（产品维度缺行）」是一个真实的组**：产品维度缺 284 行而事实表引用了这些键，这一组把它们收进来，各组之和才等于大盘（data_quality / missing-products）。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "目标销售额"
+        description: "销售目标表预算场景的目标销售额合计（约定 12）。**目标达成率的分母**，与同表的「销售额」（分子）配对。"
+        additivity: 可加
+        metric: "目标销售额"
+      - name: "目标销量"
+        description: "预算场景的目标销量合计。"
+        additivity: 可加
+        metric: "目标销量"
+      - name: "目标毛利"
+        description: "预算场景的目标毛利合计，有负值。"
+        additivity: 可加
+        metric: "目标毛利"
+
+  - name: ads_sales_day_store
+    title: "门店日销周报底表"
+    serves_reports: [R06]
+    grain: "一行 = 一天 × 一家门店。"
+    description: "全清单里最细的一张（309,058 行，占事实表 9.07%），看日度波动、周内节律、节假日与平日的差别。日历属性反范式化进来，算日均时分母用这张表的行数（有销售的天数），不是日历天数——日期维度比事实宽 1,460 天。"
+    columns:
+      - name: "日期"
+        description: "销售日期，粒度到天。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "周起始日"
+        description: "所属周，取该周的周一（`toMonday`）。日历周的标签不带年份，所以用周一这个日期做键。"
+        additivity: 维度
+      - name: "星期"
+        description: "星期几的英文名（Monday ~ Sunday）。"
+        additivity: 维度
+      - name: "星期序号"
+        description: "星期几的数字 1 ~ 7（6 = 周六、7 = 周日）。按星期排序用这一列。"
+        additivity: 维度
+      - name: "是否工作日"
+        description: "WorkDay / WeekEnd。与「是否节假日」是同一个划分的两种写法。"
+        additivity: 维度
+      - name: "是否节假日"
+        description: "Yes / No。**本库的节假日就是周末**：Yes 的天恰好是全部周六周日（约定 4、data_quality / holiday-equals-weekend）。"
+        additivity: 维度
+      - name: "欧洲季节"
+        description: "欧洲的销售季节。季节按大洲分三套，没有全局季节字段。"
+        additivity: 维度
+      - name: "北美季节"
+        description: "北美的销售季节。"
+        additivity: 维度
+      - name: "亚洲季节"
+        description: "亚洲的销售季节。"
+        additivity: 维度
+      - name: "门店名"
+        description: "门店名。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店（3 线上 / 3 经销 / 1 目录）。"
+        additivity: 维度
+      - name: "门店类型"
+        description: "Store / Online / Catalog / Reseller，决定这家店属于哪个渠道。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "退货数量"
+        description: "退货数量合计（件）。"
+        additivity: 可加
+        metric: "退货数量"
+      - name: "净销售额"
+        description: "销售金额 − 退货金额（约定 7）。行级可加，直接存终值。"
+        additivity: 可加
+        metric: "净销售额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "折扣金额"
+        description: "折扣金额合计。"
+        additivity: 可加
+        metric: "折扣金额"
+
+  - name: ads_sales_month_channel
+    title: "集团经营月报底表"
+    serves_reports: [R01]
+    grain: "一行 = 一个月 × 一个渠道。"
+    description: "全渠道销售按月 × 渠道汇总，供管理层一页看完大盘和四个渠道的结构。毛利率、退货率、折扣率、日均销售额都不存比率，分子分母都在表里，现算。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "退货数量"
+        description: "退货数量合计（件）。"
+        additivity: 可加
+        metric: "退货数量"
+      - name: "净销售额"
+        description: "销售金额 − 退货金额（约定 7）。行级可加，直接存终值。"
+        additivity: 可加
+        metric: "净销售额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "折扣金额"
+        description: "折扣金额合计。"
+        additivity: 可加
+        metric: "折扣金额"
+      - name: "折扣前原价"
+        description: "销售额 + 折扣金额。**折扣率的分母**（折扣率 = 折扣金额 ÷ 折扣前原价），按「比率存分子分母」的规矩存下来。"
+        additivity: 可加
+        metric: "折扣前原价"
+      - name: "打折销售额"
+        description: "促销键不等于 1 的销售额合计（约定 10）。与「销售额」一起构成打折销售额占比的分子和分母。"
+        additivity: 可加
+        metric: "打折销售额"
+      - name: "有销售天数"
+        description: "去重的有销售日期个数。**不能跨行相加**。它是**日均销售额的分母**（日均销售额 = 销售额 ÷ 有销售天数，约定 4），按「比率存分子分母」的规矩存下来。"
+        additivity: 去重
+        metric: "有销售天数"
+      - name: "门店数"
+        description: "去重的门店个数。**不能跨行相加**。"
+        additivity: 去重
+        metric: "门店数"
+      - name: "产品数"
+        description: "去重的产品个数。**不能跨行相加**。"
+        additivity: 去重
+        metric: "产品数"
+
+  - name: ads_sales_month_product
+    title: "商品销售月报底表"
+    serves_reports: [R10]
+    grain: "一行 = 一个月 × 一个品类 × 一个子类 × 一个品牌 × 一个厂商 × 一个渠道。"
+    description: "品类 / 品牌的销售与盈利结构。**这张表是「未知（产品维度缺行）」组最要紧的地方**：产品维度缺 284 行，用内连接会丢掉 338,898 行、726,129,808.32 销售额（5.85%），各品类之和就不等于大盘；左连接 + 未知组之后合计与事实表逐位相同（已由 build_summary.py 核过）。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "品类"
+        description: "产品品类（8 个）。**「未知（产品维度缺行）」是一个真实的组**：产品维度缺 284 行而事实表引用了这些键，这一组把它们收进来，各组之和才等于大盘（data_quality / missing-products）。"
+        additivity: 维度
+      - name: "子类"
+        description: "产品子类（44 个里产品表用到 30 个）。同样有「未知（产品维度缺行）」组。"
+        additivity: 维度
+      - name: "品牌"
+        description: "产品品牌（11 个，Contoso 是自有品牌）。同样有「未知（产品维度缺行）」组。"
+        additivity: 维度
+      - name: "厂商"
+        description: "产品制造商（11 个），与品牌一一对应、只差后缀。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "退货数量"
+        description: "退货数量合计（件）。"
+        additivity: 可加
+        metric: "退货数量"
+      - name: "净销售额"
+        description: "销售金额 − 退货金额（约定 7）。行级可加，直接存终值。"
+        additivity: 可加
+        metric: "净销售额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "折扣金额"
+        description: "折扣金额合计。"
+        additivity: 可加
+        metric: "折扣金额"
+      - name: "折扣前原价"
+        description: "销售额 + 折扣金额。**折扣率的分母**（折扣率 = 折扣金额 ÷ 折扣前原价），按「比率存分子分母」的规矩存下来。"
+        additivity: 可加
+        metric: "折扣前原价"
+      - name: "打折销售额"
+        description: "促销键不等于 1 的销售额合计（约定 10）。与「销售额」一起构成打折销售额占比的分子和分母。"
+        additivity: 可加
+        metric: "打折销售额"
+      - name: "产品数"
+        description: "去重的产品个数。**不能跨行相加**。"
+        additivity: 去重
+        metric: "产品数"
+
+  - name: ads_sales_month_store
+    title: "门店经营月报底表"
+    serves_reports: [R05]
+    grain: "一行 = 一个月 × 一家门店。"
+    description: "门店排名和单店效率。坪效与人均的分母（营业面积、员工数）反范式化进来。同店口径要配合 `ads_sales_year_store`。"
+    columns:
+      - name: "月起始日"
+        description: "所属月份，取每月 1 号。按月排序 / 筛选用这一列。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "月"
+        description: "月份数字 1 ~ 12。"
+        additivity: 维度
+      - name: "门店名"
+        description: "门店名。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店（3 线上 / 3 经销 / 1 目录）。"
+        additivity: 维度
+      - name: "门店类型"
+        description: "Store / Online / Catalog / Reseller，决定这家店属于哪个渠道。"
+        additivity: 维度
+      - name: "门店状态"
+        description: "On（营业中）/ Off（已关店）。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "门店经理"
+        description: "门店经理姓名，经 DimStore.EmployeeKey → DimEmployee 取得。**不是** DimStore.StoreManager（那一列存的是员工号字符串）。StoreKey 227 的经理在员工表里不存在，这一列在那家店上只剩一个空格。"
+        additivity: 维度
+      - name: "门店经理职级"
+        description: "门店经理的职级，绝大多数是 Sales Store Manager。"
+        additivity: 维度
+      - name: "门店城市"
+        description: "**门店所在**城市（约定 5 的门店分支）。"
+        additivity: 维度
+      - name: "门店省州"
+        description: "门店所在省 / 州。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "门店大洲"
+        description: "门店所在大洲：North America / Europe / Asia。"
+        additivity: 维度
+      - name: "门店营业面积"
+        description: "门店营业面积（单位数据里没写），反范式化进来做**坪效的分母**（坪效 = 销售额 ÷ 营业面积）。2 家门店是 93,800，比其余（450 ~ 1,125）高约两个数量级，是离群值。"
+        additivity: 维度
+      - name: "门店员工数"
+        description: "门店员工数，反范式化进来做**门店人均销售额的分母**。1 家是 325，是离群值。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "退货数量"
+        description: "退货数量合计（件）。"
+        additivity: 可加
+        metric: "退货数量"
+      - name: "净销售额"
+        description: "销售金额 − 退货金额（约定 7）。行级可加，直接存终值。"
+        additivity: 可加
+        metric: "净销售额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "折扣金额"
+        description: "折扣金额合计。"
+        additivity: 可加
+        metric: "折扣金额"
+      - name: "有销售天数"
+        description: "去重的有销售日期个数。**不能跨行相加**。它是**日均销售额的分母**（日均销售额 = 销售额 ÷ 有销售天数，约定 4），按「比率存分子分母」的规矩存下来。"
+        additivity: 去重
+        metric: "有销售天数"
+      - name: "产品数"
+        description: "去重的产品个数。**不能跨行相加**。"
+        additivity: 去重
+        metric: "产品数"
+
+  - name: ads_sales_week_channel_country
+    title: "渠道与区域周报底表"
+    serves_reports: [R02]
+    grain: "一行 = 一个周（周一为键）× 一个渠道 × 一个门店所在国家。"
+    description: "按区域看周度走势。地理走**门店所在地**（全渠道销售没有客户键，约定 2 + 约定 5）。"
+    columns:
+      - name: "周起始日"
+        description: "所属周，取该周的周一（`toMonday`）。日历周的标签不带年份，所以用周一这个日期做键。"
+        additivity: 维度
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "门店大洲"
+        description: "门店所在大洲：North America / Europe / Asia。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "退货数量"
+        description: "退货数量合计（件）。"
+        additivity: 可加
+        metric: "退货数量"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "有销售天数"
+        description: "去重的有销售日期个数。**不能跨行相加**。它是**日均销售额的分母**（日均销售额 = 销售额 ÷ 有销售天数，约定 4），按「比率存分子分母」的规矩存下来。"
+        additivity: 去重
+        metric: "有销售天数"
+      - name: "门店数"
+        description: "去重的门店个数。**不能跨行相加**。"
+        additivity: 去重
+        metric: "门店数"
+
+  - name: ads_sales_year_store
+    title: "门店年度汇总（同店口径用）"
+    serves_reports: [R05]
+    grain: "一行 = 一个年 × 一家门店。"
+    description: "约定 15 的同店只比较「两个对比年份都有销售的门店」，这是关于**年份对**的条件，放不进月报的一行。报表侧把这张表按两个年份自连接、取两边都有行的门店，就得到同店口径，而且不写死具体年份（实测 2008 与 2009 都有销售的是 301 家）。"
+    columns:
+      - name: "年"
+        description: "日历年。约定 3：以 2009-12-31 为今天，今年 = 2009、去年 = 2008。"
+        additivity: 维度
+      - name: "门店名"
+        description: "门店名。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店（3 线上 / 3 经销 / 1 目录）。"
+        additivity: 维度
+      - name: "门店类型"
+        description: "Store / Online / Catalog / Reseller，决定这家店属于哪个渠道。"
+        additivity: 维度
+      - name: "渠道"
+        description: "销售渠道：Store / Online / Catalog / Reseller。渠道由门店唯一决定，所以按渠道分组等价于按门店类型分组。"
+        additivity: 维度
+      - name: "门店国家"
+        description: "门店所在国家 / 地区。"
+        additivity: 维度
+      - name: "销售额"
+        description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
+        additivity: 可加
+        metric: "销售额"
+      - name: "销售数量"
+        description: "销售数量合计（件）。"
+        additivity: 可加
+        metric: "销售数量"
+      - name: "退货金额"
+        description: "退货金额合计。"
+        additivity: 可加
+        metric: "退货金额"
+      - name: "总成本"
+        description: "总成本合计。它同时是**毛利率的分母侧**所需的量（毛利率 = (销售额 − 总成本) ÷ 销售额）。"
+        additivity: 可加
+        metric: "总成本"
+      - name: "毛利"
+        description: "销售金额 − 总成本（约定 7）。行级可加，直接存终值。毛利率不存，要用「毛利 ÷ 销售额」现算——比率不能跨行相加。"
+        additivity: 可加
+        metric: "毛利"
+      - name: "有销售天数"
+        description: "去重的有销售日期个数。**不能跨行相加**。它是**日均销售额的分母**（日均销售额 = 销售额 ÷ 有销售天数，约定 4），按「比率存分子分母」的规矩存下来。"
+        additivity: 去重
+        metric: "有销售天数"

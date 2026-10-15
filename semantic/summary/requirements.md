@@ -1,7 +1,7 @@
 # 常规经营报表需求清单
 
-状态：**待用户过目**（任务卡 T08 交付物 3 的第一步）。用户确认后才做 `summary.sql` 与
-`summary.yaml`。
+状态：**用户已过目**（2026-10-15，用户看过本清单后指示继续）。汇总层已按本清单落地，
+见文末「落地结果」；两处偏离（R03 拆表、R05/R07 各加一张配套底表）也记在那里。
 
 ## 这份清单是怎么来的
 
@@ -229,14 +229,54 @@
 - **员工维度的销售报表**：没有事实表挂在员工上，「某个销售员卖了多少」只能理解成
   「他管的门店卖了多少」，已经由 R05 的门店经理维度覆盖。
 
-## 下一步（等用户确认）
+## 落地结果（用户 2026-10-15 过目并让继续之后）
 
-用户确认这份清单之后：
+12 份报表落成 **16 张汇总表**（`ads` 库）加 9 个维度视图，见
+`semantic/summary/summary.sql` 和 `semantic/summary/summary.yaml`，
+一条命令重建与对账：`uv run python render/build_summary.py`，报告在
+`reports/validation/summary.md`。
 
-1. 写 `semantic/summary/summary.sql`：每张汇总表一条建表语句，物化在 chDB 的独立库 `ads` 里，
-   另在 `ads` 里建维度表的视图。
-2. 写 `semantic/summary/summary.yaml`：每张表的粒度、每列描述、可加性、对应的 L1 指标口径。
-3. 写 `render/build_summary.py`：一条命令重建 `ads`，并核对每张汇总表的可加指标在全量范围内
-   的合计与对应事实表一致。
-4. 规矩（任务卡）：比率同时存分子和分母；去重计数标明「不能跨行相加」；
-   维度属性可以反范式化进汇总表；`ads` 库里不得出现任何明细事实表。
+| 报表 | 汇总表 |
+|---|---|
+| R01 | `ads_sales_month_channel` |
+| R02 | `ads_sales_week_channel_country` |
+| R03 | `ads_plan_month_store_account`、`ads_plan_month_category_account` |
+| R04 | `ads_quota_month_channel_store_category` |
+| R05 | `ads_sales_month_store`、`ads_sales_year_store` |
+| R06 | `ads_sales_day_store` |
+| R07 | `ads_online_week_store`、`ads_online_week_total` |
+| R08 | `ads_online_customer_month_tier` |
+| R09 | `ads_online_customer_profile_quarter` |
+| R10 | `ads_sales_month_product` |
+| R11 | `ads_inventory_week_store_category`、`ads_inventory_current_store_category` |
+| R12 | `ads_promotion_month_channel` |
+
+### 与上面清单的两处偏离，都是硬规则逼出来的
+
+1. **R03 的粒度去掉了品类，并拆成两张表。** 清单里写的是「月 × 门店 × 品类 × 科目 × 场景」，
+   但战略计划事实表的粒度本来就是「月 × 实体 × 场景 × 科目 × 品类」，而实体与门店一一对应
+   ——照清单建出来的汇总表有 **2,750,628 行，和事实表一模一样**，那不是汇总表，是明细事实表
+   换了个列名，违反任务卡的「`ads` 库里不得出现任何明细事实表」。
+   改成 `ads_plan_month_store_account`（月 × 门店 × 科目 × 场景，345,348 行，占基表 12.56%）
+   加 `ads_plan_month_category_account`（月 × 品类 × 科目 × 场景，9,792 行）两张，
+   两张的计划金额合计都等于事实表全量。要品类 × 门店的计划明细，查 DWD 层而不是 ADS 层
+   ——这也是数仓的常规做法。
+   这条是 `render/build_summary.py` 的自动检查抓出来的（判据：汇总表行数不得超过基表的 50%）。
+
+2. **R05 和 R07 各多出一张表。** R05 的同店口径（约定 15）是关于**年份对**的条件，
+   放不进月报的一行，所以加了 `ads_sales_year_store`（年 × 门店）供报表自连接两个年份；
+   R07 的订单数和客户数是去重计数，三家线上店的值加起来不等于全站值，所以加了
+   `ads_online_week_total` 在全站粒度上重新算。两张都不是新报表，是同一份报表的配套底表。
+
+其余 10 份报表的读者、粒度、维度、指标、频率都与上面的清单一致。
+
+### 任务卡那四条规矩的落地
+
+- **比率同时存分子和分母**：表里没有任何比率列（`validate.py` 第 5 项强制检查
+  「不得出现 additivity 为比率的列」）。毛利率存毛利和销售额；日均销售额存销售额和有销售天数；
+  目标达成率存销售额和目标销售额；折扣率存折扣金额和折扣前原价；坪效存销售额和门店营业面积。
+- **去重计数标明不能跨行相加**：订单数、客户数、门店数、产品数、有销售天数、
+  低于安全库存的门店产品数、门店产品组合数的列描述里都写了，`validate.py` 强制检查这句话在。
+  `reports/validation/summary.md` 还把「直接相加会得到多少」列出来，和全量去重值对照。
+- **维度属性反范式化**：门店经理姓名、营业面积、员工数、地理四级、产品层级都反范式化进表。
+- **`ads` 里没有明细事实表**：16 张表相对基表的占比从 0.00% 到 12.56%，见上。

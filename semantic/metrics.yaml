@@ -501,6 +501,45 @@ metrics:
     unit: "个"
     dataset: FactInventory
 
+  - name: "快照日在手库存数量"
+    definition: "某一个快照日的在手库存数量之和。与「当前在手库存数量」的区别是它固定在一个快照日上， 用来看库存水位的时间趋势；「当前」那个取的是每个门店 × 产品各自最近的一次。"
+    additivity: 半可加
+    dax_measure: "[Snapshot On Hand Quantity]"
+    cube_member: "inventory.snapshot_on_hand_quantity"
+    unit: "件"
+    dataset: FactInventory
+
+  - name: "快照日在订库存数量"
+    definition: "某一个快照日的在订（已下采购单未到货）数量之和。"
+    additivity: 半可加
+    dax_measure: "[Snapshot On Order Quantity]"
+    cube_member: "inventory.snapshot_on_order_quantity"
+    unit: "件"
+    dataset: FactInventory
+
+  - name: "快照日安全库存数量"
+    definition: "某一个快照日的安全库存水位之和。"
+    additivity: 半可加
+    dax_measure: "[Snapshot Safety Stock Quantity]"
+    cube_member: "inventory.snapshot_safety_stock_quantity"
+    unit: "件"
+    dataset: FactInventory
+
+  - name: "快照日低于安全库存的门店产品数"
+    definition: "某一个快照日里 在手数量 < 安全库存水位 的门店 × 产品组合个数。"
+    additivity: 去重
+    dax_measure: "[Snapshot Below Safety Stock Count]"
+    cube_member: "inventory.snapshot_below_safety_stock_count"
+    unit: "个"
+    dataset: FactInventory
+
+  - name: "门店产品组合数"
+    definition: "去重的门店 × 产品组合个数。缺货面的分母（低于安全库存的门店产品数 ÷ 门店产品组合数）。"
+    additivity: 去重
+    dax_measure: "[Store Product Pair Count]"
+    cube_member: "inventory.store_product_pair_count"
+    unit: "个"
+    dataset: FactInventory
   - name: "快照日在手库存金额"
     definition: "某一个快照日的 在手数量 × 单位成本 之和。与「当前在手库存金额」的区别是它固定在 一个快照日上，用来看库存的时间趋势。"
     additivity: 半可加
