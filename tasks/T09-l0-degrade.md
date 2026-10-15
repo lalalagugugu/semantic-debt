@@ -1,6 +1,6 @@
 # T09 L0 劣化
 
-- 状态：未开始
+- 状态：已完成（2026-10-15，PR 待合并）
 - 负责：Claude Code
 - 模式：**盲**（`scripts/start-card.sh T09`）
 - 依赖：T08
@@ -33,5 +33,16 @@
 ## 记录（完成后填写）
 
 - 产出：
+  - `semantic/l0_map.yaml`：25 张表的改名映射（表名 `fct_` / `d_` 缩写；键和维度属性用一张全局字典，事实表度量用 `amt1` / `qty1` 这类表内位置名，代理主键一律 `row_id`）；8 张事实表各 2–3 个技术字段（`etl_btch_id`、`src_sys_cd`、`load_dttm`，常量或由 DateKey 决定）；source.yaml 的 48 条关系保留 32、删 16（33%）。
+  - `render/build_l0.py`：从映射生成 `render/l0_views.sql`（入库），在 chDB 建库 `l0`，并核对。
+  - `reports/validation/l0.md`：核对结果和删除 / 保留关系清单（原名与 L0 名对照）。
+  - `tests/test_l0_map.py`：可逆、覆盖建表语句且列序一致、无描述类字段、关系恰好分成两份且约三分之一、SQL 与映射同步。
+  - 复现：`uv run python render/build_l0.py`（约 5 秒）；`uv run pytest tests/test_l0_map.py`。
+  - 验收：25 个视图的行数一致；不只数值列，**每一列**的非空个数和合计（数值列定点数合计、其余列哈希合计）都与原表逐位一致；列序、类型与原表一致。
 - 偏离与理由：
-- 工时：
+  - 核对比卡片要求的更严：非数值列也做了哈希合计，证明视图与原表逐列相同。
+  - 改名用全局字典而不是逐表随机缩写，所以原来键名一致的关系在 L0 里仍能靠列名猜到（如 `gk` = `gk`）。这样「删关系」只拿掉显式的关系声明，不额外制造或抹掉键名线索；原来键名就不一致的（父子自连接、`channelKey`）在 L0 里也不一致。删的 16 条按卡片优先删非显然的：6 条键名不一致、7 条维度到维度的二跳、3 条事实表上的非显然连接（计划 → 实体、计划 → 品类、目标 → 渠道）。
+  - 技术字段只加在事实表上（卡片原文如此），维度表不加。
+  - 盲模式下 `uv run pytest` 4 红，都在 `tests/test_repo_layout.py` 的 `start-card.sh` 用例：脚本去读 `$SEMDEBT_MAIN_DIR/tasks/cards.yaml`，主工作区在本 clone 之外，被沙箱拒读（隔离本应如此）。与本卡改动无关；T08 记的 `runs/` 那 3 红已随 PR #19 消失。记为 open-questions T09-1，不阻塞。
+  - 本会话的 uv 需要 `UV_CACHE_DIR`、`UV_PYTHON_INSTALL_DIR` 指向 `$TMPDIR`、`UV_PYTHON` 指向系统 Python，否则读不到 `~/.cache/uv` 和 `~/.local/share/uv`（沙箱拒读）。
+- 工时：约 0.5 小时（agent）

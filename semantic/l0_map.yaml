@@ -1,0 +1,442 @@
+# L0 劣化映射（T09）：「坏交付」版本的语义层。
+#
+# L0 只作用于原始的 25 张表（retail 库）；明细宽表、汇总层和指标不参与 L0。
+# 它只改名字和元数据，不动数据行：chDB 里 L0 是独立库 `l0` 的一组视图，
+# 底层仍是 retail 的原表（render/build_l0.py 从本文件生成 render/l0_views.sql）。
+#
+# L0 档 agent 看到的只有：表名、列名、列类型、下面「保留」的关系、技术字段。
+# 没有任何描述、同义词、约定和指标口径（本文件里也就不写这些）。
+# relationships.dropped 里的 why 只给人看，渲染器（T10）不得把它渲染进 L0 上下文。
+#
+# 命名规则：
+#   - 表名：fct_ / d_ 前缀 + 缩写。
+#   - 键和维度属性：全局一张字典，同一个原列名在所有表里改成同一个缩写
+#     （如 DateKey → dk）。所以原来「键名一致」的关系在 L0 里仍然键名一致，
+#     原来键名不一致的（FactSales.channelKey 对 DimChannel.ChannelKey、父子自连接）
+#     在 L0 里也不一致。改名不额外制造、也不额外抹掉键名线索。
+#   - 事实表的代理主键一律 row_id；度量列按表内位置用 amt1 / qty1 / rt1 / d1 这类
+#     通用名，同名在不同表里可以指不同的东西（如 fct_sls_qta.amt1 是目标销售额）。
+#   - 可逆：在同一张表内，L0 列名与原列名一一对应；L0 表名与原表名一一对应。
+#     由（L0 表名, L0 列名）能唯一还原（原表名, 原列名）。tests/test_l0_map.py 校验。
+#
+# 技术字段：每张事实表 2–3 列，全部是常量或由 DateKey 决定的确定性表达式，
+# 追加在原列之后，不替换、不删除任何原列：
+#   etl_btch_id  加载批次号（= 业务日期的 yyyymmdd）
+#   src_sys_cd   来源系统码（每张表一个常量）
+#   load_dttm    加载时间（业务日期次日 02:00 UTC）
+# expr 里引用的是 retail 原表的列名。
+#
+# 关系：source.yaml 的 48 条关系里保留 32 条、删 16 条（三分之一），SQL 和 DAX 用同一份。
+# 优先删「非显然」的：键名不一致的（父子自连接、channelKey 大小写、门店 / 辖区的
+# 员工键）、维度到维度的二跳（雪花链），再加三条事实表上的非显然连接。
+
+version: 1
+source_database: retail
+database: l0
+
+tables:
+  - source: FactOnlineSales
+    l0: fct_ol_sls
+    columns:
+      OnlineSalesKey:       row_id
+      DateKey:              dk
+      StoreKey:             stk
+      ProductKey:           prk
+      PromotionKey:         pmk
+      CurrencyKey:          cyk
+      CustomerKey:          csk
+      SalesOrderNumber:     ord_no
+      SalesOrderLineNumber: ln_no
+      SalesQuantity:        qty1
+      SalesAmount:          amt1
+      ReturnQuantity:       qty2
+      ReturnAmount:         amt2
+      DiscountQuantity:     qty3
+      DiscountAmount:       amt3
+      TotalCost:            amt4
+      UnitCost:             uc
+      UnitPrice:            up
+    technical_columns:
+      - {name: etl_btch_id, expr: "toUInt32(toYYYYMMDD(DateKey))"}
+      - {name: src_sys_cd, expr: "'ECOM01'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: FactSales
+    l0: fct_sls
+    columns:
+      SalesKey:         row_id
+      DateKey:          dk
+      channelKey:       chnk
+      StoreKey:         stk
+      ProductKey:       prk
+      PromotionKey:     pmk
+      CurrencyKey:      cyk
+      UnitCost:         uc
+      UnitPrice:        up
+      SalesQuantity:    qty1
+      ReturnQuantity:   qty2
+      ReturnAmount:     amt2
+      DiscountQuantity: qty3
+      DiscountAmount:   amt3
+      TotalCost:        amt4
+      SalesAmount:      amt1
+    technical_columns:
+      - {name: etl_btch_id, expr: "toUInt32(toYYYYMMDD(DateKey))"}
+      - {name: src_sys_cd, expr: "'POS02'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: FactInventory
+    l0: fct_inv_snp
+    columns:
+      InventoryKey:        row_id
+      DateKey:             dk
+      StoreKey:            stk
+      ProductKey:          prk
+      CurrencyKey:         cyk
+      OnHandQuantity:      qty1
+      OnOrderQuantity:     qty2
+      SafetyStockQuantity: qty3
+      UnitCost:            uc
+      DaysInStock:         d1
+      MinDayInStock:       d2
+      MaxDayInStock:       d3
+      Aging:               d4
+    technical_columns:
+      - {name: etl_btch_id, expr: "toUInt32(toYYYYMMDD(DateKey))"}
+      - {name: src_sys_cd, expr: "'WMS01'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: FactSalesQuota
+    l0: fct_sls_qta
+    columns:
+      SalesQuotaKey:      row_id
+      ChannelKey:         chk
+      StoreKey:           stk
+      ProductKey:         prk
+      DateKey:            dk
+      CurrencyKey:        cyk
+      ScenarioKey:        scnk
+      SalesQuantityQuota: qty1
+      SalesAmountQuota:   amt1
+      GrossMarginQuota:   amt2
+    technical_columns:
+      - {name: etl_btch_id, expr: "toUInt32(toYYYYMMDD(DateKey))"}
+      - {name: src_sys_cd, expr: "'PLN01'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: FactStrategyPlan
+    l0: fct_stg_pln
+    columns:
+      StrategyPlanKey:    row_id
+      DateKey:            dk
+      EntityKey:          enk
+      ScenarioKey:        scnk
+      AccountKey:         acct_k
+      CurrencyKey:        cyk
+      ProductCategoryKey: pck
+      Amount:             amt1
+    technical_columns:
+      - {name: etl_btch_id, expr: "toUInt32(toYYYYMMDD(DateKey))"}
+      - {name: src_sys_cd, expr: "'PLN02'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: FactExchangeRate
+    l0: fct_fx
+    columns:
+      ExchangeRateKey: row_id
+      CurrencyKey:     cyk
+      DateKey:         dk
+      AverageRate:     rt1
+      EndOfDayRate:    rt2
+    technical_columns:
+      - {name: src_sys_cd, expr: "'TRS01'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: FactITMachine
+    l0: fct_it_mch
+    columns:
+      ITMachinekey: row_id
+      MachineKey:   mck
+      DateKey:      dk
+      CostAmount:   amt1
+      CostType:     tp_cd
+    technical_columns:
+      - {name: src_sys_cd, expr: "'ITAM01'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: FactITSLA
+    l0: fct_it_sla
+    columns:
+      ITSLAkey:        row_id
+      DateKey:         dk
+      StoreKey:        stk
+      MachineKey:      mck
+      OutageKey:       otk
+      OutageStartTime: ts1
+      OutageEndTime:   ts2
+      DownTime:        dur
+    technical_columns:
+      - {name: src_sys_cd, expr: "'ITSM01'"}
+      - {name: load_dttm, expr: "toDateTime(DateKey, 'UTC') + toIntervalHour(26)"}
+  - source: DimProduct
+    l0: d_prd
+    columns:
+      ProductKey:            prk
+      ProductName:           pr_nm
+      ProductDescription:    pr_ds
+      ProductSubcategoryKey: psck
+      Manufacturer:          mfr
+      BrandName:             brd
+      ClassID:               cls_id
+      ClassName:             cls_nm
+      StyleID:               sty_id
+      StyleName:             sty_nm
+      ColorID:               clr_id
+      ColorName:             clr_nm
+      Weight:                wt
+      WeightUnitMeasureID:   wt_uom
+      UnitOfMeasureID:       uom_id
+      UnitOfMeasureName:     uom_nm
+      StockTypeID:           stck_tp_id
+      StockTypeName:         stck_tp_nm
+      UnitCost:              uc
+      UnitPrice:             up
+      AvailableForSaleDate:  afs_dt
+      Status:                stat
+  - source: DimStore
+    l0: d_str
+    columns:
+      StoreKey:        stk
+      GeographyKey:    gk
+      StoreManager:    mgr
+      StoreType:       st_tp
+      StoreName:       st_nm
+      Status:          stat
+      OpenDate:        opn_dt
+      CloseDate:       cls_dt
+      EntityKey:       enk
+      StorePhone:      tel
+      StoreFax:        fax
+      CloseReason:     cls_rsn
+      EmployeeCount:   emp_n
+      SellingAreaSize: area
+      LastRemodelDate: rmd_dt
+      EmployeeKey:     emk
+  - source: DimCustomer
+    l0: d_cst
+    columns:
+      RowNum:               rn
+      CustomerKey:          csk
+      GeographyKey:         gk
+      FirstName:            fnm
+      LastName:             lnm
+      BirthDate:            bdt
+      MaritalStatus:        ms_cd
+      Gender:               gdr
+      YearlyIncome:         inc_y
+      TotalChildren:        chld_t
+      NumberChildrenAtHome: chld_h
+      Education:            edu
+      Occupation:           ocp
+      HouseOwnerFlag:       ho_flg
+      NumberCarsOwned:      car_n
+  - source: DimDate
+    l0: d_dt
+    columns:
+      DateKey:                 dk
+      CalendarYear:            c_yr
+      CalendarYearLabel:       c_yr_lb
+      CalendarHalfYearLabel:   c_hy_lb
+      CalendarQuarterLabel:    c_qtr_lb
+      CalendarMonthLabel:      c_mo_lb
+      CalendarWeekLabel:       c_wk_lb
+      CalendarDayOfWeekLabel:  c_dow_lb
+      FiscalYear:              f_yr
+      FiscalYearLabel:         f_yr_lb
+      FiscalHalfYearLabel:     f_hy_lb
+      FiscalQuarterLabel:      f_qtr_lb
+      FiscalMonthLabel:        f_mo_lb
+      IsWorkDay:               wd_flg
+      IsHoliday:               hol_flg
+      EuropeSeason:            ssn_eu
+      NorthAmericaSeason:      ssn_na
+      AsiaSeason:              ssn_as
+      MonthNumber:             mo_no
+      CalendarDayOfWeekNumber: dow_no
+  - source: DimGeography
+    l0: d_geo
+    columns:
+      GeographyKey:      gk
+      GeographyType:     geo_tp
+      ContinentName:     cont_nm
+      CityName:          cty_nm
+      StateProvinceName: prov_nm
+      RegionCountryName: ctry_nm
+  - source: DimChannel
+    l0: d_chn
+    columns:
+      ChannelKey:         chk
+      ChannelName:        ch_nm
+      ChannelDescription: ch_ds
+  - source: DimPromotion
+    l0: d_prm
+    columns:
+      PromotionKey:      pmk
+      PromotionName:     pm_nm
+      DiscountPercent:   dsc_pct
+      PromotionType:     pm_tp
+      PromotionCategory: pm_cat
+  - source: DimScenario
+    l0: d_scn
+    columns:
+      ScenarioKey:  scnk
+      ScenarioName: scn_nm
+  - source: DimAccount
+    l0: d_acct
+    columns:
+      AccountKey:         acct_k
+      ParentAccountKey:   p_acct
+      AccountName:        acct_nm
+      AccountDescription: acct_ds
+      AccountType:        acct_tp
+      ValueType:          val_tp
+  - source: DimCurrency
+    l0: d_ccy
+    columns:
+      CurrencyKey:         cyk
+      CurrencyName:        cy_nm
+      CurrencyDescription: cy_ds
+  - source: DimProductCategory
+    l0: d_prd_cat
+    columns:
+      ProductCategoryKey:  pck
+      ProductCategoryName: pc_nm
+  - source: DimProductSubcategory
+    l0: d_prd_sub
+    columns:
+      ProductSubcategoryKey:  psck
+      ProductSubcategoryName: psc_nm
+      ProductCategoryKey:     pck
+  - source: DimEmployee
+    l0: d_emp
+    columns:
+      EmployeeKey:           emk
+      ParentEmployeeKey:     p_emp
+      FirstName:             fnm
+      LastName:              lnm
+      Title:                 ttl
+      HireDate:              hr_dt
+      BirthDate:             bdt
+      EmailAddress:          eml
+      Phone:                 tel
+      EmergencyContactName:  ec_nm
+      EmergencyContactPhone: ec_tel
+      Gender:                gdr
+      PayFrequency:          pay_frq
+      BaseRate:              rt_b
+      VacationHours:         vac_h
+      DepartmentName:        dpt_nm
+      StartDate:             st_dt
+      Status:                stat
+      SalaryStatus:          sal_st
+      IsSalesPerson:         sp_flg
+      IsMarried:             mar_flg
+  - source: DimEntity
+    l0: d_ent
+    columns:
+      EntityKey:         enk
+      ParentEntityKey:   p_ent
+      ParentEntityLabel: p_ent_lb
+      EntityName:        ent_nm
+      EntityDescription: ent_ds
+      EntityType:        ent_tp
+      StartDate:         st_dt
+      Status:            stat
+  - source: DimSalesTerritory
+    l0: d_sls_ter
+    columns:
+      SalesTerritoryKey:     terk
+      GeographyKey:          gk
+      SalesTerritoryName:    ter_nm
+      SalesTerritoryRegion:  ter_rgn
+      SalesTerritoryCountry: ter_ctry
+      SalesTerritoryGroup:   ter_grp
+      SalesTerritoryLevel:   ter_lvl
+      SalesTerritoryManager: ter_mgr
+      Status:                stat
+      EmployeeKey:           emk
+  - source: DimMachine
+    l0: d_mch
+    columns:
+      MachineKey:         mck
+      StoreKey:           stk
+      MachineType:        mc_tp
+      MachineName:        mc_nm
+      MachineDescription: mc_ds
+      VendorName:         vnd_nm
+      MachineOS:          mc_os
+      MachineSource:      mc_src
+      MachineHardware:    mc_hw
+      MachineSoftware:    mc_sw
+      Status:             stat
+      ServiceStartDate:   svc_st_dt
+      DecommissionDate:   dcm_dt
+      LastModifiedDate:   lm_dt
+  - source: DimOutage
+    l0: d_otg
+    columns:
+      OutageKey:             otk
+      OutageName:            ot_nm
+      OutageType:            ot_tp
+      OutageTypeDescription: ot_tp_ds
+      OutageSubType:         ot_stp
+
+relationships:
+  # 按原表名写；渲染器按上面的映射换成 L0 名。kept + dropped 恰好是 source.yaml 的全部关系。
+  kept:
+    - {from: FactOnlineSales.DateKey, to: DimDate.DateKey}
+    - {from: FactOnlineSales.CustomerKey, to: DimCustomer.CustomerKey}
+    - {from: FactOnlineSales.ProductKey, to: DimProduct.ProductKey}
+    - {from: FactOnlineSales.StoreKey, to: DimStore.StoreKey}
+    - {from: FactOnlineSales.PromotionKey, to: DimPromotion.PromotionKey}
+    - {from: FactOnlineSales.CurrencyKey, to: DimCurrency.CurrencyKey}
+    - {from: FactSales.DateKey, to: DimDate.DateKey}
+    - {from: FactSales.StoreKey, to: DimStore.StoreKey}
+    - {from: FactSales.ProductKey, to: DimProduct.ProductKey}
+    - {from: FactSales.PromotionKey, to: DimPromotion.PromotionKey}
+    - {from: FactSales.CurrencyKey, to: DimCurrency.CurrencyKey}
+    - {from: FactInventory.DateKey, to: DimDate.DateKey}
+    - {from: FactInventory.StoreKey, to: DimStore.StoreKey}
+    - {from: FactInventory.ProductKey, to: DimProduct.ProductKey}
+    - {from: FactInventory.CurrencyKey, to: DimCurrency.CurrencyKey}
+    - {from: FactSalesQuota.DateKey, to: DimDate.DateKey}
+    - {from: FactSalesQuota.StoreKey, to: DimStore.StoreKey}
+    - {from: FactSalesQuota.ProductKey, to: DimProduct.ProductKey}
+    - {from: FactSalesQuota.ScenarioKey, to: DimScenario.ScenarioKey}
+    - {from: FactSalesQuota.CurrencyKey, to: DimCurrency.CurrencyKey}
+    - {from: FactStrategyPlan.DateKey, to: DimDate.DateKey}
+    - {from: FactStrategyPlan.ScenarioKey, to: DimScenario.ScenarioKey}
+    - {from: FactStrategyPlan.AccountKey, to: DimAccount.AccountKey}
+    - {from: FactStrategyPlan.CurrencyKey, to: DimCurrency.CurrencyKey}
+    - {from: FactExchangeRate.CurrencyKey, to: DimCurrency.CurrencyKey}
+    - {from: FactExchangeRate.DateKey, to: DimDate.DateKey}
+    - {from: FactITMachine.MachineKey, to: DimMachine.MachineKey}
+    - {from: FactITMachine.DateKey, to: DimDate.DateKey}
+    - {from: FactITSLA.DateKey, to: DimDate.DateKey}
+    - {from: FactITSLA.StoreKey, to: DimStore.StoreKey}
+    - {from: FactITSLA.MachineKey, to: DimMachine.MachineKey}
+    - {from: FactITSLA.OutageKey, to: DimOutage.OutageKey}
+
+  dropped:
+    # 键名不一致
+    - {from: FactSales.channelKey, to: DimChannel.ChannelKey, why: "子表列名首字母小写，键名不一致"}
+    - {from: DimStore.EmployeeKey, to: DimEmployee.EmployeeKey, why: "门店经理键，类型是 Float64，且门店表另有字符串型的 StoreManager 干扰"}
+    - {from: DimSalesTerritory.EmployeeKey, to: DimEmployee.EmployeeKey, why: "辖区负责人键，类型是 Float64"}
+    - {from: DimAccount.ParentAccountKey, to: DimAccount.AccountKey, why: "父子自连接，键名不一致"}
+    - {from: DimEmployee.ParentEmployeeKey, to: DimEmployee.EmployeeKey, why: "父子自连接，键名不一致"}
+    - {from: DimEntity.ParentEntityKey, to: DimEntity.EntityKey, why: "父子自连接，键名不一致"}
+    # 维度到维度的二跳（雪花链）
+    - {from: DimCustomer.GeographyKey, to: DimGeography.GeographyKey, why: "事实 → 客户 → 地理的第二跳"}
+    - {from: DimStore.GeographyKey, to: DimGeography.GeographyKey, why: "事实 → 门店 → 地理的第二跳"}
+    - {from: DimStore.EntityKey, to: DimEntity.EntityKey, why: "计划 → 实体 ← 门店的桥，类型是 Float64"}
+    - {from: DimProduct.ProductSubcategoryKey, to: DimProductSubcategory.ProductSubcategoryKey, why: "事实 → 产品 → 子类的第二跳，类型是 Float64"}
+    - {from: DimProductSubcategory.ProductCategoryKey, to: DimProductCategory.ProductCategoryKey, why: "子类 → 品类，事实 → 品类的第三跳"}
+    - {from: DimMachine.StoreKey, to: DimStore.StoreKey, why: "设备 → 门店；故障表另有直连门店的键，两条路径"}
+    - {from: DimSalesTerritory.GeographyKey, to: DimGeography.GeographyKey, why: "辖区 → 地理的维度间连接"}
+    # 事实表上的非显然连接
+    - {from: FactStrategyPlan.EntityKey, to: DimEntity.EntityKey, why: "计划挂在实体而不是门店上，要经实体表才能接到门店"}
+    - {from: FactStrategyPlan.ProductCategoryKey, to: DimProductCategory.ProductCategoryKey, why: "计划直挂品类，跳过产品和子类，与销售表的路径不同"}
+    - {from: FactSalesQuota.ChannelKey, to: DimChannel.ChannelKey, why: "与门店路径冗余（渠道由门店决定）"}
