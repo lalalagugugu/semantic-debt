@@ -12,6 +12,10 @@
 #   dax_measure   Power BI 里的度量值名，agent 在 DAX 里写这个名字
 #   cube_member   Cube 里的成员名（<cube>.<measure>），agent 在 SQL 接口里写
 #                 MEASURE(<cube>.<measure>)、在 JSON 接口里写这个名字
+#   alternate_dax_measure / alternate_cube_member
+#                 只在有 alternate_dataset 的指标上出现：同一口径落在另一张表上的调用名。
+#                 主调用名（dax_measure / cube_member）落在 dataset 那张表上。
+#                 裁决见 decisions/2026-10-15-dual-dataset-metric-callables.md（T10-1）
 #
 # 实现上的限制（第一期已知，T16 / T17 落地时再处理，不在本卡范围）：
 #   - Cube 不能在指标结果上再算一步，所以「销售额占比」「销售额环比增长率」这类
@@ -35,163 +39,195 @@ metrics:
     definition: "销售金额合计，已扣折扣、未扣退货（约定 7）。"
     additivity: 可加
     dax_measure: "[Sales Amount]"
-    cube_member: "sales.sales_amount"
+    cube_member: "online_sales.sales_amount"
     unit: "USD"
     default_filters:
       - "未说明渠道时用线上销售（约定 1）；以门店为对象时用全渠道销售（约定 2）"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Sales Amount]"
+    alternate_cube_member: "sales.sales_amount"
 
   - name: "销售数量"
     definition: "销售数量合计。"
     additivity: 可加
     dax_measure: "[Sales Quantity]"
-    cube_member: "sales.sales_quantity"
+    cube_member: "online_sales.sales_quantity"
     unit: "件"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Sales Quantity]"
+    alternate_cube_member: "sales.sales_quantity"
 
   - name: "总成本"
     definition: "销售行的总成本合计。"
     additivity: 可加
     dax_measure: "[Total Cost]"
-    cube_member: "sales.total_cost"
+    cube_member: "online_sales.total_cost"
     unit: "USD"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Total Cost]"
+    alternate_cube_member: "sales.total_cost"
 
   - name: "平均单价"
     definition: "销售额 ÷ 销售数量。"
     additivity: 比率
     dax_measure: "[Average Unit Price]"
-    cube_member: "sales.average_unit_price"
+    cube_member: "online_sales.average_unit_price"
     unit: "USD"
     numerator: "销售额"
     denominator: "销售数量"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Average Unit Price]"
+    alternate_cube_member: "sales.average_unit_price"
 
   - name: "退货金额"
     definition: "退货金额合计。"
     additivity: 可加
     dax_measure: "[Return Amount]"
-    cube_member: "sales.return_amount"
+    cube_member: "online_sales.return_amount"
     unit: "USD"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Return Amount]"
+    alternate_cube_member: "sales.return_amount"
 
   - name: "退货数量"
     definition: "退货数量合计。"
     additivity: 可加
     dax_measure: "[Return Quantity]"
-    cube_member: "sales.return_quantity"
+    cube_member: "online_sales.return_quantity"
     unit: "件"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Return Quantity]"
+    alternate_cube_member: "sales.return_quantity"
 
   - name: "净销售额"
     definition: "销售金额 − 退货金额（约定 7）。"
     additivity: 可加
     dax_measure: "[Net Sales Amount]"
-    cube_member: "sales.net_sales_amount"
+    cube_member: "online_sales.net_sales_amount"
     unit: "USD"
     numerator: "销售额 − 退货金额"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Net Sales Amount]"
+    alternate_cube_member: "sales.net_sales_amount"
 
   - name: "退货率"
     definition: "退货数量 ÷ 销售数量（约定 7）。注意分子分母都是**数量**，不是金额。"
     additivity: 比率
     dax_measure: "[Return Rate]"
-    cube_member: "sales.return_rate"
+    cube_member: "online_sales.return_rate"
     numerator: "退货数量"
     denominator: "销售数量"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Return Rate]"
+    alternate_cube_member: "sales.return_rate"
 
   - name: "折扣金额"
     definition: "折扣金额合计。按约定 10，问折扣金额时不计无折扣交易（PromotionKey = 1）。"
     additivity: 可加
     dax_measure: "[Discount Amount]"
-    cube_member: "sales.discount_amount"
+    cube_member: "online_sales.discount_amount"
     unit: "USD"
     default_filters:
       - "PromotionKey != 1（约定 10）"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Discount Amount]"
+    alternate_cube_member: "sales.discount_amount"
 
   - name: "折扣数量"
     definition: "参与折扣的数量合计。"
     additivity: 可加
     dax_measure: "[Discount Quantity]"
-    cube_member: "sales.discount_quantity"
+    cube_member: "online_sales.discount_quantity"
     unit: "件"
     default_filters:
       - "PromotionKey != 1（约定 10）"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Discount Quantity]"
+    alternate_cube_member: "sales.discount_quantity"
 
   - name: "折扣前原价"
     definition: "销售额 + 折扣金额。因为 SalesAmount 已经扣掉折扣，加回折扣就得到折前金额 （全渠道销售 3,406,089 行全部满足 SalesAmount = UnitPrice × SalesQuantity − DiscountAmount）。"
     additivity: 可加
     dax_measure: "[List Amount Before Discount]"
-    cube_member: "sales.list_amount_before_discount"
+    cube_member: "online_sales.list_amount_before_discount"
     unit: "USD"
     numerator: "销售额 + 折扣金额"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel List Amount Before Discount]"
+    alternate_cube_member: "sales.list_amount_before_discount"
 
   - name: "折扣率"
     definition: "折扣金额 ÷ 折扣前原价。"
     additivity: 比率
     dax_measure: "[Discount Rate]"
-    cube_member: "sales.discount_rate"
+    cube_member: "online_sales.discount_rate"
     numerator: "折扣金额"
     denominator: "折扣前原价"
     default_filters:
       - "PromotionKey != 1（约定 10）"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Discount Rate]"
+    alternate_cube_member: "sales.discount_rate"
 
   - name: "打折销售额"
     definition: "促销键不等于 1 的交易的销售额合计（约定 10）。"
     additivity: 可加
     dax_measure: "[Discounted Sales Amount]"
-    cube_member: "sales.discounted_sales_amount"
+    cube_member: "online_sales.discounted_sales_amount"
     unit: "USD"
     numerator: "销售额，筛 PromotionKey != 1"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Discounted Sales Amount]"
+    alternate_cube_member: "sales.discounted_sales_amount"
 
   - name: "打折销售额占比"
     definition: "打折销售额 ÷ 销售额（分母含无折扣交易）。"
     additivity: 比率
     dax_measure: "[Discounted Sales Share]"
-    cube_member: "sales.discounted_sales_share"
+    cube_member: "online_sales.discounted_sales_share"
     numerator: "打折销售额"
     denominator: "销售额"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Discounted Sales Share]"
+    alternate_cube_member: "sales.discounted_sales_share"
 
   - name: "毛利"
     definition: "销售金额 − 总成本（约定 7）。"
     additivity: 可加
     dax_measure: "[Gross Margin]"
-    cube_member: "sales.gross_margin"
+    cube_member: "online_sales.gross_margin"
     unit: "USD"
     numerator: "销售额 − 总成本"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Gross Margin]"
+    alternate_cube_member: "sales.gross_margin"
 
   - name: "毛利率"
     definition: "毛利 ÷ 销售金额（约定 7）。"
     additivity: 比率
     dax_measure: "[Gross Margin %]"
-    cube_member: "sales.gross_margin_pct"
+    cube_member: "online_sales.gross_margin_pct"
     numerator: "毛利"
     denominator: "销售额"
     dataset: FactOnlineSales
     alternate_dataset: FactSales
+    alternate_dax_measure: "[All Channel Gross Margin %]"
+    alternate_cube_member: "sales.gross_margin_pct"
 
   - name: "订单数"
     definition: "去重的线上订单号个数（约定 8）。"
@@ -318,6 +354,8 @@ metrics:
     unit: "天"
     dataset: FactSales
     alternate_dataset: FactOnlineSales
+    alternate_dax_measure: "[Online Selling Day Count]"
+    alternate_cube_member: "online_sales.selling_day_count"
 
   - name: "日均销售额"
     definition: "先按天汇总销售额，再对天数求平均（约定 4）。等价于 销售额 ÷ 有销售天数。 比较节假日与平日、周末与工作日、季节时用这个，不要直接比销售额合计。"
@@ -329,6 +367,8 @@ metrics:
     denominator: "有销售天数"
     dataset: FactSales
     alternate_dataset: FactOnlineSales
+    alternate_dax_measure: "[Online Average Daily Sales Amount]"
+    alternate_cube_member: "online_sales.average_daily_sales_amount"
 
   - name: "日均销售数量"
     definition: "先按天汇总销售数量，再对天数求平均。等价于 销售数量 ÷ 有销售天数。"
@@ -340,6 +380,8 @@ metrics:
     denominator: "有销售天数"
     dataset: FactSales
     alternate_dataset: FactOnlineSales
+    alternate_dax_measure: "[Online Average Daily Sales Quantity]"
+    alternate_cube_member: "online_sales.average_daily_sales_quantity"
 
   - name: "门店数"
     definition: "去重的门店个数。"
@@ -357,6 +399,8 @@ metrics:
     unit: "个"
     dataset: FactSales
     alternate_dataset: FactOnlineSales
+    alternate_dax_measure: "[Online Product Count]"
+    alternate_cube_member: "online_sales.product_count"
 
   - name: "店均销售额"
     definition: "销售额 ÷ 门店数。"
@@ -397,6 +441,8 @@ metrics:
     denominator: "去年同期销售额"
     dataset: FactSales
     alternate_dataset: FactOnlineSales
+    alternate_dax_measure: "[Online Sales Amount YoY %]"
+    alternate_cube_member: "online_sales.sales_amount_yoy_pct"
 
   - name: "销售额环比增长率"
     definition: "（本期销售额 − 上一期销售额）÷ 上一期销售额。期的长度由问题的粒度决定（月、季）。"
@@ -407,6 +453,8 @@ metrics:
     denominator: "上一期销售额"
     dataset: FactSales
     alternate_dataset: FactOnlineSales
+    alternate_dax_measure: "[Online Sales Amount MoM %]"
+    alternate_cube_member: "online_sales.sales_amount_mom_pct"
 
   - name: "销售额占比"
     definition: "某一组的销售额 ÷ 对应范围内的销售额合计。分母的范围由问题决定（全公司、某渠道、某品类内）。"
@@ -417,6 +465,8 @@ metrics:
     denominator: "范围内销售额合计"
     dataset: FactSales
     alternate_dataset: FactOnlineSales
+    alternate_dax_measure: "[Online Sales Amount Share]"
+    alternate_cube_member: "online_sales.sales_amount_share"
 
   - name: "同店销售额"
     definition: "只统计两个对比年份都有销售的门店的销售额（约定 15）。按约定 2 走全渠道销售。"
