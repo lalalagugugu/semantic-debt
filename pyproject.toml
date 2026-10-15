@@ -3,7 +3,7 @@ name = "semantic-debt"
 version = "0.1.0"
 description = "语义层质量对智能问数准确率的影响：可复现实验"
 requires-python = ">=3.11"
-dependencies = ["chdb>=3.0"]
+dependencies = ["chdb>=3.0", "pyyaml>=6.0"]
 
 [dependency-groups]
 dev = ["pytest>=8.0"]

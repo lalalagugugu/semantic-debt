@@ -1,0 +1,3372 @@
+# 语义层源文件（L1）
+#
+# 这是本实验唯一的语义内容源：L1、L1.5W、L1.5S、L2、L0 全部由它派生（见 render/）。
+# 结构参考 Open Semantic Interchange 的组织方式（datasets / columns / relationships /
+# metrics），但不绑定任何查询语言。
+#
+# 写法约定（给后面读这个文件的人和脚本）：
+#   - 一切描述用中文；物理名（表名、列名）原样照抄数据库，不翻译、不改大小写。
+#     `FactSales.channelKey` 的首字母确实是小写，数据里就是这样。
+#   - `technical: true` 的列是技术字段（代理键、行号、内部时间戳）。按档位定义，
+#     L1 及以上的上下文不呈现它们；它们留在这里是因为 L0 要暴露技术字段，而且
+#     关系的两端必须指得出来。渲染器负责过滤。
+#   - `values` 只在「不同取值少于 50 个」的字符串列和码值列上出现，取值原文来自
+#     semantic/profiling/out/columns.md，不是凭印象写的。
+#   - 本文件里的每一条事实陈述（粒度、基数、取值、孤儿行、金额对账）都能在
+#     semantic/profiling/out/ 的四份报告里找到对应的查询和输出。
+#
+# 冻结：G1 打 tag `semantic-v1` 之后本文件不得再改（AGENTS.md 硬规则 2）。
+
+version: 1
+name: retail
+title: "零售经营分析语义层"
+description: >-
+  一家虚拟零售公司（Contoso）的经营数据仓库。卖消费电子与家电，自营门店加线上、
+  目录和经销三个渠道，覆盖北美、欧洲、亚洲三个大洲。库里有销售、退货、折扣、库存、
+  销售目标、战略计划和门店 IT 运维七类事实，外加一组共用维度。
+  数据区间 2007-01-01 ~ 2009-12-31，金额一律美元。
+database: retail
+as_of_date: "2009-12-31"
+currency: USD
+grain_note: >-
+  这个库里有两张口径不同的销售事实表（线上明细和全渠道汇总），选错表是最常见的错误。
+  先看 conventions 的前两条，再看两张表各自的 when_to_use。
+
+# ---------------------------------------------------------------------------
+# 企业约定：把 semantic/conventions.md 的 15 条逐条结构化，并标注涉及的表和字段。
+# 原文不得修改；这里只做结构化和落地到物理字段。
+# ---------------------------------------------------------------------------
+conventions:
+  - id: 1
+    group: "渠道与事实表"
+    rule: "未说明渠道的「销售、订单、退货、折扣、营收」指线上渠道。"
+    applies_to_datasets: [FactOnlineSales]
+    applies_to_columns: [FactOnlineSales.SalesAmount, FactOnlineSales.SalesQuantity, FactOnlineSales.ReturnAmount, FactOnlineSales.DiscountAmount, FactOnlineSales.SalesOrderNumber]
+    note: >-
+      默认用 FactOnlineSales。它是订单行级明细，带客户和订单号，这两样全渠道表都没有。
+
+  - id: 2
+    group: "渠道与事实表"
+    rule: >-
+      以门店为对象的问题（各门店、门店经理、同店、渠道对比、全渠道）用全渠道销售。
+      全渠道销售按天、门店、产品、促销汇总，没有订单号。
+    applies_to_datasets: [FactSales]
+    applies_to_columns: [FactSales.StoreKey, FactSales.channelKey, FactSales.DateKey, FactSales.ProductKey, FactSales.PromotionKey]
+    note: >-
+      实测粒度就是这四列（天 × 门店 × 产品 × 促销）唯一，渠道列是冗余的：每家门店只
+      属于一个渠道。FactSales 确实没有订单号列，也没有客户列。
+
+  - id: 3
+    group: "时间"
+    rule: "数据截至 2009-12-31，以这一天为「今天」：今年 = 2009 年，去年 = 2008 年，上季度 = 2009 年第四季度。"
+    applies_to_datasets: [DimDate, FactSales, FactOnlineSales]
+    applies_to_columns: [DimDate.DateKey, DimDate.CalendarYear, DimDate.CalendarQuarterLabel]
+    note: >-
+      两张销售表的 DateKey 上限都正好是 2009-12-31。其余事实表的上限更早：
+      库存 2009-12-26、销售目标与战略计划 2009-12-01、汇率 2009-07-01、IT 成本 2009-01-01。
+      日期维度本身覆盖 2005-01-01 ~ 2011-12-31，比事实宽，按日期维度取范围会带出没有销售的天。
+
+  - id: 4
+    group: "时间"
+    rule: "比较不同类型的日子（节假日与平日、周末与工作日、季节）时用日均销售：先按天汇总，再对天数求平均。"
+    applies_to_datasets: [DimDate]
+    applies_to_columns: [DimDate.IsHoliday, DimDate.IsWorkDay, DimDate.EuropeSeason, DimDate.NorthAmericaSeason, DimDate.AsiaSeason]
+    metrics: ["日均销售额"]
+    note: >-
+      数据里「节假日」和「周末」是同一个划分：IsHoliday = Yes 的 731 天恰好就是全部周六
+      和周日，IsWorkDay = WeekEnd 也是同一批。所以这两种比较会得到同一个结果。
+      另外「季节」有三套，按大洲分（EuropeSeason / NorthAmericaSeason / AsiaSeason），
+      没有一套全局的季节字段。
+
+  - id: 5
+    group: "地理与币种"
+    rule: "按国家、地区、大洲分析销售时，默认按客户所在地；只有明确说「门店所在地」才按门店。"
+    applies_to_datasets: [DimGeography, DimCustomer, DimStore]
+    applies_to_columns: [DimCustomer.GeographyKey, DimStore.GeographyKey, DimGeography.RegionCountryName, DimGeography.ContinentName, DimGeography.StateProvinceName, DimGeography.CityName]
+    note: >-
+      客户所在地只能从线上销售走（FactOnlineSales → DimCustomer → DimGeography），因为
+      全渠道销售表没有客户列。所以「按国家看销售」这类问题落在线上销售上，这和约定 1
+      的默认是一致的；一旦问题点明了门店（约定 2），就改走门店所在地。
+      两条路都走到同一张 DimGeography，但从不同的 GeographyKey 进去，结果不同。
+
+  - id: 6
+    group: "地理与币种"
+    rule: "金额一律为美元；线上销售已是美元，无需换算。"
+    applies_to_datasets: [FactOnlineSales, FactSales, FactInventory, FactSalesQuota, FactStrategyPlan, DimCurrency]
+    applies_to_columns: [FactOnlineSales.CurrencyKey, FactSales.CurrencyKey]
+    note: >-
+      五张带币种的事实表里 CurrencyKey 都只有一个取值 1 = USD，所以任何金额都不需要换算，
+      汇率表（FactExchangeRate）在本库里用不上。
+
+  - id: 7
+    group: "口径与业务词"
+    rule: >-
+      销售额、营收、GMV = 销售金额（已扣折扣、未扣退货）；净销售额 = 销售金额 − 退货金额；
+      毛利 = 销售金额 − 总成本；毛利率 = 毛利 ÷ 销售金额；退货率 = 退货数量 ÷ 销售数量。
+    applies_to_columns: [FactOnlineSales.SalesAmount, FactOnlineSales.ReturnAmount, FactOnlineSales.TotalCost, FactOnlineSales.SalesQuantity, FactOnlineSales.ReturnQuantity, FactSales.SalesAmount, FactSales.ReturnAmount, FactSales.TotalCost, FactSales.SalesQuantity, FactSales.ReturnQuantity]
+    metrics: ["销售额", "净销售额", "毛利", "毛利率", "退货率"]
+    note: >-
+      「已扣折扣」在数据上成立：全渠道销售的 3,406,089 行全部满足
+      SalesAmount = UnitPrice × SalesQuantity − DiscountAmount。
+
+  - id: 8
+    group: "口径与业务词"
+    rule: "订单 = 线上订单号；客单价（平均订单金额）= 销售额 ÷ 去重订单数。"
+    applies_to_datasets: [FactOnlineSales]
+    applies_to_columns: [FactOnlineSales.SalesOrderNumber]
+    metrics: ["订单数", "客单价"]
+    note: >-
+      1,674,320 个订单号、12,627,608 个订单行，平均每单 7.5 行。一个订单号不跨天，
+      但有 2,034 个订单号挂在多个客户上，所以订单数和客户数不能互相推算。
+
+  - id: 9
+    group: "口径与业务词"
+    rule: "产品利润率、「最贵的产品」这类问题用产品表的标价和成本，不用成交价推算。"
+    applies_to_datasets: [DimProduct]
+    applies_to_columns: [DimProduct.UnitPrice, DimProduct.UnitCost]
+    metrics: ["产品标价", "产品单位成本", "产品利润率"]
+    note: >-
+      DimProduct 的 UnitPrice / UnitCost 全部非空且为正，没有标价低于成本的行。
+      事实表里也有同名的 UnitPrice / UnitCost 列，那是成交价，按本条不用于这类问题。
+
+  - id: 10
+    group: "口径与业务词"
+    rule: "促销键 1 表示「无折扣」；问折扣金额或促销效果时不计无折扣交易。"
+    applies_to_datasets: [DimPromotion]
+    applies_to_columns: [DimPromotion.PromotionKey, FactOnlineSales.PromotionKey, FactSales.PromotionKey]
+    metrics: ["折扣金额", "折扣率", "打折销售额占比"]
+    note: >-
+      PromotionKey = 1 的那行是 PromotionName = No Discount、DiscountPercent = 0。
+      按本条筛选的依据是促销键，不是折扣金额：在线上销售里两者等价（没有一行不一致），
+      但在全渠道销售里有 446,677 行挂了季节性促销而 DiscountAmount = 0。以促销键为准。
+
+  - id: 11
+    group: "库存、计划与销售目标"
+    rule: "库存是每日快照，不能跨日期求和；「当前库存」取每个门店 × 产品最近一次快照。"
+    applies_to_datasets: [FactInventory]
+    applies_to_columns: [FactInventory.DateKey, FactInventory.StoreKey, FactInventory.ProductKey, FactInventory.OnHandQuantity]
+    metrics: ["当前在手库存数量", "当前在手库存金额"]
+    note: >-
+      快照实际是**每周一次**，全部落在周六，156 个日期、相邻间隔都是 7 天，不是每日。
+      「不能跨日期求和」仍然成立，而且「取每个门店 × 产品最近一次快照」这句是必须的：
+      各门店 × 产品的最后一次快照并不在同一天（最多的一天 2009-12-26 只占 27,425 组，
+      合计 600,241 组），每个快照日覆盖的门店 × 产品组合数从 18,969 到 98,552 不等。
+
+  - id: 12
+    group: "库存、计划与销售目标"
+    rule: >-
+      战略计划表按实体 × 品类 × 科目记金额，分实际、预算、预测三个场景；「收入」对应科目
+      Sale Revenue。销售目标表（数据里叫 quota，也常译作「配额」）记录分配给每家门店 ×
+      产品 × 日期的目标销售额和目标销量，同样分三个场景，正式目标看预算场景。
+      目标达成率 = 全渠道实际销售额 ÷ 预算场景的目标销售额。
+    applies_to_datasets: [FactStrategyPlan, FactSalesQuota, DimScenario, DimAccount]
+    applies_to_columns: [FactStrategyPlan.EntityKey, FactStrategyPlan.ProductCategoryKey, FactStrategyPlan.AccountKey, FactStrategyPlan.ScenarioKey, FactSalesQuota.SalesAmountQuota, FactSalesQuota.SalesQuantityQuota, DimScenario.ScenarioName, DimAccount.AccountName]
+    metrics: ["目标销售额", "目标销量", "目标达成率", "计划金额"]
+    note: >-
+      核实结果：AccountName = Sale Revenue 确实存在（AccountKey = 4，AccountType = Income）；
+      三个场景就是 Actual / Budget / Forecast。战略计划表的实体全部是门店级
+      （EntityType = Store，306 个），与 DimStore.EntityKey 一一对应，没有一行挂在非门店实体上，
+      所以「实体」在这个库里等于门店。销售目标表的日期全是每月 1 号（月粒度，36 个月），
+      粒度里除了门店 × 产品 × 日期 × 场景还有渠道列。
+      三张表的「实际」口径互相对得上，都是 12,413,657,608.89：全渠道销售额合计 =
+      战略计划 Actual / Sale Revenue = 销售目标表 Actual 场景的目标销售额。
+
+  - id: 13
+    group: "客户"
+    rule: "按最近一次购买距 2009-12-31 的月数分层：6 个月内为活跃，7–12 个月为有流失风险，超过 12 个月为已流失。"
+    applies_to_datasets: [DimCustomer, FactOnlineSales]
+    applies_to_columns: [FactOnlineSales.CustomerKey, FactOnlineSales.DateKey]
+    metrics: ["客户最近购买月数", "活跃客户数", "有流失风险客户数", "已流失客户数"]
+    note: >-
+      只能用线上销售算，全渠道表没有客户列。18,869 个客户全都有线上购买记录，没有
+      「从未购买」的客户。按这个分层实测：活跃 16,890、有流失风险 1,841、已流失 138。
+
+  - id: 14
+    group: "客户"
+    rule: >-
+      新客：首次购买日落在截止日前 90 天内的客户；首次购买指该客户有史以来第一次购买；
+      截止日由问题的时间窗口决定（按月看就是每个月的最后一天）。
+    applies_to_datasets: [DimCustomer, FactOnlineSales]
+    applies_to_columns: [FactOnlineSales.CustomerKey, FactOnlineSales.DateKey]
+    metrics: ["新客数", "新客销售额", "新客销售额占比"]
+    note: >-
+      这条在本库的数据上几乎恒为空：18,869 个客户里 18,868 个的首次购买都在 2007 年，
+      只有 1 个在 2009 年。任何 2008 年之后的 90 天窗口里新客数是 0 或 1。
+      口径本身仍然按原文实现，不改。
+
+  - id: 15
+    group: "客户"
+    rule: "同店口径：只比较两个对比年份都有销售的门店。"
+    applies_to_datasets: [FactSales, DimStore]
+    applies_to_columns: [FactSales.StoreKey, FactSales.DateKey]
+    metrics: ["同店销售额", "同店销售额增长率"]
+    note: >-
+      按约定 2，同店走全渠道销售。实测 2008 与 2009 都有销售的门店 301 家（2008 年 301 家、
+      2009 年 306 家，全部 306 家）。
+
+# ---------------------------------------------------------------------------
+# 同义词：业务说法 → 字段或指标。
+# 一条同义词只映到一个落点；落点不唯一的（例如「销售额」在两张事实表上都有）
+# 由 default_dataset 指出默认走哪张表，依据写在 why 里。
+# ---------------------------------------------------------------------------
+synonyms:
+  - terms: ["销售额", "营收", "收入", "GMV", "销售金额", "成交额", "营业额"]
+    maps_to_metric: "销售额"
+    default_dataset: FactOnlineSales
+    why: "约定 1：未说明渠道时指线上渠道。点明门店或全渠道时改走 FactSales（约定 2）。"
+  - terms: ["净销售额", "净收入", "扣退货后销售额"]
+    maps_to_metric: "净销售额"
+  - terms: ["销量", "销售数量", "件数", "卖了多少件"]
+    maps_to_metric: "销售数量"
+  - terms: ["退货金额", "退款金额"]
+    maps_to_metric: "退货金额"
+  - terms: ["退货量", "退货数量", "退了多少件"]
+    maps_to_metric: "退货数量"
+  - terms: ["退货率"]
+    maps_to_metric: "退货率"
+  - terms: ["折扣金额", "优惠金额", "让利"]
+    maps_to_metric: "折扣金额"
+  - terms: ["折扣率", "折扣力度"]
+    maps_to_metric: "折扣率"
+  - terms: ["毛利", "毛利额", "利润"]
+    maps_to_metric: "毛利"
+  - terms: ["毛利率", "利润率"]
+    maps_to_metric: "毛利率"
+  - terms: ["成本", "销货成本", "总成本"]
+    maps_to_metric: "总成本"
+  - terms: ["订单数", "单量", "订单量", "下了多少单"]
+    maps_to_metric: "订单数"
+    default_dataset: FactOnlineSales
+    why: "约定 8：订单 = 线上订单号。全渠道销售表没有订单号，问订单只能用线上销售。"
+  - terms: ["客单价", "平均订单金额", "平均客单", "AOV"]
+    maps_to_metric: "客单价"
+  - terms: ["客户数", "买家数", "有多少客户", "购买人数"]
+    maps_to_metric: "客户数"
+  - terms: ["客均销售额", "人均消费", "每位客户贡献"]
+    maps_to_metric: "客均销售额"
+  - terms: ["平均单价", "均价", "成交均价"]
+    maps_to_metric: "平均单价"
+  - terms: ["标价", "吊牌价", "零售价", "产品单价"]
+    maps_to_column: DimProduct.UnitPrice
+    why: "约定 9：产品利润率、最贵的产品用产品表的标价，不用成交价。"
+  - terms: ["产品成本", "单位成本"]
+    maps_to_column: DimProduct.UnitCost
+  - terms: ["产品利润率"]
+    maps_to_metric: "产品利润率"
+  - terms: ["日均销售", "日均销售额", "每天平均卖多少"]
+    maps_to_metric: "日均销售额"
+    why: "约定 4：比较不同类型的日子时用日均销售。"
+  - terms: ["销售目标", "目标", "配额", "quota", "目标销售额"]
+    maps_to_metric: "目标销售额"
+    why: "约定 12：正式目标看预算（Budget）场景。"
+  - terms: ["目标销量", "目标数量"]
+    maps_to_metric: "目标销量"
+  - terms: ["目标达成率", "完成率", "达成情况", "完成了多少目标"]
+    maps_to_metric: "目标达成率"
+  - terms: ["计划", "战略计划", "预算金额", "计划金额"]
+    maps_to_metric: "计划金额"
+  - terms: ["在手库存", "库存", "现有库存", "当前库存"]
+    maps_to_metric: "当前在手库存数量"
+    why: "约定 11：当前库存取每个门店 × 产品最近一次快照。"
+  - terms: ["库存金额", "库存价值"]
+    maps_to_metric: "当前在手库存金额"
+  - terms: ["在订库存", "在途库存", "已下单未到货"]
+    maps_to_metric: "当前在订库存数量"
+  - terms: ["安全库存"]
+    maps_to_metric: "当前安全库存数量"
+  - terms: ["缺货", "低于安全库存", "补货预警"]
+    maps_to_metric: "低于安全库存的门店产品数"
+  - terms: ["同店", "同店销售", "可比门店"]
+    maps_to_metric: "同店销售额"
+  - terms: ["同比", "同比增长", "去年同期比"]
+    maps_to_metric: "销售额同比增长率"
+  - terms: ["环比", "环比增长", "上期比"]
+    maps_to_metric: "销售额环比增长率"
+  - terms: ["占比", "份额", "贡献度"]
+    maps_to_metric: "销售额占比"
+  - terms: ["活跃客户"]
+    maps_to_metric: "活跃客户数"
+  - terms: ["流失风险客户", "有流失风险"]
+    maps_to_metric: "有流失风险客户数"
+  - terms: ["流失客户", "已流失"]
+    maps_to_metric: "已流失客户数"
+  - terms: ["新客", "新客户", "新增客户"]
+    maps_to_metric: "新客数"
+  - terms: ["门店", "店", "门店数", "店铺"]
+    maps_to_column: DimStore.StoreName
+  - terms: ["门店经理", "店长"]
+    maps_to_column: DimEmployee.FirstName
+    why: >-
+      门店经理是 DimStore.EmployeeKey → DimEmployee 的姓名，不是 DimStore.StoreManager
+      ——那一列存的是员工号的字符串形式（306 行全部等于 EmployeeKey）。
+  - terms: ["营业面积", "门店面积", "卖场面积"]
+    maps_to_column: DimStore.SellingAreaSize
+  - terms: ["坪效", "单位面积销售额"]
+    maps_to_metric: "坪效"
+  - terms: ["品类", "大类", "产品类别"]
+    maps_to_column: DimProductCategory.ProductCategoryName
+  - terms: ["子类", "小类", "子品类"]
+    maps_to_column: DimProductSubcategory.ProductSubcategoryName
+  - terms: ["品牌"]
+    maps_to_column: DimProduct.BrandName
+  - terms: ["厂商", "制造商", "供应商"]
+    maps_to_column: DimProduct.Manufacturer
+  - terms: ["颜色"]
+    maps_to_column: DimProduct.ColorName
+  - terms: ["渠道"]
+    maps_to_column: DimChannel.ChannelName
+  - terms: ["促销", "活动", "促销活动"]
+    maps_to_column: DimPromotion.PromotionName
+  - terms: ["国家", "地区"]
+    maps_to_column: DimGeography.RegionCountryName
+  - terms: ["大洲", "洲"]
+    maps_to_column: DimGeography.ContinentName
+  - terms: ["省", "州", "省份"]
+    maps_to_column: DimGeography.StateProvinceName
+  - terms: ["城市"]
+    maps_to_column: DimGeography.CityName
+  - terms: ["场景", "实际", "预算", "预测"]
+    maps_to_column: DimScenario.ScenarioName
+  - terms: ["科目", "会计科目"]
+    maps_to_column: DimAccount.AccountName
+  - terms: ["停机时长", "宕机时长", "故障时长"]
+    maps_to_metric: "停机时长"
+  - terms: ["IT 成本", "设备成本", "运维成本"]
+    maps_to_metric: "IT 成本"
+
+# ---------------------------------------------------------------------------
+# 数据集：25 张表。先事实表（选错表是最常见的错误），再维度表。
+# 每张表写明粒度（一行是什么）、何时使用、与相近表的区别。
+# ---------------------------------------------------------------------------
+datasets:
+
+  # ======================= 事实表 =======================
+
+  - name: FactOnlineSales
+    title: "线上销售明细"
+    kind: fact
+    rows: 12627608
+    grain: "一行 = 一个线上订单的一个订单行（SalesOrderNumber × SalesOrderLineNumber 唯一）。"
+    description: >-
+      线上渠道的订单行级明细，带客户和订单号。这是全库唯一能回答「订单」「客单价」
+      「客户」类问题的表，也是未说明渠道时的默认销售表。
+      销售行与退货行是**分开的两种行**：销售行 SalesQuantity = 1、ReturnQuantity = 0；
+      退货行 SalesQuantity = 0、SalesAmount = 0、ReturnQuantity = 1、ReturnAmount > 0，
+      但 TotalCost 仍然大于 0。12,527,442 行销售 + 100,166 行退货。
+    when_to_use: >-
+      问销售、订单、退货、折扣、营收而没说渠道时（约定 1）；问客户、客单价、客户分层、
+      新客时（只有这张表有客户）；问按国家 / 地区 / 大洲的销售时（约定 5 按客户所在地，
+      客户只能从这张表进去）。
+    differs_from:
+      - dataset: FactSales
+        how: >-
+          FactSales 是全渠道的日 × 门店 × 产品 × 促销汇总，没有订单号也没有客户，
+          退货写在销售的同一行上。两张表的线上口径**对不上**：FactSales 里 Online 渠道
+          销售额 2,677,599,035.07，这张表合计 2,718,202,629.81（差约 4,060 万，1.5%）；
+          退货 32,983,261.29 对 29,244,318.20。不要把两者相加或互相替代。
+    date_column: DateKey
+    columns:
+      - name: OnlineSalesKey
+        description: "行的代理键，无业务含义。"
+        technical: true
+      - name: DateKey
+        description: "订单日期。粒度到天，无时间部分。数据范围 2007-01-01 ~ 2009-12-31，1,096 天连续无缺口。"
+        role: date
+      - name: StoreKey
+        description: >-
+          承接这笔线上交易的线上店。只有三个取值：199 = 北美线上店、306 = 欧洲线上店、
+          307 = 亚洲线上店，都是 DimStore 里 StoreType = Online 的虚拟门店，不是实体店。
+          所以这张表不能用来回答「各门店」类问题。
+        values:
+          - { value: 199, meaning: "Contoso North America Online Store（北美线上店）", rows: 4645792 }
+          - { value: 306, meaning: "Contoso Europe Online Store（欧洲线上店）", rows: 3847281 }
+          - { value: 307, meaning: "Contoso Asia Online Store（亚洲线上店）", rows: 4134535 }
+      - name: ProductKey
+        description: >-
+          卖出的产品。用到 2,516 个产品键，其中 283 个在 DimProduct 里没有对应行
+          （详见 data_quality 的 missing-products 条）：内连接产品表会丢掉 1,715,380 行、
+          152,121,858.08 的销售额。
+      - name: PromotionKey
+        description: "这笔交易所属的促销。1 = 无折扣（约定 10）。这张表里促销键与折扣金额完全一致：PromotionKey = 1 的 3,899,892 行折扣金额全为 0。"
+      - name: CurrencyKey
+        description: "币种。全表只有 1 = USD，金额无需换算（约定 6）。"
+      - name: CustomerKey
+        description: "下单客户。18,869 个客户全部在这张表里出现过，没有零购买客户。全渠道销售表没有这一列。"
+      - name: SalesOrderNumber
+        description: >-
+          线上订单号，形如 `200912105CS943`。这就是约定 8 说的「订单」。
+          1,674,320 个订单号，平均每单 7.5 行。一个订单号不跨天，但有 2,034 个订单号
+          挂在多个客户上，所以订单数不能当作客户数用。
+      - name: SalesOrderLineNumber
+        description: "订单内的行号，与订单号合起来唯一。最大 4,972。"
+      - name: SalesQuantity
+        description: "销售数量（件）。只有 0 和 1 两个取值：销售行是 1，退货行是 0。"
+        unit: "件"
+      - name: SalesAmount
+        description: "销售金额（美元），已扣折扣、未扣退货（约定 7）。退货行上这一列是 0。"
+        unit: USD
+      - name: ReturnQuantity
+        description: "退货数量（件）。只有 0 和 1：退货行是 1，销售行是 0。"
+        unit: "件"
+      - name: ReturnAmount
+        description: "退货金额（美元）。只出现在退货行上，合计 29,244,318.20。"
+        unit: USD
+      - name: DiscountQuantity
+        description: "参与折扣的数量（件）。0 或 1，与 PromotionKey != 1 完全一致。"
+        unit: "件"
+      - name: DiscountAmount
+        description: >-
+          折扣金额（美元）。已经从 SalesAmount 里扣掉了，所以折前原价 =
+          SalesAmount + DiscountAmount。退货行上也可能有折扣金额（合计 2,907,826.10）。
+        unit: USD
+      - name: TotalCost
+        description: >-
+          这一行的总成本（美元），用于算毛利（约定 7）。退货行上也大于 0
+          （合计 13,703,156.24），所以退货行算出来的毛利是负的。
+          全表有 369,350 行销售额低于成本，其中 100,166 行是退货行。
+        unit: USD
+      - name: UnitCost
+        description: "成交时的单位成本（美元）。算产品利润率时不用这一列，用 DimProduct.UnitCost（约定 9）。"
+        unit: USD
+      - name: UnitPrice
+        description: >-
+          成交时的单位标价（美元）。销售行满足 SalesAmount = UnitPrice × SalesQuantity
+          − DiscountAmount。算「最贵的产品」时不用这一列，用 DimProduct.UnitPrice（约定 9）。
+        unit: USD
+
+  - name: FactSales
+    title: "全渠道销售汇总"
+    kind: fact
+    rows: 3406089
+    grain: >-
+      一行 = 一天 × 一家门店 × 一个产品 × 一个促销的汇总（DateKey × StoreKey ×
+      ProductKey × PromotionKey 唯一；channelKey 由门店决定，是冗余列）。没有订单号。
+    description: >-
+      四个渠道（门店、线上、目录、经销）合在一起的销售汇总，按天、门店、产品、促销预聚合。
+      与线上明细相反，**退货写在销售的同一行上**：480,943 行 ReturnQuantity > 0 的行同时
+      带着销售额。销售额合计 12,413,657,608.86，是全库的「实际收入」口径
+      （与战略计划 Actual/Sale Revenue 和销售目标表 Actual 场景三方相等）。
+    when_to_use: >-
+      问各门店、门店经理、同店、渠道对比、全渠道时（约定 2）；问目标达成率时的分子
+      （约定 12）。
+    differs_from:
+      - dataset: FactOnlineSales
+        how: >-
+          没有订单号也没有客户，所以回答不了订单数、客单价、客户数、客户分层、新客，
+          也回答不了「按客户所在地」的地理问题。两张表的线上口径对不上，见
+          FactOnlineSales 的 differs_from。
+    date_column: DateKey
+    columns:
+      - name: SalesKey
+        description: "行的代理键，无业务含义。"
+        technical: true
+      - name: DateKey
+        description: "销售日期，粒度到天。2007-01-01 ~ 2009-12-31，1,096 天连续无缺口。"
+        role: date
+      - name: channelKey
+        description: >-
+          销售渠道。注意物理列名首字母是小写的 `channelKey`（数据原样），而 DimChannel
+          里的列叫 `ChannelKey`。取值 1 = 门店、2 = 线上、3 = 目录、4 = 经销。
+          渠道由门店唯一决定（306 家门店里没有一家跨渠道），所以渠道对比等价于门店类型对比。
+        values:
+          - { value: 1, meaning: "Store（自营门店），2,173,872 行，销售额 6,942,853,195.14" }
+          - { value: 2, meaning: "Online（线上），629,223 行，销售额 2,677,599,035.07" }
+          - { value: 3, meaning: "Catalog（目录邮购），194,976 行，销售额 1,078,007,547.23" }
+          - { value: 4, meaning: "Reseller（经销），408,018 行，销售额 1,715,197,831.44" }
+      - name: StoreKey
+        description: >-
+          门店。306 家门店全部在这张表里有销售，其中 299 家是实体店（StoreType = Store），
+          另外 7 家是渠道用的虚拟门店：3 家线上店、3 家经销店、1 家目录店。
+          问「门店」时按需要决定是否排除这 7 家。
+      - name: ProductKey
+        description: >-
+          产品。用到 2,516 个产品键，其中 284 个在 DimProduct 里没有对应行：内连接产品表
+          会丢掉 338,898 行、726,129,808.32 的销售额（5.85%）。见 data_quality。
+      - name: PromotionKey
+        description: >-
+          促销。1 = 无折扣（约定 10）。注意这张表里促销键与折扣金额**不完全一致**：
+          有 446,677 行挂了季节性促销但 DiscountAmount = 0。按约定 10，筛选依据是促销键。
+      - name: CurrencyKey
+        description: "币种。全表只有 1 = USD（约定 6）。"
+      - name: UnitCost
+        description: "汇总行的单位成本（美元）。"
+        unit: USD
+      - name: UnitPrice
+        description: "汇总行的单位标价（美元）。"
+        unit: USD
+      - name: SalesQuantity
+        description: "销售数量（件）。因为是汇总行，最小值是 2，最大 2,880；合计 53,320,454。"
+        unit: "件"
+      - name: ReturnQuantity
+        description: "退货数量（件），0 ~ 5。合计 493,587。与销售在同一行上。"
+        unit: "件"
+      - name: ReturnAmount
+        description: "退货金额（美元），合计 156,839,375.87。与销售在同一行上。"
+        unit: USD
+      - name: DiscountQuantity
+        description: "参与折扣的数量（件），0 ~ 24。"
+        unit: "件"
+      - name: DiscountAmount
+        description: "折扣金额（美元），合计 204,157,104.07。已从 SalesAmount 里扣掉。"
+        unit: USD
+      - name: TotalCost
+        description: "总成本（美元），合计 5,364,896,601.72。毛利 = SalesAmount − TotalCost（约定 7）。这张表没有一行毛利为负。"
+        unit: USD
+      - name: SalesAmount
+        description: >-
+          销售金额（美元），已扣折扣、未扣退货（约定 7）。合计 12,413,657,608.86。
+          全部 3,406,089 行都满足 SalesAmount = UnitPrice × SalesQuantity − DiscountAmount。
+        unit: USD
+
+  - name: FactInventory
+    title: "库存快照"
+    kind: fact
+    rows: 8013099
+    grain: "一行 = 一个快照日 × 一家门店 × 一个产品（DateKey × StoreKey × ProductKey 唯一）。"
+    description: >-
+      门店 × 产品的库存快照。**快照是每周一次、全部落在周六**，156 个快照日，
+      2007-01-06 ~ 2009-12-26，相邻间隔都是 7 天（约定 11 写的是「每日快照」，与数据不符，
+      见 data_quality 的 inventory-weekly 条）。
+      每个快照日覆盖的门店 × 产品组合数差别很大（18,969 ~ 98,552），所以各组合的最后一次
+      快照并不在同一天。
+    when_to_use: >-
+      问库存、缺货、安全库存时。按约定 11，「当前库存」= 每个门店 × 产品最近一次快照，
+      不是最后一个快照日的全部行；已经做成 L1.5W 的 `wide_current_inventory` 视图。
+    cautions:
+      - "快照不可跨日期求和（约定 11）。要算期间平均，先按快照日汇总再对快照日求平均。"
+    date_column: DateKey
+    columns:
+      - name: InventoryKey
+        description: "行的代理键，无业务含义。"
+        technical: true
+      - name: DateKey
+        description: "快照日期。156 个值，全是周六，2007-01-06 ~ 2009-12-26。"
+        role: date
+      - name: StoreKey
+        description: "门店。306 家都有库存行。"
+      - name: ProductKey
+        description: "产品。用到 2,516 个键，其中 283 个在 DimProduct 里没有对应行（丢 533,358 行）。"
+      - name: CurrencyKey
+        description: "币种。全表只有 1 = USD。"
+      - name: OnHandQuantity
+        description: "快照时点的在手库存数量（件），0 ~ 5,517。不可跨日期求和。"
+        unit: "件"
+      - name: OnOrderQuantity
+        description: "快照时点已下采购单但未到货的数量（件），0 ~ 2,770。不可跨日期求和。"
+        unit: "件"
+      - name: SafetyStockQuantity
+        description: "该门店 × 产品设定的安全库存水位（件），3 ~ 3,228。在手低于这个数即为缺货预警。"
+        unit: "件"
+      - name: UnitCost
+        description: "快照时点的单位成本（美元）。库存金额 = OnHandQuantity × UnitCost。"
+        unit: USD
+      - name: DaysInStock
+        description: "该门店 × 产品的在库天数，5 ~ 119。"
+        unit: "天"
+      - name: MinDayInStock
+        description: "在库天数的下限参数，5 ~ 59。"
+        unit: "天"
+      - name: MaxDayInStock
+        description: "在库天数的上限参数，60 ~ 119。"
+        unit: "天"
+      - name: Aging
+        description: >-
+          库龄分档，1 ~ 7 的整数码，没有配套的说明表，数据里也看不出严格的业务含义
+          （各档的平均在手数量不单调）。分布极不均匀：7 档占 5,264,135 行、6 档占 2,357,475 行，
+          1 ~ 4 档合计不到 3 万行。不建议作为业务口径使用。
+        values:
+          - { value: 1, meaning: "库龄档 1，121 行，平均在手 7.3 件" }
+          - { value: 2, meaning: "库龄档 2，943 行，平均在手 8.5 件" }
+          - { value: 3, meaning: "库龄档 3，18,037 行，平均在手 2.8 件" }
+          - { value: 4, meaning: "库龄档 4，9,960 行，平均在手 9.6 件" }
+          - { value: 5, meaning: "库龄档 5，362,428 行，平均在手 6.1 件" }
+          - { value: 6, meaning: "库龄档 6，2,357,475 行，平均在手 7.8 件，平均在库 62 天" }
+          - { value: 7, meaning: "库龄档 7，5,264,135 行，平均在手 21 件，平均在库 44.6 天" }
+
+  - name: FactSalesQuota
+    title: "销售目标（配额）"
+    kind: fact
+    rows: 7465911
+    grain: >-
+      一行 = 一个月 × 一个渠道 × 一家门店 × 一个产品 × 一个场景
+      （DateKey × ChannelKey × StoreKey × ProductKey × ScenarioKey 唯一）。
+    description: >-
+      分配到门店 × 产品 × 月的销售目标，分实际 / 预算 / 预测三个场景，每个场景
+      2,488,637 行。日期全是每月 1 号，36 个月（2007-01 ~ 2009-12）。
+      约定 12 说的「销售目标表」就是这张；正式目标看预算（Budget）场景。
+      注意 Actual 场景的目标销售额合计 12,413,657,608.89 与全渠道销售额合计完全相等
+      ——这个场景记的是实际值，不是目标。
+    when_to_use: "问销售目标、目标达成率、预算差异时（约定 12）。"
+    cautions:
+      - "必须先按场景筛选，否则三个场景的金额会被加在一起（放大三倍）。"
+      - "目标是月粒度，不能和日粒度的销售直接按天对比；要先把销售汇总到月。"
+    date_column: DateKey
+    columns:
+      - name: SalesQuotaKey
+        description: "行的代理键，无业务含义。"
+        technical: true
+      - name: ChannelKey
+        description: "渠道。1 = 门店、2 = 线上、3 = 目录、4 = 经销。预算场景下各渠道目标：门店 5,965,123,660.92、线上 2,305,357,130.68、经销 1,482,013,781.77、目录 914,970,790.30。"
+      - name: StoreKey
+        description: "门店。306 家都有目标。"
+      - name: ProductKey
+        description: "产品。用到 2,516 个键，其中 283 个在 DimProduct 里没有对应行（丢 521,121 行）。"
+      - name: DateKey
+        description: "目标所属的月份，取值是每月 1 号。36 个月，2007-01-01 ~ 2009-12-01。"
+        role: date
+      - name: CurrencyKey
+        description: "币种。全表只有 1 = USD。"
+      - name: ScenarioKey
+        description: "场景。1 = Actual（实际）、2 = Budget（预算，正式目标）、3 = Forecast（预测）。三个场景行数相同。"
+      - name: SalesQuantityQuota
+        description: "目标销量（件）。Actual 53,320,454、Budget 44,300,085、Forecast 53,875,174。"
+        unit: "件"
+      - name: SalesAmountQuota
+        description: >-
+          目标销售额（美元）。三个场景合计：Actual 12,413,657,608.89、
+          Budget 10,667,465,363.67、Forecast 12,917,294,708.20。按约定 12 用 Budget。
+        unit: USD
+      - name: GrossMarginQuota
+        description: "目标毛利（美元）。有负值（最小 -1,620.95）。"
+        unit: USD
+
+  - name: FactStrategyPlan
+    title: "战略计划"
+    kind: fact
+    rows: 2750628
+    grain: >-
+      一行 = 一个月 × 一个实体 × 一个场景 × 一个会计科目 × 一个产品品类
+      （DateKey × EntityKey × ScenarioKey × AccountKey × ProductCategoryKey 唯一）。
+    description: >-
+      按会计科目记的损益计划，分实际 / 预算 / 预测三个场景，每个场景 916,876 行。
+      月粒度，36 个月。实体全部是门店级（EntityType = Store，306 个），与
+      DimStore.EntityKey 一一对应，所以「实体」在这个库里等于门店。
+      只用到 24 个科目里的 17 个。约定 12 说「收入」对应科目 Sale Revenue（AccountKey = 4）；
+      该科目 Actual 场景合计 12,413,657,608.89，与全渠道销售额完全相等。
+    when_to_use: "问预算、计划、损益科目（成本、费用、税、利润）时。"
+    cautions:
+      - "必须先按场景和科目筛选。不筛科目会把收入和各类费用加在一起。"
+      - "科目之间有父子关系（DimAccount.ParentAccountKey），把父子科目一起求和会重复计算。"
+    date_column: DateKey
+    columns:
+      - name: StrategyPlanKey
+        description: "行的代理键，无业务含义。"
+        technical: true
+      - name: DateKey
+        description: "计划所属月份，每月 1 号。36 个月，2007-01-01 ~ 2009-12-01。"
+        role: date
+      - name: EntityKey
+        description: "计划实体。306 个取值，全部是 DimEntity 里 EntityType = Store 的门店实体，与 DimStore.EntityKey 一一对应。"
+      - name: ScenarioKey
+        description: "场景。1 = Actual、2 = Budget、3 = Forecast。"
+      - name: AccountKey
+        description: "会计科目。用到 17 个：4、5、7 ~ 12、15 ~ 23。收入看 4 = Sale Revenue（约定 12）。"
+      - name: CurrencyKey
+        description: "币种。全表只有 1 = USD。"
+      - name: ProductCategoryKey
+        description: "产品品类，8 个品类都用到。注意计划只到品类级，没有到产品级。"
+      - name: Amount
+        description: >-
+          科目金额（美元），0.324 ~ 25,931,992.51，全表合计 65,893,562,614.49。
+          含义随科目变：收入类科目是收入，费用类科目是费用，都记为正数
+          （科目的方向看 DimAccount.AccountType）。
+        unit: USD
+
+  - name: FactExchangeRate
+    title: "汇率"
+    kind: fact
+    rows: 773
+    grain: "一行 = 一个日期 × 一种币种（DateKey × CurrencyKey 唯一）。"
+    description: >-
+      25 种币种对美元的汇率，31 个日期（2007-01-01 ~ 2009-07-01，不是每天）。
+      **本库用不上这张表**：所有带币种的事实表 CurrencyKey 都只有 1 = USD，
+      金额无需换算（约定 6）。
+    when_to_use: "本期实验里没有需要用到它的场景。保留是为了完整描述这个库。"
+    date_column: DateKey
+    columns:
+      - name: ExchangeRateKey
+        description: "行的代理键，无业务含义。"
+        technical: true
+      - name: CurrencyKey
+        description: "币种。25 个取值（DimCurrency 有 28 种，键 14、27、28 没有汇率）。"
+      - name: DateKey
+        description: "汇率日期。31 个值，2007-01-01 ~ 2009-07-01。"
+        role: date
+      - name: AverageRate
+        description: "当期平均汇率，0.21338 ~ 10,114.86。"
+      - name: EndOfDayRate
+        description: "收盘汇率，0.2885 ~ 10,199。"
+
+  - name: FactITMachine
+    title: "门店 IT 设备成本"
+    kind: fact
+    rows: 23283
+    grain: "一行 = 一台设备 × 一个日期 × 一个成本类型（MachineKey × DateKey × CostType 唯一）。"
+    description: >-
+      门店 IT 设备（POS、服务器、路由器等）的成本记录。只有 3 个日期
+      （2007-01-01、2008-01-01、2009-01-01），即按年记一次。成本合计 240,765,805。
+    when_to_use: "问门店 IT 成本、设备投入时。与销售分析无关。"
+    date_column: DateKey
+    columns:
+      - name: ITMachinekey
+        description: "行的代理键，无业务含义。注意物理列名的 k 是小写（数据原样）。"
+        technical: true
+      - name: MachineKey
+        description: "设备。7,816 台设备都有成本行。"
+      - name: DateKey
+        description: "成本所属年度，取值只有 2007-01-01、2008-01-01、2009-01-01。"
+        role: date
+      - name: CostAmount
+        description: "成本金额（美元），390 ~ 18,499，只有 23 个不同取值。"
+        unit: USD
+      - name: CostType
+        description: "成本类型。"
+        values:
+          - { value: "Annual Maintenance Cost", meaning: "年度维护费，23,062 行", rows: 23062 }
+          - { value: "Equipment Costs", meaning: "设备购置费，221 行", rows: 221 }
+
+  - name: FactITSLA
+    title: "门店 IT 故障与停机"
+    kind: fact
+    rows: 4925
+    grain: "一行 = 一次故障事件（ITSLAkey 唯一）。"
+    description: >-
+      门店 IT 设备的故障事件与停机时长。1,046 个日期，2007-01-01 ~ 2009-12-31，
+      涉及 299 家门店、2,553 台设备、294 种故障。停机时长合计 396,699 分钟。
+    when_to_use: "问门店 IT 故障次数、停机时长、服务水平时。与销售分析无关。"
+    date_column: DateKey
+    columns:
+      - name: ITSLAkey
+        description: "行的代理键，无业务含义。注意物理列名的 k 是小写（数据原样）。"
+        technical: true
+      - name: DateKey
+        description: "故障日期，1,046 个值，2007-01-01 ~ 2009-12-31。"
+        role: date
+      - name: StoreKey
+        description: "发生故障的门店，299 家。"
+      - name: MachineKey
+        description: "出故障的设备，2,553 台。"
+      - name: OutageKey
+        description: "故障类型，294 个取值。"
+      - name: OutageStartTime
+        description: "故障开始时间，字符串，形如 `2008-03-12 05:15:00`。"
+      - name: OutageEndTime
+        description: "故障结束时间，字符串，形如 `2009-06-20 16:22:00`。注意它与开始时间不一定在同一天。"
+      - name: DownTime
+        description: "停机时长（分钟），1 ~ 1,433。"
+        unit: "分钟"
+
+  # ======================= 维度表：销售分析常用 =======================
+
+  - name: DimProduct
+    title: "产品"
+    kind: dimension
+    rows: 2233
+    grain: "一行 = 一个产品（ProductKey 唯一）。"
+    description: >-
+      产品主数据：名称、品牌、厂商、颜色、款式、重量、标价、成本、子类。
+      **这张表不全**：ProductKey 的取值范围是 1 ~ 2,517 共 2,517 个位置，但只有 2,233 行，
+      缺 284 个键（散落在 416 ~ 2,497 之间），而四张事实表都引用了这些缺失的键。
+      内连接产品表会静默丢数据，见 data_quality 的 missing-products 条。
+    when_to_use: "按产品、品牌、厂商、颜色、品类、子类分析时；问产品标价、成本、利润率时（约定 9）。"
+    columns:
+      - name: ProductKey
+        description: "产品键。1 ~ 2,517，但只有 2,233 行（缺 284 个键）。"
+        role: key
+      - name: ProductName
+        description: "产品名，形如 `Contoso SLR Camera X144 Silver Grey`，全表唯一。品牌名通常是名字的第一个词。"
+      - name: ProductDescription
+        description: "产品卖点描述，653 个不同取值（多个产品共用一句）。"
+      - name: ProductSubcategoryKey
+        description: "所属子类。只用到 44 个子类里的 30 个。"
+      - name: Manufacturer
+        description: "制造商。11 个取值，与 BrandName 一一对应（只差后缀，如 `Contoso, Ltd` 对 `Contoso`）。"
+        values:
+          - { value: "Contoso, Ltd", meaning: "Contoso（自有品牌），644 个产品" }
+          - { value: "Fabrikam, Inc.", meaning: "Fabrikam，267 个" }
+          - { value: "Litware, Inc.", meaning: "Litware，264 个" }
+          - { value: "Proseware, Inc.", meaning: "Proseware，244 个" }
+          - { value: "Adventure Works", meaning: "Adventure Works，170 个" }
+          - { value: "The Phone Company", meaning: "The Phone Company，152 个" }
+          - { value: "Wide World Importers", meaning: "Wide World Importers，150 个" }
+          - { value: "Southridge Video", meaning: "Southridge Video，139 个" }
+          - { value: "A. Datum Corporation", meaning: "A. Datum，132 个" }
+          - { value: "Northwind Traders", meaning: "Northwind Traders，47 个" }
+          - { value: "Tailspin Toys", meaning: "Tailspin Toys，24 个" }
+      - name: BrandName
+        description: "品牌。11 个取值，问「品牌」用这一列（比 Manufacturer 干净）。Contoso 是自有品牌，644 个产品。"
+        values:
+          - { value: "Contoso", meaning: "自有品牌，644 个产品" }
+          - { value: "Fabrikam", meaning: "267 个产品" }
+          - { value: "Litware", meaning: "264 个产品" }
+          - { value: "Proseware", meaning: "244 个产品" }
+          - { value: "Adventure Works", meaning: "170 个产品" }
+          - { value: "The Phone Company", meaning: "152 个产品" }
+          - { value: "Wide World Importers", meaning: "150 个产品" }
+          - { value: "Southridge Video", meaning: "139 个产品" }
+          - { value: "A. Datum", meaning: "132 个产品" }
+          - { value: "Northwind Traders", meaning: "47 个产品" }
+          - { value: "Tailspin Toys", meaning: "24 个产品" }
+      - name: ClassID
+        description: "档位的数字码，与 ClassName 一一对应。1 = Economy、2 = Regular、3 = Deluxe。"
+        technical: true
+      - name: ClassName
+        description: "产品档位。"
+        values:
+          - { value: "Regular", meaning: "标准档，1,189 个产品" }
+          - { value: "Economy", meaning: "经济档，718 个" }
+          - { value: "Deluxe", meaning: "高档，326 个" }
+      - name: StyleID
+        description: "款式的数字码，16 个取值，但分布极偏（码 1 占 1,136 个产品，码 6 ~ 16 各只有 1 个）。没有配套的款式名称表，业务含义不明。"
+        technical: true
+      - name: StyleName
+        description: >-
+          列名叫「款式名」，**实际存的是产品编码**，形如 `Product0501042`，2,233 个产品
+          各不相同，与 StyleID 没有对应关系（StyleID = 1 的 1,136 个产品有 1,136 个不同的
+          StyleName）。不要当款式用；要分款式没有可用字段。
+      - name: ColorID
+        description: "颜色的数字码，16 个取值，与 ColorName 基本对应（ColorName 有 17 个取值，因为 `blue` 与 `Blue` 大小写不一致）。"
+        technical: true
+      - name: ColorName
+        description: >-
+          颜色。17 个取值。注意两处脏数据：`blue`（2 个产品，小写）与 `Blue`（148 个）是
+          同一个颜色的两种写法；`Silver Grey`（14 个）与 `Silver`、`Grey` 并列存在。
+          按颜色分组时这几个会分开。
+        values:
+          - { value: "Black", meaning: "黑，540 个产品" }
+          - { value: "White", meaning: "白，454 个" }
+          - { value: "Silver", meaning: "银，357 个" }
+          - { value: "Grey", meaning: "灰，271 个" }
+          - { value: "Blue", meaning: "蓝，148 个" }
+          - { value: "Red", meaning: "红，96 个" }
+          - { value: "Green", meaning: "绿，72 个" }
+          - { value: "Brown", meaning: "棕，66 个" }
+          - { value: "Pink", meaning: "粉，63 个" }
+          - { value: "Orange", meaning: "橙，53 个" }
+          - { value: "Gold", meaning: "金，49 个" }
+          - { value: "Yellow", meaning: "黄，29 个" }
+          - { value: "Azure", meaning: "天蓝，14 个" }
+          - { value: "Silver Grey", meaning: "银灰，14 个（与 Silver / Grey 并列，不是它们的子集）" }
+          - { value: "Purple", meaning: "紫，4 个" }
+          - { value: "blue", meaning: "蓝（小写写法，2 个），与 Blue 是同一个颜色" }
+          - { value: "Transparent", meaning: "透明，1 个" }
+      - name: Weight
+        description: "重量，0.17 ~ 239。单位看 WeightUnitMeasureID，三种单位混在一列里，不能直接跨产品比较或求和。"
+      - name: WeightUnitMeasureID
+        description: "重量的单位。列名叫 ID，实际存的是单位名。"
+        values:
+          - { value: "pounds", meaning: "磅，1,822 个产品" }
+          - { value: "ounces", meaning: "盎司，401 个" }
+          - { value: "grams", meaning: "克，10 个" }
+      - name: UnitOfMeasureID
+        description: "尺寸单位的数字码。1 = inches、2 = mm。"
+        technical: true
+      - name: UnitOfMeasureName
+        description: "尺寸单位。"
+        values:
+          - { value: "inches", meaning: "英寸，2,221 个产品" }
+          - { value: "mm", meaning: "毫米，12 个" }
+      - name: StockTypeID
+        description: "备货档位的数字码。1 = High、2 = Mid、3 = Low。"
+        technical: true
+      - name: StockTypeName
+        description: "备货档位（计划备货的高中低）。"
+        values:
+          - { value: "High", meaning: "高备货，1,314 个产品" }
+          - { value: "Mid", meaning: "中备货，658 个" }
+          - { value: "Low", meaning: "低备货，261 个" }
+      - name: UnitCost
+        description: "产品单位成本（美元），1.50 ~ 1,060.22，全部非空且为正。算产品利润率用这一列（约定 9）。"
+        unit: USD
+      - name: UnitPrice
+        description: >-
+          产品标价（美元），2.94 ~ 3,199.99，全部非空且为正，没有低于成本的。
+          问「最贵的产品」、算产品利润率用这一列，不用成交价（约定 9）。
+        unit: USD
+      - name: AvailableForSaleDate
+        description: "可售起始日，字符串日期，332 个取值。"
+      - name: Status
+        description: "产品状态。"
+        values:
+          - { value: "On", meaning: "在售，1,938 个产品" }
+          - { value: "Off", meaning: "停售，295 个" }
+
+  - name: DimStore
+    title: "门店"
+    kind: dimension
+    rows: 306
+    grain: "一行 = 一家门店（StoreKey 唯一）。"
+    description: >-
+      门店主数据。306 家里 299 家是实体店，另外 7 家是渠道用的虚拟门店：
+      3 家线上店（StoreKey 199 / 306 / 307）、3 家经销店、1 家目录店。
+      门店与渠道一一对应：StoreType 决定了它在 FactSales 里的 channelKey。
+      只有实体店有营业面积和员工数这类属性。
+    when_to_use: "按门店、门店类型、门店经理、门店所在地分析时（约定 2、约定 5 的门店分支）。"
+    columns:
+      - name: StoreKey
+        description: "门店键。1 ~ 310，306 行（缺 4 个键）。"
+        role: key
+      - name: GeographyKey
+        description: "门店所在城市。306 家门店落在 263 个城市，指向的 DimGeography 行全部是 City 级。只有问题明确说「门店所在地」时才走这条（约定 5）。"
+      - name: StoreManager
+        description: >-
+          列名叫「门店经理」，**实际存的是员工号的字符串形式**（306 行全部等于
+          EmployeeKey 的字符串），不是姓名。要门店经理的姓名，走
+          EmployeeKey → DimEmployee 取 FirstName / LastName。
+      - name: StoreType
+        description: "门店类型。决定了这家店在 FactSales 里属于哪个渠道。"
+        values:
+          - { value: "Store", meaning: "实体自营门店，299 家（对应渠道 Store）" }
+          - { value: "Online", meaning: "线上店，3 家（StoreKey 199 北美、306 欧洲、307 亚洲；对应渠道 Online，也是 FactOnlineSales 里唯一出现的三家）" }
+          - { value: "Reseller", meaning: "经销店，3 家（对应渠道 Reseller）" }
+          - { value: "Catalog", meaning: "目录店，1 家（对应渠道 Catalog）" }
+      - name: StoreName
+        description: "门店名，形如 `Contoso Seattle No.1 Store`，全表唯一。"
+      - name: Status
+        description: "门店状态。与 CloseDate 配合：Off 的 12 家都有真实关店日期，On 的 294 家关店日期都是哨兵值 2090-12-31。"
+        values:
+          - { value: "On", meaning: "营业中，294 家" }
+          - { value: "Off", meaning: "已关店，12 家" }
+      - name: OpenDate
+        description: "开店日，字符串日期，165 个取值。"
+      - name: CloseDate
+        description: >-
+          关店日，字符串日期，只有 8 个取值。294 家在营门店用的是**哨兵值** `2090-12-31`
+          （表示未关店），不是真实日期；按关店日排序或取最大值会得到它。
+          12 家已关店的是 2008 ~ 2009 年的真实日期。按关店日筛选时要先排掉哨兵值
+          （或按 Status = Off 筛）。
+        values:
+          - { value: "2090-12-31", meaning: "哨兵值：**未关店**，294 家（不是真实日期）" }
+          - { value: "2008-09-22", meaning: "真实关店日，1 家" }
+          - { value: "2008-12-12", meaning: "真实关店日，1 家" }
+          - { value: "2009-02-12", meaning: "真实关店日，1 家" }
+          - { value: "2009-04-12", meaning: "真实关店日，1 家" }
+          - { value: "2009-05-12", meaning: "真实关店日，2 家" }
+          - { value: "2009-07-02", meaning: "真实关店日，1 家" }
+          - { value: "2009-07-12", meaning: "真实关店日，5 家" }
+      - name: EntityKey
+        description: "对应的计划实体，与 DimEntity 一一对应（306 对 306）。战略计划表挂在这个键上，所以门店能和战略计划对起来。"
+      - name: StorePhone
+        description: "门店电话。"
+      - name: StoreFax
+        description: "门店传真。"
+      - name: CloseReason
+        description: "关店原因。"
+        values:
+          - { value: "Not Yet Closed", meaning: "未关店，294 家" }
+          - { value: "Relocation", meaning: "搬迁，10 家" }
+          - { value: "Store", meaning: "取值本身是脏数据（只写了 `Store`，看不出原因），2 家" }
+      - name: EmployeeCount
+        description: "门店员工数，7 ~ 325（325 是离群值，只有 1 家）。算人均销售额用这一列。"
+        unit: "人"
+      - name: SellingAreaSize
+        description: >-
+          营业面积，450 ~ 93,800。单位数据里没写。注意 93,800 出现在 2 家门店上，
+          比其余门店（450 ~ 1,125）大约两个数量级，是离群值，算坪效时会压掉这两家。
+      - name: LastRemodelDate
+        description: "最近一次翻新日，字符串时间戳。大部分集中在 2009-06-16 ~ 2009-06-20，像是一次批量导入。"
+        technical: true
+      - name: EmployeeKey
+        description: >-
+          门店经理的员工键。306 家都有值，其中 1 家（StoreKey 227 Contoso Naples Store，
+          EmployeeKey 245）在 DimEmployee 里找不到对应行，内连接会丢掉这家店。
+
+  - name: DimCustomer
+    title: "客户"
+    kind: dimension
+    rows: 18869
+    grain: "一行 = 一个客户（CustomerKey 唯一）。"
+    description: >-
+      客户主数据：人口属性加所在城市。18,869 个客户全部在线上销售里出现过。
+      只有线上销售带客户键，所以一切客户分析都走 FactOnlineSales。
+    when_to_use: "按客户属性（性别、婚姻、学历、职业、收入、子女、有房、车辆数）分析时；按客户所在地分析销售时（约定 5 的默认分支）；客户分层与新客（约定 13、14）。"
+    columns:
+      - name: RowNum
+        description: "导入时的行号（0 ~ 18,868）。CSV 第一列没有表头，建表语句给它起了这个名字。无业务含义。"
+        technical: true
+      - name: CustomerKey
+        description: "客户键。1 ~ 19,145，18,869 行（缺 276 个键）。"
+        role: key
+      - name: GeographyKey
+        description: "客户所在城市，476 个城市，指向的 DimGeography 行全部是 City 级。按国家 / 地区 / 大洲看销售默认走这条（约定 5）。"
+      - name: FirstName
+        description: "名。671 个取值，其中最常见的是占位值 `Not Provided`。"
+      - name: LastName
+        description: "姓。376 个取值，最常见的同样是 `Not Provided`。"
+      - name: BirthDate
+        description: "出生日期，字符串日期。可用来算年龄（以 2009-12-31 为今天）。"
+      - name: MaritalStatus
+        description: "婚姻状况。"
+        values:
+          - { value: "M", meaning: "已婚（Married），10,188 人" }
+          - { value: "S", meaning: "单身（Single），8,681 人" }
+      - name: Gender
+        description: "客户性别，单字母码。注意 DimEmployee.Gender 写的是全词 Male / Female，两张表的写法不一致。"
+        values:
+          - { value: "M", meaning: "男（Male），9,525 人" }
+          - { value: "F", meaning: "女（Female），9,344 人" }
+      - name: YearlyIncome
+        description: >-
+          年收入（美元），17 个档位值。注意 10,000,000 这个档有 385 人，比第二高的 170,000
+          高出约 59 倍，是哨兵值或脏数据；算平均收入时会被它拉偏。
+        unit: USD
+      - name: TotalChildren
+        description: "子女总数，0 ~ 5。"
+        unit: "人"
+      - name: NumberChildrenAtHome
+        description: "同住子女数，0 ~ 5。"
+        unit: "人"
+      - name: Education
+        description: "客户学历，五档，从 Partial High School 到 Graduate Degree。可作客户分群维度。"
+        values:
+          - { value: "Bachelors", meaning: "本科，5,448 人" }
+          - { value: "Partial College", meaning: "大学未毕业，5,138 人" }
+          - { value: "High School", meaning: "高中，3,362 人" }
+          - { value: "Graduate Degree", meaning: "研究生及以上，3,260 人" }
+          - { value: "Partial High School", meaning: "高中未毕业，1,661 人" }
+      - name: Occupation
+        description: "客户职业，五类。可作客户分群维度。"
+        values:
+          - { value: "Professional", meaning: "专业人士，5,606 人" }
+          - { value: "Skilled Manual", meaning: "技术工人，4,649 人" }
+          - { value: "Management", meaning: "管理者，3,147 人" }
+          - { value: "Clerical", meaning: "文职，3,014 人" }
+          - { value: "Manual", meaning: "普通体力工作，2,453 人" }
+      - name: HouseOwnerFlag
+        description: "是否有房。"
+        values:
+          - { value: 1, meaning: "有房，12,704 人" }
+          - { value: 0, meaning: "无房，6,165 人" }
+      - name: NumberCarsOwned
+        description: "拥有车辆数，0 ~ 4。"
+        unit: "辆"
+
+  - name: DimDate
+    title: "日期"
+    kind: dimension
+    rows: 2556
+    grain: "一行 = 一天（DateKey 唯一）。"
+    description: >-
+      日期维度，2005-01-01 ~ 2011-12-31。**比事实宽**：两张销售表只覆盖 2007-01-01 ~
+      2009-12-31（1,096 天），日期维度另外 1,460 天没有任何销售。从日期维度出发做左连接
+      会带出这些空天。
+      财年与日历年完全相同（FiscalYear = CalendarYear，季度和半年标签也一样），
+      所以本库里没有财年与日历年之分。
+    when_to_use: "按年 / 半年 / 季 / 月 / 周 / 星期几分析时；比较节假日与平日、周末与工作日、季节时（约定 4）。"
+    cautions:
+      - "「节假日」与「周末」在这个库里是同一个划分，见 IsHoliday 的说明。"
+      - "季节有三套，按大洲分，没有全局季节字段。"
+    columns:
+      - name: DateKey
+        description: "日期，2005-01-01 ~ 2011-12-31，每天一行共 2,556 天。"
+        role: key
+      - name: CalendarYear
+        description: "日历年，2005 ~ 2011 的整数。"
+      - name: CalendarYearLabel
+        description: "日历年的文字标签。排序和筛选用 CalendarYear（整数）更方便。"
+        values:
+          - { value: "Year 2005", meaning: "2005 年，365 天（无销售数据）" }
+          - { value: "Year 2006", meaning: "2006 年，365 天（无销售数据）" }
+          - { value: "Year 2007", meaning: "2007 年，365 天" }
+          - { value: "Year 2008", meaning: "2008 年，366 天（闰年）。约定 3 的「去年」" }
+          - { value: "Year 2009", meaning: "2009 年，365 天。约定 3 的「今年」" }
+          - { value: "Year 2010", meaning: "2010 年，365 天（无销售数据）" }
+          - { value: "Year 2011", meaning: "2011 年，365 天（无销售数据）" }
+      - name: CalendarHalfYearLabel
+        description: "半年标签。"
+        values:
+          - { value: "H1", meaning: "上半年，1,268 天" }
+          - { value: "H2", meaning: "下半年，1,288 天" }
+      - name: CalendarQuarterLabel
+        description: "季度标签。注意只有 Q1 ~ Q4，不带年份，跨年分析时必须同时带上年。"
+        values:
+          - { value: "Q1", meaning: "一季度，631 天" }
+          - { value: "Q2", meaning: "二季度，637 天" }
+          - { value: "Q3", meaning: "三季度，644 天" }
+          - { value: "Q4", meaning: "四季度，644 天（约定 3 说的「上季度」= 2009 年 Q4）" }
+      - name: CalendarMonthLabel
+        description: >-
+          月份的英文名（`January` ~ `December`），不带年份，而且按字母排序不等于按月排序。
+          要按月排序用 MonthNumber。
+        values:
+          - { value: "January", meaning: "1 月" }
+          - { value: "February", meaning: "2 月" }
+          - { value: "March", meaning: "3 月" }
+          - { value: "April", meaning: "4 月" }
+          - { value: "May", meaning: "5 月" }
+          - { value: "June", meaning: "6 月" }
+          - { value: "July", meaning: "7 月" }
+          - { value: "August", meaning: "8 月" }
+          - { value: "September", meaning: "9 月" }
+          - { value: "October", meaning: "10 月" }
+          - { value: "November", meaning: "11 月" }
+          - { value: "December", meaning: "12 月" }
+      - name: CalendarWeekLabel
+        description: "周标签，形如 `Week 4`，53 个取值，不带年份。"
+      - name: CalendarDayOfWeekLabel
+        description: "星期几的英文名。"
+        values:
+          - { value: "Monday", meaning: "周一" }
+          - { value: "Tuesday", meaning: "周二" }
+          - { value: "Wednesday", meaning: "周三" }
+          - { value: "Thursday", meaning: "周四" }
+          - { value: "Friday", meaning: "周五" }
+          - { value: "Saturday", meaning: "周六（库存快照全部落在这一天）" }
+          - { value: "Sunday", meaning: "周日" }
+      - name: FiscalYear
+        description: "财年。与 CalendarYear 完全相同，本库没有财年差异。"
+      - name: FiscalYearLabel
+        description: "财年文字标签。财年与日历年完全相同，所以这一列只是 CalendarYearLabel 的另一种写法。"
+        values:
+          - { value: "FiscalYear 2005", meaning: "财年 2005，365 天" }
+          - { value: "FiscalYear 2006", meaning: "财年 2006，365 天" }
+          - { value: "FiscalYear 2007", meaning: "财年 2007，365 天" }
+          - { value: "FiscalYear 2008", meaning: "财年 2008，366 天" }
+          - { value: "FiscalYear 2009", meaning: "财年 2009，365 天" }
+          - { value: "FiscalYear 2010", meaning: "财年 2010，365 天" }
+          - { value: "FiscalYear 2011", meaning: "财年 2011，365 天" }
+      - name: FiscalHalfYearLabel
+        description: "财年半年标签。与 CalendarHalfYearLabel 逐行相同（财年等于日历年）。"
+        values:
+          - { value: "H1", meaning: "财年上半年，1,268 天" }
+          - { value: "H2", meaning: "财年下半年，1,288 天" }
+      - name: FiscalQuarterLabel
+        description: "财年季度标签。与 CalendarQuarterLabel 逐行相同。不带年份，跨年分析要同时带上年。"
+        values:
+          - { value: "Q1", meaning: "财年一季度，631 天" }
+          - { value: "Q2", meaning: "财年二季度，637 天" }
+          - { value: "Q3", meaning: "财年三季度，644 天" }
+          - { value: "Q4", meaning: "财年四季度，644 天" }
+      - name: FiscalMonthLabel
+        description: >-
+          财月标签，与日历月一一对应（Month 1 = January）。注意按字母排序不等于按月排序
+          （`Month 10` 会排在 `Month 2` 前面），要按月排序用 MonthNumber。
+        values:
+          - { value: "Month 1", meaning: "1 月，217 天" }
+          - { value: "Month 2", meaning: "2 月，197 天" }
+          - { value: "Month 3", meaning: "3 月，217 天" }
+          - { value: "Month 4", meaning: "4 月，210 天" }
+          - { value: "Month 5", meaning: "5 月，217 天" }
+          - { value: "Month 6", meaning: "6 月，210 天" }
+          - { value: "Month 7", meaning: "7 月，217 天" }
+          - { value: "Month 8", meaning: "8 月，217 天" }
+          - { value: "Month 9", meaning: "9 月，210 天" }
+          - { value: "Month 10", meaning: "10 月，217 天" }
+          - { value: "Month 11", meaning: "11 月，210 天" }
+          - { value: "Month 12", meaning: "12 月，217 天" }
+      - name: IsWorkDay
+        description: >-
+          是否工作日。与 IsHoliday 是同一个划分的两种写法：WorkDay 的 1,825 天就是
+          IsHoliday = No 的那 1,825 天，WeekEnd 的 731 天就是 IsHoliday = Yes 的 731 天。
+        values:
+          - { value: "WorkDay", meaning: "工作日（周一至周五），1,825 天" }
+          - { value: "WeekEnd", meaning: "周末（周六、周日），731 天" }
+      - name: IsHoliday
+        description: >-
+          是否节假日。**在这个库里「节假日」就是周末**：IsHoliday = Yes 的 731 天恰好是
+          全部 366 个周六加 365 个周日，一个工作日都没有标成节假日。
+          所以「节假日 vs 平日」和「周末 vs 工作日」是同一个比较（约定 4）。
+        values:
+          - { value: "Yes", meaning: "节假日，731 天，实际等于全部周六与周日" }
+          - { value: "No", meaning: "平日，1,825 天，实际等于周一至周五" }
+      - name: EuropeSeason
+        description: "欧洲的销售季节。按大洲分，三套季节字段互不相同。"
+        values:
+          - { value: "Holiday", meaning: "假日季，861 天" }
+          - { value: "No Season", meaning: "平季，847 天" }
+          - { value: "Back to School", meaning: "返校季，434 天" }
+          - { value: "Spring/Business", meaning: "春季 / 商务季，414 天" }
+      - name: NorthAmericaSeason
+        description: "北美的销售季节。"
+        values:
+          - { value: "No Season", meaning: "平季，854 天" }
+          - { value: "Back to School", meaning: "返校季，644 天" }
+          - { value: "Spring/Back to Business", meaning: "春季 / 返工季，631 天" }
+          - { value: "Holiday", meaning: "假日季，427 天" }
+      - name: AsiaSeason
+        description: "亚洲的销售季节。"
+        values:
+          - { value: "No Season", meaning: "平季，1,071 天" }
+          - { value: "Holiday", meaning: "假日季，644 天" }
+          - { value: "Spring/Back to School", meaning: "春季 / 返校季，624 天" }
+          - { value: "Tax Time/Summer", meaning: "报税季 / 夏季，217 天" }
+      - name: MonthNumber
+        description: "月份数字 1 ~ 12。按月排序用这一列，不要用 CalendarMonthLabel。"
+      - name: CalendarDayOfWeekNumber
+        description: "星期几的数字 1 ~ 7。6 对应周六（366 天），7 对应周日（365 天），1 对应周一。"
+
+  - name: DimGeography
+    title: "地理"
+    kind: dimension
+    rows: 674
+    grain: "一行 = 一个地理位置（GeographyKey 唯一）。"
+    description: >-
+      扁平化的地理层级表：城市 → 省/州 → 国家/地区 → 大洲四级压在同一行上，
+      按 GeographyType 区分这一行代表哪一级。
+      517 行是 City（四级都填满）、120 行是 State/Province（城市为空）、
+      34 行是 Country/Region（城市和省为空）、3 行是 Continent（只有大洲）。
+      客户和门店指向的都是 City 级的行，所以**不需要自连接**就能拿到省、国家、大洲。
+    when_to_use: "按城市 / 省州 / 国家 / 大洲分析时。走客户还是走门店由约定 5 决定。"
+    columns:
+      - name: GeographyKey
+        description: "地理键。1 ~ 952，674 行。"
+        role: key
+      - name: GeographyType
+        description: "这一行代表地理层级的哪一级。客户和门店指向的都是 City 级。"
+        values:
+          - { value: "City", meaning: "城市级，517 行，四级字段都有值" }
+          - { value: "State/Province", meaning: "省 / 州级，120 行，CityName 为空" }
+          - { value: "Country/Region", meaning: "国家 / 地区级，34 行，CityName 与 StateProvinceName 为空" }
+          - { value: "Continent", meaning: "大洲级，3 行，只有 ContinentName，RegionCountryName 是空字符串" }
+      - name: ContinentName
+        description: "大洲。三个取值，所有行都有值。"
+        values:
+          - { value: "North America", meaning: "北美，339 行" }
+          - { value: "Europe", meaning: "欧洲，221 行" }
+          - { value: "Asia", meaning: "亚洲，114 行" }
+      - name: CityName
+        description: "城市名，511 个取值。只有 City 级的行有值（23.29% 为空，就是非 City 级的那 157 行）。"
+      - name: StateProvinceName
+        description: "省 / 州名，125 个取值。City 与 State/Province 级有值，更高两级为空（5.49% 为空）。"
+      - name: RegionCountryName
+        description: >-
+          国家 / 地区名，35 个取值。注意有 3 行是**空字符串**（不是 NULL），就是三个
+          Continent 级的行；按国家分组时会多出一个空名字的组。
+          与 DimSalesTerritory.SalesTerritoryCountry 的写法不一致（那里写 UK、Greater China），
+          两张表不能按国家名直接连接。
+        values:
+          - { value: "United States", meaning: "美国，312 行（最大的国家）" }
+          - { value: "France", meaning: "法国，65 行" }
+          - { value: "Germany", meaning: "德国，54 行" }
+          - { value: "Australia", meaning: "澳大利亚，47 行" }
+          - { value: "United Kingdom", meaning: "英国，47 行（辖区表里写 UK）" }
+          - { value: "Canada", meaning: "加拿大，26 行" }
+          - { value: "Japan", meaning: "日本，13 行" }
+          - { value: "China", meaning: "中国大陆，11 行（辖区表把中国大陆与台湾合称 Greater China）" }
+          - { value: "Italy", meaning: "意大利，11 行" }
+          - { value: "India", meaning: "印度，7 行" }
+          - { value: "Russia", meaning: "俄罗斯，7 行" }
+          - { value: "South Korea", meaning: "韩国，5 行" }
+          - { value: "", meaning: "**空字符串**，3 行，就是三个 Continent 级的行（大洲没有国家）" }
+          - { value: "Armenia", meaning: "亚美尼亚，3 行" }
+          - { value: "Bhutan", meaning: "不丹，3 行" }
+          - { value: "Denmark", meaning: "丹麦，3 行" }
+          - { value: "Greece", meaning: "希腊，3 行" }
+          - { value: "Iran", meaning: "伊朗，3 行" }
+          - { value: "Ireland", meaning: "爱尔兰，3 行" }
+          - { value: "Kyrgyzstan", meaning: "吉尔吉斯斯坦，3 行" }
+          - { value: "Malta", meaning: "马耳他，3 行" }
+          - { value: "Pakistan", meaning: "巴基斯坦，3 行" }
+          - { value: "Poland", meaning: "波兰，3 行" }
+          - { value: "Portugal", meaning: "葡萄牙，3 行" }
+          - { value: "Romania", meaning: "罗马尼亚，3 行" }
+          - { value: "Singapore", meaning: "新加坡，3 行" }
+          - { value: "Slovenia", meaning: "斯洛文尼亚，3 行" }
+          - { value: "Spain", meaning: "西班牙，3 行" }
+          - { value: "Sweden", meaning: "瑞典，3 行" }
+          - { value: "Switzerland", meaning: "瑞士，3 行" }
+          - { value: "Syria", meaning: "叙利亚，3 行" }
+          - { value: "Taiwan", meaning: "中国台湾，3 行" }
+          - { value: "Thailand", meaning: "泰国，3 行" }
+          - { value: "Turkmenistan", meaning: "土库曼斯坦，3 行" }
+          - { value: "the Netherlands", meaning: "荷兰，3 行（注意首字母小写的 the，是数据原样）" }
+
+  - name: DimChannel
+    title: "渠道"
+    kind: dimension
+    rows: 4
+    grain: "一行 = 一个销售渠道（ChannelKey 唯一）。"
+    description: "四个销售渠道。FactSales 的 channelKey、FactSalesQuota 的 ChannelKey 都指向这里。渠道由门店唯一决定。"
+    when_to_use: "渠道对比时（约定 2）。"
+    columns:
+      - name: ChannelKey
+        description: "渠道键 1 ~ 4。注意 FactSales 里的同名列首字母是小写的 `channelKey`。"
+        role: key
+      - name: ChannelName
+        description: "渠道名。"
+        values:
+          - { value: "Store", meaning: "自营门店，键 1，全渠道销售额 6,942,853,195.14（最大渠道）" }
+          - { value: "Online", meaning: "线上，键 2，2,677,599,035.07" }
+          - { value: "Catalog", meaning: "目录邮购，键 3，1,078,007,547.23" }
+          - { value: "Reseller", meaning: "经销，键 4，1,715,197,831.44" }
+      - name: ChannelDescription
+        description: "渠道描述。内容与 ChannelName 完全相同，没有额外信息，筛渠道用 ChannelName。"
+        values:
+          - { value: "Store", meaning: "自营门店（同 ChannelName）" }
+          - { value: "Online", meaning: "线上（同 ChannelName）" }
+          - { value: "Catalog", meaning: "目录邮购（同 ChannelName）" }
+          - { value: "Reseller", meaning: "经销（同 ChannelName）" }
+
+  - name: DimPromotion
+    title: "促销"
+    kind: dimension
+    rows: 28
+    grain: "一行 = 一个促销活动（PromotionKey 唯一）。"
+    description: >-
+      28 个促销活动，其中 1 个是「无折扣」（PromotionKey = 1），其余 27 个是季节性促销。
+      27 个季节性促销只有 9 个不同的名字，每个名字出现 3 次（同一个活动在不同年份各一行），
+      所以按促销名分组会把三年合在一起。
+    when_to_use: "问折扣、促销效果时。按约定 10，这类问题要排除 PromotionKey = 1。"
+    columns:
+      - name: PromotionKey
+        description: "促销键 1 ~ 28。**1 = 无折扣**（约定 10）。"
+        role: key
+      - name: PromotionName
+        description: >-
+          促销名。10 个不同取值：1 个 `No Discount` 加 9 个季节性促销名，
+          每个季节性名字对应 3 个促销键（三个年份）。
+        values:
+          - { value: "No Discount", meaning: "无折扣，仅 PromotionKey = 1 这一行，折扣率 0" }
+          - { value: "North America Spring Promotion", meaning: "北美春促，3 个键，折扣率 5%" }
+          - { value: "North America Back-to-School Promotion", meaning: "北美返校促，3 个键，折扣率 10%" }
+          - { value: "North America Holiday Promotion", meaning: "北美假日促，3 个键，折扣率 20%" }
+          - { value: "European Spring Promotion", meaning: "欧洲春促，3 个键，折扣率 7%" }
+          - { value: "European Back-to-Scholl Promotion", meaning: "欧洲返校促，3 个键，折扣率 10%。名字里的 Scholl 是数据里的拼写错误（应为 School）" }
+          - { value: "European Holiday Promotion", meaning: "欧洲假日促，3 个键，折扣率 20%" }
+          - { value: "Asian Spring Promotion", meaning: "亚洲春促，3 个键，折扣率 20%" }
+          - { value: "Asian Summer Promotion", meaning: "亚洲夏促，3 个键，折扣率 10%" }
+          - { value: "Asian Holiday Promotion", meaning: "亚洲假日促，3 个键，折扣率 15%" }
+      - name: DiscountPercent
+        description: "名义折扣率，小数（0.05 = 5%）。取值 0、0.05、0.07、0.10、0.15、0.20。这是活动的名义折扣率，不是实际成交的折扣，实际折扣看事实表的 DiscountAmount。"
+        values:
+          - { value: 0, meaning: "无折扣（只有 PromotionKey = 1）" }
+          - { value: 0.05, meaning: "5%，3 个促销" }
+          - { value: 0.07, meaning: "7%，3 个" }
+          - { value: 0.1, meaning: "10%，9 个" }
+          - { value: 0.15, meaning: "15%，3 个" }
+          - { value: 0.2, meaning: "20%，9 个" }
+      - name: PromotionType
+        description: "促销类型。"
+        values:
+          - { value: "Seasonal Discount", meaning: "季节性折扣，27 个促销" }
+          - { value: "No Discount", meaning: "无折扣，1 个（PromotionKey = 1）" }
+      - name: PromotionCategory
+        description: "促销归类。信息量很低：27 个季节性促销全是 `Store`，无折扣那行是 `No Discount`。等价于 PromotionType。"
+        values:
+          - { value: "Store", meaning: "门店促销，27 个" }
+          - { value: "No Discount", meaning: "无折扣，1 个" }
+
+  - name: DimScenario
+    title: "场景"
+    kind: dimension
+    rows: 3
+    grain: "一行 = 一个场景（ScenarioKey 唯一）。"
+    description: >-
+      战略计划表和销售目标表共用的场景维度。两张事实表都必须先按场景筛选，
+      否则三个场景会被加在一起。
+    when_to_use: "查计划、预算、预测、销售目标时（约定 12）。"
+    columns:
+      - name: ScenarioKey
+        description: "场景键 1 ~ 3。"
+        role: key
+      - name: ScenarioName
+        description: "场景名。按约定 12，正式目标看 Budget。"
+        values:
+          - { value: "Actual", meaning: "实际，键 1。在销售目标表里这个场景记的是实际值（合计与全渠道销售额完全相等），不是目标" }
+          - { value: "Budget", meaning: "预算，键 2。**正式目标 / 正式预算看这个场景**（约定 12）" }
+          - { value: "Forecast", meaning: "预测，键 3" }
+
+  - name: DimAccount
+    title: "会计科目"
+    kind: dimension
+    rows: 24
+    grain: "一行 = 一个会计科目（AccountKey 唯一）。"
+    description: >-
+      战略计划表用的损益科目表，24 个科目，带父子关系（ParentAccountKey 指向同一张表）。
+      战略计划表只用到其中 17 个。**父子科目一起求和会重复计算**。
+      约定 12 说的「收入」对应 AccountName = Sale Revenue（AccountKey = 4）。
+    when_to_use: "查战略计划的某个科目时（约定 12）。"
+    cautions:
+      - "科目有层级，汇总时要么只取叶子科目，要么只取某一个父科目，不能混。"
+    columns:
+      - name: AccountKey
+        description: "科目键 1 ~ 24。收入是 4（Sale Revenue）。"
+        role: key
+      - name: ParentAccountKey
+        description: >-
+          父科目键，指向本表的 AccountKey。7 个取值（1、2、3、6、13、14、24）。
+          有层级就意味着父子科目的金额会重叠，求和时不能同时取。
+      - name: AccountName
+        description: >-
+          科目名，24 个全不相同。约定 12 指定的「收入」是 `Sale Revenue`。
+          战略计划表用到的 17 个科目是键 4、5、7 ~ 12、15 ~ 23。
+        values:
+          - { value: "Sale Revenue", meaning: "销售收入，键 4。**约定 12 的「收入」就是这个科目**；Actual 场景合计 12,413,657,608.89，与全渠道销售额相等" }
+          - { value: "Income", meaning: "收入（父科目），键 2" }
+          - { value: "Cost of Goods Sold", meaning: "销货成本" }
+          - { value: "Expense", meaning: "费用（父科目）" }
+          - { value: "Other Expenses", meaning: "其他费用" }
+          - { value: "Selling, General & Administrative Expenses", meaning: "销售及管理费用" }
+          - { value: "Administration Expense", meaning: "管理费用" }
+          - { value: "Human Capital", meaning: "人力成本" }
+          - { value: "Property Costs", meaning: "物业成本" }
+          - { value: "Light, Heat, Communication Cost", meaning: "水电通信费" }
+          - { value: "IT Cost", meaning: "IT 成本" }
+          - { value: "Marketing Cost", meaning: "营销成本" }
+          - { value: "Business Ad Cost", meaning: "商务广告费" }
+          - { value: "Spring Ad Cost", meaning: "春季广告费" }
+          - { value: "Back-to-School Ad Cost", meaning: "返校季广告费" }
+          - { value: "Holiday Ad Cost", meaning: "假日季广告费" }
+          - { value: "Tax Time / Summer Ad Cost", meaning: "报税季 / 夏季广告费" }
+          - { value: "Internet", meaning: "互联网投放" }
+          - { value: "Print", meaning: "平面投放" }
+          - { value: "Radio & TV", meaning: "广播电视投放" }
+          - { value: "Other", meaning: "其他投放" }
+          - { value: "Taxation", meaning: "税（科目）" }
+          - { value: "Profit and Loss before tax", meaning: "税前利润" }
+          - { value: "Profit and Loss after tax", meaning: "税后利润" }
+      - name: AccountDescription
+        description: >-
+          科目描述，24 个取值。与 AccountName **不完全一致**：四个投放渠道科目
+          （Internet / Print / Radio & TV / Other）的描述写成了 `Holiday Ad Cost by ...`，
+          而 AccountName 只写渠道名；`Marketing Cost` 的描述是 `Marketing & Advertisement Cost`；
+          AccountName 里的 `Other` 和 `Business Ad Cost` 在描述里没有同名项。
+          **筛科目一律用 AccountName**（约定 12 指的是 AccountName）。
+        values:
+          - { value: "Sale Revenue", meaning: "销售收入（对应 AccountName = Sale Revenue，约定 12 的「收入」）" }
+          - { value: "Income", meaning: "收入（父科目）" }
+          - { value: "Cost of Goods Sold", meaning: "销货成本" }
+          - { value: "Expense", meaning: "费用（父科目）" }
+          - { value: "Other Expenses", meaning: "其他费用" }
+          - { value: "Selling, General & Administrative Expenses", meaning: "销售及管理费用" }
+          - { value: "Administration Expense", meaning: "管理费用" }
+          - { value: "Human Capital", meaning: "人力成本" }
+          - { value: "Property Costs", meaning: "物业成本" }
+          - { value: "Light, Heat, Communication Cost", meaning: "水电通信费" }
+          - { value: "IT Cost", meaning: "IT 成本" }
+          - { value: "Marketing & Advertisement Cost", meaning: "营销与广告成本（对应 AccountName = Marketing Cost，两边名字不同）" }
+          - { value: "Business Ad Cost", meaning: "商务广告费" }
+          - { value: "Spring Ad Cost", meaning: "春季广告费" }
+          - { value: "Back-to-School Ad Cost", meaning: "返校季广告费" }
+          - { value: "Holiday Ad Cost", meaning: "假日季广告费（汇总）" }
+          - { value: "Holiday Ad Cost by Internet", meaning: "假日季互联网投放（对应 AccountName = Internet）" }
+          - { value: "Holiday Ad Cost by Print", meaning: "假日季平面投放（对应 AccountName = Print）" }
+          - { value: "Holiday Ad Cost by Radio & TV", meaning: "假日季广播电视投放（对应 AccountName = Radio & TV）" }
+          - { value: "Holiday Ad Cost by Other", meaning: "假日季其他投放（对应 AccountName = Other）" }
+          - { value: "Tax Time / Summer Ad Cost", meaning: "报税季 / 夏季广告费" }
+          - { value: "Taxation", meaning: "税（科目）" }
+          - { value: "Profit and Loss before tax", meaning: "税前利润" }
+          - { value: "Profit and Loss after tax", meaning: "税后利润" }
+      - name: AccountType
+        description: "科目方向。"
+        values:
+          - { value: "Expense", meaning: "费用类，19 个科目" }
+          - { value: "Income", meaning: "收入类，4 个科目" }
+          - { value: "Taxation", meaning: "税类，1 个科目" }
+      - name: ValueType
+        description: "值类型。内容与 AccountType 完全相同，没有额外信息。"
+        values:
+          - { value: "Expense", meaning: "费用类，19 个" }
+          - { value: "Income", meaning: "收入类，4 个" }
+          - { value: "Taxation", meaning: "税类，1 个" }
+
+  - name: DimCurrency
+    title: "币种"
+    kind: dimension
+    rows: 28
+    grain: "一行 = 一种币种（CurrencyKey 唯一）。"
+    description: >-
+      28 种币种。**本库里所有事实表的 CurrencyKey 都只有 1 = USD**，所以这张表
+      实际只用到一行，金额无需换算（约定 6）。
+    when_to_use: "本期实验里没有需要用到它的场景。"
+    columns:
+      - name: CurrencyKey
+        description: "币种键 1 ~ 28。**1 = USD**，是全库唯一被事实表用到的币种。"
+        role: key
+      - name: CurrencyName
+        description: >-
+          币种代码，28 个三字母 ISO 风格代码。只有 USD（键 1）被事实表用到，其余 27 种只存在于
+          这张表和汇率表里。
+        values:
+          - { value: "USD", meaning: "美元（键 1）。**全库唯一被事实表用到的币种**" }
+          - { value: "EUR", meaning: "欧元" }
+          - { value: "GBP", meaning: "英镑" }
+          - { value: "JPY", meaning: "日元" }
+          - { value: "CNY", meaning: "人民币" }
+          - { value: "HKD", meaning: "港元" }
+          - { value: "TWD", meaning: "新台币" }
+          - { value: "KRW", meaning: "韩元" }
+          - { value: "SGD", meaning: "新加坡元" }
+          - { value: "AUD", meaning: "澳元" }
+          - { value: "CAD", meaning: "加元" }
+          - { value: "CHF", meaning: "瑞士法郎" }
+          - { value: "DKK", meaning: "丹麦克朗" }
+          - { value: "SEK", meaning: "瑞典克朗" }
+          - { value: "PLN", meaning: "波兰兹罗提" }
+          - { value: "RUB", meaning: "俄罗斯卢布" }
+          - { value: "INR", meaning: "印度卢比" }
+          - { value: "PKR", meaning: "巴基斯坦卢比" }
+          - { value: "THB", meaning: "泰铢" }
+          - { value: "IRR", meaning: "伊朗里亚尔" }
+          - { value: "SYP", meaning: "叙利亚镑" }
+          - { value: "AMD", meaning: "亚美尼亚德拉姆" }
+          - { value: "BTN", meaning: "不丹努尔特鲁姆" }
+          - { value: "KGS", meaning: "吉尔吉斯斯坦索姆" }
+          - { value: "MTL", meaning: "马耳他里拉（已停用的旧币种）" }
+          - { value: "ROL", meaning: "罗马尼亚旧列伊（已停用）" }
+          - { value: "SIT", meaning: "斯洛文尼亚托拉尔（已停用）" }
+          - { value: "TMM", meaning: "土库曼斯坦马纳特（已停用）" }
+      - name: CurrencyDescription
+        description: "币种全名，与 CurrencyName 一一对应。筛币种用 CurrencyName（代码更短）。"
+        values:
+          - { value: "US Dollar", meaning: "美元，对应代码 USD（键 1）" }
+          - { value: "EURO", meaning: "欧元，对应 EUR" }
+          - { value: "British Pound", meaning: "英镑，对应 GBP" }
+          - { value: "Japanese Yen", meaning: "日元，对应 JPY" }
+          - { value: "Renminbi Yuan", meaning: "人民币，对应 CNY" }
+          - { value: "Hong Kong Dollar", meaning: "港元，对应 HKD" }
+          - { value: "Taiwan Dollar", meaning: "新台币，对应 TWD" }
+          - { value: "South Korean Won", meaning: "韩元，对应 KRW" }
+          - { value: "Singapore Dollar", meaning: "新加坡元，对应 SGD" }
+          - { value: "Australian Dollar", meaning: "澳元，对应 AUD" }
+          - { value: "Canadian Dollar", meaning: "加元，对应 CAD" }
+          - { value: "Swiss Franc", meaning: "瑞士法郎，对应 CHF" }
+          - { value: "Danish Krone", meaning: "丹麦克朗，对应 DKK" }
+          - { value: "Swedish Krona", meaning: "瑞典克朗，对应 SEK" }
+          - { value: "Polish Zloty", meaning: "波兰兹罗提，对应 PLN" }
+          - { value: "Russian Ruble", meaning: "俄罗斯卢布，对应 RUB" }
+          - { value: "Indian Rupee", meaning: "印度卢比，对应 INR" }
+          - { value: "Pakistan Rupee", meaning: "巴基斯坦卢比，对应 PKR" }
+          - { value: "Thai Baht", meaning: "泰铢，对应 THB" }
+          - { value: "Iranian Rial", meaning: "伊朗里亚尔，对应 IRR" }
+          - { value: "Syrian Pound", meaning: "叙利亚镑，对应 SYP" }
+          - { value: "Armenian Dram", meaning: "亚美尼亚德拉姆，对应 AMD" }
+          - { value: "Bhutan Ngultrum", meaning: "不丹努尔特鲁姆，对应 BTN" }
+          - { value: "Som", meaning: "索姆，对应 KGS（吉尔吉斯斯坦）" }
+          - { value: "Maltese Lira", meaning: "马耳他里拉，对应 MTL" }
+          - { value: "Romanian Leu", meaning: "罗马尼亚列伊，对应 ROL" }
+          - { value: "Slovenian Tolar", meaning: "斯洛文尼亚托拉尔，对应 SIT" }
+          - { value: "Turkmenistan Manat", meaning: "土库曼斯坦马纳特，对应 TMM" }
+
+  - name: DimProductCategory
+    title: "产品品类"
+    kind: dimension
+    rows: 8
+    grain: "一行 = 一个品类（ProductCategoryKey 唯一）。"
+    description: "8 个产品大类。战略计划表直接挂在品类上（不到产品级）；产品表经子类间接挂到品类。"
+    when_to_use: "按品类分析销售、库存、计划时。"
+    columns:
+      - name: ProductCategoryKey
+        description: "品类键 1 ~ 8。"
+        role: key
+      - name: ProductCategoryName
+        description: "品类名。"
+        values:
+          - { value: "Audio", meaning: "音频，键 1" }
+          - { value: "TV and Video", meaning: "电视与影音，键 2" }
+          - { value: "Computers", meaning: "电脑，键 3" }
+          - { value: "Cameras and camcorders", meaning: "相机与摄像机，键 4" }
+          - { value: "Cell phones", meaning: "手机，键 5" }
+          - { value: "Music, Movies and Audio Books", meaning: "音乐、影片与有声书，键 6" }
+          - { value: "Games and Toys", meaning: "游戏与玩具，键 7" }
+          - { value: "Home Appliances", meaning: "家电，键 8" }
+
+  - name: DimProductSubcategory
+    title: "产品子类"
+    kind: dimension
+    rows: 44
+    grain: "一行 = 一个子类（ProductSubcategoryKey 唯一）。"
+    description: >-
+      44 个产品子类，每个挂在一个品类下。产品表只用到其中 30 个子类，
+      另外 14 个子类没有任何产品。
+    when_to_use: "按子类分析，或从产品走到品类（产品 → 子类 → 品类）时。"
+    columns:
+      - name: ProductSubcategoryKey
+        description: "子类键。1 ~ 48，44 行（缺 12、26、30、37 四个键）。"
+        role: key
+      - name: ProductSubcategoryName
+        description: >-
+          子类名，44 个全不相同。产品表只用到其中 30 个，下面标了「无产品」的 14 个子类
+          没有任何产品，按子类看销售时它们不会出现。
+        values:
+          - { value: "Televisions", meaning: "电视（TV and Video）" }
+          - { value: "VCD & DVD", meaning: "VCD 与 DVD 播放机（TV and Video）" }
+          - { value: "Home Theater System", meaning: "家庭影院（TV and Video）" }
+          - { value: "Car Video", meaning: "车载影音（TV and Video）" }
+          - { value: "Projectors & Screens", meaning: "投影与幕布（TV and Video）" }
+          - { value: "TV & Video Accessories", meaning: "影音配件（TV and Video），无产品" }
+          - { value: "MP4&MP3", meaning: "MP3 / MP4 播放器（Audio）" }
+          - { value: "Headphones", meaning: "耳机（Audio）" }
+          - { value: "Bluetooth Headphones", meaning: "蓝牙耳机（Audio）" }
+          - { value: "Speakers", meaning: "音箱（Audio）" }
+          - { value: "Recording Pen", meaning: "录音笔（Audio）" }
+          - { value: "Recorder", meaning: "录音机（Audio），无产品" }
+          - { value: "Radio", meaning: "收音机（Audio），无产品" }
+          - { value: "Audio Accessories", meaning: "音频配件（Audio），无产品" }
+          - { value: "Laptops", meaning: "笔记本电脑（Computers）" }
+          - { value: "Desktops", meaning: "台式机（Computers）" }
+          - { value: "Netbooks", meaning: "上网本（Computers）" }
+          - { value: "Monitors", meaning: "显示器（Computers）" }
+          - { value: "Printers, Scanners & Fax", meaning: "打印、扫描与传真（Computers）" }
+          - { value: "Computers Accessories", meaning: "电脑配件（Computers），无产品" }
+          - { value: "Computer Setup & Service", meaning: "电脑安装与服务（Computers），无产品" }
+          - { value: "Digital Cameras", meaning: "数码相机（Cameras and camcorders）" }
+          - { value: "Digital SLR Cameras", meaning: "数码单反（Cameras and camcorders）" }
+          - { value: "Camcorders", meaning: "摄像机（Cameras and camcorders）" }
+          - { value: "Film Cameras", meaning: "胶片相机（Cameras and camcorders），无产品" }
+          - { value: "Cameras & Camcorders Accessories", meaning: "相机配件（Cameras and camcorders），无产品" }
+          - { value: "Touch Screen Phones", meaning: "触屏手机（Cell phones）" }
+          - { value: "Smart phones & PDAs", meaning: "智能手机与 PDA（Cell phones）" }
+          - { value: "Home & Office Phones", meaning: "家用与办公电话（Cell phones）" }
+          - { value: "Cell phones Accessories", meaning: "手机配件（Cell phones），无产品" }
+          - { value: "Movie DVD", meaning: "影片 DVD（Music, Movies and Audio Books）" }
+          - { value: "Music CD", meaning: "音乐 CD（Music, Movies and Audio Books）" }
+          - { value: "Audio Books", meaning: "有声书（Music, Movies and Audio Books），无产品" }
+          - { value: "Download Games", meaning: "下载版游戏（Games and Toys）" }
+          - { value: "Boxed Games", meaning: "盒装游戏（Games and Toys），无产品" }
+          - { value: "Games Accessories", meaning: "游戏配件（Games and Toys），无产品" }
+          - { value: "Refrigerators", meaning: "冰箱（Home Appliances）" }
+          - { value: "Washers & Dryers", meaning: "洗衣机与干衣机（Home Appliances）" }
+          - { value: "Microwaves", meaning: "微波炉（Home Appliances）" }
+          - { value: "Coffee Machines", meaning: "咖啡机（Home Appliances）" }
+          - { value: "Air Conditioners", meaning: "空调（Home Appliances）" }
+          - { value: "Water Heaters", meaning: "热水器（Home Appliances）" }
+          - { value: "Fans", meaning: "风扇（Home Appliances）" }
+          - { value: "Lamps", meaning: "灯具（Home Appliances）" }
+      - name: ProductCategoryKey
+        description: "所属品类。8 个品类各有 3 ~ 8 个子类。"
+
+  # ======================= 维度表：组织、运维与未被销售事实引用的 =======================
+
+  - name: DimEmployee
+    title: "员工"
+    kind: dimension
+    rows: 293
+    grain: "一行 = 一个员工（EmployeeKey 唯一）。"
+    description: >-
+      销售组织的员工表，带上下级关系（ParentEmployeeKey 指向同一张表）。
+      **没有任何事实表挂在员工上**，员工只能通过 DimStore.EmployeeKey（门店经理）
+      和 DimSalesTerritory.EmployeeKey（辖区负责人）间接参与分析。
+      所以「某个员工卖了多少」这类问题只能理解成「他管的门店卖了多少」。
+    when_to_use: "要门店经理的姓名或职级时（约定 2 提到的门店经理）。"
+    cautions:
+      - "DimStore 里有 1 家店（StoreKey 227）的 EmployeeKey = 245 在这张表里不存在，内连接会丢掉它。"
+    columns:
+      - name: EmployeeKey
+        description: "员工键。1 ~ 296，293 行（缺 3 个键）。"
+        role: key
+      - name: ParentEmployeeKey
+        description: "上级员工键，指向本表的 EmployeeKey。11 个取值，构成四级销售组织。"
+      - name: FirstName
+        description: "名，234 个取值。门店经理的姓名用 FirstName + LastName。"
+      - name: LastName
+        description: "姓，288 个取值。"
+      - name: Title
+        description: "职级。四级销售组织，门店经理占绝大多数。"
+        values:
+          - { value: "Sales Store Manager", meaning: "门店经理，264 人（约定 2 说的「门店经理」）" }
+          - { value: "Sales State Manager", meaning: "州 / 省销售经理，23 人" }
+          - { value: "Sales Region Manager", meaning: "大区销售经理，5 人" }
+          - { value: "Sales Group Manager", meaning: "销售总监，1 人" }
+      - name: HireDate
+        description: "入职日，字符串日期，164 个取值。"
+      - name: BirthDate
+        description: "出生日期，字符串日期。"
+      - name: EmailAddress
+        description: "公司邮箱，形如 `anibal0@contoso.com`，全表唯一。"
+      - name: Phone
+        description: "员工联系电话，285 个取值。与经营分析无关。"
+      - name: EmergencyContactName
+        description: "紧急联系人姓名。人事字段，与经营分析无关。"
+      - name: EmergencyContactPhone
+        description: "紧急联系人电话。人事字段，与经营分析无关。"
+      - name: Gender
+        description: "性别。注意这里写的是全词，而 DimCustomer.Gender 写的是单字母 M / F，两张表的写法不一致。"
+        values:
+          - { value: "Male", meaning: "男，206 人" }
+          - { value: "Female", meaning: "女，87 人" }
+      - name: PayFrequency
+        description: "发薪频率的码值，存成字符串 `1` / `2`，没有配套说明，业务含义不明。"
+        values:
+          - { value: "1", meaning: "频率码 1，147 人（含义数据里没写）" }
+          - { value: "2", meaning: "频率码 2，146 人（含义数据里没写）" }
+      - name: BaseRate
+        description: "基础时薪（美元）。只有 4 个取值，与职级一一对应：25（门店经理 264 人）、55（州经理 23 人）、72.45（大区经理 5 人）、125（销售总监 1 人）。"
+        unit: USD
+      - name: VacationHours
+        description: "年假小时数，0 ~ 99。"
+        unit: "小时"
+      - name: DepartmentName
+        description: >-
+          部门名，17 个取值。注意有一个脏取值 `'Human Resources Contral`
+          （带前导单引号且拼写错误，1 人），与 `Human Resources`（6 人）是两个组。
+        values:
+          - { value: "Production", meaning: "生产，176 人" }
+          - { value: "Sales", meaning: "销售，18 人" }
+          - { value: "Purchasing", meaning: "采购，13 人" }
+          - { value: "Finance", meaning: "财务，10 人" }
+          - { value: "Information Services", meaning: "信息服务，10 人" }
+          - { value: "Marketing", meaning: "市场，10 人" }
+          - { value: "Facilities and Maintenance", meaning: "后勤与维护，7 人" }
+          - { value: "Production Control", meaning: "生产管理，7 人" }
+          - { value: "Engineering", meaning: "工程，6 人" }
+          - { value: "Human Resources", meaning: "人力资源，6 人" }
+          - { value: "Quality Assurance", meaning: "质量保证，6 人" }
+          - { value: "Shipping and Receiving", meaning: "收发货，6 人" }
+          - { value: "Document Control", meaning: "文档管理，5 人" }
+          - { value: "Tool Design", meaning: "工具设计，5 人" }
+          - { value: "Research and Development", meaning: "研发，4 人" }
+          - { value: "Executive", meaning: "高管，3 人" }
+          - { value: "'Human Resources Contral", meaning: "脏数据：带前导单引号、拼写错误的「人力资源」，1 人" }
+      - name: StartDate
+        description: "当前岗位的起始日，字符串日期。与 HireDate 多数相同。"
+      - name: Status
+        description: "在职状态。全表只有一个取值，没有区分度。"
+        values:
+          - { value: "Current", meaning: "在职，293 人（全部）" }
+      - name: SalaryStatus
+        description: "是否为固定薪。"
+        values:
+          - { value: "Not Salaried", meaning: "非固定薪（时薪制），237 人" }
+          - { value: "Salaried", meaning: "固定薪，56 人" }
+      - name: IsSalesPerson
+        description: "是否销售人员。注意只有 17 人是 Yes，而 264 人的职级是门店经理，两者并不一致。"
+        values:
+          - { value: "No", meaning: "非销售岗，276 人" }
+          - { value: "Yes", meaning: "销售岗，17 人" }
+      - name: IsMarried
+        description: "是否已婚。"
+        values:
+          - { value: "No", meaning: "未婚，147 人" }
+          - { value: "Yes", meaning: "已婚，146 人" }
+
+  - name: DimEntity
+    title: "计划实体"
+    kind: dimension
+    rows: 421
+    grain: "一行 = 一个计划实体（EntityKey 唯一）。"
+    description: >-
+      战略计划用的组织实体树：门店 → 州 → 国家/地区 → 集团四级，父子关系在
+      ParentEntityKey 上。421 行里 306 行是门店级，79 行是州级，33 行是国家/地区级，
+      3 行是集团级。
+      **战略计划表只挂在门店级实体上**（306 个，与 DimStore.EntityKey 一一对应），
+      更高层级的实体没有任何计划行，要按州或国家看计划必须自己沿父链上卷。
+    when_to_use: "把战略计划挂到门店上，或沿组织树上卷到州 / 国家时（约定 12）。"
+    columns:
+      - name: EntityKey
+        description: "实体键。1 ~ 949，421 行。"
+        role: key
+      - name: ParentEntityKey
+        description: "父实体键，指向本表的 EntityKey。114 个取值，构成四级组织树。"
+      - name: ParentEntityLabel
+        description: >-
+          父实体的名字（反范式化的冗余列），113 个取值，形如 `Texas`、`Washington`。
+          门店级实体的这一列就是它所在的州名（线上店和目录店例外，它们的父级是国家）。
+          用它可以不自连接就按州分组。
+      - name: EntityName
+        description: "实体名，419 个取值（有 2 个重名）。门店级实体的名字与 DimStore.StoreName 相同。"
+      - name: EntityDescription
+        description: "实体描述，内容与 EntityName 基本相同，没有额外信息。"
+      - name: EntityType
+        description: "实体层级。战略计划表只用到 Store 这一级。"
+        values:
+          - { value: "Store", meaning: "门店级，306 个。**战略计划表只挂在这一级上**，与 DimStore 一一对应" }
+          - { value: "State", meaning: "州 / 省级，79 个，没有计划行" }
+          - { value: "Country/Region", meaning: "国家 / 地区级，33 个，没有计划行" }
+          - { value: "Group", meaning: "集团级，3 个，没有计划行" }
+      - name: StartDate
+        description: "实体起始日，字符串时间戳，166 个取值。"
+      - name: Status
+        description: "实体状态。全表只有一个取值，没有区分度。"
+        values:
+          - { value: "Current", meaning: "现行，421 个（全部）" }
+
+  - name: DimSalesTerritory
+    title: "销售辖区"
+    kind: dimension
+    rows: 265
+    grain: "一行 = 一个销售辖区（SalesTerritoryKey 唯一）。"
+    description: >-
+      销售辖区表，每个辖区对应一个城市（GeographyKey 与辖区一一对应）。
+      **没有任何事实表挂在辖区上**——销售事实走的是门店和客户，不是辖区。
+      所以这张表在销售分析里用不上；它只能提供「某个城市属于哪个辖区、辖区负责人是谁」
+      这类信息。
+    when_to_use: "本期实验里没有需要用到它的场景。保留是为了完整描述这个库。"
+    columns:
+      - name: SalesTerritoryKey
+        description: "辖区键。1 ~ 274，265 行。"
+        role: key
+      - name: GeographyKey
+        description: "辖区对应的城市，与辖区一一对应（265 对 265）。"
+      - name: SalesTerritoryName
+        description: "辖区名，265 个全不相同，实际就是城市名（`Fort Worth`、`Taipei` 等）。"
+      - name: SalesTerritoryRegion
+        description: "辖区所属区域，80 个取值，实际是州 / 省名。"
+      - name: SalesTerritoryCountry
+        description: >-
+          辖区所属国家，33 个取值。注意写法与 DimGeography.RegionCountryName 不一致：
+          这里写 `UK`、`Greater China`，那里写 `United Kingdom`、`China` / `Taiwan`，
+          两张表不能按国家名直接连接（要连就经 GeographyKey）。
+        values:
+          - { value: "United States", meaning: "美国，179 个辖区" }
+          - { value: "UK", meaning: "英国，14 个（地理表里写 United Kingdom）" }
+          - { value: "Germany", meaning: "德国，11 个" }
+          - { value: "France", meaning: "法国，7 个" }
+          - { value: "Japan", meaning: "日本，7 个" }
+          - { value: "Greater China", meaning: "大中华区，6 个（地理表里分成 China 与 Taiwan 两个国家）" }
+          - { value: "Canada", meaning: "加拿大，5 个" }
+          - { value: "Italy", meaning: "意大利，5 个" }
+          - { value: "India", meaning: "印度，3 个" }
+          - { value: "Russia", meaning: "俄罗斯，3 个" }
+          - { value: "Australia", meaning: "澳大利亚，2 个" }
+          - { value: "South Korea", meaning: "韩国，2 个" }
+          - { value: "Armenia", meaning: "亚美尼亚，1 个" }
+          - { value: "Bhutan", meaning: "不丹，1 个" }
+          - { value: "Denmark", meaning: "丹麦，1 个" }
+          - { value: "Greece", meaning: "希腊，1 个" }
+          - { value: "Iran", meaning: "伊朗，1 个" }
+          - { value: "Ireland", meaning: "爱尔兰，1 个" }
+          - { value: "Kyrgyzstan", meaning: "吉尔吉斯斯坦，1 个" }
+          - { value: "Malta", meaning: "马耳他，1 个" }
+          - { value: "Pakistan", meaning: "巴基斯坦，1 个" }
+          - { value: "Poland", meaning: "波兰，1 个" }
+          - { value: "Portugal", meaning: "葡萄牙，1 个" }
+          - { value: "Romania", meaning: "罗马尼亚，1 个" }
+          - { value: "Singapore", meaning: "新加坡，1 个" }
+          - { value: "Slovenia", meaning: "斯洛文尼亚，1 个" }
+          - { value: "Spain", meaning: "西班牙，1 个" }
+          - { value: "Sweden", meaning: "瑞典，1 个" }
+          - { value: "Switzerland", meaning: "瑞士，1 个" }
+          - { value: "Syria", meaning: "叙利亚，1 个" }
+          - { value: "Thailand", meaning: "泰国，1 个" }
+          - { value: "Turkmenistan", meaning: "土库曼斯坦，1 个" }
+          - { value: "the Netherlands", meaning: "荷兰，1 个" }
+      - name: SalesTerritoryGroup
+        description: "辖区所属大区。"
+        values:
+          - { value: "North America", meaning: "北美，184 个辖区" }
+          - { value: "Europe", meaning: "欧洲，52 个" }
+          - { value: "Asia", meaning: "亚洲，29 个" }
+      - name: SalesTerritoryLevel
+        description: "辖区层级。全表只有一个取值 `4`（存成字符串），没有区分度。"
+        values:
+          - { value: "4", meaning: "层级 4，265 个（全部）" }
+      - name: SalesTerritoryManager
+        description: "辖区负责人，存的是员工号的字符串形式（和 DimStore.StoreManager 一样的做法），不是姓名。要姓名走 EmployeeKey。"
+      - name: Status
+        description: "辖区状态。全表只有一个取值，没有区分度。"
+        values:
+          - { value: "Current", meaning: "现行，265 个（全部）" }
+      - name: EmployeeKey
+        description: "辖区负责人的员工键，264 个取值。"
+
+  - name: DimMachine
+    title: "IT 设备"
+    kind: dimension
+    rows: 7816
+    grain: "一行 = 一台 IT 设备（MachineKey 唯一）。"
+    description: >-
+      门店和数据中心的 IT 设备台账：POS 机、服务器、集线器、路由器。
+      7,816 台设备分布在 303 家门店上。与销售分析无关，只服务于 IT 成本和故障两张事实表。
+    when_to_use: "问 IT 设备、IT 成本、故障时。"
+    columns:
+      - name: MachineKey
+        description: "设备键 1 ~ 7,816，连续无缺。"
+        role: key
+      - name: StoreKey
+        description: "设备所在门店，303 家（306 家里有 3 家没有设备）。"
+      - name: MachineType
+        description: "设备型号代码。与 MachineName 基本对应（POS 系列的四个型号对应三个名字）。"
+        values:
+          - { value: "WSR01", meaning: "Web 服务器一代，3,040 台" }
+          - { value: "POS01", meaning: "POS 一体机，2,679 台" }
+          - { value: "WSR02", meaning: "Web 服务器二代，1,060 台" }
+          - { value: "HUB01", meaning: "USB 集线器，460 台" }
+          - { value: "MSR01", meaning: "邮件服务器，346 台" }
+          - { value: "POS02", meaning: "POS 系统 2.0，102 台" }
+          - { value: "POS03", meaning: "POS 系统（基础版），73 台" }
+          - { value: "POS04", meaning: "POS 高配版 1.0，46 台" }
+          - { value: "RUT01", meaning: "无线路由器，10 台" }
+      - name: MachineName
+        description: "设备名，9 个取值。与 MachineType 基本对应（POS 的四个型号对应三个名字）。"
+        values:
+          - { value: "Fabrikam NAS Web Server", meaning: "Web 服务器（型号 WSR01），3,040 台" }
+          - { value: "Fabrikam Point of Sale 4-in-1", meaning: "四合一 POS 一体机（型号 POS01），1,945 台" }
+          - { value: "Fabrikam Imperium SVIXV9080H Server", meaning: "Web 服务器二代（型号 WSR02），1,060 台" }
+          - { value: "A. Datum Corporation DUB-H7 High Speed USB 2.0 7-Port Hub", meaning: "7 口 USB 集线器（型号 HUB01），460 台" }
+          - { value: "Fabrikam Point of Sale System 2.0", meaning: "POS 系统 2.0（型号 POS02 / POS03），383 台" }
+          - { value: "Fabrikam Point of Sale System", meaning: "POS 系统基础版（型号 POS01），359 台" }
+          - { value: "Fabrikam 250GB Mail Server Mail Server", meaning: "邮件服务器（型号 MSR01），346 台。名字里 Mail Server 重复了两次，是数据原样" }
+          - { value: "Fabrikam Point of Sale High Version 1.0", meaning: "POS 高配版 1.0（型号 POS04），213 台" }
+          - { value: "A. Datum Corporation ME1004-R Wireless Cable/DSL Router", meaning: "无线路由器（型号 RUT01），10 台" }
+      - name: MachineDescription
+        description: "设备配置描述，9 个取值，与 MachineName 一一对应。"
+        values:
+          - { value: "4GB DDR2 Memory; 250GB Hard Drives; Windows 2003 Web Server", meaning: "Web 服务器的配置，3,040 台" }
+          - { value: "Kit contains one convenient box, barcode scanner, receipt printer, cash drawer and keyboard.", meaning: "四合一 POS 的配置，1,945 台" }
+          - { value: "Dual Contoso 2.00GHz Core Processors; Windows 2008 Web Server", meaning: "Web 服务器二代的配置，1,060 台" }
+          - { value: "PC and Mac Compatible; Up to 40 Times Faster than USB 1.1", meaning: "USB 集线器的配置，460 台" }
+          - { value: 'Kit contains 15" LCD screen, Cash Drawer, Barcode Scanner and Receipt Printer.', meaning: "POS 系统 2.0 的配置，383 台" }
+          - { value: 'Kit contains 15" LCD screen, 1 cash drawer port and 5 USB ports.', meaning: "POS 系统基础版的配置，359 台" }
+          - { value: "Contoso 2.00GHz Core Processor; Windows 2003", meaning: "邮件服务器的配置，346 台" }
+          - { value: 'Kit contains 15" LCD screen, Cash Drawer, Barcode Scanner, Receipt Printer,Power Supply and Magstripe Reader.', meaning: "POS 高配版的配置，213 台" }
+          - { value: "Offers backward-compatibility with all 802.11b devices", meaning: "无线路由器的配置，10 台" }
+      - name: VendorName
+        description: "设备厂商。"
+        values:
+          - { value: "Fabrikam, Inc.", meaning: "Fabrikam，7,346 台" }
+          - { value: "A. Datum Corporation", meaning: "A. Datum，470 台" }
+      - name: MachineOS
+        description: "操作系统。内容与 MachineSoftware 几乎相同（只有路由器那 10 台不同）。"
+        values:
+          - { value: "Windows Server 2003", meaning: "3,386 台" }
+          - { value: "Linux2.6", meaning: "2,304 台" }
+          - { value: "Windows Server 2008", meaning: "1,060 台" }
+          - { value: "UNKNOWN", meaning: "未知（集线器没有操作系统），460 台" }
+          - { value: "Windows Embedded for Point of Service", meaning: "383 台" }
+          - { value: "Windows Embedded POSReady 2009", meaning: "213 台" }
+          - { value: "Router OS", meaning: "10 台" }
+      - name: MachineSource
+        description: "设备所在场所。"
+        values:
+          - { value: "Online Data Center", meaning: "线上数据中心，4,341 台" }
+          - { value: "Store", meaning: "门店，2,900 台" }
+          - { value: "Catalog Data Center", meaning: "目录业务数据中心，575 台" }
+      - name: MachineHardware
+        description: "硬件配置，9 个取值，与 MachineName 一一对应。内容与 MachineDescription 大体重复。"
+        values:
+          - { value: "4GB DDR2 Memory; 250GB Hard Drives", meaning: "Web 服务器，3,040 台" }
+          - { value: '15" LCD screen; 4 USB ports (USB 1.0)', meaning: "四合一 POS，1,945 台" }
+          - { value: "Dual 2.33GHz Core Processor; 8GB DDR2 667MHz PC5400 Memory;", meaning: "Web 服务器二代，1,060 台" }
+          - { value: "7-Port (each port can be used as either an RJ-45 10/100 port)", meaning: "USB 集线器，460 台" }
+          - { value: '15" LCD screen;Cash Drawer, Barcode Scanner, Receipt Printer', meaning: "POS 系统 2.0，383 台" }
+          - { value: '15" LCD screen;1 cash drawer port;5 USB ports (USB 2.0)', meaning: "POS 系统基础版，359 台" }
+          - { value: "Contoso 2.00GHz Core Processors; 4GB Memory; 250GB Hard Drives", meaning: "邮件服务器，346 台" }
+          - { value: '15" LCD screen;Cash Drawer, Barcode Scanner,Receipt Printer,Power Supply, Magstripe Reader', meaning: "POS 高配版，213 台" }
+          - { value: "4-port (Wireless Cable/DSL access point)", meaning: "无线路由器，10 台" }
+      - name: MachineSoftware
+        description: "软件配置，7 个取值。与 MachineOS 几乎相同。"
+        values:
+          - { value: "Windows Server 2003", meaning: "3,386 台" }
+          - { value: "Linux2.6", meaning: "2,304 台" }
+          - { value: "Windows Server 2008", meaning: "1,060 台" }
+          - { value: "UNKNOWN", meaning: "未知，460 台" }
+          - { value: "Windows Embedded for Point of Service", meaning: "383 台" }
+          - { value: "Windows Embedded POSReady 2009", meaning: "213 台" }
+          - { value: "Router OS; NAT and SPI firewall", meaning: "10 台" }
+      - name: Status
+        description: "设备状态。全表只有一个取值，没有区分度。"
+        values:
+          - { value: "Used", meaning: "在用，7,816 台（全部）" }
+      - name: ServiceStartDate
+        description: "投产日，字符串时间戳，160 个取值。"
+      - name: DecommissionDate
+        description: >-
+          计划退役日，字符串时间戳（形如 `2011-06-17 00:00:00.000`），28 个取值，
+          全部在 2010-06-16 ~ 2016-06-18 之间，即都在数据截止日 2009-12-31 之后
+          ——所以截至「今天」没有任何设备已退役。
+        value_semantics: >-
+          取值是**日期**而不是枚举类别：28 个取值构成一段连续的日期域（2010 ~ 2016 年，
+          集中在每年 6 月中旬的三天和零星几个 7 / 9 月的日子），逐个列出不增加任何业务信息。
+          按时间筛选或分年统计即可。
+      - name: LastModifiedDate
+        description: "记录最后修改时间，字符串时间戳。技术字段。"
+        technical: true
+
+  - name: DimOutage
+    title: "故障类型"
+    kind: dimension
+    rows: 303
+    grain: "一行 = 一种故障分类（OutageKey 唯一）。"
+    description: >-
+      IT 故障的分类表，三层分类（OutageName / OutageType / OutageSubType）。
+      分类本身比较脏：同一个概念在不同行里有多种写法（`Network`、`Network error`、
+      `HM-Network`、`Network HW Failure-test`），还有明显是测试数据的取值。
+    when_to_use: "问 IT 故障分类时。与销售分析无关。"
+    columns:
+      - name: OutageKey
+        description: "故障分类键。293 ~ 595，303 行。"
+        role: key
+      - name: OutageName
+        description: >-
+          故障名，28 个取值。最常见的是 `Move/Add/Change`（47 行）、`Change Management`（42）、
+          `Hardware`（30）、`Incident`（30）。有明显的脏取值，如
+          `Hub Port light is blinking`、`Network HW Failure-test`。
+        values:
+          - { value: "Move/Add/Change", meaning: "搬迁 / 新增 / 变更，47 行" }
+          - { value: "Change Management", meaning: "变更管理，42 行" }
+          - { value: "Hardware", meaning: "硬件，30 行" }
+          - { value: "Incident", meaning: "事件，30 行" }
+          - { value: "Deployment", meaning: "部署，24 行" }
+          - { value: "Security", meaning: "安全，24 行" }
+          - { value: "Request", meaning: "请求，21 行" }
+          - { value: "Network Device", meaning: "网络设备，14 行" }
+          - { value: "Change/Maintenance", meaning: "变更 / 维护，12 行" }
+          - { value: "Network Configuration", meaning: "网络配置，7 行" }
+          - { value: "Network Capacity", meaning: "网络容量，6 行" }
+          - { value: "Maintenance", meaning: "维护，5 行" }
+          - { value: "Investigation", meaning: "排查，4 行" }
+          - { value: "Network", meaning: "网络，4 行" }
+          - { value: "Network error", meaning: "网络错误，4 行（与 Network 是同类的另一种写法）" }
+          - { value: "CPU Failure", meaning: "CPU 故障，3 行" }
+          - { value: "Disk Failure", meaning: "磁盘故障，3 行" }
+          - { value: "Motherboard Failure", meaning: "主板故障，3 行" }
+          - { value: "Network Adapter Failure", meaning: "网卡故障，3 行" }
+          - { value: "OS Failed", meaning: "操作系统故障，3 行" }
+          - { value: "RAM Failure", meaning: "内存故障，3 行" }
+          - { value: "Software", meaning: "软件，3 行" }
+          - { value: "Database Error", meaning: "数据库错误，2 行" }
+          - { value: "HM-Network", meaning: "网络（又一种写法），2 行" }
+          - { value: "Hub Port light is blinking", meaning: "脏数据：把现象当成了分类名，1 行" }
+          - { value: "Hub Power Down", meaning: "集线器断电，1 行" }
+          - { value: "Infrastructure", meaning: "基础设施，1 行" }
+          - { value: "Network HW Failure-test", meaning: "脏数据：带 -test 后缀的测试取值，1 行" }
+      - name: OutageType
+        description: "故障大类，55 个取值。最常见的是 `Hardware`、`Software`、`Network`、`Configuration Management`、`OS`。取值多于 OutageName，层级关系反了。"
+      - name: OutageTypeDescription
+        description: "故障大类的描述，53 个取值，与 OutageType 大体对应但不完全一致。"
+      - name: OutageSubType
+        description: "故障子类，159 个取值。最常见的是 `Upgrade`、`Other`、`Install/Update Software`、`Memory`、`Vulnerability`。"
+
+# ---------------------------------------------------------------------------
+# 关系。
+#
+# 建表语句里**没有任何外键声明**，下面每一条都是按列名提出候选、再用数据实测出来的
+# （semantic/profiling/out/keys.md）。`orphan_rows` 是实测的孤儿行数：子表里该键非空、
+# 父表里却找不到对应行的行数。孤儿行不为 0 的关系要用左连接，否则会静默丢数据。
+#
+# 同一对表有多条路径时，由 multi_path_defaults 指出默认走哪条。
+# ---------------------------------------------------------------------------
+relationships:
+
+  # ---- 线上销售 ----
+  - from: FactOnlineSales.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按年 / 季 / 月 / 周 / 星期几 / 节假日 / 季节分析线上销售时走这条。"
+  - from: FactOnlineSales.CustomerKey
+    to: DimCustomer.CustomerKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      按客户属性分析，以及**按客户所在地**分析国家 / 地区 / 大洲时走这条
+      （约定 5 的默认分支，再接 DimCustomer.GeographyKey）。
+  - from: FactOnlineSales.ProductKey
+    to: DimProduct.ProductKey
+    cardinality: 多对一
+    orphan_rows: 1715380
+    use: "按产品、品牌、厂商、颜色、品类分析线上销售时走这条。"
+    caution: >-
+      有 1,715,380 行（13.6%、152,121,858.08 销售额）的 ProductKey 在 DimProduct 里
+      不存在。要保住销售总额就用左连接；用内连接会少算。见 data_quality。
+  - from: FactOnlineSales.StoreKey
+    to: DimStore.StoreKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      只能拿到三家线上虚拟门店（199 北美 / 306 欧洲 / 307 亚洲），用来按大洲区分线上业务。
+      **不要用它回答「各门店」类问题**，那要用 FactSales（约定 2）。
+  - from: FactOnlineSales.PromotionKey
+    to: DimPromotion.PromotionKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按促销活动分析，或按约定 10 排除无折扣交易（PromotionKey = 1）时走这条。"
+  - from: FactOnlineSales.CurrencyKey
+    to: DimCurrency.CurrencyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "实际用不上：全表只有 USD（约定 6）。"
+
+  # ---- 全渠道销售 ----
+  - from: FactSales.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按时间分析全渠道销售时走这条。"
+  - from: FactSales.channelKey
+    to: DimChannel.ChannelKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      渠道对比时走这条（约定 2）。注意子表列名首字母是小写的 `channelKey`。
+      渠道由门店唯一决定，所以这条和「按门店类型分组」等价。
+  - from: FactSales.StoreKey
+    to: DimStore.StoreKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      按门店、门店经理、同店分析时走这条；**按门店所在地**分析地理时也走这条
+      （约定 5 的门店分支，再接 DimStore.GeographyKey）。
+  - from: FactSales.ProductKey
+    to: DimProduct.ProductKey
+    cardinality: 多对一
+    orphan_rows: 338898
+    use: "按产品、品牌、品类分析全渠道销售时走这条。"
+    caution: >-
+      有 338,898 行（9.95%、726,129,808.32 销售额、占全渠道销售额 5.85%）的 ProductKey
+      在 DimProduct 里不存在。用左连接才能保住销售总额。见 data_quality。
+  - from: FactSales.PromotionKey
+    to: DimPromotion.PromotionKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按促销分析，或按约定 10 排除无折扣交易时走这条。"
+  - from: FactSales.CurrencyKey
+    to: DimCurrency.CurrencyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "实际用不上：全表只有 USD（约定 6）。"
+
+  # ---- 库存 ----
+  - from: FactInventory.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按快照日期分析库存时走这条。快照只落在周六，156 个日期。"
+  - from: FactInventory.StoreKey
+    to: DimStore.StoreKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按门店看库存时走这条。"
+  - from: FactInventory.ProductKey
+    to: DimProduct.ProductKey
+    cardinality: 多对一
+    orphan_rows: 533358
+    use: "按产品、品类看库存时走这条。"
+    caution: "有 533,358 行（6.7%）的 ProductKey 在 DimProduct 里不存在，用左连接。"
+  - from: FactInventory.CurrencyKey
+    to: DimCurrency.CurrencyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "实际用不上：全表只有 USD。"
+
+  # ---- 销售目标 ----
+  - from: FactSalesQuota.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按月看目标时走这条。目标的日期是每月 1 号，不能按天对齐销售。"
+  - from: FactSalesQuota.ChannelKey
+    to: DimChannel.ChannelKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按渠道看目标时走这条。"
+  - from: FactSalesQuota.StoreKey
+    to: DimStore.StoreKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按门店看目标、算门店目标达成率时走这条。"
+  - from: FactSalesQuota.ProductKey
+    to: DimProduct.ProductKey
+    cardinality: 多对一
+    orphan_rows: 521121
+    use: "按产品、品类看目标时走这条。"
+    caution: "有 521,121 行（7%）的 ProductKey 在 DimProduct 里不存在，用左连接。"
+  - from: FactSalesQuota.ScenarioKey
+    to: DimScenario.ScenarioKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      **必走**：不按场景筛选就会把实际 / 预算 / 预测三份金额加在一起。
+      正式目标取 ScenarioName = Budget（约定 12）。
+  - from: FactSalesQuota.CurrencyKey
+    to: DimCurrency.CurrencyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "实际用不上：全表只有 USD。"
+
+  # ---- 战略计划 ----
+  - from: FactStrategyPlan.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按月看计划时走这条。计划的日期是每月 1 号。"
+  - from: FactStrategyPlan.EntityKey
+    to: DimEntity.EntityKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      拿计划实体的名字和层级。计划只挂在门店级实体上；要按州或国家看计划，
+      用 DimEntity.ParentEntityLabel 分组，或沿 ParentEntityKey 上卷。
+  - from: FactStrategyPlan.ScenarioKey
+    to: DimScenario.ScenarioKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "**必走**：不按场景筛选会把三个场景加在一起。预算取 ScenarioName = Budget。"
+  - from: FactStrategyPlan.AccountKey
+    to: DimAccount.AccountKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      **必走**：不按科目筛选会把收入和各类费用加在一起。
+      「收入」取 AccountName = Sale Revenue（约定 12）。注意科目有父子关系，
+      父子一起求和会重复计算。
+  - from: FactStrategyPlan.ProductCategoryKey
+    to: DimProductCategory.ProductCategoryKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按品类看计划时走这条。计划只到品类级，没有产品级。"
+  - from: FactStrategyPlan.CurrencyKey
+    to: DimCurrency.CurrencyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "实际用不上：全表只有 USD。"
+
+  # ---- 汇率与 IT ----
+  - from: FactExchangeRate.CurrencyKey
+    to: DimCurrency.CurrencyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "本库用不上（约定 6）。"
+  - from: FactExchangeRate.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "本库用不上。"
+  - from: FactITMachine.MachineKey
+    to: DimMachine.MachineKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按设备型号、厂商、所在门店看 IT 成本时走这条。"
+  - from: FactITMachine.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按年份看 IT 成本时走这条（只有 2007 / 2008 / 2009 三个日期）。"
+  - from: FactITSLA.DateKey
+    to: DimDate.DateKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按时间看故障与停机时走这条。"
+  - from: FactITSLA.StoreKey
+    to: DimStore.StoreKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按门店看故障与停机时走这条。"
+  - from: FactITSLA.MachineKey
+    to: DimMachine.MachineKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按设备看故障时走这条。"
+  - from: FactITSLA.OutageKey
+    to: DimOutage.OutageKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "按故障分类看故障时走这条。注意分类字段比较脏，同一概念有多种写法。"
+
+  # ---- 维度到维度 ----
+  - from: DimCustomer.GeographyKey
+    to: DimGeography.GeographyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      **按客户所在地**分析城市 / 省州 / 国家 / 大洲时走这条（约定 5 的默认分支）。
+      客户指向的都是 City 级的行，四级地理字段在同一行上，不需要自连接。
+  - from: DimStore.GeographyKey
+    to: DimGeography.GeographyKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      **按门店所在地**分析地理时走这条（约定 5 只在问题明说「门店所在地」时才走这条）。
+      306 家门店落在 263 个城市上。
+  - from: DimStore.EntityKey
+    to: DimEntity.EntityKey
+    cardinality: 一对一
+    orphan_rows: 0
+    use: >-
+      把门店和战略计划接起来的唯一桥梁：FactStrategyPlan.EntityKey → DimEntity ←
+      DimStore.EntityKey。306 对 306 一一对应。
+  - from: DimStore.EmployeeKey
+    to: DimEmployee.EmployeeKey
+    cardinality: 多对一
+    orphan_rows: 1
+    use: "拿门店经理的姓名和职级（约定 2 提到门店经理）。不要用 DimStore.StoreManager，那是员工号字符串。"
+    caution: "StoreKey 227（Contoso Naples Store）的 EmployeeKey = 245 在 DimEmployee 里不存在，内连接会丢掉这家店。"
+  - from: DimProduct.ProductSubcategoryKey
+    to: DimProductSubcategory.ProductSubcategoryKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "产品 → 子类。再接 DimProductSubcategory.ProductCategoryKey 到品类。"
+  - from: DimProductSubcategory.ProductCategoryKey
+    to: DimProductCategory.ProductCategoryKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "子类 → 品类。产品到品类只有这一条路（经子类），没有直连。"
+  - from: DimMachine.StoreKey
+    to: DimStore.StoreKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "设备 → 所在门店。"
+  - from: DimSalesTerritory.GeographyKey
+    to: DimGeography.GeographyKey
+    cardinality: 一对一
+    orphan_rows: 0
+    use: "辖区 → 城市。本库的销售事实不挂辖区，这条实际用不上。"
+  - from: DimSalesTerritory.EmployeeKey
+    to: DimEmployee.EmployeeKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "辖区 → 负责人。本库用不上。"
+  - from: DimAccount.ParentAccountKey
+    to: DimAccount.AccountKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "科目的父子关系（自连接）。父子科目一起求和会重复计算。"
+  - from: DimEmployee.ParentEmployeeKey
+    to: DimEmployee.EmployeeKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: "员工的上下级关系（自连接），四级销售组织。"
+  - from: DimEntity.ParentEntityKey
+    to: DimEntity.EntityKey
+    cardinality: 多对一
+    orphan_rows: 0
+    use: >-
+      实体的父子关系（自连接）：门店 → 州 → 国家/地区 → 集团。
+      要按州看计划，用这条上卷，或直接用反范式化的 ParentEntityLabel 分组。
+
+# 同一对表有多条路径时的默认选择
+multi_path_defaults:
+  - pair: "销售 → DimGeography"
+    paths:
+      - path: "FactOnlineSales → DimCustomer → DimGeography"
+        meaning: "客户所在地"
+      - path: "FactOnlineSales / FactSales → DimStore → DimGeography"
+        meaning: "门店所在地"
+    default: "FactOnlineSales → DimCustomer → DimGeography（客户所在地）"
+    why: >-
+      约定 5：按国家、地区、大洲分析销售时默认按客户所在地，只有明确说「门店所在地」
+      才按门店。而客户键只在线上销售上有，所以地理问题的默认落点是线上销售。
+      一旦问题以门店为对象（约定 2），就改走 FactSales → DimStore → DimGeography。
+  - pair: "FactSales → 渠道"
+    paths:
+      - path: "FactSales.channelKey → DimChannel"
+        meaning: "渠道维度"
+      - path: "FactSales → DimStore.StoreType"
+        meaning: "门店类型"
+    default: "FactSales.channelKey → DimChannel"
+    why: "两者等价（渠道由门店唯一决定），但渠道维度是正式的渠道名，门店类型只是门店属性。"
+  - pair: "FactStrategyPlan → DimStore"
+    paths:
+      - path: "FactStrategyPlan.EntityKey → DimEntity ← DimStore.EntityKey"
+        meaning: "经实体表的唯一通路"
+    default: "FactStrategyPlan.EntityKey → DimEntity ← DimStore.EntityKey"
+    why: "战略计划表没有 StoreKey；要把计划和门店（或门店的销售）对起来，只能经 DimEntity。"
+  - pair: "产品 → 品类"
+    paths:
+      - path: "DimProduct → DimProductSubcategory → DimProductCategory"
+        meaning: "经子类的唯一通路"
+    default: "DimProduct → DimProductSubcategory → DimProductCategory"
+    why: "产品表没有品类键，只有子类键。注意战略计划表反而直接挂品类键。"
+
+# ---------------------------------------------------------------------------
+# 指标：文字口径。
+#
+# 这一节是 L1.5S（汇总层）和 L2（可调用指标）的唯一来源：汇总表只汇总这里定义过的
+# 指标，metrics.yaml 只包含这里定义过的指标，不多不少（设计规矩 3）。
+#
+# 每个指标写清：
+#   definition  文字公式
+#   numerator / denominator  比率型指标的分子分母（分开写，汇总层要分别存）
+#   additivity  可加 / 比率 / 半可加 / 去重
+#       可加   ——  在任何维度上直接相加都成立
+#       比率   ——  不能相加；要重新用分子合计 ÷ 分母合计算
+#       半可加 ——  在某些维度上可加、在时间上不可加（库存快照）
+#       去重   ——  去重计数，不能跨行相加
+#   default_filters  默认筛选（不写明时就按这个）
+#   dataset  默认落在哪张表
+# ---------------------------------------------------------------------------
+metrics:
+
+  # ========== 销售 ==========
+  - name: "销售额"
+    aliases: ["营收", "GMV", "销售金额", "收入"]
+    definition: "销售金额合计，已扣折扣、未扣退货（约定 7）。"
+    expression: "sum(SalesAmount)"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    default_filters: ["未说明渠道时用线上销售（约定 1）；以门店为对象时用全渠道销售（约定 2）"]
+    conventions: [1, 2, 7]
+  - name: "销售数量"
+    aliases: ["销量", "件数"]
+    definition: "销售数量合计。"
+    expression: "sum(SalesQuantity)"
+    additivity: 可加
+    unit: "件"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [1, 2]
+  - name: "总成本"
+    aliases: ["销货成本"]
+    definition: "销售行的总成本合计。"
+    expression: "sum(TotalCost)"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [7]
+  - name: "平均单价"
+    aliases: ["成交均价"]
+    definition: "销售额 ÷ 销售数量。"
+    numerator: "销售额"
+    denominator: "销售数量"
+    additivity: 比率
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+
+  # ========== 退货 ==========
+  - name: "退货金额"
+    definition: "退货金额合计。"
+    expression: "sum(ReturnAmount)"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    note: >-
+      线上销售的退货写在独立的行上（SalesQuantity = 0）；全渠道销售的退货写在销售的
+      同一行上。两种形态都只要对这一列求和，但按「退货的行」筛选时写法不同。
+  - name: "退货数量"
+    definition: "退货数量合计。"
+    expression: "sum(ReturnQuantity)"
+    additivity: 可加
+    unit: "件"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+  - name: "净销售额"
+    aliases: ["净收入"]
+    definition: "销售金额 − 退货金额（约定 7）。"
+    numerator: "销售额 − 退货金额"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [7]
+  - name: "退货率"
+    definition: "退货数量 ÷ 销售数量（约定 7）。注意分子分母都是**数量**，不是金额。"
+    numerator: "退货数量"
+    denominator: "销售数量"
+    additivity: 比率
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [7]
+    note: "全量值：线上 0.7996%，全渠道 0.9257%。"
+
+  # ========== 折扣 ==========
+  - name: "折扣金额"
+    aliases: ["优惠金额"]
+    definition: "折扣金额合计。按约定 10，问折扣金额时不计无折扣交易（PromotionKey = 1）。"
+    expression: "sum(DiscountAmount)"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    default_filters: ["PromotionKey != 1（约定 10）"]
+    conventions: [10]
+  - name: "折扣数量"
+    definition: "参与折扣的数量合计。"
+    expression: "sum(DiscountQuantity)"
+    additivity: 可加
+    unit: "件"
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    default_filters: ["PromotionKey != 1（约定 10）"]
+    conventions: [10]
+  - name: "折扣前原价"
+    aliases: ["折前金额", "吊牌金额"]
+    definition: >-
+      销售额 + 折扣金额。因为 SalesAmount 已经扣掉折扣，加回折扣就得到折前金额
+      （全渠道销售 3,406,089 行全部满足 SalesAmount = UnitPrice × SalesQuantity
+      − DiscountAmount）。
+    numerator: "销售额 + 折扣金额"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+  - name: "折扣率"
+    aliases: ["折扣力度"]
+    definition: "折扣金额 ÷ 折扣前原价。"
+    numerator: "折扣金额"
+    denominator: "折扣前原价"
+    additivity: 比率
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    default_filters: ["PromotionKey != 1（约定 10）"]
+    conventions: [10]
+  - name: "打折销售额"
+    definition: "促销键不等于 1 的交易的销售额合计（约定 10）。"
+    numerator: "销售额，筛 PromotionKey != 1"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [10]
+  - name: "打折销售额占比"
+    definition: "打折销售额 ÷ 销售额（分母含无折扣交易）。"
+    numerator: "打折销售额"
+    denominator: "销售额"
+    additivity: 比率
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [10]
+
+  # ========== 毛利 ==========
+  - name: "毛利"
+    aliases: ["毛利额"]
+    definition: "销售金额 − 总成本（约定 7）。"
+    numerator: "销售额 − 总成本"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [7]
+    note: >-
+      线上销售有 369,350 行毛利为负，其中 100,166 行是退货行（销售额 0、成本大于 0）。
+      全渠道销售没有一行毛利为负。
+  - name: "毛利率"
+    aliases: ["利润率"]
+    definition: "毛利 ÷ 销售金额（约定 7）。"
+    numerator: "毛利"
+    denominator: "销售额"
+    additivity: 比率
+    dataset: FactOnlineSales
+    alternate_dataset: FactSales
+    conventions: [7]
+    note: "全渠道各渠道的毛利率都在 56.5% ~ 56.9% 之间，差别很小。"
+
+  # ========== 订单 ==========
+  - name: "订单数"
+    aliases: ["单量", "订单量"]
+    definition: "去重的线上订单号个数（约定 8）。"
+    expression: "uniqExact(SalesOrderNumber)"
+    additivity: 去重
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [8]
+    note: >-
+      **不能跨行相加**：各组的订单数加起来不等于总体订单数。
+      只有线上销售有订单号，全渠道销售回答不了订单类问题。全量值 1,674,320。
+  - name: "订单行数"
+    definition: "线上销售的行数。"
+    expression: "count()"
+    additivity: 可加
+    dataset: FactOnlineSales
+    only_dataset: true
+  - name: "每单行数"
+    definition: "订单行数 ÷ 订单数。"
+    numerator: "订单行数"
+    denominator: "订单数"
+    additivity: 比率
+    dataset: FactOnlineSales
+    only_dataset: true
+    note: "全量值 7.542。"
+  - name: "客单价"
+    aliases: ["平均订单金额", "AOV"]
+    definition: "销售额 ÷ 去重订单数（约定 8）。"
+    numerator: "销售额"
+    denominator: "订单数"
+    additivity: 比率
+    unit: USD
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [8]
+    note: "全量值 1,623.4666。"
+
+  # ========== 客户 ==========
+  - name: "客户数"
+    aliases: ["买家数", "购买人数"]
+    definition: "去重的客户键个数。"
+    expression: "uniqExact(CustomerKey)"
+    additivity: 去重
+    dataset: FactOnlineSales
+    only_dataset: true
+    note: "**不能跨行相加**。只有线上销售有客户键；18,869 个客户全部有购买记录。"
+  - name: "客均销售额"
+    aliases: ["人均消费"]
+    definition: "销售额 ÷ 客户数。"
+    numerator: "销售额"
+    denominator: "客户数"
+    additivity: 比率
+    unit: USD
+    dataset: FactOnlineSales
+    only_dataset: true
+  - name: "客均订单数"
+    definition: "订单数 ÷ 客户数。"
+    numerator: "订单数"
+    denominator: "客户数"
+    additivity: 比率
+    dataset: FactOnlineSales
+    only_dataset: true
+  - name: "客户最近购买月数"
+    definition: >-
+      从该客户最后一次购买日到 2009-12-31 的整月数（约定 13 的分层依据）。
+      按客户算，不是聚合指标。
+    expression: "dateDiff('month', max(DateKey), toDate('2009-12-31'))，按 CustomerKey 分组"
+    additivity: 比率
+    unit: "月"
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [3, 13]
+  - name: "活跃客户数"
+    definition: "最近购买月数 ≤ 6 的去重客户数（约定 13）。"
+    numerator: "客户数，筛 客户最近购买月数 <= 6"
+    additivity: 去重
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [13]
+    note: "全量值 16,890。不能跨行相加。"
+  - name: "有流失风险客户数"
+    definition: "最近购买月数在 7 ~ 12 之间的去重客户数（约定 13）。"
+    numerator: "客户数，筛 7 <= 客户最近购买月数 <= 12"
+    additivity: 去重
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [13]
+    note: "全量值 1,841。"
+  - name: "已流失客户数"
+    definition: "最近购买月数 > 12 的去重客户数（约定 13）。"
+    numerator: "客户数，筛 客户最近购买月数 > 12"
+    additivity: 去重
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [13]
+    note: "全量值 138。"
+  - name: "新客数"
+    aliases: ["新增客户数"]
+    definition: >-
+      首次购买日落在截止日前 90 天内的去重客户数；首次购买指该客户有史以来第一次购买；
+      截止日由时间窗口决定，按月看就是每个月的最后一天（约定 14）。
+    numerator: "客户数，筛 首次购买日 在 [截止日 − 89 天, 截止日] 内"
+    additivity: 去重
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [14]
+    note: >-
+      这个库的数据让这个指标几乎恒为 0：18,869 个客户里 18,868 个首次购买在 2007 年，
+      只有 1 个在 2009 年。口径按约定原文实现，不因为结果为空而改。
+  - name: "新客销售额"
+    definition: "新客（按约定 14 判定）在窗口内的销售额合计。"
+    numerator: "销售额，筛 客户属于新客"
+    additivity: 可加
+    unit: USD
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [14]
+  - name: "新客销售额占比"
+    definition: "新客销售额 ÷ 销售额。"
+    numerator: "新客销售额"
+    denominator: "销售额"
+    additivity: 比率
+    dataset: FactOnlineSales
+    only_dataset: true
+    conventions: [14]
+
+  # ========== 日均与计数 ==========
+  - name: "有销售天数"
+    definition: "去重的有销售日期个数。"
+    expression: "uniqExact(DateKey)"
+    additivity: 去重
+    unit: "天"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+  - name: "日均销售额"
+    aliases: ["日均销售"]
+    definition: >-
+      先按天汇总销售额，再对天数求平均（约定 4）。等价于 销售额 ÷ 有销售天数。
+      比较节假日与平日、周末与工作日、季节时用这个，不要直接比销售额合计。
+    numerator: "销售额"
+    denominator: "有销售天数"
+    additivity: 比率
+    unit: USD
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+    conventions: [4]
+    note: >-
+      2009 年全渠道实测：平日 261 天日均 10,260,907.86，节假日 104 天日均 10,215,251.62。
+      两者几乎相同，因为这个库的「节假日」就是周末。
+  - name: "日均销售数量"
+    definition: "先按天汇总销售数量，再对天数求平均。等价于 销售数量 ÷ 有销售天数。"
+    numerator: "销售数量"
+    denominator: "有销售天数"
+    additivity: 比率
+    unit: "件"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+    conventions: [4]
+  - name: "门店数"
+    definition: "去重的门店个数。"
+    expression: "uniqExact(StoreKey)"
+    additivity: 去重
+    unit: "家"
+    dataset: FactSales
+    note: "**不能跨行相加**。306 家门店里 299 家是实体店，7 家是渠道用的虚拟门店。"
+  - name: "产品数"
+    aliases: ["在售产品数", "SKU 数"]
+    definition: "去重的产品个数。"
+    expression: "uniqExact(ProductKey)"
+    additivity: 去重
+    unit: "个"
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+    note: "**不能跨行相加**。"
+  - name: "店均销售额"
+    aliases: ["单店销售额"]
+    definition: "销售额 ÷ 门店数。"
+    numerator: "销售额"
+    denominator: "门店数"
+    additivity: 比率
+    unit: USD
+    dataset: FactSales
+  - name: "坪效"
+    aliases: ["单位面积销售额"]
+    definition: "销售额 ÷ 门店营业面积合计（DimStore.SellingAreaSize）。只对实体店有意义。"
+    numerator: "销售额"
+    denominator: "门店营业面积合计"
+    additivity: 比率
+    unit: USD
+    dataset: FactSales
+    note: >-
+      营业面积有 2 家门店是 93,800，比其余门店（450 ~ 1,125）大约两个数量级，
+      算到这两家头上的坪效会被压得极低。
+  - name: "门店人均销售额"
+    definition: "销售额 ÷ 门店员工数合计（DimStore.EmployeeCount）。"
+    numerator: "销售额"
+    denominator: "门店员工数合计"
+    additivity: 比率
+    unit: USD
+    dataset: FactSales
+
+  # ========== 增长与占比 ==========
+  - name: "销售额同比增长率"
+    aliases: ["同比增长率"]
+    definition: "（本期销售额 − 去年同期销售额）÷ 去年同期销售额。以 2009 年为今年、2008 年为去年（约定 3）。"
+    numerator: "本期销售额 − 去年同期销售额"
+    denominator: "去年同期销售额"
+    additivity: 比率
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+    conventions: [3]
+  - name: "销售额环比增长率"
+    aliases: ["环比增长率"]
+    definition: "（本期销售额 − 上一期销售额）÷ 上一期销售额。期的长度由问题的粒度决定（月、季）。"
+    numerator: "本期销售额 − 上一期销售额"
+    denominator: "上一期销售额"
+    additivity: 比率
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+  - name: "销售额占比"
+    aliases: ["份额", "贡献度"]
+    definition: "某一组的销售额 ÷ 对应范围内的销售额合计。分母的范围由问题决定（全公司、某渠道、某品类内）。"
+    numerator: "该组销售额"
+    denominator: "范围内销售额合计"
+    additivity: 比率
+    dataset: FactSales
+    alternate_dataset: FactOnlineSales
+  - name: "同店销售额"
+    definition: "只统计两个对比年份都有销售的门店的销售额（约定 15）。按约定 2 走全渠道销售。"
+    numerator: "销售额，筛 门店在两个对比年份都有销售"
+    additivity: 可加
+    unit: USD
+    dataset: FactSales
+    conventions: [2, 15]
+    note: "2008 与 2009 都有销售的门店 301 家（全部 306 家）。"
+  - name: "同店销售额增长率"
+    definition: "（同店本年销售额 − 同店去年销售额）÷ 同店去年销售额（约定 15）。"
+    numerator: "同店本年销售额 − 同店去年销售额"
+    denominator: "同店去年销售额"
+    additivity: 比率
+    dataset: FactSales
+    conventions: [15]
+
+  # ========== 产品属性类 ==========
+  - name: "产品标价"
+    definition: "DimProduct.UnitPrice。问「最贵的产品」用这一列，不用成交价（约定 9）。"
+    expression: "DimProduct.UnitPrice"
+    additivity: 比率
+    unit: USD
+    dataset: DimProduct
+    conventions: [9]
+  - name: "产品单位成本"
+    definition: "DimProduct.UnitCost（约定 9）。"
+    expression: "DimProduct.UnitCost"
+    additivity: 比率
+    unit: USD
+    dataset: DimProduct
+    conventions: [9]
+  - name: "产品利润率"
+    definition: "（产品标价 − 产品单位成本）÷ 产品标价，用产品表的标价和成本，不用成交价推算（约定 9）。"
+    numerator: "产品标价 − 产品单位成本"
+    denominator: "产品标价"
+    additivity: 比率
+    dataset: DimProduct
+    conventions: [9]
+
+  # ========== 库存 ==========
+  - name: "当前在手库存数量"
+    aliases: ["在手库存", "当前库存"]
+    definition: >-
+      每个门店 × 产品最近一次快照的在手数量之和（约定 11）。
+      「最近一次」按门店 × 产品各自取最大快照日，不是取全局最后一个快照日。
+    expression: "sum(OnHandQuantity)，筛 每个 (StoreKey, ProductKey) 的 DateKey = 该组合的 max(DateKey)"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: >-
+      **在时间维度上不可加**（快照不能跨日期求和）；在门店、产品、品类等维度上可加。
+      全量值：600,241 个门店 × 产品组合，在手 11,897,661 件。
+  - name: "当前在手库存金额"
+    aliases: ["库存金额", "库存价值"]
+    definition: "每个门店 × 产品最近一次快照的 在手数量 × 单位成本 之和（约定 11）。"
+    expression: "sum(OnHandQuantity * UnitCost)，筛同「当前在手库存数量」"
+    additivity: 半可加
+    unit: USD
+    dataset: FactInventory
+    conventions: [11]
+    note: "全量值 1,291,296,461.45。在时间维度上不可加。"
+  - name: "当前在订库存数量"
+    aliases: ["在途库存"]
+    definition: "每个门店 × 产品最近一次快照的在订数量之和（已下采购单未到货）。"
+    expression: "sum(OnOrderQuantity)，筛同「当前在手库存数量」"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: "全量值 494,285。在时间维度上不可加。"
+  - name: "当前安全库存数量"
+    aliases: ["安全库存"]
+    definition: "每个门店 × 产品最近一次快照的安全库存水位之和。"
+    expression: "sum(SafetyStockQuantity)，筛同「当前在手库存数量」"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+  - name: "低于安全库存的门店产品数"
+    aliases: ["缺货预警数"]
+    definition: "最近一次快照里 在手数量 < 安全库存水位 的门店 × 产品组合个数。"
+    expression: "countIf(OnHandQuantity < SafetyStockQuantity)，筛同「当前在手库存数量」"
+    additivity: 去重
+    unit: "个"
+    dataset: FactInventory
+    conventions: [11]
+    note: "全量值 89,591（占 600,241 个组合的 14.9%）。按门店 × 产品计数，不能跨行相加。"
+  - name: "快照日在手库存数量"
+    definition: >-
+      某一个快照日的在手库存数量之和。与「当前在手库存数量」的区别是它固定在一个快照日上，
+      用来看库存水位的时间趋势；「当前」那个取的是每个门店 × 产品各自最近的一次。
+    expression: "sum(OnHandQuantity)，按 DateKey 分组"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: "不同快照日之间不可相加（约定 11）。快照只落在周六，156 个日期。"
+  - name: "快照日在订库存数量"
+    definition: "某一个快照日的在订（已下采购单未到货）数量之和。"
+    expression: "sum(OnOrderQuantity)，按 DateKey 分组"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: "不同快照日之间不可相加。"
+  - name: "快照日安全库存数量"
+    definition: "某一个快照日的安全库存水位之和。"
+    expression: "sum(SafetyStockQuantity)，按 DateKey 分组"
+    additivity: 半可加
+    unit: "件"
+    dataset: FactInventory
+    conventions: [11]
+    note: "不同快照日之间不可相加。"
+  - name: "快照日低于安全库存的门店产品数"
+    definition: "某一个快照日里 在手数量 < 安全库存水位 的门店 × 产品组合个数。"
+    expression: "countIf(OnHandQuantity < SafetyStockQuantity)，按 DateKey 分组"
+    additivity: 去重
+    unit: "个"
+    dataset: FactInventory
+    conventions: [11]
+    note: "按门店 × 产品计数，不能跨行相加；也不能跨快照日相加。"
+  - name: "门店产品组合数"
+    definition: >-
+      去重的门店 × 产品组合个数。缺货面的分母（低于安全库存的门店产品数 ÷ 门店产品组合数）。
+    expression: "uniqExact((StoreKey, ProductKey))"
+    additivity: 去重
+    unit: "个"
+    dataset: FactInventory
+    note: "**不能跨行相加**。全量值 600,241。"
+  - name: "快照日在手库存金额"
+    definition: >-
+      某一个快照日的 在手数量 × 单位成本 之和。与「当前在手库存金额」的区别是它固定在
+      一个快照日上，用来看库存的时间趋势。
+    expression: "sum(OnHandQuantity * UnitCost)，按 DateKey 分组"
+    additivity: 半可加
+    unit: USD
+    dataset: FactInventory
+    conventions: [11]
+    note: "不同快照日之间不可相加，只能逐日看或对快照日求平均。"
+  - name: "平均在手库存金额"
+    definition: "各快照日的在手库存金额的平均（先按快照日汇总，再对快照日求平均）。"
+    numerator: "快照日在手库存金额合计"
+    denominator: "快照日个数"
+    additivity: 比率
+    unit: USD
+    dataset: FactInventory
+    conventions: [11]
+  - name: "库存周转率"
+    definition: "期间总成本 ÷ 平均在手库存金额。分子取全渠道销售的总成本。"
+    numerator: "总成本（全渠道销售）"
+    denominator: "平均在手库存金额"
+    additivity: 比率
+    dataset: FactInventory
+    note: "跨表指标：分子在 FactSales 上，分母在 FactInventory 上，两边的时间窗口要一致。"
+
+  # ========== 计划与销售目标 ==========
+  - name: "目标销售额"
+    aliases: ["销售目标", "配额"]
+    definition: "销售目标表的目标销售额合计，默认取预算场景（约定 12）。"
+    expression: "sum(SalesAmountQuota)"
+    additivity: 可加
+    unit: USD
+    dataset: FactSalesQuota
+    default_filters: ["ScenarioName = Budget（约定 12：正式目标看预算场景）"]
+    conventions: [12]
+    note: >-
+      不筛场景会把三个场景加在一起。预算场景全量值 10,667,465,363.67。
+      Actual 场景记的是实际值（12,413,657,608.89，与全渠道销售额相等），不是目标。
+  - name: "目标销量"
+    definition: "销售目标表的目标销量合计，默认取预算场景（约定 12）。"
+    expression: "sum(SalesQuantityQuota)"
+    additivity: 可加
+    unit: "件"
+    dataset: FactSalesQuota
+    default_filters: ["ScenarioName = Budget"]
+    conventions: [12]
+    note: "预算场景全量值 44,300,085。"
+  - name: "目标毛利"
+    definition: "销售目标表的目标毛利合计，默认取预算场景。"
+    expression: "sum(GrossMarginQuota)"
+    additivity: 可加
+    unit: USD
+    dataset: FactSalesQuota
+    default_filters: ["ScenarioName = Budget"]
+    conventions: [12]
+  - name: "目标达成率"
+    aliases: ["完成率"]
+    definition: "全渠道实际销售额 ÷ 预算场景的目标销售额（约定 12）。"
+    numerator: "销售额（全渠道销售）"
+    denominator: "目标销售额（预算场景）"
+    additivity: 比率
+    dataset: FactSales
+    denominator_dataset: FactSalesQuota
+    default_filters: ["分母筛 ScenarioName = Budget（约定 12）"]
+    conventions: [12]
+    note: >-
+      跨表指标。目标是月粒度，销售是日粒度，比之前要把销售汇总到月。
+      2009 年实测：实际 3,740,483,119.18 ÷ 预算目标 3,084,785,562.03 = 121.3%。
+  - name: "目标差异"
+    aliases: ["预算差异"]
+    definition: "全渠道实际销售额 − 预算场景的目标销售额。"
+    numerator: "销售额（全渠道销售） − 目标销售额（预算场景）"
+    additivity: 可加
+    unit: USD
+    dataset: FactSales
+    denominator_dataset: FactSalesQuota
+    conventions: [12]
+  - name: "计划金额"
+    aliases: ["战略计划金额"]
+    definition: >-
+      战略计划表的科目金额合计。**必须同时筛场景和科目**，否则会把三个场景、
+      以及收入与各类费用加在一起（约定 12）。
+    expression: "sum(Amount)"
+    additivity: 可加
+    unit: USD
+    dataset: FactStrategyPlan
+    default_filters: ["必须指定 ScenarioName 与 AccountName；科目有父子关系，父子一起求和会重复计算"]
+    conventions: [12]
+  - name: "计划收入"
+    definition: "战略计划表里 AccountName = Sale Revenue 的金额合计（约定 12 的「收入」）。默认取预算场景。"
+    numerator: "计划金额，筛 AccountName = Sale Revenue"
+    additivity: 可加
+    unit: USD
+    dataset: FactStrategyPlan
+    default_filters: ["AccountName = Sale Revenue；ScenarioName = Budget"]
+    conventions: [12]
+    note: >-
+      三方对账：Actual 场景的计划收入 12,413,657,608.89 = 全渠道销售额合计 =
+      销售目标表 Actual 场景的目标销售额。Budget 场景 11,548,720,849.89。
+
+  # ========== IT 运维 ==========
+  - name: "IT 成本"
+    aliases: ["设备成本", "运维成本"]
+    definition: "门店 IT 设备的成本金额合计。"
+    expression: "sum(CostAmount)"
+    additivity: 可加
+    unit: USD
+    dataset: FactITMachine
+    note: "全量值 240,765,805。只有 2007 / 2008 / 2009 三个日期，按年记一次。"
+  - name: "停机时长"
+    aliases: ["宕机时长"]
+    definition: "IT 故障的停机时长合计。"
+    expression: "sum(DownTime)"
+    additivity: 可加
+    unit: "分钟"
+    dataset: FactITSLA
+    note: "全量值 396,699 分钟。"
+  - name: "故障次数"
+    definition: "IT 故障事件的行数。"
+    expression: "count()"
+    additivity: 可加
+    unit: "次"
+    dataset: FactITSLA
+    note: "全量值 4,925。"
+
+# ---------------------------------------------------------------------------
+# 数据质量：会让查询算错、而又不会报错的地方。
+# 每条都标出实测数字；影响到约定清单的那几条另外记在
+# decisions/open-questions.md 里交用户裁决。
+# ---------------------------------------------------------------------------
+data_quality:
+
+  - id: missing-products
+    severity: 高
+    title: "产品维度缺 284 行，四张事实表都引用了缺失的键"
+    detail: >-
+      DimProduct 的 ProductKey 范围是 1 ~ 2,517（2,517 个位置），但只有 2,233 行，
+      缺的 284 个键散落在 416 ~ 2,497 之间。四张事实表都引用了这些键：
+      FactSales 338,898 行（9.95%，726,129,808.32 销售额，占全渠道销售额 5.85%）、
+      FactOnlineSales 1,715,380 行（13.6%，152,121,858.08 销售额）、
+      FactSalesQuota 521,121 行、FactInventory 533,358 行。
+      这些行的单价分布正常（0.95 ~ 969，均价 98.12），不是坏行。
+    impact: >-
+      **内连接产品表会静默少算**：销售总额、品类合计、品牌合计都会偏低，而查询不会报错。
+      「按品类看销售额」的各组之和不等于「销售额合计」。
+    workaround: "需要保住总额时用左连接；缺行的产品归到一个「未知产品」组。"
+
+  - id: inventory-weekly
+    severity: 中
+    title: "库存快照是每周一次，不是约定 11 说的每日"
+    detail: >-
+      FactInventory 只有 156 个快照日，全部落在周六，2007-01-06 ~ 2009-12-26，
+      相邻间隔全是 7 天。约定 11 的原文写的是「库存是每日快照」。
+    impact: >-
+      「不能跨日期求和」这条仍然成立，所以按约定做出来的结果不会错；
+      但「每日」的说法会让人以为任意一天都有库存数据，实际只有周六有。
+    workaround: "按约定 11 的第二句做（取每个门店 × 产品最近一次快照），已做成 wide_current_inventory 视图。"
+    open_question: 10
+
+  - id: holiday-equals-weekend
+    severity: 中
+    title: "「节假日」在数据里就是周末"
+    detail: >-
+      DimDate.IsHoliday = Yes 的 731 天恰好是全部 366 个周六加 365 个周日，
+      一个工作日都没有标成节假日；IsWorkDay 是同一个划分的另一种写法。
+    impact: >-
+      约定 4 把「节假日与平日」和「周末与工作日」并列成两种比较，在这个库里是同一个比较，
+      会得到同一个结果（2009 年全渠道日均：平日 10,260,907.86、节假日 10,215,251.62）。
+    workaround: "没有真正的公共假日字段可用。按哪一组字段算都一样。"
+    open_question: 11
+
+  - id: new-customer-degenerate
+    severity: 中
+    title: "约定 14 的「新客」在这个库里几乎恒为空"
+    detail: >-
+      18,869 个客户里 18,868 个的首次购买日落在 2007 年，只有 1 个落在 2009 年。
+      按约定 14（首次购买日在截止日前 90 天内），2008 年之后任何窗口的新客数都是 0 或 1。
+    impact: "新客数、新客销售额、新客销售额占比这三个指标在 2008 年之后的时间窗口上基本都是 0。"
+    workaround: "口径按约定原文实现，不因为结果为空而改。"
+    open_question: 12
+
+  - id: online-sales-mismatch
+    severity: 高
+    title: "两张销售表的线上口径对不上"
+    detail: >-
+      FactSales 里 ChannelName = Online 的销售额 2,677,599,035.07、退货 32,983,261.29；
+      FactOnlineSales 合计销售额 2,718,202,629.81、退货 29,244,318.20。
+      销售额差 40,603,594.74（1.5%），退货差 3,738,943.09（12.8%）。
+    impact: >-
+      同一个「线上销售额」问题，用两张表会得到不同的答案。也不能把两张表相加
+      （那会把线上算两遍），也不能用一张替代另一张。
+    workaround: >-
+      按约定 1 和 2 选表：不说渠道就用 FactOnlineSales，以门店 / 渠道为对象就用 FactSales。
+      不要试图让两边对平。
+    open_question: 13
+
+  - id: promotion-vs-discount-amount
+    severity: 中
+    title: "全渠道销售里「挂了促销」与「有折扣金额」不一致"
+    detail: >-
+      FactSales 有 446,677 行 PromotionKey != 1（挂了季节性促销）但 DiscountAmount = 0。
+      线上销售没有这种行（两个判定完全一致）。
+    impact: "「打折交易」按促销键筛和按折扣金额筛，在全渠道销售上结果不同。"
+    workaround: "按约定 10，以**促销键**为准（PromotionKey = 1 才是无折扣）。本语义层的所有折扣类指标都按促销键筛。"
+
+  - id: store-manager-is-id
+    severity: 中
+    title: "DimStore.StoreManager 存的是员工号，不是姓名"
+    detail: >-
+      306 行的 StoreManager 全部等于 EmployeeKey 的字符串形式。
+      DimSalesTerritory.SalesTerritoryManager 也是同样的做法。
+    impact: "问「门店经理是谁」时，直接取 StoreManager 会返回一串数字。"
+    workaround: "走 DimStore.EmployeeKey → DimEmployee，取 FirstName + LastName。"
+
+  - id: orphan-store-employee
+    severity: 低
+    title: "1 家门店的经理在员工表里不存在"
+    detail: "StoreKey 227（Contoso Naples Store）的 EmployeeKey = 245 在 DimEmployee 里没有对应行。"
+    impact: "门店连员工表用内连接时会丢掉这家店（306 → 305）。"
+    workaround: "用左连接。"
+
+  - id: sentinel-close-date
+    severity: 低
+    title: "DimStore.CloseDate 用 2090-12-31 当「未关店」的哨兵值"
+    detail: "294 家在营门店的 CloseDate 是 2090-12-31；12 家已关店的是 2008 ~ 2009 年的真实日期。"
+    impact: "按关店日期排序或取最大值会得到 2090-12-31。"
+    workaround: "先按 Status = Off 或 CloseDate != '2090-12-31' 筛掉在营门店。"
+
+  - id: mislabeled-stylename
+    severity: 低
+    title: "DimProduct.StyleName 装的是产品编码，不是款式名"
+    detail: >-
+      StyleName 的 2,233 个取值形如 `Product0501042`，每个产品都不同，
+      与 StyleID 没有对应关系（StyleID = 1 的 1,136 个产品有 1,136 个不同 StyleName）。
+    impact: "按「款式」分组会得到每个产品一组。这个库里没有可用的款式字段。"
+    workaround: "不要用 StyleName 作为款式。要分档位用 ClassName（Economy / Regular / Deluxe）。"
+
+  - id: dirty-enum-values
+    severity: 低
+    title: "几个低基数字段里有大小写或拼写不一致的取值"
+    detail: >-
+      DimProduct.ColorName：`blue`（2 个产品）与 `Blue`（148 个）是同一颜色的两种写法；
+      `Silver Grey`（14 个）与 `Silver`、`Grey` 并列。
+      DimEmployee.DepartmentName：`'Human Resources Contral`（带前导单引号、拼写错误，1 人）
+      与 `Human Resources`（6 人）。
+      DimPromotion.PromotionName：`European Back-to-Scholl Promotion`（Scholl 应为 School）。
+      DimGeography.RegionCountryName：3 行是空字符串（三个 Continent 级的行）。
+    impact: "按这些字段分组会多出本该合并的组；按国家分组会多出一个空名字的组。"
+    workaround: "需要干净分组时自己做大小写归一；或按数字码列（ColorID）分组再取名字。"
+
+  - id: outlier-values
+    severity: 低
+    title: "几个数值字段有量级异常的离群值"
+    detail: >-
+      DimCustomer.YearlyIncome：10,000,000 这一档有 385 人，是第二高档（170,000）的约 59 倍。
+      DimStore.SellingAreaSize：2 家门店是 93,800，其余 450 ~ 1,125。
+      DimStore.EmployeeCount：1 家是 325，其余 7 ~ 131。
+    impact: "算平均收入、坪效、人均销售额时会被这些值拉偏。"
+    workaround: "需要稳健结果时用中位数，或说明里点出离群值。"
+
+  - id: no-fact-on-employee-or-territory
+    severity: 低
+    title: "员工和销售辖区上没有挂任何事实表"
+    detail: >-
+      DimEmployee 和 DimSalesTerritory 都没有事实表直接引用。员工只能经
+      DimStore.EmployeeKey（门店经理）或 DimSalesTerritory.EmployeeKey 间接参与。
+    impact: "「某个销售员卖了多少」没法直接回答，只能理解成「他管的门店卖了多少」。辖区在销售分析里完全用不上。"
+    workaround: "按门店经理分组时走 FactSales → DimStore → DimEmployee。"
+
+  - id: date-dim-wider-than-facts
+    severity: 低
+    title: "日期维度比事实宽 1,460 天"
+    detail: "DimDate 覆盖 2005-01-01 ~ 2011-12-31（2,556 天），两张销售表只有 2007-01-01 ~ 2009-12-31（1,096 天，连续无缺口）。"
+    impact: "从日期维度出发做左连接会带出 1,460 个没有任何销售的日期；按日期维度算「平均每天」会把这些空天算进分母。"
+    workaround: "算日均时分母用有销售的天数（见「有销售天数」指标），或先把日期范围限定到事实的区间。"
+
+  - id: country-name-mismatch
+    severity: 低
+    title: "两张表的国家名写法不一致"
+    detail: >-
+      DimGeography.RegionCountryName 写 `United Kingdom`、`China`、`Taiwan`；
+      DimSalesTerritory.SalesTerritoryCountry 写 `UK`、`Greater China`。
+    impact: "两张表不能按国家名直接连接。"
+    workaround: "都经 GeographyKey 连接，不要按名字连。"
+
+# ---------------------------------------------------------------------------
+# L1.5W 明细宽表。
+#
+# 定义在 semantic/widetables.sql，建在独立库 `dwd`（`retail` 库的原始表仍然可见）。
+# 重建与核对：uv run python render/build_widetables.py
+#
+# 只做关联和行级派生，不做聚合，所以除「当前库存」外每个视图的行数都等于对应事实表
+# （实测见 reports/validation/widetables.md）。每个派生列的口径都在上面的 metrics
+# 或 conventions 里已经定义过——宽表没有引入任何新口径。
+#
+# 列名用中文（ClickHouse 里要加反引号引用）。重复出现在多个视图里的维度列
+# （年 / 月 / 品类 / 门店城市……）含义相同，不逐个视图重复解释。
+# ---------------------------------------------------------------------------
+widetables:
+  database: dwd
+  shared_column_meanings:
+    - columns: ["年", "月", "月名", "季度", "半年", "周", "星期", "星期序号"]
+      description: "来自 DimDate 的时间属性。按月排序用「月」（数字），不要用「月名」（英文月名按字母排序）。「季度」「周」「月名」都不带年份，跨年分析要同时带上「年」。"
+    - columns: ["是否工作日", "是否节假日"]
+      description: "来自 DimDate.IsWorkDay / IsHoliday。两者是同一个划分的两种写法；本库的「节假日」就是周六周日（约定 4、data_quality / holiday-equals-weekend）。"
+    - columns: ["欧洲季节", "北美季节", "亚洲季节"]
+      description: "来自 DimDate 的三套销售季节，按大洲分，没有全局季节字段。"
+    - columns: ["产品名", "品牌", "厂商", "颜色", "产品档位", "备货档位", "产品状态", "子类", "品类"]
+      description: >-
+        来自 DimProduct → DimProductSubcategory → DimProductCategory 的产品层级。
+        因为产品维度缺 284 行而事实表引用了这些键，这几列在那些行上是 NULL
+        （data_quality / missing-products）——这是左连接的结果，行本身没丢。
+    - columns: ["产品标价", "产品单位成本"]
+      description: "来自 DimProduct.UnitPrice / UnitCost。算产品利润率、问「最贵的产品」用这两列，不用成交价（约定 9）。"
+    - columns: ["门店名", "门店类型", "门店状态", "门店城市", "门店省州", "门店国家", "门店大洲"]
+      description: >-
+        来自 DimStore 与 DimStore → DimGeography 的门店属性和**门店所在地**。
+        按约定 5，只有问题明说「门店所在地」时才按这几列分析地理。
+        门店类型有 4 个值：299 家 Store 是实体店，另外 7 家（3 Online / 3 Reseller / 1 Catalog）是渠道用的虚拟门店。
+    - columns: ["促销名", "名义折扣率", "促销类型"]
+      description: >-
+        来自 DimPromotion。名义折扣率是活动的折扣率，不是实际成交折扣（看「折扣金额」）。
+        同一个促销名对应三个促销键（三个年份），按促销名分组会把三年合在一起。
+    - columns: ["场景"]
+      description: "来自 DimScenario，取值 Actual / Budget / Forecast。**宽表没有替你筛场景**，不筛会把三份金额加在一起；正式目标 / 预算取 Budget（约定 12）。"
+    - columns: ["渠道"]
+      description: "来自 DimChannel，取值 Store / Online / Catalog / Reseller。渠道由门店唯一决定。"
+
+  views:
+    - name: wide_online_sales
+      title: "线上销售明细宽表"
+      subject: "线上订单行"
+      base: retail.FactOnlineSales
+      grain: "一行 = 一个线上订单行（与事实表相同）。"
+      rows: 12627608
+      row_count_equals_fact: true
+      description: >-
+        约定 1 的默认销售表加上时间、产品层级、促销、客户与客户地理，并把净销售金额、
+        毛利、折扣前原价、是否打折、是否退货行做成列。
+        这是唯一带客户和订单号的宽表，所以订单数、客单价、客户分层、新客、
+        以及「按客户所在地」的地理问题都落在它上面。
+      columns:
+        - { name: "订单日期", source: FactOnlineSales.DateKey, description: "订单日期，粒度到天。" }
+        - { name: "订单号", source: FactOnlineSales.SalesOrderNumber, description: "线上订单号。约定 8 的「订单」，去重计数得订单数。" }
+        - { name: "订单行号", source: FactOnlineSales.SalesOrderLineNumber, description: "订单内行号，与订单号合起来唯一。" }
+        - { name: "销售数量", source: FactOnlineSales.SalesQuantity, description: "销售数量（件）。只有 0 和 1：销售行 1，退货行 0。" }
+        - { name: "销售金额", source: FactOnlineSales.SalesAmount, description: "销售金额（美元），已扣折扣未扣退货。退货行上是 0。" }
+        - { name: "退货数量", source: FactOnlineSales.ReturnQuantity, description: "退货数量（件）。只有 0 和 1。" }
+        - { name: "退货金额", source: FactOnlineSales.ReturnAmount, description: "退货金额（美元）。只出现在退货行上。" }
+        - { name: "折扣数量", source: FactOnlineSales.DiscountQuantity, description: "参与折扣的数量（件）。" }
+        - { name: "折扣金额", source: FactOnlineSales.DiscountAmount, description: "折扣金额（美元），已从销售金额里扣掉。" }
+        - { name: "总成本", source: FactOnlineSales.TotalCost, description: "该行总成本（美元）。退货行上也大于 0。" }
+        - { name: "成交单价", source: FactOnlineSales.UnitPrice, description: "成交时的单价（美元）。不是产品标价（约定 9）。" }
+        - { name: "成交单位成本", source: FactOnlineSales.UnitCost, description: "成交时的单位成本（美元）。" }
+        - { name: "净销售金额", derived: "销售金额 − 退货金额", metric: "净销售额", description: "行级净额（约定 7）。可加。" }
+        - { name: "毛利", derived: "销售金额 − 总成本", metric: "毛利", description: "行级毛利（约定 7）。可加。线上有 369,350 行为负（含 100,166 行退货行）。" }
+        - { name: "折扣前原价", derived: "销售金额 + 折扣金额", metric: "折扣前原价", description: "折前金额。折扣率的分母。" }
+        - { name: "是否打折", derived: "PromotionKey != 1", description: "是否为打折交易（约定 10 以促销键为准）。线上这一列与「折扣金额 > 0」完全一致。" }
+        - { name: "是否退货行", derived: "SalesQuantity = 0", description: "这一行是退货还是销售。线上销售的退货写在独立的行上，这一列把它标出来。" }
+        - { name: "客户名", source: DimCustomer.FirstName, description: "客户名。最常见的取值是占位值 `Not Provided`。" }
+        - { name: "客户姓", source: DimCustomer.LastName, description: "客户姓。" }
+        - { name: "客户性别", source: DimCustomer.Gender, description: "客户性别，M / F。" }
+        - { name: "客户婚姻状况", source: DimCustomer.MaritalStatus, description: "M = 已婚、S = 单身。" }
+        - { name: "客户学历", source: DimCustomer.Education, description: "五档学历。" }
+        - { name: "客户职业", source: DimCustomer.Occupation, description: "五类职业。" }
+        - { name: "客户年收入", source: DimCustomer.YearlyIncome, description: "年收入（美元），17 个档。10,000,000 这一档（385 人）是离群值。" }
+        - { name: "客户子女数", source: DimCustomer.TotalChildren, description: "子女总数 0 ~ 5。" }
+        - { name: "客户是否有房", source: DimCustomer.HouseOwnerFlag, description: "1 = 有房、0 = 无房。" }
+        - { name: "客户出生日期", source: DimCustomer.BirthDate, description: "出生日期（字符串）。算年龄以 2009-12-31 为今天（约定 3）。" }
+        - { name: "客户城市", source: DimGeography.CityName, description: "**客户所在**城市（约定 5 的默认分支）。" }
+        - { name: "客户省州", source: DimGeography.StateProvinceName, description: "客户所在省 / 州。" }
+        - { name: "客户国家", source: DimGeography.RegionCountryName, description: "客户所在国家 / 地区。" }
+        - { name: "客户大洲", source: DimGeography.ContinentName, description: "客户所在大洲，三个取值。" }
+        - { name: "线上店名", source: DimStore.StoreName, description: "承接交易的线上虚拟店，只有北美 / 欧洲 / 亚洲三家。不是实体门店，不能用来回答「各门店」问题。" }
+        - { name: "线上店类型", source: DimStore.StoreType, description: "恒为 `Online`。" }
+
+    - name: wide_all_channel_sales
+      title: "全渠道销售宽表"
+      subject: "全渠道销售汇总行"
+      base: retail.FactSales
+      grain: "一行 = 一天 × 一家门店 × 一个产品 × 一个促销（与事实表相同）。"
+      rows: 3406089
+      row_count_equals_fact: true
+      description: >-
+        约定 2 的门店 / 渠道分析表，加上渠道、时间、门店与门店地理、门店经理姓名、
+        产品层级、促销，并把净销售金额、毛利、折扣前原价、是否打折做成列。
+        没有订单号和客户，所以回答不了订单、客单价、客户类问题。
+      columns:
+        - { name: "销售日期", source: FactSales.DateKey, description: "销售日期，粒度到天。" }
+        - { name: "销售数量", source: FactSales.SalesQuantity, description: "销售数量（件）。汇总行，最小值 2。" }
+        - { name: "销售金额", source: FactSales.SalesAmount, description: "销售金额（美元），已扣折扣未扣退货。全量合计 12,413,657,608.86。" }
+        - { name: "退货数量", source: FactSales.ReturnQuantity, description: "退货数量（件），0 ~ 5。与销售在同一行上。" }
+        - { name: "退货金额", source: FactSales.ReturnAmount, description: "退货金额（美元）。与销售在同一行上。" }
+        - { name: "折扣数量", source: FactSales.DiscountQuantity, description: "参与折扣的数量（件），0 ~ 24。" }
+        - { name: "折扣金额", source: FactSales.DiscountAmount, description: "折扣金额（美元），已从销售金额里扣掉。" }
+        - { name: "总成本", source: FactSales.TotalCost, description: "总成本（美元）。" }
+        - { name: "成交单价", source: FactSales.UnitPrice, description: "成交单价（美元）。" }
+        - { name: "成交单位成本", source: FactSales.UnitCost, description: "成交单位成本（美元）。" }
+        - { name: "净销售金额", derived: "销售金额 − 退货金额", metric: "净销售额", description: "行级净额（约定 7）。可加。" }
+        - { name: "毛利", derived: "销售金额 − 总成本", metric: "毛利", description: "行级毛利（约定 7）。可加。这张表没有一行为负。" }
+        - { name: "折扣前原价", derived: "销售金额 + 折扣金额", metric: "折扣前原价", description: "折前金额。全部 3,406,089 行都满足 销售金额 = 成交单价 × 销售数量 − 折扣金额。" }
+        - name: "是否打折"
+          derived: "PromotionKey != 1"
+          description: >-
+            是否为打折交易（约定 10 以促销键为准）。注意这一列与「折扣金额 > 0」**不等价**：
+            有 446,677 行是 true 但折扣金额为 0（data_quality / promotion-vs-discount-amount）。
+        - { name: "门店开业日", source: DimStore.OpenDate, description: "门店开业日（字符串）。" }
+        - { name: "门店营业面积", source: DimStore.SellingAreaSize, description: "营业面积（单位数据里没写）。坪效的分母。2 家门店是 93,800，是离群值。" }
+        - { name: "门店员工数", source: DimStore.EmployeeCount, description: "门店员工数。门店人均销售额的分母。1 家是 325，是离群值。" }
+        - name: "门店经理"
+          derived: "concat(DimEmployee.FirstName, ' ', DimEmployee.LastName)"
+          description: >-
+            门店经理姓名，经 DimStore.EmployeeKey → DimEmployee 取得。
+            **不是** DimStore.StoreManager（那一列存的是员工号字符串）。
+            StoreKey 227 的经理在员工表里不存在，这一列在那家店上是空的。
+        - { name: "门店经理职级", source: DimEmployee.Title, description: "门店经理的职级，绝大多数是 `Sales Store Manager`。" }
+
+    - name: wide_current_inventory
+      title: "当前库存宽表"
+      subject: "当前库存"
+      base: retail.FactInventory
+      grain: "一行 = 一个门店 × 产品组合的**最近一次**快照。"
+      rows: 600241
+      row_count_equals_fact: false
+      row_count_note: >-
+        这是唯一行数不等于事实表的视图：按约定 11 做了行筛选，从 8,013,099 行快照里
+        取出每个门店 × 产品最近一次的那一行，剩 600,241 行（= 门店 × 产品组合数）。
+        筛选条件是「该组合的快照日 = 该组合的最大快照日」，不是「全局最后一个快照日」
+        ——各组合的最后一次快照并不在同一天（最多的 2009-12-26 只占 27,425 组）。
+        视图本身**不做聚合**，每一行都是原始快照行加两个行级派生列。
+      description: >-
+        把约定 11 的「当前库存」口径编码进视图，省掉每次都要写一遍「取最近一次快照」。
+        由此得到的在手数量合计 11,897,661、在手库存金额 1,291,296,461.45、
+        低于安全库存的组合 89,591 个。
+      columns:
+        - { name: "快照日期", source: FactInventory.DateKey, description: "这一行所属的快照日。各门店 × 产品不一定相同。快照只落在周六。" }
+        - { name: "在手数量", source: FactInventory.OnHandQuantity, description: "在手库存数量（件）。已经是「最近一次」，可以直接按门店 / 产品 / 品类求和；**不要再跨快照日求和**。" }
+        - { name: "在订数量", source: FactInventory.OnOrderQuantity, description: "已下采购单未到货的数量（件）。" }
+        - { name: "安全库存水位", source: FactInventory.SafetyStockQuantity, description: "该门店 × 产品设定的安全库存水位（件）。" }
+        - { name: "库存单位成本", source: FactInventory.UnitCost, description: "快照时点的单位成本（美元）。" }
+        - { name: "在库天数", source: FactInventory.DaysInStock, description: "在库天数，5 ~ 119。" }
+        - { name: "在手库存金额", derived: "在手数量 × 库存单位成本", metric: "当前在手库存金额", description: "行级库存金额（美元）。" }
+        - { name: "是否低于安全库存", derived: "在手数量 < 安全库存水位", description: "缺货预警标志。为 true 的组合有 89,591 个（14.9%）。" }
+
+    - name: wide_sales_quota
+      title: "销售目标宽表"
+      subject: "销售目标"
+      base: retail.FactSalesQuota
+      grain: "一行 = 一个月 × 渠道 × 门店 × 产品 × 场景（与事实表相同）。"
+      rows: 7465911
+      row_count_equals_fact: true
+      description: >-
+        把销售目标接上时间、渠道、门店与门店地理、产品层级、场景名（约定 12）。
+        没有做任何行级派生，因为目标表的三个度量本身就是终值。
+      cautions:
+        - "**三个场景都在表里**，用之前必须按「场景」筛选（正式目标 = Budget），否则金额放大三倍。"
+        - "目标是月粒度，要和销售比先把销售汇总到月。"
+      columns:
+        - { name: "目标月份", source: FactSalesQuota.DateKey, description: "目标所属月份，取值是每月 1 号。36 个月。" }
+        - { name: "目标销售额", source: FactSalesQuota.SalesAmountQuota, metric: "目标销售额", description: "目标销售额（美元）。目标达成率的分母（取 Budget 场景）。" }
+        - { name: "目标销量", source: FactSalesQuota.SalesQuantityQuota, metric: "目标销量", description: "目标销量（件）。" }
+        - { name: "目标毛利", source: FactSalesQuota.GrossMarginQuota, metric: "目标毛利", description: "目标毛利（美元），有负值。" }
+
+    - name: wide_strategy_plan
+      title: "战略计划宽表"
+      subject: "战略计划"
+      base: retail.FactStrategyPlan
+      grain: "一行 = 一个月 × 实体 × 场景 × 科目 × 品类（与事实表相同）。"
+      rows: 2750628
+      row_count_equals_fact: true
+      description: >-
+        把战略计划接上时间、场景名、科目名与方向、实体、**门店**（经 DimEntity ←
+        DimStore.EntityKey，这是计划和门店之间唯一的桥梁）和品类（约定 12）。
+      cautions:
+        - "**三个场景、17 个科目都在表里**，用之前必须同时筛场景和科目，否则会把三份金额、以及收入与各类费用加在一起。"
+        - "科目有父子关系，父子科目一起求和会重复计算（看「科目有父级」列）。"
+      columns:
+        - { name: "计划月份", source: FactStrategyPlan.DateKey, description: "计划所属月份，每月 1 号。36 个月。" }
+        - { name: "计划金额", source: FactStrategyPlan.Amount, metric: "计划金额", description: "科目金额（美元）。含义随科目变：收入类科目是收入，费用类科目是费用，都记为正数。" }
+        - { name: "科目", source: DimAccount.AccountName, description: "会计科目名。约定 12 的「收入」= `Sale Revenue`。" }
+        - { name: "科目方向", source: DimAccount.AccountType, description: "Income / Expense / Taxation。" }
+        - { name: "科目有父级", derived: "DimAccount.ParentAccountKey IS NOT NULL", description: "这个科目在科目树上有没有父级。用来提醒不要把父子科目一起求和。" }
+        - { name: "实体名", source: DimEntity.EntityName, description: "计划实体名。计划只挂在门店级实体上，所以这一列等于门店名。" }
+        - { name: "实体层级", source: DimEntity.EntityType, description: "恒为 `Store`（计划只挂门店级实体）。" }
+        - { name: "实体所属上级", source: DimEntity.ParentEntityLabel, description: "实体的上级名字（反范式化）。门店级实体这里是州名；线上店和目录店的上级是国家。按州看计划可以直接用这一列分组。" }
