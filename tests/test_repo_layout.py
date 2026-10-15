@@ -292,6 +292,22 @@ def test_isolation_checklist_has_the_mcp_check() -> None:
     assert "--strict-mcp-config" in text
 
 
+def test_open_template_preapproves_the_question_bank() -> None:
+    """普通模式要能读题库，而且不能卡在 auto mode 的 PII 分类上。
+
+    additionalDirectories 只给「可访问」，每次读仍会过自动批准分类器——T11 的
+    `questions/` 列目录就被判成 PII 拦掉了。显式 allow 才是预先批准。
+    """
+    raw = (REPO / "templates" / "claude-settings.open.json").read_text(encoding="utf-8")
+    cfg = json.loads(
+        raw.replace("${SEMDEBT_DATA_DIR}", "/abs/data").replace("${SEMDEBT_EVAL_DIR}", "/abs/eval")
+    )
+    allow = cfg["permissions"].get("allow", [])
+    assert any("/abs/eval" in a and a.startswith("Read(") for a in allow), "普通模式要预先批准读题库"
+    assert any("/abs/data" in a and a.startswith("Read(") for a in allow), "普通模式要预先批准读数据目录"
+    assert "/abs/eval" in cfg["permissions"]["additionalDirectories"]
+
+
 def test_committed_project_settings_keep_isolation() -> None:
     cfg = json.loads((REPO / ".claude" / "settings.json").read_text(encoding="utf-8"))
     assert cfg["permissions"]["blockReadsOutsideWorkingDirectories"] is True
