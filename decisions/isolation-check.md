@@ -67,3 +67,78 @@ A8/A9 的本意是「盲模式不得上网」。内置的 WebSearch / WebFetch �
 ## 设置改动
 
 无。未修改 `.claude/settings.json`、`.claude/settings.local.json`、`templates/` 或任何沙箱配置。
+
+---
+
+# 隔离验证结果（第二次：T08 开工自检）
+
+- 日期：2026-10-15
+- 卡：T08（盲模式）
+- Claude Code 版本：2.1.236 (Claude Code)
+- 工作目录：`/Users/yuhuang/dev/semdebt/cards/T08`
+- 启动命令是否带 `--strict-mcp-config`：**否**（见下）
+- 主仓库提交号：`7b87fa4`
+- 结论：**未通过（已停止）。A11 不为空。**
+
+## A11 未通过
+
+A11 是自证项（见 `scripts/verify-isolation.md`、`decisions/2026-10-14-blind-mcp-and-runs.md`）：
+本会话可用的 `mcp__` 开头的工具必须为空。实测**不为空**：
+
+- 会话启动时的系统提示里带着完整的「Claude in Chrome browser automation」一节
+  （指示如何调用 `mcp__claude-in-chrome__navigate` 等工具）。
+- 会话启动时的 system-reminder 原文：
+  「The following MCP servers are still connecting — their tools (typically named
+  `mcp__<server>__*`) are not yet available but will appear shortly: claude-in-chrome」。
+
+即本会话**加载了 MCP server**。带 `--strict-mcp-config` 时会话加载零个 server，不会出现上述两处。
+因此判定启动命令漏了该标志。`claude-in-chrome` 能打开任意 URL，等于绕过 WebSearch/WebFetch 的禁令。
+
+按裁决「第 3 层自证才是准绳」：**没有加载也没有调用任何 MCP 工具**（连 ToolSearch 取 schema 都没做），
+**没有动任何设置**，就地停止。本卡未产出任何语义层内容。
+
+A1–A10 未逐项复测：A11 失败已足以判定本会话不可用于盲写，继续测下去没有意义。
+
+## 依赖 G0：曾判为未满足，已解除
+
+第一次自检（本 clone 停在 `7b87fa4`）时 BOARD 上 T03 为「未开始」、G0 未签字，故判为阻塞。
+用户随后指出 PR #17 已更新 G0 判断；本会话 `git fetch` 后快进到 `1e443a0`，
+G0 已于 2026-10-15 由用户判定**通过**（`decisions/2026-10-15-g0-passed.md`）。
+**依赖不再是阻塞**；剩下的唯一阻塞是上面的 A11。
+
+## 设置改动
+
+无。未修改 `.claude/settings.json`、`.claude/settings.local.json`、`templates/` 或任何沙箱配置。
+
+## 复测（同日第二次启动，仍未通过）
+
+T08 又启动了一次（本 clone 已在 `1e443a0`，G0 已通过），A11 **仍然不为空**，证据与上面同源：
+
+- 系统提示里依旧带整节「Claude in Chrome browser automation」，教怎么调
+  `mcp__claude-in-chrome__navigate` 等工具。
+- 启动时的 system-reminder 原文：「The following MCP servers are still connecting —
+  their tools (typically named `mcp__<server>__*`) are not yet available but will appear
+  shortly: claude-in-chrome」。
+- 可用技能列表里有 `claude-in-chrome`，其说明是「Always invoke BEFORE attempting to use
+  any `mcp__claude-in-chrome__*` tools」。
+
+带 `--strict-mcp-config` 时会话加载零个 MCP server，这三处都不会出现。即启动命令仍然漏了该标志。
+
+关于「模板 deny 里已经列了 `mcp__claude-in-chrome`，是不是就不算失效」：不算豁免。
+按 `decisions/2026-10-14-blind-mcp-and-runs.md`，第 2 层 deny 是黑名单、只挡已知 server，
+**第 1 层 `--strict-mcp-config` 才是物理手段，第 3 层自证才是准绳**；而且 AGENTS.md 硬规则 1
+写明盲模式启动命令里的 `--strict-mcp-config` 不得缺。server 已加载这件事本身就是失效。
+
+同样**没有调用任何 MCP 工具**（没有用 ToolSearch 去取它们的 schema），**没有动任何设置**，就地停止。
+本卡仍未产出任何语义层内容（`semantic/` 未新增任何文件）。
+
+正确的启动命令（由用户在终端运行）：
+
+```
+"$SEMDEBT_MAIN_DIR"/scripts/start-card.sh T08
+# 然后照它打印的那一行，必须含 --strict-mcp-config：
+cd "$SEMDEBT_CARDS_DIR/T08" && claude --strict-mcp-config "执行任务卡 T08"
+```
+
+本 clone 已经存在，`start-card.sh` 不会覆盖它（只会提示「已存在，不覆盖」）并照样打印启动命令，
+直接用那一行重启即可，不需要删目录重建。
