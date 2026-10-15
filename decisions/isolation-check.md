@@ -210,3 +210,35 @@ Claude Code 把这条 Read deny 规则翻译进沙箱的 read-denyOnly 时，glo
 ## 设置改动
 
 无。未修改 `.claude/settings.json`、`.claude/settings.local.json`、`templates/` 或任何沙箱配置。
+
+## B4 的三条失败，逐条
+
+2026-10-15，`uv run pytest -p no:cacheprovider` → **3 failed, 116 passed**。
+三条红全部出自同一个原因（沙箱读规则挡住本 clone 自己的 `runs/README.md` 与 `runs/INDEX.md`），
+但失败点和触发路径各不相同，逐条记下：
+
+| # | 测试 | 失败位置 | 报错原文 | 为什么会红 |
+|---|---|---|---|---|
+| 1 | `tests/test_repo_layout.py::test_skeleton_dir_exists_with_readme[runs]` | `tests/test_repo_layout.py:86` | `PermissionError: [Errno 1] Operation not permitted: '.../cards/T08/runs/README.md'` | 这个测试被 `SKELETON_DIRS` 参数化，逐个骨架目录断言 `(d / "README.md").is_file()`。走到参数 `runs` 时要 `stat` `runs/README.md`，沙箱不让 stat，`is_file()` 直接抛 `PermissionError`（不是返回 False，所以也不是断言失败而是报错）。`runs/README.md` 本来就存在，是 T00 的产物。 |
+| 2 | `tests/test_repo_layout.py::test_templates_exist` | `tests/test_repo_layout.py:91` | `PermissionError: [Errno 1] Operation not permitted: '.../cards/T08/runs/INDEX.md'` | 这个测试遍历一个固定清单 `("decisions/open-questions.md", "runs/INDEX.md", "AGENTS.md", "pyproject.toml")` 断言每个都 `is_file()`。清单里第二项就是 `runs/INDEX.md`，同样在 `stat` 上抛错。文件同样本来就存在。 |
+| 3 | `tests/test_repo_layout.py::test_no_api_key_literals` | `tests/test_repo_layout.py:123` | `PermissionError: [Errno 1] Operation not permitted: '.../cards/T08/runs/README.md'` | 这条是**第 3 条裁决收窄之后新出现的**。它用 `REPO.rglob("*")` 扫全仓库找硬编码的 key，对每个条目先判 `not f.is_file()`。收窄前沙箱拒的是 `runs` 目录本身，`rglob` 列不进去、枚举不到里面的文件；收窄成 `./runs/*` 之后目录可列、文件不可 stat，于是 `rglob` 枚举到了 `runs/README.md`，`f.is_file()` 抛错。 |
+
+即：第 1、2 条是 2026-10-14 就有的那两条（T01 记录为「2 failed」），第 3 条是收窄写法带来的**新增**一条。
+三条都不是骨架缺东西，是「文件存在但读不到」；也都和题库隔离无关——挡住的是本 clone 自己的 `runs/`，
+不是主工作区的 `runs/` 或题库。
+
+### 根因与修复状态
+
+根因：盲模板 `templates/claude-settings.blind.json` 里的 `Read(./runs/*/**)` 这条
+deny（本意只挡 `runs/<run-id>/` 下的运行日志）被 Claude Code 翻译进沙箱 read-denyOnly 时
+掉了一层，变成 `./runs/*`，从而把 `runs/` 下的两个说明文件也挡住了。本会话系统提示里
+沙箱配置的原文含 `"./runs/*"` 可证。
+
+**已在主仓库修掉**：PR #19 把盲模板里针对 clone 本地 `runs/` 的那条 deny 去掉
+（主工作区的 `runs/` 和 `$SEMDEBT_DATA_DIR/runs-raw/` 两条 deny 保留不动，隔离不受影响）。
+
+**本 clone 刻意不刷新设置**：卡进行中换隔离设置会让本文件上面那份 A 组 / B 组的实测结果失真
+（A 组是在当前这套设置下测出来的）。所以 T08 全程继续用现在的设置跑，B4 保持 3 红；
+修复**从 T09 起生效**（T09 会用新模板重建 clone，届时按本清单重做一遍 A 组和 B 组）。
+
+这是用户 2026-10-15 的决定，不是 agent 自行取舍。
