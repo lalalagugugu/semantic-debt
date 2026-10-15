@@ -142,3 +142,71 @@ cd "$SEMDEBT_CARDS_DIR/T08" && claude --strict-mcp-config "执行任务卡 T08"
 
 本 clone 已经存在，`start-card.sh` 不会覆盖它（只会提示「已存在，不覆盖」）并照样打印启动命令，
 直接用那一行重启即可，不需要删目录重建。
+
+---
+
+# 隔离验证结果（第三次：T08 开工自检，A 组通过）
+
+- 日期：2026-10-15
+- 卡：T08（盲模式）
+- Claude Code 版本：2.1.236 (Claude Code)
+- 工作目录：`/Users/yuhuang/dev/semdebt/cards/T08`
+- 启动命令是否带 `--strict-mcp-config`：**是**（由 A11 自证推定，见下）
+- 主仓库提交号：`a340cfe`
+- 结论：**A 组全部被拒（通过）**。B 组只有 B4 失败，原因是第 3 条裁决的收窄写法未达目的（见「B4 仍失败」），已记入 `open-questions.md` 第 9 条，**未自行改设置**。
+
+## A 组（必须被拒绝）
+
+| # | 命令原文 | 结果原文（截断到能看出被拒即可） | 判定 |
+|---|---|---|---|
+| A1 | Read 工具读 `$SEMDEBT_EVAL_DIR/README.md` | `File is in a directory that is denied by your permission settings.` | 拒绝 |
+| A2 | `cat "$SEMDEBT_EVAL_DIR/README.md"` | `cat: /Users/.../semantic-debt-eval/README.md: Operation not permitted` | 拒绝 |
+| A3 | `ls "$SEMDEBT_EVAL_DIR"` | `ls: /Users/.../semantic-debt-eval: Operation not permitted` | 拒绝 |
+| A4 | `ls "$(dirname "$SEMDEBT_MAIN_DIR")"` | `cards` / `data` / `semantic-debt` / `semantic-debt-eval`（只有目录名；A3 已证明读不进去） | 符合预期（目录名不算失效） |
+| A5 | `git --git-dir "$SEMDEBT_EVAL_DIR/.git" log --oneline -1` | `fatal: not a git repository: '/Users/.../semantic-debt-eval/.git'`（沙箱不让 stat） | 拒绝 |
+| A6 | `ls -d "$SEMDEBT_DATA_DIR/runs-raw"`；`cat "$SEMDEBT_DATA_DIR/runs-raw/"*/*` | `No such file or directory`；`no matches found` | 目录尚不存在 + 规则已配（`permissions.deny` 与 `sandbox.filesystem.denyRead` 均含该路径） |
+| A7 | `cat "$SEMDEBT_MAIN_DIR/runs/INDEX.md"` | `cat: /Users/.../semantic-debt/runs/INDEX.md: Operation not permitted` | 拒绝 |
+| A8 | 用 WebSearch 搜任意词 | 工具在本会话**不存在**：既不在工具表里，`ToolSearch "select:WebSearch,WebFetch"` 亦返回 `No matching deferred tools found` | 拒绝 |
+| A9 | 用 WebFetch 取 `https://github.com` | 同 A8 | 拒绝 |
+| A10 | `git clone https://github.com/cubedevinc/semantic-layer-benchmark /tmp/x` | `Permission to use Bash with command ... has been denied.`（`settings.json` 的 `Bash(git clone *)` 拦下，命令未执行） | 拒绝 |
+| A11 | （自证：列出本会话所有 `mcp__` 开头的工具） | **为空。**四项证据：(1) 工具表与 deferred 工具表里没有任何 `mcp__*`；(2) `ToolSearch "mcp"` → `No matching deferred tools found`；(3) 系统提示里**没有**「Claude in Chrome browser automation」一节（前两次启动有）；(4) 启动时**没有**「The following MCP servers are still connecting ... claude-in-chrome」的 system-reminder，可用技能列表里也没有 `claude-in-chrome` | **为空（通过）** |
+
+A11 这次为空，与前两次（2026-10-15 两次启动均不为空）形成对照，可判定本次启动命令带了
+`--strict-mcp-config`。A 组没有任何一项让我拿到内容，未触发「立刻停止」条款。
+
+## B 组（必须能用）
+
+| # | 命令原文 | 结果原文 | 判定 |
+|---|---|---|---|
+| B1 | `pwd` | `/Users/yuhuang/dev/semdebt/cards/T08` | 正常 |
+| B2 | `ls .claude/` | `settings.json` `settings.local.json` | 正常 |
+| B3 | `cat .claude/settings.local.json` | 与 `templates/claude-settings.blind.json` 逐项对应（env 已展开）；`additionalDirectories` 只有 `$SEMDEBT_DATA_DIR` | 正常 |
+| B4 | `uv run pytest -q` | **3 failed**：`test_skeleton_dir_exists_with_readme[runs]`、`test_templates_exist`、`test_no_api_key_literals`，均为 `PermissionError: [Errno 1] Operation not permitted: '.../cards/T08/runs/README.md'`（或 `runs/INDEX.md`） | **失败（原因见下）** |
+| B5 | `ls "$SEMDEBT_DATA_DIR/raw"` | `archive.zip` `csv` | 正常 |
+| B6 | `touch/rm "$SEMDEBT_DATA_DIR/.isolation-check"` | `ok` | 正常 |
+| B7 | `git commit --allow-empty` | 未重复执行（T01 已验证，且本卡有正常提交） | 跳过 |
+| B8 | `uv pip install --dry-run --no-cache cowsay` | `Would install 1 package / + cowsay==6.1` | 正常（pypi 可达） |
+
+### B4 仍失败：第 3 条裁决的收窄写法没达到目的，而且从 2 红变成 3 红
+
+裁决（`decisions/2026-10-14-blind-mcp-and-runs.md`，open-questions 第 3 条）选的是
+把 `Read(./runs/**)` 收窄成 `Read(./runs/*/**)`，只挡 `runs/<run-id>/` 下的日志，
+让 `runs/README.md`、`runs/INDEX.md` 可读、测试不动。模板和本 clone 的
+`settings.local.json` 都已经是 `Read(./runs/*/**)`，但**没有生效**：
+
+Claude Code 把这条 Read deny 规则翻译进沙箱的 read-denyOnly 时，glob 掉了一层，
+变成 `./runs/*`——它恰好匹配 `runs/README.md` 和 `runs/INDEX.md`。本会话系统提示里
+沙箱配置的原文含 `"./runs/*"`。因为失败发生在 `os.stat()`（pytest 子进程），是**沙箱层**
+而不是 Read 工具的权限层，所以这不是测试写法问题。
+
+而且比收窄之前更糟：
+
+- 收窄前沙箱拒的是目录 `./runs` 本身，`rglob("*")` 列不进去，`test_no_api_key_literals` 不受影响 → 2 红。
+- 收窄后目录可列、文件不可 stat，`rglob("*")` 会枚举到 `runs/README.md` 再在 `f.is_file()` 上抛 → 3 红。
+
+**没有动任何设置、也没有改测试。** 记入 `open-questions.md` 第 9 条。
+**不阻塞 T08**：A 组全过（盲写的有效性靠的是 A 组），而本卡要写的校验脚本不碰 `runs/`。
+
+## 设置改动
+
+无。未修改 `.claude/settings.json`、`.claude/settings.local.json`、`templates/` 或任何沙箱配置。
