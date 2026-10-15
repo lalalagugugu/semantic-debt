@@ -42,3 +42,24 @@ def test_reviewed_category_ledger_applies_ruling() -> None:
     assert len(ledger) == 68
     assert ledger[("O-S", 90)][0] == "舍入/相对误差"
     assert ledger[("S-R", 88)][0] == "行序与验证流程"
+
+
+def test_global_unit_rules_and_cross_engine_tie_quantization() -> None:
+    from decimal import Decimal
+    from harness.value_units import infer_value_kind, quantize_tie
+    assert infer_value_kind('gross_margin_pct') == 'percentage'
+    assert infer_value_kind('promo_to_fullprice_ratio') == 'ratio'
+    assert infer_value_kind('total_sales', 'UInt64') == 'count'
+    assert infer_value_kind('sum(SalesAmount)', 'Float64') == 'amount'
+    assert infer_value_kind('month','UInt8') == 'other'
+    assert quantize_tie(Decimal('10.23000000001'),'amount') == quantize_tie(Decimal('10.22999999999'),'amount')
+    assert quantize_tie(Decimal('0.123456000001'),'ratio') == quantize_tie(Decimal('12.3455999999'),'percentage')
+    assert quantize_tie(Decimal('1.005'),'amount') == Decimal('1.00')
+    assert quantize_tie(Decimal('1.015'),'amount') == Decimal('1.02')
+
+
+def test_count_provenance_does_not_capture_ratio_denominators() -> None:
+    from scripts.validate_scorer import reference_value_kinds
+    columns = [{'name':'holiday_days','type':'UInt64'}, {'name':'aov','type':'Float64'}, {'name':'retention_pct','type':'Float64'}]
+    sql = 'SELECT count() AS holiday_days, sum(amount)/count() AS aov, countIf(x)*100.0/count() AS retention_pct FROM t'
+    assert reference_value_kinds(sql,columns) == ['count','other','percentage']

@@ -15,6 +15,8 @@ from itertools import permutations
 from numbers import Number
 from typing import Literal, TypeAlias
 
+from harness.value_units import KINDS, ValueKind, absolute_tolerance, quantize_tie
+
 
 Outcome: TypeAlias = Literal["correct", "wrong", "exec_error", "refused"]
 Sensitivity: TypeAlias = Literal[
@@ -55,6 +57,9 @@ class _Rules:
     ordered: bool
     top_n: int | None
     tie_columns: tuple[int, ...]
+    value_kinds: tuple[ValueKind, ...] = ()
+    use_absolute_tolerance: bool = True
+    exact_counts: bool = False
 
 
 def score(
@@ -128,7 +133,7 @@ def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -
             continue
         if any(i not in numeric_ref for i in rules.tie_columns):
             continue
-        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns))
+        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts)
         projected_candidate = tuple(tuple(row[i] for i in numeric_candidate) for row in candidate)
         projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
         matched, _ = _matches_reference(projected_candidate, projected_reference, projected_rules)
@@ -161,7 +166,14 @@ def _parse_rules(rules: Mapping[str, object]) -> _Rules:
         raise ValueError("rules['tie_columns'] must contain non-negative integers")
     if len(set(tie_columns)) != len(tie_columns):
         raise ValueError("rules['tie_columns'] must not contain duplicates")
-    return _Rules(ordered=ordered, top_n=top_n, tie_columns=tuple(tie_columns))
+    value_kinds = rules.get("value_kinds", ())
+    if isinstance(value_kinds, (str, bytes)) or not isinstance(value_kinds, Sequence) or any(k not in KINDS for k in value_kinds):
+        raise ValueError("value_kinds must be a sequence of supported reference-column kinds")
+    use_absolute = rules.get("use_absolute_tolerance", True)
+    exact_counts = rules.get("exact_counts", False)
+    if not isinstance(use_absolute, bool) or not isinstance(exact_counts, bool):
+        raise TypeError("comparison mode flags must be bool")
+    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts)
 
 
 def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
@@ -183,6 +195,8 @@ def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
 
 
 def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple[bool, str]:
+    if rules.value_kinds and reference and len(rules.value_kinds) != len(reference[0]):
+        raise ValueError("value_kinds must match reference column count")
     if rules.top_n is None:
         if len(candidate) != len(reference):
             return False, "row_count"
@@ -210,9 +224,9 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
             if _top_rows_match(candidate, reference, mapping, rules):
                 return True, "matched"
         elif rules.ordered:
-            if all(_rows_equal(candidate_row, reference_row, mapping) for candidate_row, reference_row in zip(candidate, reference)):
+            if all(_rows_equal(candidate_row, reference_row, mapping, rules) for candidate_row, reference_row in zip(candidate, reference)):
                 return True, "matched"
-        elif _rows_match_unordered(candidate, reference, mapping):
+        elif _rows_match_unordered(candidate, reference, mapping, rules):
             return True, "matched"
     return False, "values"
 
@@ -231,7 +245,7 @@ def _validate_top_reference(reference: Rows, rules: _Rules) -> str | None:
 
     boundary = reference[rules.top_n - 1]
     for row in reference[rules.top_n :]:
-        if not _tie_keys_equal(row, boundary, rules.tie_columns):
+        if not _tie_keys_equal(row, boundary, rules.tie_columns, rules.value_kinds):
             return "Top-N reference contains rows below the complete boundary tie group"
     return None
 
@@ -245,13 +259,13 @@ def _top_rows_match(
     assert rules.top_n is not None
     if len(reference) == rules.top_n:
         return all(
-            _rows_equal(candidate_row, reference_row, mapping)
+            _rows_equal(candidate_row, reference_row, mapping, rules)
             for candidate_row, reference_row in zip(candidate, reference)
         )
 
-    boundary_start = _boundary_start(reference, rules.top_n, rules.tie_columns)
+    boundary_start = _boundary_start(reference, rules.top_n, rules.tie_columns, rules.value_kinds)
     if not all(
-        _rows_equal(candidate[index], reference[index], mapping)
+        _rows_equal(candidate[index], reference[index], mapping, rules)
         for index in range(boundary_start)
     ):
         return False
@@ -259,6 +273,7 @@ def _top_rows_match(
         candidate[boundary_start:],
         reference[boundary_start:],
         mapping,
+        rules,
     )
 
 
@@ -269,39 +284,39 @@ def _is_complete_boundary_group(candidate: Rows, reference: Rows, rules: _Rules)
     if not candidate or len(candidate[0]) < len(reference[0]):
         return False
 
-    boundary_start = _boundary_start(reference, rules.top_n, rules.tie_columns)
+    boundary_start = _boundary_start(reference, rules.top_n, rules.tie_columns, rules.value_kinds)
     for mapping in permutations(range(len(candidate[0])), len(reference[0])):
         prefix_matches = all(
-            _rows_equal(candidate[index], reference[index], mapping)
+            _rows_equal(candidate[index], reference[index], mapping, rules)
             for index in range(boundary_start)
         )
         if prefix_matches and _rows_match_unordered(
-            candidate[boundary_start:], reference[boundary_start:], mapping
+            candidate[boundary_start:], reference[boundary_start:], mapping, rules
         ):
             return True
     return False
 
 
-def _boundary_start(reference: Rows, top_n: int, tie_columns: tuple[int, ...]) -> int:
+def _boundary_start(reference: Rows, top_n: int, tie_columns: tuple[int, ...], value_kinds: tuple[ValueKind, ...] = ()) -> int:
     boundary = reference[top_n - 1]
     start = top_n - 1
-    while start > 0 and _tie_keys_equal(reference[start - 1], boundary, tie_columns):
+    while start > 0 and _tie_keys_equal(reference[start - 1], boundary, tie_columns, value_kinds):
         start -= 1
     return start
 
 
-def _tie_keys_equal(left: Row, right: Row, columns: tuple[int, ...]) -> bool:
+def _tie_keys_equal(left: Row, right: Row, columns: tuple[int, ...], value_kinds: tuple[ValueKind, ...] = ()) -> bool:
     # Result tolerance must not enlarge a ranking tie group.
-    return all(left[column] == right[column] for column in columns)
+    return all(quantize_tie(left[column], value_kinds[column] if value_kinds else "other") == quantize_tie(right[column], value_kinds[column] if value_kinds else "other") for column in columns)
 
 
-def _rows_match_unordered(candidate: Rows, reference: Rows, mapping: tuple[int, ...]) -> bool:
+def _rows_match_unordered(candidate: Rows, reference: Rows, mapping: tuple[int, ...], rules: _Rules) -> bool:
     if len(candidate) != len(reference):
         return False
-    return _rows_match_subset(candidate, reference, mapping)
+    return _rows_match_subset(candidate, reference, mapping, rules)
 
 
-def _rows_match_subset(candidate: Rows, reference: Rows, mapping: tuple[int, ...]) -> bool:
+def _rows_match_subset(candidate: Rows, reference: Rows, mapping: tuple[int, ...], rules: _Rules) -> bool:
     if len(candidate) > len(reference):
         return False
 
@@ -316,7 +331,7 @@ def _rows_match_subset(candidate: Rows, reference: Rows, mapping: tuple[int, ...
         reference_rows = reference_buckets.get(bucket, [])
         if len(candidate_rows) > len(reference_rows):
             return False
-        if not _match_bucket(candidate_rows, reference_rows, mapping):
+        if not _match_bucket(candidate_rows, reference_rows, mapping, rules):
             return False
     return True
 
@@ -336,12 +351,12 @@ def _nonnumeric_bucket(value: object) -> object:
     return (type(value), value)
 
 
-def _match_bucket(candidate: list[Row], reference: list[Row], mapping: tuple[int, ...]) -> bool:
+def _match_bucket(candidate: list[Row], reference: list[Row], mapping: tuple[int, ...], rules: _Rules) -> bool:
     compatible = [
         [
             reference_index
             for reference_index, reference_row in enumerate(reference)
-            if _rows_equal(candidate_row, reference_row, mapping)
+            if _rows_equal(candidate_row, reference_row, mapping, rules)
         ]
         for candidate_row in candidate
     ]
@@ -367,14 +382,14 @@ def _match_bucket(candidate: list[Row], reference: list[Row], mapping: tuple[int
     return True
 
 
-def _rows_equal(candidate: Row, reference: Row, mapping: tuple[int, ...]) -> bool:
+def _rows_equal(candidate: Row, reference: Row, mapping: tuple[int, ...], rules: _Rules) -> bool:
     return all(
-        _cells_equal(candidate[mapping[reference_index]], reference_value)
+        _cells_equal(candidate[mapping[reference_index]], reference_value, kind=rules.value_kinds[reference_index] if rules.value_kinds else "other", use_absolute=rules.use_absolute_tolerance, exact_counts=rules.exact_counts)
         for reference_index, reference_value in enumerate(reference)
     )
 
 
-def _cells_equal(left: Cell, right: Cell, *, allow_percentage: bool = True) -> bool:
+def _cells_equal(left: Cell, right: Cell, *, allow_percentage: bool = True, kind: ValueKind = "other", use_absolute: bool = True, exact_counts: bool = False) -> bool:
     if _is_numeric(left) and _is_numeric(right):
         left_number = float(left)
         right_number = float(right)
@@ -382,11 +397,20 @@ def _cells_equal(left: Cell, right: Cell, *, allow_percentage: bool = True) -> b
             return math.isnan(left_number) and math.isnan(right_number)
         if math.isinf(left_number) or math.isinf(right_number):
             return left_number == right_number
+        if exact_counts and kind == "count":
+            return left == right
+        # Retain every pre-A match. Absolute floors apply in the reference unit;
+        # zero gives no evidence for choosing a 100x alternative representation.
         if _relative_close(left_number, right_number):
             return True
-        return allow_percentage and (
-            _relative_close(left_number * 100.0, right_number)
-            or _relative_close(left_number, right_number * 100.0)
+        if allow_percentage and (_relative_close(left_number * 100.0, right_number) or _relative_close(left_number, right_number * 100.0)):
+            return True
+        atol = absolute_tolerance(kind) if use_absolute else 0.0
+        if _relative_close(left_number, right_number, atol):
+            return True
+        return allow_percentage and right_number != 0 and kind in {"ratio", "percentage"} and (
+            _relative_close(left_number * 100.0, right_number, atol)
+            or _relative_close(left_number, right_number * 100.0, atol * 100.0)
         )
     if isinstance(left, str) and isinstance(right, str):
         return left.strip() == right.strip()
@@ -397,9 +421,9 @@ def _is_numeric(value: object) -> bool:
     return isinstance(value, (Number, Decimal)) and not isinstance(value, (bool, complex))
 
 
-def _relative_close(left: float, right: float) -> bool:
+def _relative_close(left: float, right: float, atol: float = 0.0) -> bool:
     if left == right:
         return True
     scale = abs(right)
     rounding_slack = 1e-12 * max(1.0, scale)
-    return scale > 0 and abs(left - right) <= RELATIVE_TOLERANCE * scale + rounding_slack
+    return (scale > 0 or atol > 0) and abs(left - right) <= max(RELATIVE_TOLERANCE * scale, atol) + rounding_slack
