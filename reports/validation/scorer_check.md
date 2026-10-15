@@ -898,3 +898,55 @@ T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落�
 - 最终完整执行600条：correct=252、wrong=303、exec_error=39、Q33公开参考不可用而excluded=6。每个候选只执行一次；三份评分共用同一执行结果，不静默重试失败SQL。
 - A前基线ad0b767在同一批执行结果上正确245/594；新规则正确252/594（42.4%），增加7条。并列量化单独未引起判定翻转；全部8个参考边界组的成员行数及哈希也与上一轮一致。历史strict一致率519/594（87.4%）及排除有意更宽后519/585（88.7%）同时保留。
 - #8只改已自动识别的count列、其他规则固定：S-S Q83从correct变wrong，正确数252→251；其余593条可比较结果不变。此为反事实，未修改正式判定或将#8标记已裁决。
+
+## 参考列量纲覆盖（2026-10-15）
+
+按参考查询的输出列位置计数，每个查询只计一次，不乘六个候选系统；不是去重列名数。通过 `DESCRIBE TABLE (<expected_sql>)` 在 `chdb-eval` 只读取100道参考查询的列名和类型，调用 `reference_value_kinds` 分类；99道参与评分题的量纲向量与本轮600条运行记录逐题完全一致。没有重跑候选，也没有开启 `exact_counts`。
+
+| 量纲 | 参与评分的99题：列数 | 占276列 | 全部100题：列数 | 占279列 |
+|---|---:|---:|---:|---:|
+| other | 121 | 43.84% | 123 | 44.09% |
+| count | 37 | 13.41% | 38 | 13.62% |
+| amount | 81 | 29.35% | 81 | 29.03% |
+| percentage | 31 | 11.23% | 31 | 11.11% |
+| ratio | 6 | 2.17% | 6 | 2.15% |
+| 合计 | 276 | 100% | 279 | 100% |
+
+Q33只取得列结构，不代表其参考结果可用，仍不进入评分分母。它贡献2列other、1列count。全部100题的123列other中，79列为String/Nullable(String)、1列Date、43列数值类型；包含维度/标识列，不能直接将other比例当作数值量纲漏判率。99题中对应为77列文本、1列日期、43列数值。
+
+以下为100题中被判为count的32个去重原始列名（99题为31个，唯一新增的是Q33的`times_together`）；这是分类结果供人工核对，并不表示已人工确认每一列的业务量纲：
+
+- `cohort_size`
+- `cohort_size_2007`
+- `count()`
+- `countDistinct(CustomerKey)`
+- `customer_count`
+- `customers`
+- `customers_analyzed`
+- `customers_in_cohort`
+- `direct_reports`
+- `discounted_orders`
+- `female_customers`
+- `holiday_days`
+- `n_customers`
+- `new_customers`
+- `num_transactions`
+- `observations`
+- `orders`
+- `product_count`
+- `production_employees`
+- `promos_analyzed`
+- `returned_2008`
+- `returned_2008_and_2009`
+- `returning_customers`
+- `store_count`
+- `stores`
+- `times_together`
+- `total_brands`
+- `total_orders`
+- `total_returns`
+- `total_sales`
+- `total_stores`
+- `units`
+
+新题的显式量纲声明要求已转交T05：元数据必须声明与参考输出列对应的`value_kinds`；`infer_value_kind`仅作交叉校验，不一致必须告警，不得静默覆盖声明。#8仍待用户裁决；此前诊断的唯一影响为S-S Q83 correct→wrong，正式规则仍保持`exact_counts=False`。
