@@ -113,6 +113,7 @@ templates/   Claude Code 的盲模式与普通模式设置模板
 
   两个仓库必须是同级目录（T01a 要在它们的上一级同时往两个仓库提交）。裁决见 `decisions/2026-10-14-paths-from-env.md`。
 - Mac：Python 3.11+、uv、chDB；指标层阶段另需 Docker（ClickHouse 服务、Cube Core）。
+- **Python 一律走 `uv run`**：`uv run python`、`uv run pytest`、`uv run python -c "..."`。依赖（`chdb`、`pyyaml`）装在项目虚拟环境里，裸 `python3` 走的是系统解释器、看不见它们，会报 `ModuleNotFoundError`。T08、T09、T10 都在这上面绊过。
 - Windows：Power BI Desktop、Python、ADOMD.NET（例如 pyadomd）；DAX 在 Desktop 打开 PBIP 后的本地 Analysis Services 端口上执行。
 - 模型：DeepSeek 官方 API（OpenAI 兼容格式）。思考模式开启（默认 high）；思考模式下 temperature 无效，不要设置。日志里记录接口返回的模型版本和题库的提交号。
 
