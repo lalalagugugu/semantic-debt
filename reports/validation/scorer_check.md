@@ -11,9 +11,9 @@
 
 ## 本次结果
 
-- strict 一致：**520/594（87.5%）**。
-- 排除本次仍存在的 12 条有意更宽差异：**520/582（89.3%）**。
-- analytical 一致：486/594（81.8%）。
+- strict 一致：**521/594（87.7%）**。
+- 排除本次仍存在的 11 条有意更宽差异：**521/583（89.4%）**。
+- analytical 一致：487/594（82.0%）。
 - 原因不明：0。
 
 | 系统 | 可比较 | strict一致 | 我们更宽 | 我们更严 |
@@ -21,7 +21,7 @@
 | O-R | 99 | 91 | 2 | 6 |
 | O-S | 99 | 85 | 3 | 11 |
 | S-R | 99 | 91 | 2 | 6 |
-| S-S | 99 | 86 | 4 | 9 |
+| S-S | 99 | 87 | 3 | 9 |
 | G-R | 99 | 85 | 5 | 9 |
 | G-S | 99 | 82 | 3 | 14 |
 
@@ -61,9 +61,9 @@
 
 ## 格式敏感性（不改变判定）
 
-严格准确率为 **252/594（42.4%）**；加上数值投影匹配的 15 条判错结果，格式敏感性上界为 **267/594（44.9%）**。这不是与外部judge的一致率。
+严格准确率为 **251/594（42.3%）**；加上数值投影匹配的 15 条判错结果，格式敏感性上界为 **266/594（44.8%）**。这不是与外部judge的一致率。
 
-wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 143, 'string_or_label_only': 15, 'no_numeric_reference': 4}`。exec_error/refused/excluded不被格式放宽挽回。
+wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 144, 'string_or_label_only': 15, 'no_numeric_reference': 4}`。exec_error/refused/excluded不被格式放宽挽回。
 
 数值投影保留联合行匹配、完整行数、NULL、排序、Top-N及每一数值参考列；删除非数值列只产生报告层上界，不证明标签指向同一实体。数字编码的维度（如月份）也视为数值列：改成文字时保守地不算纯格式挽回；没有角色元数据时不猜业务含义。纯文本参考标为no_numeric_reference，结构不符单列，不当作数值计算错。
 
@@ -111,7 +111,6 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 143, 'strin
 | S-S | Q75 | wrong | pass | 额外候选行 | 候选1470行、参考25行；完整结果行数不符。 |
 | S-S | Q80 | wrong | pass | 额外候选行 | 同 O-R Q80，多行与缺列并存。 |
 | S-S | Q82 | wrong | pass | 参考列缺失 | 缺职位列，候选用键替代；不是缺度量。 |
-| S-S | Q83 | correct | fail | 数值容差 | 冻结规则第4/5/2条有意更宽（按类别）。 |
 | S-S | Q88 | wrong | pass | 标签或列组合 | 值表示或姓名列组合不同；额外列不会恢复所需的原始参考列。 |
 | S-S | Q92 | wrong | pass | 额外候选行 | 多行之外，缺参考百分比列，用成本列替代；不是单纯超集。 |
 | G-R | Q07 | correct | fail | 边界并列 | 冻结规则第4/5/2条有意更宽（按类别）。 |
@@ -532,7 +531,7 @@ wrong标记计数：`{'structure_mismatch': 141, 'numeric_mismatch': 143, 'strin
 | S-S | Q80 | wrong | pass | pass | row_count | structure_mismatch |
 | S-S | Q81 | exec_error | fail | fail | execution_error | — |
 | S-S | Q82 | wrong | pass | pass | values | string_or_label_only |
-| S-S | Q83 | correct | fail | fail | matched | — |
+| S-S | Q83 | wrong | fail | fail | values | numeric_mismatch |
 | S-S | Q84 | wrong | fail | fail | missing_columns | numeric_mismatch |
 | S-S | Q85 | exec_error | fail | fail | execution_error | — |
 | S-S | Q86 | wrong | fail | fail | row_count | structure_mismatch |
@@ -762,9 +761,9 @@ uv run python scripts/validate_scorer.py --output /tmp/t02-scorer-check-ruling.j
 
 T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落实跨执行器可复现边界组要求，不能用本卡三次SQL重复取代跨厂商独立重算。G0/G4须同时披露历史低一致率、当前数字、系统性影响和敏感性上界，不能声称跨厂商独立核对已完成。
 
-## 2026-10-15 A裁决：放宽翻转与#8估算
+## 2026-10-15 A裁决与计数收紧
 
-旧提交ad0b767到本次wrong→correct：7条；固定本次并列参考、仅加atol的wrong→correct：7条；反向翻转0条（运行时强制检查）。
+旧提交ad0b767到本次wrong→correct：7条；固定本次并列参考、仅加atol的wrong→correct：7条；A裁决历史为7条wrong→correct、0条反向（strict520/594；排除12条有意更宽后520/582）。本轮另按#8收紧计数，见下表。
 
 | 系统 | 题号 | 旧判定 | 新判定 | 量纲向量 |
 |---|---|---|---|---|
@@ -776,15 +775,17 @@ T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落�
 | G-R | Q37 | wrong | correct | ['other', 'amount', 'percentage'] |
 | G-S | Q29 | wrong | correct | ['percentage'] |
 
-#8反事实：在新规则正确结果中，仅将自动标为count的参考列改成精确相等，有 **1 条correct→wrong**。这是估算，不进入正式判定；没有手工按题号选计数列。识别依赖名称/类型契约，未知单位列保守按other，不纳入count反事实。
+#8正式裁决：exact_counts=True，仅count且参考返回整数型时候选==参考；不使用相对容差、atol或百分数换算。与同批关闭开关的结果相比共1条翻转。每条均检查方向；预期外翻转立即停止。
 
-| 系统 | 题号 | 正式 | 计数精确反事实 |
+是否同时与上一轮600条记录逐条核对：True。
+
+| 系统 | 题号 | 收紧前 | 正式判定 |
 |---|---|---|---|
 | S-S | Q83 | correct | wrong |
 
 ## 自动量纲与并列量化契约
 
-参考列名按CamelCase/下划线拆词、忽略大小写，固定优先级：百分比(pct/percent/percentage/percentile/pp) → 比率(ratio/rate/correlation/corr) → 计数(count/countDistinct/num/n/customers/orders/stores/brands/employees/observations/reports/units/returns、cohort size、returned) → 金额(amount/amt/revenue/sales/spend/spent/cost/cogs/price/profit/income/budget/quota/ltv/dollars/discount/margin、lifetime value) → other。整数类型的sales聚合且名称不含amount/price/revenue时归count。不读取候选列名，COUNT/countDistinct/countIf/uniqExact表达式的输出别名优先标为count；不按数值大小或题号猜单位；别名必须表达单位，不能识别时atol=0。未来harness透传同样自动生成的value_kinds。
+参考列名按CamelCase/下划线拆词、忽略大小写，固定优先级：百分比(pct/percent/percentage/percentile/pp) → 比率(ratio/rate/correlation/corr) → 计数(count/countDistinct/num/n/customers/orders/stores/brands/employees/observations/reports/units/returns、cohort size、returned) → 金额(amount/amt/revenue/sales/spend/spent/cost/cogs/price/profit/income/budget/quota/ltv/dollars/discount/margin、lifetime value) → other。整数类型的sales聚合且名称不含amount/price/revenue时归count。不读取候选列名，COUNT/countDistinct/countIf/uniqExact表达式的输出别名优先标为count；不按数值大小或题号猜单位；别名必须表达单位，不能识别时atol=0。外部旧题由适配器推断；T05新题显式声明value_kinds，infer_value_kind仅交叉校验，不一致告警。harness还须透传参考返回类型value_types。
 
 比率atol=1e-4；百分比按小数形式归一后atol=1e-4（原百分比数值单位相当于0.01）；金额atol=0.01；其余0。只增加结果匹配边，不进入并列键。金额并列键Decimal保留2位、比率小数形式6位、其他数值6位；ROUND_HALF_EVEN一次固定，不逐题指定。名称推断有覆盖边界：不是语义证明，未知列不享受额外容差。
 
@@ -891,19 +892,18 @@ T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落�
 | Q99 | ['other', 'amount', 'amount', 'percentage'] |
 | Q100 | ['other', 'count', 'other', 'amount'] |
 
-## 本轮运行记录
+## 历史运行记录保留
 
-- 首次预跑因COUNT表达式识别器的回归测试发现问题而主动中止，未作为验收结果。
-- 中止过程中旧查询尚未结束，首次重启被chdb-eval锁拒绝；确认旧进程退出并释放锁后才开始最终运行。该连接失败未混入候选结果。
-- 最终完整执行600条：correct=252、wrong=303、exec_error=39、Q33公开参考不可用而excluded=6。每个候选只执行一次；三份评分共用同一执行结果，不静默重试失败SQL。
-- A前基线ad0b767在同一批执行结果上正确245/594；新规则正确252/594（42.4%），增加7条。并列量化单独未引起判定翻转；全部8个参考边界组的成员行数及哈希也与上一轮一致。历史strict一致率519/594（87.4%）及排除有意更宽后519/585（88.7%）同时保留。
-- #8只改已自动识别的count列、其他规则固定：S-S Q83从correct变wrong，正确数252→251；其余593条可比较结果不变。此为反事实，未修改正式判定或将#8标记已裁决。
+- A轮之前：strict519/594（87.4%），排除9条有意更宽后519/585（88.7%）。
+- A轮：correct252、wrong303、exec_error39、excluded6；strict520/594（87.5%），排除12条有意更宽后520/582（89.3%）；7条wrong→correct、0条反向。
+- A轮首次预跑因COUNT识别器回归测试发现问题而中止；中止时旧查询未结束，首次重启遇到chdb-eval锁；确认旧进程退出后才完成验收运行。预跑和连接失败未混入候选结果。
+- 当时#8仅做反事实，估算S-S Q83一条correct→wrong；本轮按用户裁决正式执行，并增加参考整数类型守卫。
 
-## 参考列量纲覆盖（2026-10-15）
+## 参考列量纲覆盖与整数类型守卫
 
-按参考查询的输出列位置计数，每个查询只计一次，不乘六个候选系统；不是去重列名数。通过 `DESCRIBE TABLE (<expected_sql>)` 在 `chdb-eval` 只读取100道参考查询的列名和类型，调用 `reference_value_kinds` 分类；99道参与评分题的量纲向量与本轮600条运行记录逐题完全一致。没有重跑候选，也没有开启 `exact_counts`。
+每道参考查询只计一次，按列位置计数，不乘六个系统。99题的类型来自本次参考查询JSONCompact元数据；Q33只通过DESCRIBE TABLE取列结构，仍排除评分。
 
-| 量纲 | 参与评分的99题：列数 | 占276列 | 全部100题：列数 | 占279列 |
+| 量纲 | 99题列数 | 占276列 | 100题列数 | 占279列 |
 |---|---:|---:|---:|---:|
 | other | 121 | 43.84% | 123 | 44.09% |
 | count | 37 | 13.41% | 38 | 13.62% |
@@ -912,9 +912,24 @@ T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落�
 | ratio | 6 | 2.17% | 6 | 2.15% |
 | 合计 | 276 | 100% | 279 | 100% |
 
-Q33只取得列结构，不代表其参考结果可用，仍不进入评分分母。它贡献2列other、1列count。全部100题的123列other中，79列为String/Nullable(String)、1列Date、43列数值类型；包含维度/标识列，不能直接将other比例当作数值量纲漏判率。99题中对应为77列文本、1列日期、43列数值。
+### 数值类型却判为other
 
-以下为100题中被判为count的32个去重原始列名（99题为31个，唯一新增的是Q33的`times_together`）；这是分类结果供人工核对，并不表示已人工确认每一列的业务量纲：
+- 参与评分99题：**43列**；占198个数值列的**21.72%**，占全部276列的15.58%。
+- 全部100题：**43列**；占199个数值列的**21.61%**，占全部279列的15.41%。
+
+这是数值列未获量纲atol覆盖的比例；其中也可能有年份、标识等本就不应享受atol的维度列，不等于已确认的金额/比率语义漏判率。
+
+### count但参考类型非整数：继续按0.5%相对容差
+
+以下按题号和列位置列全；不按值是否整除、大小或候选类型决定。整数守卫只接受Int/UInt8/16/32/64/128/256（含Nullable/LowCardinality包装）。
+
+| 题号 | 列位置（1起） | 参考列名 | 返回类型 |
+|---|---:|---|---|
+| — | — | 无 | — |
+
+共0个列位置、0个去重列名。
+
+### count去重列名（全部100题）
 
 - `cohort_size`
 - `cohort_size_2007`
@@ -949,4 +964,10 @@ Q33只取得列结构，不代表其参考结果可用，仍不进入评分分�
 - `total_stores`
 - `units`
 
-新题的显式量纲声明要求已转交T05：元数据必须声明与参考输出列对应的`value_kinds`；`infer_value_kind`仅作交叉校验，不一致必须告警，不得静默覆盖声明。#8仍待用户裁决；此前诊断的唯一影响为S-S Q83 correct→wrong，正式规则仍保持`exact_counts=False`。
+## 本次#8运行验证记录
+
+- 全仓库116个测试通过；`git diff --check`通过。
+- 全部600条重新执行，未重试候选；correct251、wrong304、exec_error39、excluded6。
+- 上轮记录`/tmp/t02-unit-check-final.json`逐条核对：唯一S-S Q83 correct→wrong，其余599条（含6条excluded）不变；同批开关前后比较也只有该条翻转。所有8个边界组的成员行数及哈希与上一轮一致。
+- 原始本次输出保存在运行机`/tmp/t02-integer-count-check.json`，包含参考列名/类型/量纲、开关前后判定、上一轮判定和全部600条结果。问题原文与SQL不进入输出。
+- 本次命令（先设置SEMDEBT_EVAL_DIR、SEMDEBT_DATA_DIR）：`.venv/bin/python scripts/validate_scorer.py --previous-results /tmp/t02-unit-check-final.json --output /tmp/t02-integer-count-check.json --report reports/validation/scorer_check.md`。

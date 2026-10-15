@@ -32,6 +32,23 @@ def infer_value_kind(column_name: str, column_type: str = "") -> ValueKind:
     return "other"
 
 
+def _unwrapped_type(column_type: str) -> str:
+    value = column_type.strip()
+    while match := re.fullmatch(r"(?:Nullable|LowCardinality)\((.*)\)", value, re.IGNORECASE):
+        value = match.group(1).strip()
+    return value
+
+
+def is_integer_type(column_type: str) -> bool:
+    """Use declared reference types, never cell values or nested array types."""
+    return re.fullmatch(r"U?Int(?:8|16|32|64|128|256)", _unwrapped_type(column_type), re.IGNORECASE) is not None
+
+
+def is_numeric_type(column_type: str) -> bool:
+    value = _unwrapped_type(column_type)
+    return is_integer_type(value) or re.fullmatch(r"Float(?:32|64)|BFloat16|Decimal(?:32|64|128|256)?\([^()]+\)", value, re.IGNORECASE) is not None
+
+
 def absolute_tolerance(kind: ValueKind) -> float:
     # Percentage reference values are in percentage points; normalize to a
     # fraction before applying 1e-4, equivalent to 0.01 in the original unit.
