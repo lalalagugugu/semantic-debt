@@ -25,8 +25,8 @@
 
 ## 2026-10-15：量纲绝对容差与跨引擎并列
 
-参考结果的每一列有 `value_kinds`，由 `harness/value_units.py` 的全局参考列名称规则自动生成；验证适配器补充参考返回类型及COUNT表达式别名。不依赖题号、候选列名称或数值大小。不能识别的列为other，atol=0；别名必须表达量纲，识别边界在校验报告中公开。未提供value_kinds的旧调用仍按other处理；新harness必须透传自动生成的参考列量纲，列顺序跟随参考，不跟随候选。
+参考结果的每一列有 `value_kinds`；外部旧题由 `harness/value_units.py` 的全局参考列名称规则自动生成，验证适配器补充参考返回类型及COUNT表达式别名。不依赖题号、候选列名称或数值大小。不能识别的列为other，atol=0；别名必须表达量纲，识别边界在校验报告中公开。未提供value_kinds的旧调用仍按other处理；外部旧题由适配器推断；T05新题显式声明value_kinds，infer_value_kind仅交叉校验、不一致告警。新harness必须同时透传参考返回类型`value_types`（逐列类型字符串），列顺序跟随参考，不跟随候选。
 
-相等判定是 `abs(candidate-reference) <= max(0.005*abs(reference), atol)`：金额0.01、比率小数形式1e-4、百分比先归一到小数（原百分比单位下等价于0.01），其余0。保留所有旧匹配；参考为零时不猜候选是否换了100倍单位。`use_absolute_tolerance=false`只用于诊断旧容差；`exact_counts=true`只用于待裁决#8的反事实，不进入正式评分。
+相等判定是 `abs(candidate-reference) <= max(0.005*abs(reference), atol)`：金额0.01、比率小数形式1e-4、百分比先归一到小数（原百分比单位下等价于0.01），其余0。除下述整数计数收紧外保留旧匹配；参考为零时不猜候选是否换了100倍单位。`use_absolute_tolerance=false`只用于诊断旧容差；`exact_counts=true`已按用户#8裁决成为默认正式规则：只有`value_kinds[i]=="count"`且`value_types[i]`为整数返回类型时，候选数值必须`==`参考数值，不用相对容差、atol或百分数换算。类型守卫识别Int/UInt8/16/32/64/128/256及Nullable/LowCardinality包装，不依据Python单元格类型、整数外观、数值大小或候选类型。非整数count仍按0.5%相对容差；旧调用缺少类型时无法证实整数，不启用精确相等，新harness不得遗漏类型。`exact_counts=false`仅用于收紧前的诊断对照。
 
 并列键与atol独立：Decimal(str(value))，ROUND_HALF_EVEN，金额2位、比率小数形式6位、其余数值6位。不得逐题选精度。T05b复现的是量化键和完整成员集合，不是跨引擎原始浮点哈希；单引擎三次原始参考哈希仅为运行稳定性检查。规则版本为2026-10-15，未来更改需统一迁移与重新评分。

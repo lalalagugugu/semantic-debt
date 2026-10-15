@@ -223,14 +223,47 @@ def test_absolute_tolerance_does_not_merge_money_ties() -> None:
         score([('B',0.0)], [[('A',0.01),('B',0.0)]], rules)
 
 
-def test_count_exactness_is_counterfactual_only() -> None:
-    rules = {**UNORDERED,'value_kinds':['count']}
-    assert score([(10040,)], [[(10000,)]], rules) == 'correct'
+def test_integer_count_exactness_is_default() -> None:
+    rules = {**UNORDERED,'value_kinds':['count'],'value_types':['UInt64']}
+    assert score([(10040,)], [[(10000,)]], {**rules,'exact_counts':False}) == 'correct'
+    assert score([(10040,)], [[(10000,)]], rules) == 'wrong'
     assert score([(10040,)], [[(10000,)]], {**rules,'exact_counts':True}) == 'wrong'
     assert score([(10000,)], [[(10000,)]], {**rules,'exact_counts':True}) == 'correct'
 
 
 def test_unit_metadata_tracks_reference_columns_after_permutation() -> None:
-    rules={**UNORDERED,'value_kinds':['amount','count']}
+    rules={**UNORDERED,'value_kinds':['amount','count'],'value_types':['Float64','UInt64']}
     assert score([(10000,0.009)], [[(0.0,10000)]], rules) == 'correct'
     assert score([(10040,0.009)], [[(0.0,10000)]], {**rules,'exact_counts':True}) == 'wrong'
+
+
+@pytest.mark.parametrize('column_type', ['Int8', 'UInt64', 'Int128', 'Nullable(UInt256)', 'LowCardinality(Nullable(Int32))', 'int64'])
+def test_count_guard_uses_reference_integer_return_type(column_type) -> None:
+    rules = {**UNORDERED, 'value_kinds': ['count'], 'value_types': [column_type]}
+    assert score([(10040,)], [[(10000,)]], rules) == 'wrong'
+    assert score([(10000.0,)], [[(10000,)]], rules) == 'correct'
+    assert score([(100,)], [[(10000,)]], rules) == 'wrong'
+    assert score([(2**60+1,)], [[(2**60,)]], rules) == 'wrong'
+
+
+@pytest.mark.parametrize('column_type', ['Float64', 'Nullable(Float64)', 'Decimal(18, 2)', 'Array(UInt64)', 'String'])
+def test_noninteger_count_keeps_relative_tolerance_even_for_integral_values(column_type) -> None:
+    rules = {**UNORDERED, 'value_kinds': ['count'], 'value_types': [column_type]}
+    assert score([(10040,)], [[(10000,)]], rules) == 'correct'
+    assert score([(10060,)], [[(10000,)]], rules) == 'wrong'
+    assert score([(0.00001,)], [[(0,)]], rules) == 'wrong'
+
+
+def test_missing_type_does_not_guess_integer_from_value() -> None:
+    assert score([(10040,)], [[(10000,)]], {**UNORDERED, 'value_kinds': ['count']}) == 'correct'
+    assert score([(10040,)], [[(10000,)]], {**UNORDERED, 'value_kinds': ['other'], 'value_types': ['UInt64']}) == 'correct'
+
+
+def test_type_metadata_checked_and_projected_with_sensitivity() -> None:
+    rules = {**UNORDERED, 'value_kinds': ['other', 'count'], 'value_types': ['String', 'UInt64']}
+    assert score_detailed([(10040, 'X')], [[('A',10000)]], rules).sensitivity == 'numeric_mismatch'
+    assert score_detailed([(10000, 'X')], [[('A',10000)]], rules).sensitivity == 'string_or_label_only'
+    with pytest.raises(ValueError, match='reference column count'):
+        score([('A',10000)], [[('A',10000)]], {**rules, 'value_types': ['String']})
+    with pytest.raises(ValueError, match='value_types'):
+        score([(1,)], [[(1,)]], {**UNORDERED, 'value_types': 'UInt64'})

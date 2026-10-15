@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Re-execute the public benchmark and compare deterministic verdicts.
 
-The output contains only system names, question IDs, verdicts, row counts, and
-diagnostic codes.  Questions and SQL remain in ``SEMDEBT_EVAL_DIR``.
+The output contains verdict diagnostics and reference-column unit/type metadata.
+Questions and SQL remain in ``SEMDEBT_EVAL_DIR``.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 from harness.scorer import ExecError, score_detailed  # noqa: E402
-from harness.value_units import infer_value_kind, quantize_tie  # noqa: E402
+from harness.value_units import infer_value_kind, is_integer_type, is_numeric_type, quantize_tie  # noqa: E402
 
 
 RUN_ID = "paper-2026-04-22"
@@ -57,6 +57,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--eval-dir", type=Path, default=Path(eval_dir))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, help="write the complete ID-only validation report")
+    parser.add_argument("--previous-results", type=Path, help="compare every verdict with the preceding 600-record run")
     return parser.parse_args(argv)
 
 
@@ -141,6 +142,8 @@ def stable_reference(sess: Any, sql: str, question_id: int, rules: dict[str, obj
     payload = json.loads(str(sess.query(expanded, "JSONCompact")))
     rows = payload["data"]
     rules["value_kinds"] = reference_value_kinds(sql, payload["meta"])
+    rules["value_types"] = [column["type"] for column in payload["meta"]]
+    rules["reference_columns"] = payload["meta"]
     if isinstance(rows, ExecError):
         raise RuntimeError(f"q{question_id:02d} reference failed: {rows.message}")
     if rules["top_n"] is None:
@@ -187,7 +190,6 @@ INTENTIONAL_BROADER = {
     ("G-R", 7): "边界并列", ("O-S", 27): "边界并列", ("S-S", 27): "边界并列",
     ("S-R", 37): "百分数等价", ("S-S", 64): "百分数等价", ("G-S", 64): "百分数等价",
     ("O-R", 96): "百分数等价", ("O-S", 96): "百分数等价", ("G-R", 96): "百分数等价", ("G-S", 96): "百分数等价",
-    ("S-S", 83): "数值容差",
 }
 
 
@@ -200,6 +202,34 @@ def reviewed_categories() -> dict[tuple[str, int], tuple[str, str]]:
     if len(reviewed) != 68:
         raise ValueError("expected the reviewed 68-case category ledger")
     return reviewed
+
+
+def verify_count_transition(system: str, question_id: int, before: str, after: str) -> None:
+    if before != after and (SYSTEM_LABELS[system], question_id, before, after) != ("S-S", 83, "correct", "wrong"):
+        raise RuntimeError(f"unexpected flip: {SYSTEM_LABELS[system]} Q{question_id:02d} {before} -> {after}; stop for user review")
+
+
+def reference_column_report(columns: list[dict[str, Any]]) -> list[str]:
+    active = [c for c in columns if c["question_id"] not in EXCLUDED_QUESTION_IDS]
+    lines = ["", "## 参考列量纲覆盖与整数类型守卫", "", "每道参考查询只计一次，按列位置计数，不乘六个系统。99题的类型来自本次参考查询JSONCompact元数据；Q33只通过DESCRIBE TABLE取列结构，仍排除评分。", "", f"| 量纲 | 99题列数 | 占{len(active)}列 | 100题列数 | 占{len(columns)}列 |", "|---|---:|---:|---:|---:|"]
+    for kind in ("other", "count", "amount", "percentage", "ratio"):
+        n = sum(c["kind"] == kind for c in active)
+        all_n = sum(c["kind"] == kind for c in columns)
+        lines.append(f"| {kind} | {n} | {n/len(active):.2%} | {all_n} | {all_n/len(columns):.2%} |")
+    lines += [f"| 合计 | {len(active)} | 100% | {len(columns)} | 100% |", "", "### 数值类型却判为other", ""]
+    for label, group in (("参与评分99题", active), ("全部100题", columns)):
+        numeric = [c for c in group if is_numeric_type(c["type"])]
+        unknown = [c for c in numeric if c["kind"] == "other"]
+        lines.append(f"- {label}：**{len(unknown)}列**；占{len(numeric)}个数值列的**{len(unknown)/len(numeric):.2%}**，占全部{len(group)}列的{len(unknown)/len(group):.2%}。")
+    lines += ["", "这是数值列未获量纲atol覆盖的比例；其中也可能有年份、标识等本就不应享受atol的维度列，不等于已确认的金额/比率语义漏判率。", "", "### count但参考类型非整数：继续按0.5%相对容差", "", "以下按题号和列位置列全；不按值是否整除、大小或候选类型决定。整数守卫只接受Int/UInt8/16/32/64/128/256（含Nullable/LowCardinality包装）。", "", "| 题号 | 列位置（1起） | 参考列名 | 返回类型 |", "|---|---:|---|---|"]
+    skipped = [c for c in columns if c["kind"] == "count" and not is_integer_type(c["type"])]
+    if not skipped:
+        lines.append("| — | — | 无 | — |")
+    for c in skipped:
+        lines.append(f"| Q{c['question_id']:02d} | {c['position']} | `{c['name']}` | `{c['type']}` |")
+    lines += ["", f"共{len(skipped)}个列位置、{len({c['name'] for c in skipped})}个去重列名。", "", "### count去重列名（全部100题）", ""]
+    lines += [f"- `{name}`" for name in sorted({c["name"] for c in columns if c["kind"] == "count"})]
+    return lines
 
 
 def report_from_results(output: dict[str, Any], path: Path) -> None:
@@ -254,19 +284,21 @@ def report_from_results(output: dict[str, Any], path: Path) -> None:
     lines += ["", "## 复现与验收边界", "", "```bash", "uv run pytest", "uv run python scripts/validate_scorer.py --output /tmp/t02-scorer-check-ruling.json --report reports/validation/scorer_check.md", "```", "", "运行前设置SEMDEBT_EVAL_DIR、SEMDEBT_DATA_DIR；固定本报告的运行版本，单进程独占chdb-eval。所有候选原样执行，重执行或参考失败不静默重试。", "", "T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落实跨执行器可复现边界组要求，不能用本卡三次SQL重复取代跨厂商独立重算。G0/G4须同时披露历史低一致率、当前数字、系统性影响和敏感性上界，不能声称跨厂商独立核对已完成。"]
     flipped = [r for r in comparable if r.get("baseline_outcome") == "wrong" and r["our_outcome"] == "correct"]
     atol_flipped = [r for r in comparable if r.get("relative_only_outcome") == "wrong" and r["our_outcome"] == "correct"]
-    count_flipped = [r for r in comparable if r["our_outcome"] == "correct" and r.get("exact_count_outcome") == "wrong"]
-    lines += ["", "## 2026-10-15 A裁决：放宽翻转与#8估算", "", f"旧提交{output.get('baseline_ref')}到本次wrong→correct：{len(flipped)}条；固定本次并列参考、仅加atol的wrong→correct：{len(atol_flipped)}条；反向翻转0条（运行时强制检查）。", "", "| 系统 | 题号 | 旧判定 | 新判定 | 量纲向量 |", "|---|---|---|---|---|"]
+    count_flipped = [r for r in comparable if r.get("before_count_outcome") != r["our_outcome"]]
+    lines += ["", "## 2026-10-15 A裁决与计数收紧", "", f"旧提交{output.get('baseline_ref')}到本次wrong→correct：{len(flipped)}条；固定本次并列参考、仅加atol的wrong→correct：{len(atol_flipped)}条；A裁决历史为7条wrong→correct、0条反向（strict520/594；排除12条有意更宽后520/582）。本轮另按#8收紧计数，见下表。", "", "| 系统 | 题号 | 旧判定 | 新判定 | 量纲向量 |", "|---|---|---|---|---|"]
     for r in flipped:
         lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | wrong | correct | {r['value_kinds']} |")
-    lines += ["", f"#8反事实：在新规则正确结果中，仅将自动标为count的参考列改成精确相等，有 **{len(count_flipped)} 条correct→wrong**。这是估算，不进入正式判定；没有手工按题号选计数列。识别依赖名称/类型契约，未知单位列保守按other，不纳入count反事实。", "", "| 系统 | 题号 | 正式 | 计数精确反事实 |", "|---|---|---|---|"]
+    lines += ["", f"#8正式裁决：exact_counts=True，仅count且参考返回整数型时候选==参考；不使用相对容差、atol或百分数换算。与同批关闭开关的结果相比共{len(count_flipped)}条翻转。每条均检查方向；预期外翻转立即停止。", "", f"是否同时与上一轮600条记录逐条核对：{output['previous_results_compared']}。", "", "| 系统 | 题号 | 收紧前 | 正式判定 |", "|---|---|---|---|"]
     for r in count_flipped:
-        lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | correct | wrong |")
-    lines += ["", "## 自动量纲与并列量化契约", "", "参考列名按CamelCase/下划线拆词、忽略大小写，固定优先级：百分比(pct/percent/percentage/percentile/pp) → 比率(ratio/rate/correlation/corr) → 计数(count/countDistinct/num/n/customers/orders/stores/brands/employees/observations/reports/units/returns、cohort size、returned) → 金额(amount/amt/revenue/sales/spend/spent/cost/cogs/price/profit/income/budget/quota/ltv/dollars/discount/margin、lifetime value) → other。整数类型的sales聚合且名称不含amount/price/revenue时归count。不读取候选列名，COUNT/countDistinct/countIf/uniqExact表达式的输出别名优先标为count；不按数值大小或题号猜单位；别名必须表达单位，不能识别时atol=0。未来harness透传同样自动生成的value_kinds。", "", "比率atol=1e-4；百分比按小数形式归一后atol=1e-4（原百分比数值单位相当于0.01）；金额atol=0.01；其余0。只增加结果匹配边，不进入并列键。金额并列键Decimal保留2位、比率小数形式6位、其他数值6位；ROUND_HALF_EVEN一次固定，不逐题指定。名称推断有覆盖边界：不是语义证明，未知列不享受额外容差。", "", "| 题号 | 自动参考列量纲（顺序对应参考列） |", "|---|---|"]
+        lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | {r['before_count_outcome']} | {r['our_outcome']} |")
+    lines += ["", "## 自动量纲与并列量化契约", "", "参考列名按CamelCase/下划线拆词、忽略大小写，固定优先级：百分比(pct/percent/percentage/percentile/pp) → 比率(ratio/rate/correlation/corr) → 计数(count/countDistinct/num/n/customers/orders/stores/brands/employees/observations/reports/units/returns、cohort size、returned) → 金额(amount/amt/revenue/sales/spend/spent/cost/cogs/price/profit/income/budget/quota/ltv/dollars/discount/margin、lifetime value) → other。整数类型的sales聚合且名称不含amount/price/revenue时归count。不读取候选列名，COUNT/countDistinct/countIf/uniqExact表达式的输出别名优先标为count；不按数值大小或题号猜单位；别名必须表达单位，不能识别时atol=0。外部旧题由适配器推断；T05新题显式声明value_kinds，infer_value_kind仅交叉校验，不一致告警。harness还须透传参考返回类型value_types。", "", "比率atol=1e-4；百分比按小数形式归一后atol=1e-4（原百分比数值单位相当于0.01）；金额atol=0.01；其余0。只增加结果匹配边，不进入并列键。金额并列键Decimal保留2位、比率小数形式6位、其他数值6位；ROUND_HALF_EVEN一次固定，不逐题指定。名称推断有覆盖边界：不是语义证明，未知列不享受额外容差。", "", "| 题号 | 自动参考列量纲（顺序对应参考列） |", "|---|---|"]
     seen = set()
     for r in records:
         if r['question_id'] not in seen:
             lines.append(f"| Q{r['question_id']:02} | {r.get('value_kinds', [])} |")
             seen.add(r['question_id'])
+    lines += ["", "## 历史运行记录保留", "", "- A轮之前：strict519/594（87.4%），排除9条有意更宽后519/585（88.7%）。", "- A轮：correct252、wrong303、exec_error39、excluded6；strict520/594（87.5%），排除12条有意更宽后520/582（89.3%）；7条wrong→correct、0条反向。", "- A轮首次预跑因COUNT识别器回归测试发现问题而中止；中止时旧查询未结束，首次重启遇到chdb-eval锁；确认旧进程退出后才完成验收运行。预跑和连接失败未混入候选结果。", "- 当时#8仅做反事实，估算S-S Q83一条correct→wrong；本轮按用户裁决正式执行，并增加参考整数类型守卫。"]
+    lines += reference_column_report(output["reference_columns"])
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     if unexplained:
@@ -290,7 +322,15 @@ def main(argv: list[str] | None = None) -> int:
     from chdb import session
 
     sess = session.Session(str(args.db_dir))
+    previous = None
+    if args.previous_results is not None:
+        prior_records = load_json(args.previous_results)["records"]
+        previous = {(r["system"], r["question_id"]): r["our_outcome"] for r in prior_records}
+        expected_keys = {(system, qid) for system in systems for qid in questions}
+        if set(previous) != expected_keys or len(prior_records) != 600:
+            raise ValueError("previous results must contain exactly the same 600 system/question keys")
     records: list[dict[str, object]] = []
+    reference_columns = []
     references: dict[int, list[list[object]] | ExecError] = {}
     legacy_references = {}
     baseline_ref = "ad0b767"
@@ -307,8 +347,14 @@ def main(argv: list[str] | None = None) -> int:
         for question_id, question in sorted(questions.items()):
             if question_id in EXCLUDED_QUESTION_IDS:
                 references[question_id] = ExecError("published reference excluded")
+                schema = json.loads(str(sess.query("DESCRIBE TABLE (" + question["expected_sql"].strip().rstrip(";") + ")", "JSONCompact")))
+                meta = [{"name": row[0], "type": row[1]} for row in schema["data"]]
+                kinds = reference_value_kinds(question["expected_sql"], meta)
+                reference_columns.extend({"question_id": question_id, "position": i + 1, **column, "kind": kind} for i, (column, kind) in enumerate(zip(meta, kinds)))
                 continue
             references[question_id], check, legacy_references[question_id] = stable_reference(sess, question["expected_sql"], question_id, rules_by_id[question_id])
+            rule = rules_by_id[question_id]
+            reference_columns.extend({"question_id": question_id, "position": i + 1, **column, "kind": kind} for i, (column, kind) in enumerate(zip(rule["reference_columns"], rule["value_kinds"])))
             if check is not None:
                 boundary_checks.append(check)
 
@@ -326,23 +372,27 @@ def main(argv: list[str] | None = None) -> int:
                     result_reason = "published_reference_unavailable"
                     reference_count = None
                     sensitivity = None
-                    old_outcome = exact_outcome = tolerance_baseline = "excluded"
+                    old_outcome = exact_outcome = tolerance_baseline = before_count = "excluded"
                 elif isinstance(reference, ExecError):
                     raise AssertionError("unexpected reference error")
                 else:
                     rules = rules_by_id[question_id]
                     old_candidate = baseline.ExecError(candidate.message) if isinstance(candidate, ExecError) else candidate
                     old_outcome = baseline.score(old_candidate, [legacy_references[question_id]], rules)
-                    tolerance_baseline = score_detailed(candidate, [reference], {**rules, "use_absolute_tolerance": False}).outcome
-                    result = score_detailed(candidate, [reference], rules)
-                    exact_outcome = score_detailed(candidate, [reference], {**rules, "exact_counts": True}).outcome
-                    if (old_outcome == "correct" or tolerance_baseline == "correct") and result.outcome != "correct":
-                        raise RuntimeError(f"q{question_id:02d} {system}: reverse flip from correct")
+                    tolerance_baseline = score_detailed(candidate, [reference], {**rules, "exact_counts": False, "use_absolute_tolerance": False}).outcome
+                    before_count = score_detailed(candidate, [reference], {**rules, "exact_counts": False}).outcome
+                    result = score_detailed(candidate, [reference], {**rules, "exact_counts": True})
+                    exact_outcome = result.outcome
+                    verify_count_transition(system, question_id, before_count, result.outcome)
                     result_outcome = result.outcome
                     result_reason = ("execution_environment_incompatible" if "UNKNOWN_FUNCTION" in candidate.message else "execution_error") if isinstance(candidate, ExecError) else result.reason
                     reference_count = len(reference)
                     sensitivity = result.sensitivity
 
+                if previous is not None:
+                    verify_count_transition(system, question_id, previous[(system, question_id)], result_outcome)
+                    if previous[(system, question_id)] != before_count:
+                        raise RuntimeError(f"{SYSTEM_LABELS[system]} Q{question_id:02d}: pre-count verdict differs from prior run; stop for user review")
                 records.append(
                     {
                         "system": system,
@@ -353,6 +403,9 @@ def main(argv: list[str] | None = None) -> int:
                         "baseline_outcome": old_outcome,
                         "relative_only_outcome": tolerance_baseline,
                         "exact_count_outcome": exact_outcome,
+                        "before_count_outcome": before_count,
+                        "previous_outcome": previous[(system, question_id)] if previous is not None else None,
+                        "value_types": rules_by_id[question_id].get("value_types", []),
                         "value_kinds": rules_by_id[question_id].get("value_kinds", []),
                         "ordered": rules_by_id[question_id]["ordered"],
                         "strict": strict_record["verdict"],
@@ -368,6 +421,9 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         sess.close()
 
+    flips = [r for r in records if r["before_count_outcome"] != r["our_outcome"]]
+    if len(flips) != 1 or (SYSTEM_LABELS[flips[0]["system"]], flips[0]["question_id"]) != ("S-S", 83):
+        raise RuntimeError("expected exactly one S-S Q83 correct -> wrong flip; stop for user review")
     strict_comparable = [record for record in records if record["our_outcome"] != "excluded"]
     strict_agreements = sum(
         (record["our_outcome"] == "correct") == (record["strict"] == "pass")
@@ -391,6 +447,9 @@ def main(argv: list[str] | None = None) -> int:
         "analytical_agreements": analytical_agreements,
         "analytical_agreement_rate": analytical_agreements / len(strict_comparable),
         "records": records,
+        "reference_columns": reference_columns,
+        "exact_counts": True,
+        "previous_results_compared": previous is not None,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

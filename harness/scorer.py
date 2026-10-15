@@ -15,7 +15,7 @@ from itertools import permutations
 from numbers import Number
 from typing import Literal, TypeAlias
 
-from harness.value_units import KINDS, ValueKind, absolute_tolerance, quantize_tie
+from harness.value_units import KINDS, ValueKind, absolute_tolerance, is_integer_type, quantize_tie
 
 
 Outcome: TypeAlias = Literal["correct", "wrong", "exec_error", "refused"]
@@ -59,7 +59,8 @@ class _Rules:
     tie_columns: tuple[int, ...]
     value_kinds: tuple[ValueKind, ...] = ()
     use_absolute_tolerance: bool = True
-    exact_counts: bool = False
+    exact_counts: bool = True
+    value_types: tuple[str, ...] = ()
 
 
 def score(
@@ -133,7 +134,7 @@ def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -
             continue
         if any(i not in numeric_ref for i in rules.tie_columns):
             continue
-        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts)
+        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts, tuple(rules.value_types[i] for i in numeric_ref) if rules.value_types else ())
         projected_candidate = tuple(tuple(row[i] for i in numeric_candidate) for row in candidate)
         projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
         matched, _ = _matches_reference(projected_candidate, projected_reference, projected_rules)
@@ -170,10 +171,13 @@ def _parse_rules(rules: Mapping[str, object]) -> _Rules:
     if isinstance(value_kinds, (str, bytes)) or not isinstance(value_kinds, Sequence) or any(k not in KINDS for k in value_kinds):
         raise ValueError("value_kinds must be a sequence of supported reference-column kinds")
     use_absolute = rules.get("use_absolute_tolerance", True)
-    exact_counts = rules.get("exact_counts", False)
+    exact_counts = rules.get("exact_counts", True)
     if not isinstance(use_absolute, bool) or not isinstance(exact_counts, bool):
         raise TypeError("comparison mode flags must be bool")
-    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts)
+    value_types = rules.get("value_types", ())
+    if isinstance(value_types, (str, bytes)) or not isinstance(value_types, Sequence) or any(not isinstance(t, str) or not t.strip() for t in value_types):
+        raise ValueError("value_types must be a sequence of reference return-type strings")
+    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types))
 
 
 def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
@@ -197,6 +201,8 @@ def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
 def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple[bool, str]:
     if rules.value_kinds and reference and len(rules.value_kinds) != len(reference[0]):
         raise ValueError("value_kinds must match reference column count")
+    if rules.value_types and reference and len(rules.value_types) != len(reference[0]):
+        raise ValueError("value_types must match reference column count")
     if rules.top_n is None:
         if len(candidate) != len(reference):
             return False, "row_count"
@@ -384,21 +390,21 @@ def _match_bucket(candidate: list[Row], reference: list[Row], mapping: tuple[int
 
 def _rows_equal(candidate: Row, reference: Row, mapping: tuple[int, ...], rules: _Rules) -> bool:
     return all(
-        _cells_equal(candidate[mapping[reference_index]], reference_value, kind=rules.value_kinds[reference_index] if rules.value_kinds else "other", use_absolute=rules.use_absolute_tolerance, exact_counts=rules.exact_counts)
+        _cells_equal(candidate[mapping[reference_index]], reference_value, kind=rules.value_kinds[reference_index] if rules.value_kinds else "other", use_absolute=rules.use_absolute_tolerance, exact_counts=rules.exact_counts and bool(rules.value_types) and is_integer_type(rules.value_types[reference_index]))
         for reference_index, reference_value in enumerate(reference)
     )
 
 
 def _cells_equal(left: Cell, right: Cell, *, allow_percentage: bool = True, kind: ValueKind = "other", use_absolute: bool = True, exact_counts: bool = False) -> bool:
     if _is_numeric(left) and _is_numeric(right):
+        if exact_counts and kind == "count":
+            return left == right
         left_number = float(left)
         right_number = float(right)
         if math.isnan(left_number) or math.isnan(right_number):
             return math.isnan(left_number) and math.isnan(right_number)
         if math.isinf(left_number) or math.isinf(right_number):
             return left_number == right_number
-        if exact_counts and kind == "count":
-            return left == right
         # Retain every pre-A match. Absolute floors apply in the reference unit;
         # zero gives no evidence for choosing a 100x alternative representation.
         if _relative_close(left_number, right_number):

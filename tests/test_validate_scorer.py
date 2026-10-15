@@ -64,3 +64,32 @@ def test_count_provenance_does_not_capture_ratio_denominators() -> None:
     columns = [{'name':'holiday_days','type':'UInt64'}, {'name':'aov','type':'Float64'}, {'name':'retention_pct','type':'Float64'}]
     sql = 'SELECT count() AS holiday_days, sum(amount)/count() AS aov, countIf(x)*100.0/count() AS retention_pct FROM t'
     assert reference_value_kinds(sql,columns) == ['count','other','percentage']
+
+
+def test_count_transition_guard_stops_unexpected_flips() -> None:
+    from scripts.validate_scorer import verify_count_transition
+    semantic = 'claude_claude_sonnet_4_6_semantic'
+    verify_count_transition(semantic, 83, 'correct', 'wrong')
+    verify_count_transition(semantic, 24, 'correct', 'correct')
+    for qid, before, after in [(24,'correct','wrong'), (83,'wrong','correct'), (83,'exec_error','wrong')]:
+        with pytest.raises(RuntimeError, match='unexpected flip'):
+            verify_count_transition(semantic, qid, before, after)
+
+
+def test_reference_type_coverage_includes_numeric_other_and_guard_exemptions() -> None:
+    from harness.value_units import is_integer_type, is_numeric_type
+    from scripts.validate_scorer import reference_column_report
+    assert is_integer_type('Nullable(UInt64)')
+    assert not is_integer_type('Array(UInt64)')
+    for value in ['Float64', 'Nullable(Decimal(18, 2))', 'Decimal128(2)', 'Int64']:
+        assert is_numeric_type(value)
+    for value in ['Date', 'String', 'Array(Int64)']:
+        assert not is_numeric_type(value)
+    cols = [
+        {'question_id':1, 'position':1, 'name':'customers','type':'Float64','kind':'count'},
+        {'question_id':1, 'position':2, 'name':'x','type':'Nullable(Float64)','kind':'other'},
+        {'question_id':1, 'position':3, 'name':'label','type':'String','kind':'other'},
+    ]
+    report = '\n'.join(reference_column_report(cols))
+    assert '**1列**；占2个数值列的**50.00%**' in report
+    assert '| Q01 | 1 | `customers` | `Float64` |' in report
