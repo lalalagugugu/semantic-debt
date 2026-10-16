@@ -1,6 +1,6 @@
 # T11 SQL harness
 
-- 状态：进行中（代码与离线验收完成；真实题目加载与真实 API 冒烟待用户放行，见记录）
+- 状态：已完成（2026-10-16，待 PR 合并；评分覆盖受题库 `rules` 缺口限制，见记录第二段）
 - 负责：Claude Code
 - 模式：普通（G1 之后，`scripts/start-card.sh T11`）
 - 依赖：G1、T02（评分器）
@@ -85,4 +85,20 @@ L1.5S 的列描述里保留了血缘注记（提到明细表名），这是**有
   - API 传输失败（退避用尽）记 `status=api_error` 行保留在日志里，续跑时该 (题, 次) 重跑；报告只取 `status=done` 的行。
   - 超时默认 120 秒，待裁决（open question T11-1）。
   - 新发现 chDB 失败查询残留输出问题（open question T11-2），harness 已规避。
-- 工时：约 2.5 小时（至第一段）。
+- 第二段（2026-10-16，用户放行读题库与 API key 之后；裁决见 `decisions/2026-10-16-t11-exec-limits-and-scope-message.md`）：
+  - **真实题目格式**（`harness/questions.py`）：中文题集 = `questions/*.yaml`（外部 100 + 新题 22 = 122 道），题干 `text_zh`；参考结果读 `result_path` 的 CSV，按 `refs/MANIFEST.json` 的列类型还原（`\N` → NULL、整数/浮点/字符串）。`rules` 原样透传；**外部 100 题没有 `rules`**，harness 不替题库补（已派给 Codex，`decisions/2026-10-16-rules-backfill-for-vendored-questions.md`）。英文锚点 = `vendor/cube/text_to_sql_benchmark.json` 原题，排除 q33，**99 道**，题号记为 `EN01`…；锚点的参考结果尚未构建。
+  - **评分「待定」态**：凡是 harness 这里不能确定性评分的（`scoring=judge` 13 道、缺 `rules` 87 道、锚点缺参考 99 道），返回行集记 `final.outcome = "pending"` 并注明原因（`judge` / `no_rules` / `no_refs`）；执行失败与拒答不需要参考，照常当场判定。每次执行的完整结果（行集或完整报错）写进 `runs-raw/<run-id>/<cell>/<qid>_r<rep>_t<turn>.exec.json`，日志记它的哈希——补齐 `rules` 后可以离线重评，不必重跑模型。`summarize` 在有待定行时 `accuracy` 为空，另给 `accuracy_scored`。
+  - **L1c 与英文锚点的上下文**：外部基准原样——R-EN = `vendor/cube/retail_schema.sql`（DDL）；L1c / L1c-EN = 题库仓库 `vendor/cube/fixtures/semantic_layer.md` 在前、同一份 DDL 在后（与外部基准 "+Sem = 语义文档前置于 DDL" 的组装一致）。系统提示与语法说明与其他单元相同。
+  - **资源闸**（裁决第二节）：全局常量，不逐题调整——`max_result_rows = 2,000,000`、`max_memory_usage = 16 GiB`，超时 120 秒不变（`--exec-timeout`）。依据：参考结果最大 **561,293 行**（不是裁决里写的约 18,869 行，那是 Q14；行数上限仍在百万级，留了约 3.5 倍余量）；最重的参考查询 Q33 峰值常驻内存约 2.7 GB（本机 48 GB）；经 harness 执行器（默认线程数、120 秒）实测两次 32.9 / 33.7 秒通过（首次冷缓存直连时曾测到 285 秒，说明冷启动时有超时风险，T13 开跑前宜先预热一次）。查询里写 `SETTINGS max_memory_usage = …` 之类改闸的一律 `forbidden_statement`。
+  - **三类失败分开归类**：`error_class` = `timeout` / `resource_limit`（另有 `limit` = `memory` 或 `result_rows`）/ `engine_error`，另有 `scope_violation`、`forbidden_statement`、`no_query`。`summarize` 分别给出：最终失败按类计数、资源闸按种类计数、每轮报错按类计数、出现过 `no_query` 的作答数、出现过越界的作答数（T19 的三项拆分）。
+  - **scope violation 的回传消息**（裁决第三节）：由 harness 生成「该查询引用了本单元不可用的库或表；本单元可用的数据集见上下文。」。两条路径都覆盖：静态检查拒绝的（`retail.X`），以及引擎报 `UNKNOWN_TABLE` 且提示里出现本单元不可用的库名的（ClickHouse 的 "Maybe you meant retail.FactOnlineSales?"——在 L1.5S 里写不带库名的明细表名就会触发，已实测）。原始报错/越界名写进 `exec.json` 的 `detail`，不进回传消息、也不进提交的日志。其他执行错误原样回传。
+  - **修了两个问题**：`EXPLAIN AST` 原先在钉住会话设置之前执行，会沿用上一个执行器的设置（生产里所有执行器同值、无影响，测试里暴露）；冒烟时遇到读响应体时的 `ssl.SSLError`，它不在退避捕获范围内、落成了一条 `harness_error`（已如实留在日志里，续跑补上），现在所有 `OSError` / `http.client.HTTPException` 都按传输错误退避，有测试。
+  - 测试：全仓 `uv run pytest` **207 过、1 跳过**（新增：越界消息两条路径、资源闸分类、改闸被拒、真实题库加载与 `rules` 透传、外部上下文、待定评分、传输错误退避）。
+  - **mock 端到端（真实题目 5 道）**：`tests/test_harness_e2e_bank.py` 运行时从题库取题（文件里不含题目和 SQL），对 / 修一次后对 / 错 / 拒答 / 缺 `rules` 待定各一条，真 chDB、真评分器；日志无题目原文。原先的自造 5 题端到端（含 L1.5S 越界）保留。
+  - **`--dry-run`**（`uv run python -m harness.run_direct --cell all --dry-run`）：中文 8 个单元 × 122 题 × 3 次 = 366 次/单元，英文锚点 2 × 99 × 3 = 297 次/单元，合计 3,522 次作答，与 BOARD 单元清单一致（SQL-L1-tuned 的上下文 T14 才有；SQL-L2 的执行器在 T16）。
+  - **真实 API 冒烟**：`uv run python -m harness.run_direct --cell SQL-L1 --questions Q02,Q101 --reps 3 --concurrency 2 --budget 2 --model deepseek-flash --run-id 20261016-T11-smoke-01`（北京时间 08:5x，非高峰）。6 次作答全部 `done`：Q101 三次全对；Q02 三次返回行集与参考一致到 1e-15，但因缺 `rules` 记为待定；其中一次首轮语法错（中文别名未加引号）→ 发回报错 → 修正一次成功。**缓存命中**：首个调用 46,137 token 全部未命中，此后每次约 45,950 命中、约 187 未命中（命中率 99.6%）。实际费用 **0.10 元**。返回的模型版本 `deepseek-flash`。日志字段齐全、无题目原文。
+  - **给 T12 的实测数字**（仅 7 次调用，样本很小）：SQL-L1 实际输入约 **46.1k token**/次（T10 的估算是 40.8k）；输出（含思考）仅 **60–340 token**/次，远低于 dry run 默认假设的 3,000——Flash 的费用主要由输入的未命中部分决定，按单元顺序跑以保住缓存很关键。
+- 偏离与理由（第二段）：
+  - `max_result_rows` 取 200 万而不是「百万级」的下沿：参考结果实际最大 561,293 行，100 万只留不到 2 倍余量。
+  - 冒烟测试按「2 题 × 1 单元」跑了每题 3 次（规格第 5 条的重复次数），以便在同一题内观察缓存命中；费用仍只有 0.10 元。
+- 工时：约 2.5 小时（第一段）+ 约 1.5 小时（第二段）。

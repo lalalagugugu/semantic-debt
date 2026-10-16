@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import http.client
 import json
 import os
 import random
@@ -102,7 +103,8 @@ class DeepSeekClient:
                 last_error = f"HTTP {exc.code}: {detail}"
                 if exc.code != 429 and exc.code < 500:
                     raise APIError(last_error, retries) from None
-            except (urllib.error.URLError, TimeoutError, ConnectionError, json.JSONDecodeError) as exc:
+            except (OSError, http.client.HTTPException, json.JSONDecodeError) as exc:
+                # URLError, timeouts, connection resets and ssl.SSLError mid-read are all OSError
                 last_error = f"{type(exc).__name__}: {exc}"
             retries += 1
             if attempt + 1 < self.max_attempts:

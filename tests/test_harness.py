@@ -468,3 +468,39 @@ def test_external_contexts():
     assert md in l1c and ddl in l1c and l1c.index(md) < l1c.index(ddl) < l1c.index(P.SYNTAX_HEADER)
     assert ddl in ren and md not in ren
     assert R.system_for(CELLS["SQL-L1c-EN"]) == l1c
+
+
+def test_transport_errors_mid_read_are_retried(monkeypatch):
+    """An ssl.SSLError while reading the body (seen in the T11 smoke run) is a transport retry."""
+    import ssl
+    import urllib.request
+    from harness import client as C
+
+    payload = json.dumps({"model": "m", "choices": [{"message": {"content": "x"}, "finish_reason": "stop"}],
+                          "usage": {"prompt_tokens": 1}}).encode()
+    events = [ssl.SSLError("record layer failure"), payload]
+
+    class Resp:
+        def __init__(self, body):
+            self.body = body
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return self.body
+
+    def fake_urlopen(request, timeout):
+        e = events.pop(0)
+        if isinstance(e, Exception):
+            raise e
+        return Resp(e)
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(C.time, "sleep", lambda s: None)
+    reply = C.DeepSeekClient("deepseek-flash").chat([{"role": "user", "content": "hi"}])
+    assert reply.content == "x" and reply.transport_retries == 1
