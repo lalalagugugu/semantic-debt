@@ -10,7 +10,11 @@ Two question sets:
   as in the benchmark's published numbers). Scored against the benchmark's own
   original reference (built by ``harness/anchor_refs.py``), with our current
   revised references as a second, comparison column
-  (decisions/2026-10-16-q79-release-and-anchor-refs.md §2).
+  (decisions/2026-10-16-q79-release-and-anchor-refs.md §2). Rules for an
+  original reference whose column structure differs from ours come from the
+  question bank's ``audit/anchor-original-rules-review.md`` (eval PR #12), picked
+  by benchmark id and checked against the SQL and payload hashes. Top-N anchors
+  use the boundary-complete reference (§4.3; ``harness/anchor_refs.py``).
 
 ``rules`` are reference metadata and are passed to the scorer untouched
 (decisions/2026-10-14-scorer-contract-and-acceptance.md). A ref may carry its own
@@ -71,7 +75,8 @@ def eval_dir() -> Path:
     return Path(root).expanduser()
 
 
-BANK_PATHS = ("questions", "refs", "vendor")
+ANCHOR_RULES = Path("audit") / "anchor-original-rules-review.md"
+BANK_PATHS = ("questions", "refs", "vendor", str(ANCHOR_RULES))
 
 
 def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
@@ -200,12 +205,32 @@ def _strip_nullable(t: str) -> str:
     return m.group(1) if m else t
 
 
+def _is_top_n(rules: dict) -> bool:
+    return rules.get("top_n") is not None or bool(rules.get("selection"))
+
+
+def _self_match(rules: dict, rows: list[list], pick: list[list] | None = None) -> tuple[dict | None, str | None]:
+    """The scorer must accept a valid answer against the reference under ``rules``:
+    the rows themselves, or for a boundary-complete Top-N reference ``pick`` (a
+    valid choice of N rows; returning the whole tie group is wrong by contract)."""
+    from harness.scorer import score_detailed
+
+    try:
+        ok = score_detailed(rows if pick is None else pick, [rows], rules).outcome == "correct"
+    except (ValueError, TypeError) as exc:
+        return None, f"rules_invalid_for_original: {exc}"
+    return (rules, None) if ok else (None, "rules_invalid_for_original: self-match failed")
+
+
 def anchor_rules(meta: list[dict], rows: list[list], current: Question,
-                 published_rows: int | None = None) -> tuple[dict | None, str | None]:
-    """The current question's rules for an anchor's original reference.
+                 published_rows: int | None = None, original_rules: dict | None = None,
+                 pick: list[list] | None = None) -> tuple[dict | None, str | None]:
+    """The rules for an anchor's original reference.
 
     decisions/2026-10-16-q79-release-and-anchor-refs.md §2.4 and §3:
 
+    - The question bank's rules written for this original reference
+      (``original_rules``, already checked against its hashes) → taken as they are.
     - Same column structure as one of the current refs — column count and return
       types, compared after stripping ``Nullable(...)`` — → that ref's effective
       rules, taken as they are.
@@ -215,26 +240,37 @@ def anchor_rules(meta: list[dict], rows: list[list], current: Question,
       are used as they are. Otherwise the anchor stays pending.
 
     Returns (rules, None) or (None, reason). The scorer must also accept the
-    original rows as a reference under the chosen rules (self-match).
+    original rows under the chosen rules (self-match; ``pick`` for a
+    boundary-complete Top-N reference).
     """
-    from harness.scorer import score_detailed
-
-    def accepted(rules: dict) -> tuple[dict | None, str | None]:
-        try:
-            ok = score_detailed(rows, [rows], rules).outcome == "correct"
-        except (ValueError, TypeError) as exc:
-            return None, f"rules_invalid_for_original: {exc}"
-        return (rules, None) if ok else (None, "rules_invalid_for_original: self-match failed")
-
+    if original_rules is not None:
+        return _self_match(original_rules, rows, pick)
     if not rows:
         if published_rows != 0:
             return None, f"empty_ref_not_confirmed: published artifact has {published_rows} rows"
-        return accepted(current.rules) if current.rules is not None else (None, "structure_differs")
+        return _self_match(current.rules, rows) if current.rules is not None else (None, "structure_differs")
     types = [_strip_nullable(c["type"]) for c in meta]
     for rules in effective_rules(current):
         if rules is not None and [_strip_nullable(t) for t in rules.get("value_types", [])] == types:
-            return accepted(rules)
+            return _self_match(rules, rows, pick)
     return None, "structure_differs"
+
+
+def bank_anchor_rules(root: Path) -> dict[int, dict]:
+    """Rules the question bank wrote for original anchor references whose column
+    structure differs from ours: {benchmark id: {"rules", "sql_sha256", "sha256"}}.
+
+    Read from the ``## ENnn`` sections of ``audit/anchor-original-rules-review.md``
+    (the bank's machine-checked handoff; ``scripts/review_anchor_rules.py --check``).
+    """
+    path = root / ANCHOR_RULES
+    if not path.exists():
+        return {}
+    out = {}
+    for m in re.finditer(r"^## EN(\d+)\n\n原始SQL SHA256：`([0-9a-f]{64})`；payload SHA256：`([0-9a-f]{64})`。\n\n"
+                         r"```json\n(.*?)\n```", path.read_text(encoding="utf-8"), flags=re.M | re.S):
+        out[int(m.group(1))] = {"sql_sha256": m.group(2), "sha256": m.group(3), "rules": json.loads(m.group(4))}
+    return out
 
 
 def published_row_count(root: Path, vendor_id: int) -> int | None:
@@ -249,10 +285,12 @@ def published_row_count(root: Path, vendor_id: int) -> int | None:
 
 
 def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
-    from harness.anchor_refs import load_anchor_ref
+    from harness.anchor_refs import anchor_manifest, load_anchor_ref
 
     zh = {q.qid: q for q in load_zh(root)}
     mapping = anchor_mapping(root, list(zh.values()))
+    written = bank_anchor_rules(root)
+    built = anchor_manifest(anchors)
     out = []
     for vq in vendor_questions(root):
         vid = int(vq["id"])
@@ -267,10 +305,33 @@ def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
         if original is not None:
             columns, rows = original
             refs = [rows]
-            rules, reason = anchor_rules(columns, rows, current, published_row_count(root, vid) if not rows else None)
+            own, reason = None, None
+            if vid in written:
+                record = built.get(vid, {})
+                if (written[vid]["sql_sha256"], written[vid]["sha256"]) == (record.get("sql_sha256"), record.get("sha256")):
+                    own = written[vid]["rules"]
+                    meta["rules_source"] = str(ANCHOR_RULES)
+                else:
+                    reason = "rules_hash_mismatch: the bank's rules were written for a different SQL or payload"
+            if reason is None:
+                candidate_rules = own
+                if candidate_rules is None:
+                    candidate_rules, _ = anchor_rules(columns, rows, current,
+                                                      published_row_count(root, vid) if not rows else None)
+                tied = load_anchor_ref(vid, anchors, boundary=True)
+                pick = None
+                if candidate_rules is not None and _is_top_n(candidate_rules) and tied is not None:
+                    # §4.3: the original truncation dropped boundary ties; score on the complete group
+                    pick = rows if candidate_rules.get("selection") else tied[1][:candidate_rules["top_n"]]
+                    refs = [tied[1]]
+                    meta["boundary_completed"] = {"original_rows": len(rows), "rows": len(tied[1])}
+                rules, reason = anchor_rules(columns, refs[0], current,
+                                             published_row_count(root, vid) if not rows else None,
+                                             original_rules=own, pick=pick)
             if not rows:
                 meta["empty_original_ref"] = True
             if reason:
+                rules = None
                 meta["rules_pending"] = "anchor_" + reason.split(":")[0]
                 meta["rules_pending_detail"] = reason
         out.append(Question(qid=f"EN{vid:02d}", text=vq["question"], refs=refs, rules=rules, lang="en",

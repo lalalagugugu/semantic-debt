@@ -14,6 +14,16 @@ repository:
     $SEMDEBT_DATA_DIR/anchor-refs/<benchmark run>/qNN.json     {"meta": [...], "rows": [...]}
     $SEMDEBT_DATA_DIR/anchor-refs/<benchmark run>/MANIFEST.json
 
+Top-N boundary (decisions/2026-10-16-q79-release-and-anchor-refs.md §4.3, and
+the scorer's contract that a Top-N reference holds the complete boundary tie
+group): an original query that truncates with ``LIMIT n`` or ``row_number()`` can
+drop rows tied at the boundary (EN79: all 306 stores tie, the original keeps 10).
+Each original query is therefore also run with only those two truncations made
+tie-inclusive (``LIMIT n WITH TIES``, ``rank()``; nothing else changes, so the
+result differs only where there are ties). When that adds rows, it is stored next
+to the original as ``qNN.boundary.json``; ``harness/questions.py`` uses it for
+anchors whose rules are Top-N (``top_n`` or ``selection``).
+
 Reference answers never enter this repository. ``--check`` re-executes and
 compares the stored files byte for byte.
 
@@ -28,6 +38,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -57,12 +68,28 @@ def restore_denormals(meta: list[dict], rows: list[list]) -> list[list]:
     return rows
 
 
-def load_anchor_ref(vendor_id: int, root: Path | None = None) -> tuple[list[dict], list[list]] | None:
-    path = (root or anchor_dir()) / f"q{vendor_id:02d}.json"
+def boundary_sql(sql: str) -> str:
+    """The original query with its truncations made tie-inclusive, and nothing else changed."""
+    sql = re.sub(r"\bLIMIT\s+(\d+)\b(?!\s+WITH\s+TIES)", r"LIMIT \1 WITH TIES", sql, flags=re.I)
+    return re.sub(r"\brow_number\s*\(\s*\)", "rank()", sql, flags=re.I)
+
+
+def load_anchor_ref(vendor_id: int, root: Path | None = None,
+                    boundary: bool = False) -> tuple[list[dict], list[list]] | None:
+    """The original reference (``boundary=False``) or its boundary-complete
+    version (``boundary=True``; None when completing the ties adds no row)."""
+    path = (root or anchor_dir()) / f"q{vendor_id:02d}{'.boundary' if boundary else ''}.json"
     if not path.exists():
         return None
     payload = json.loads(path.read_text(encoding="utf-8"))
     return payload["meta"], restore_denormals(payload["meta"], payload["rows"])
+
+
+def anchor_manifest(root: Path | None = None) -> dict[int, dict]:
+    path = (root or anchor_dir()) / "MANIFEST.json"
+    if not path.exists():
+        return {}
+    return {r["vendor_id"]: r for r in json.loads(path.read_text(encoding="utf-8"))["records"]}
 
 
 def _payload(meta: list[dict], rows: list[list]) -> bytes:
@@ -91,21 +118,37 @@ def build(check: bool = False) -> int:
             started = time.monotonic()
             payload = json.loads(str(sess.query(sql, "JSONCompact")))
             body = _payload(payload["meta"], payload["data"])
-            path = out / f"q{vid:02d}.json"
-            if check:
-                same = path.exists() and path.read_bytes() == body
-                failures += not same
-                print(f"q{vid:02d} {'same' if same else 'DIFFERENT'}", flush=True)
-            else:
-                path.write_bytes(body)
-            records.append({"vendor_id": vid, "sql_sha256": hashlib.sha256(sql.encode()).hexdigest(),
-                            "row_count": len(payload["data"]), "columns": payload["meta"],
-                            "sha256": hashlib.sha256(body).hexdigest(),
-                            "elapsed_s": round(time.monotonic() - started, 3)})
+            record = {"vendor_id": vid, "sql_sha256": hashlib.sha256(sql.encode()).hexdigest(),
+                      "row_count": len(payload["data"]), "columns": payload["meta"],
+                      "sha256": hashlib.sha256(body).hexdigest(),
+                      "elapsed_s": round(time.monotonic() - started, 3), "boundary": None}
+            files = {f"q{vid:02d}.json": body}
+            tie_sql = boundary_sql(sql)
+            if tie_sql != sql:
+                tied = json.loads(str(sess.query(tie_sql, "JSONCompact")))
+                if len(tied["data"]) != len(payload["data"]):
+                    tied_body = _payload(tied["meta"], tied["data"])
+                    files[f"q{vid:02d}.boundary.json"] = tied_body
+                    record["boundary"] = {"sql_sha256": hashlib.sha256(tie_sql.encode()).hexdigest(),
+                                          "row_count": len(tied["data"]),
+                                          "sha256": hashlib.sha256(tied_body).hexdigest()}
+            for name, data in files.items():
+                path = out / name
+                if check:
+                    same = path.exists() and path.read_bytes() == data
+                    failures += not same
+                    print(f"{name} {'same' if same else 'DIFFERENT'}", flush=True)
+                else:
+                    path.write_bytes(data)
+            if check and record["boundary"] is None and (out / f"q{vid:02d}.boundary.json").exists():
+                failures += 1
+                print(f"q{vid:02d}.boundary.json DIFFERENT (no longer adds rows)", flush=True)
+            records.append(record)
     finally:
         sess.close()
     manifest = {"benchmark_run": RUN, "source": "vendor/cube/text_to_sql_benchmark.json expected_sql, unmodified",
                 "engine": f"chdb {version}", "max_threads": 1, "max_execution_time": 0,
+                "boundary": "qNN.boundary.json: LIMIT n WITH TIES / rank(), stored only when it adds rows",
                 "excluded": sorted(EN_EXCLUDED), "records": records}
     if not check:
         (out / "MANIFEST.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
