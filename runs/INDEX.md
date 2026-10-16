@@ -4,6 +4,7 @@
 
 | run-id | 日期 | 单元 | 卡 | 题数 | 模型版本 | 题库提交号 | 费用（元） | 原始响应目录 | 原因 / 备注 |
 |---|---|---|---|---|---|---|---|---|---|
+| 20261016-T11-smoke-01 | 2026-10-16 | SQL-L1 | T11 | 2（Q02、Q101）× 3 次 | deepseek-flash | eval@4f13cb7 | 0.10 | $SEMDEBT_DATA_DIR/runs-raw/20261016-T11-smoke-01 | T11 冒烟测试。Q02 r2 首次落成 `harness_error`（读响应时 SSLError，未进退避），修客户端后用同一 run-id 续跑补齐，原行保留 |
 
 <!-- 追加格式：
 | 20261101-SQL-L1-01 | 2026-11-01 | SQL-L1 | T13 | 120 | deepseek-… | eval@a1b2c3d | 12.3 | $SEMDEBT_DATA_DIR/runs-raw/20261101-SQL-L1-01 | 首跑 |

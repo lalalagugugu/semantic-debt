@@ -5,7 +5,8 @@
   1. 每张表、每列都有描述（而且表和列与建表语句逐一对得上，列序也一致）。
   2. 每个外键样式的列都有关系，关系写明基数。
   3. 每个低基数字符串列（不同取值 < 50）都有取值说明。
-  4. metrics.yaml 的每个指标都能在 source.yaml 的文字口径里找到（不多不少）。
+  4. metrics.yaml 的每个指标都能在 source.yaml 的文字口径里找到（不多不少）；
+     两张表都能算的指标每表一个调用名，调用名全局唯一。
   5. 汇总层 summary.yaml 的每个指标列都能在 source.yaml 的文字口径里找到。
   6. 明细宽表的每个视图和每个列都在 source.yaml 的 widetables 节里有描述。
   7. source.yaml 里的实测数字（行数、孤儿行、基数）与数据对得上。
@@ -244,6 +245,32 @@ def check_metrics_yaml(c: Checker, src: dict) -> None:
             c.check(m.get("additivity") == by_name[name].get("additivity"),
                     f"「{name}」的可加性与 source.yaml 一致",
                     f"metrics.yaml：{m.get('additivity')}；source.yaml：{by_name[name].get('additivity')}")
+
+    # 两张表都能算的指标：每表一个调用名（decisions/2026-10-15-dual-dataset-metric-callables.md）
+    cube_of = {"FactOnlineSales": "online_sales", "FactSales": "sales"}
+    dax_seen: list[str] = []
+    cube_seen: list[str] = []
+    for m in mfile.get("metrics", []):
+        name = m["name"]
+        dax_seen.append(m.get("dax_measure"))
+        cube_seen.append(m.get("cube_member"))
+        if not m.get("alternate_dataset"):
+            c.check("alternate_dax_measure" not in m and "alternate_cube_member" not in m,
+                    f"「{name}」没有 alternate_dataset，也就没有第二个调用名")
+            continue
+        alt_dax, alt_cube = m.get("alternate_dax_measure"), m.get("alternate_cube_member")
+        c.check(has_text(alt_dax, 3) and has_text(alt_cube, 3),
+                f"「{name}」有 alternate_dataset，所以有第二个 DAX 度量值名和 Cube 成员名")
+        dax_seen.append(alt_dax)
+        cube_seen.append(alt_cube)
+        for key, ds in (("cube_member", m.get("dataset")), ("alternate_cube_member", m.get("alternate_dataset"))):
+            member = m.get(key) or ""
+            c.check(member.split(".")[0] == cube_of.get(ds),
+                    f"「{name}」的 {key} 落在 {ds} 对应的 cube 上", f"写的是 {member}")
+    dup_dax = sorted({x for x in dax_seen if dax_seen.count(x) > 1})
+    dup_cube = sorted({x for x in cube_seen if cube_seen.count(x) > 1})
+    c.check(not dup_dax, "DAX 度量值名全模型唯一", f"重复：{dup_dax}")
+    c.check(not dup_cube, "Cube 成员名全局唯一", f"重复：{dup_cube}")
 
 
 def check_summary_yaml(c: Checker, src: dict) -> None:
