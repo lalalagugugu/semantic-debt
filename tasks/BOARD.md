@@ -53,7 +53,7 @@
 | 9 | harness 透传逐参考 `rules` | Claude Code | 评分器改了接口、harness 不跟，逐参考规则就不生效 | 同上；**等第 8 项的评分器 PR 合并** | ✅ 已做（T11 遗留项，分支 `T11-per-ref-rules`，PR 待合并）：逐参考 `rules` 原样透传；真实题库 mock 端到端覆盖 Q98（多解 + 分组）与 Q71/Q22（分组）；冒烟离线重评 Q02 → correct |
 | 10 | 仍有内连接删行路径的 **20 题 / 24 份参考**：逐份算「左连接 vs 内连接」结果是否不同；**不同就照 Q74 修**，相同则记「路径存在、结果无影响」 | Codex | 「已逐题说明」不等于「无影响」；不量化，T05b 从题意重算时会把它们全部报成差异 | 第 6 项同一裁决 | 未开始 |
 | 5 | T05 重写完成后，**第二轮参考必须全量重算** | Codex | 第一轮「137 份参考通过」的结论**不能沿用**到重写后的题集 | Codex 自述，保留执行 | 未开始（等第二轮 22 题正式 SQL） |
-| 11 | 英文锚点按外部基准**原始参考**评分，另报一列修订后参考的对照；按外部原题号对应 | Claude Code（并入 T11 遗留项）；列结构不同的题的 `rules` 由 Codex 补 | 挡 T13 的英文锚点单元 | `decisions/2026-10-16-q79-release-and-anchor-refs.md` 第二节 | 接线已做（T11 遗留项，PR 待合并）：78 道可评、12 道 judge、9 道列结构不同待定；列表见 `reports/validation/anchor_refs.md`，**待 Codex 补这些题的 `rules`**，另有 EN84/EN100（只差 Nullable）与 EN39/EN49（原始参考 0 行）待定 |
+| 11 | 英文锚点按外部基准**原始参考**评分，另报一列修订后参考的对照；按外部原题号对应 | Claude Code（并入 T11 遗留项）；列结构不同的题的 `rules` 由 Codex 补 | 挡 T13 的英文锚点单元 | `decisions/2026-10-16-q79-release-and-anchor-refs.md` 第二节 | 接线已做（PR #40 已合并）；第三节补充裁决已落实（分支 `T11-anchor-details`，PR 待合并）：81 道可评、12 道 judge、**6 道列结构不同待 Codex 补 `rules`**（EN13、14、20、74、83、87），见 `reports/validation/anchor_refs.md` |
 | 12 | Q79：存 306 个边界成员快照（带规则版本号）；T05b 独立复现成员集合即放行 | 快照：Codex（T05）；复现：Claude Code（T05b） | 卡 `eval-v1` 里 Q79 能否带 Top-N 并列 | 同上第一节 | 已裁决，待做 |
 | 13 | harness **只从 `eval-v1` tag 读题库**，不读 `$SEMDEBT_EVAL_DIR` 共用工作区（Codex 在那里原地干活，可能在别的分支、带未提交改动）；读到的不是 tag 内容就拒绝开跑 | Claude Code（T12 实现；T13、T15、T16、T18 的运行都走它） | 读错版本的题，整轮运行作废 | T12、T13 卡「题库版本」 | 待做（G2 之后） |
 

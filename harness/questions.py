@@ -195,24 +195,57 @@ def effective_rules(q: Question) -> list[dict | None]:
     return [own if own is not None else q.rules for own in (q.ref_rules or [None] * len(q.refs or []))]
 
 
-def anchor_rules(meta: list[dict], rows: list[list], current: Question) -> tuple[dict | None, str | None]:
-    """The current question's rules for the original reference, if it has the same
-    column structure (column count and return types) as one of the current refs.
+def _strip_nullable(t: str) -> str:
+    m = re.fullmatch(r"Nullable\((.*)\)", t)
+    return m.group(1) if m else t
 
-    Returns (rules, None) or (None, reason). The rules are taken as they are; the
-    scorer must also accept the original rows as a reference under them.
+
+def anchor_rules(meta: list[dict], rows: list[list], current: Question,
+                 published_rows: int | None = None) -> tuple[dict | None, str | None]:
+    """The current question's rules for an anchor's original reference.
+
+    decisions/2026-10-16-q79-release-and-anchor-refs.md §2.4 and §3:
+
+    - Same column structure as one of the current refs — column count and return
+      types, compared after stripping ``Nullable(...)`` — → that ref's effective
+      rules, taken as they are.
+    - Original reference with 0 rows → scored as an empty result, but only if the
+      benchmark's published reference artifact is also empty (``published_rows ==
+      0``); an empty set has no columns to compare, so the question-level rules
+      are used as they are. Otherwise the anchor stays pending.
+
+    Returns (rules, None) or (None, reason). The scorer must also accept the
+    original rows as a reference under the chosen rules (self-match).
     """
     from harness.scorer import score_detailed
 
-    types = [c["type"] for c in meta]
+    def accepted(rules: dict) -> tuple[dict | None, str | None]:
+        try:
+            ok = score_detailed(rows, [rows], rules).outcome == "correct"
+        except (ValueError, TypeError) as exc:
+            return None, f"rules_invalid_for_original: {exc}"
+        return (rules, None) if ok else (None, "rules_invalid_for_original: self-match failed")
+
+    if not rows:
+        if published_rows != 0:
+            return None, f"empty_ref_not_confirmed: published artifact has {published_rows} rows"
+        return accepted(current.rules) if current.rules is not None else (None, "structure_differs")
+    types = [_strip_nullable(c["type"]) for c in meta]
     for rules in effective_rules(current):
-        if rules is not None and list(rules.get("value_types", [])) == types:
-            try:
-                ok = score_detailed(rows, [rows], rules).outcome == "correct"
-            except (ValueError, TypeError) as exc:
-                return None, f"rules_invalid_for_original: {exc}"
-            return (rules, None) if ok else (None, "rules_invalid_for_original: self-match failed")
+        if rules is not None and [_strip_nullable(t) for t in rules.get("value_types", [])] == types:
+            return accepted(rules)
     return None, "structure_differs"
+
+
+def published_row_count(root: Path, vendor_id: int) -> int | None:
+    """Row count of the benchmark's own published reference result, or None if unavailable."""
+    from harness.anchor_refs import RUN
+
+    path = root / "vendor" / "cube" / "published-runs" / RUN / "reference" / f"q{vendor_id:02d}.json"
+    if not path.exists():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return None if data.get("error") else int(data["row_count"])
 
 
 def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
@@ -234,7 +267,9 @@ def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
         if original is not None:
             columns, rows = original
             refs = [rows]
-            rules, reason = anchor_rules(columns, rows, current)
+            rules, reason = anchor_rules(columns, rows, current, published_row_count(root, vid) if not rows else None)
+            if not rows:
+                meta["empty_original_ref"] = True
             if reason:
                 meta["rules_pending"] = "anchor_" + reason.split(":")[0]
                 meta["rules_pending_detail"] = reason
