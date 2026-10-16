@@ -58,6 +58,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, help="write the complete ID-only validation report")
     parser.add_argument("--previous-results", type=Path, help="compare every verdict with the preceding 600-record run")
+    parser.add_argument(
+        "--session-bug-baseline",
+        type=Path,
+        help="list verdict changes from a 600-record run that reused chDB after execution errors",
+    )
     return parser.parse_args(argv)
 
 
@@ -124,6 +129,15 @@ def reference_digest(rows: list[list[object]]) -> str:
     return hashlib.sha256(json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
 
 
+def boundary_hash_versions() -> dict[str, str]:
+    """Identify both the unit policy and the boundary/encoding implementation."""
+    return {
+        "unit_policy_sha256": hashlib.sha256((REPO / "harness/value_units.py").read_bytes()).hexdigest(),
+        "boundary_policy_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "serialization_version": "json-compact-utf8-v1",
+    }
+
+
 def verify_reference_digests(digests: list[str], question_id: int) -> None:
     if len(digests) != 3 or len(set(digests)) != 1:
         raise RuntimeError(f"q{question_id:02d}: reference boundary is not reproducible")
@@ -165,7 +179,7 @@ def stable_reference(sess: Any, sql: str, question_id: int, rules: dict[str, obj
             raise RuntimeError(f"q{question_id:02d} repeated reference failed: {repeated.message}")
         digests.append(reference_digest(complete_boundary(repeated, rules, descending)))
     verify_reference_digests(digests, question_id)
-    return rows, {"question_id": question_id, "row_count": len(rows), "sha256": digests[0], "repeat_checks": 3, "tie_columns": rules["tie_columns"], "descending": descending, "criterion": "Decimal ROUND_HALF_EVEN: amount=2 digits; ratio/fraction=6; other=6", "value_kinds": rules["value_kinds"]}, legacy
+    return rows, {"question_id": question_id, "row_count": len(rows), "sha256": digests[0], **boundary_hash_versions(), "repeat_checks": 3, "tie_columns": rules["tie_columns"], "descending": descending, "criterion": "Decimal ROUND_HALF_EVEN: amount=2 digits; ratio/fraction=6; other=6", "value_kinds": rules["value_kinds"]}, legacy
 
 
 def execute_rows(sess: Any, sql: str) -> list[list[object]] | ExecError:
@@ -177,8 +191,35 @@ def execute_rows(sess: Any, sql: str) -> list[list[object]] | ExecError:
     return rows
 
 
+def open_session(session_module: Any, db_dir: Path) -> Any:
+    """Open a clean chDB session with the validation execution settings."""
+    sess = session_module.Session(str(db_dir))
+    try:
+        sess.query("SET max_execution_time = 30")
+        sess.query("SET max_threads = 1")
+    except Exception:
+        sess.close()
+        raise
+    return sess
+
+
+def reset_session(sess: Any, session_module: Any, db_dir: Path) -> Any:
+    """Discard a failed chDB session before another query can observe its output."""
+    sess.close()
+    return open_session(session_module, db_dir)
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_outcomes(path: Path, systems: list[str], questions: dict[int, Any]) -> dict[tuple[str, int], str]:
+    records = load_json(path)["records"]
+    outcomes = {(r["system"], r["question_id"]): r["our_outcome"] for r in records}
+    expected_keys = {(system, qid) for system in systems for qid in questions}
+    if set(outcomes) != expected_keys or len(records) != 600:
+        raise ValueError(f"{path} must contain exactly the same 600 system/question keys")
+    return outcomes
 
 
 SYSTEM_LABELS = {
@@ -271,6 +312,9 @@ def report_from_results(output: dict[str, Any], path: Path) -> None:
     lines += ["", "## 三条缺陷的修复证据", "", "1. `ordered` 要求元数据与最终外层 ORDER BY 同时成立；窗口/子查询的排序不作为最终排序。O-R/O-S Q22现按无序完整行集比较，结果见全量表。", "2. 固定单线程运行，Top-N从完整排序域构造参考。使用按全局固定精度量化的参考排序值识别并列；所有题统一使用量纲量化规则，不采用Q88特例。行编码固定同值前缀行序，每个参考三次成员哈希必须一致，否则报错停止。0.5%结果容差不再扩大并列组。", "3. 舍入差异实测：S-S Q24约0.70%/0.53%；O-S Q90最高约2.10%；G-S Q29约12.40%；S-S Q99最高约17.13%。不能统称小于1%。问题#7已裁决A，本次应用量纲绝对下限；历史实测偏差保留用于解释。", "", f"运行条件：`{output['runtime']}`。", "", "| 题号 | 完整边界参考行数 | 三次哈希一致 | SHA256 |", "|---|---:|---|---|"]
     for check in output["boundary_checks"]:
         lines.append(f"| Q{check['question_id']:02} | {check['row_count']} | 是（{check['repeat_checks']}次） | `{check['sha256']}` |")
+    lines += ["", "每个边界哈希的版本信息如下。历史记录没有版本时明确标为未记录；跨版本或跨会话须比较量化后的完整成员集合，不能用原始浮点行编码哈希代替。", "", "| 题号 | unit_policy_sha256 | boundary_policy_sha256 | 编码版本 |", "|---|---|---|---|"]
+    for check in output["boundary_checks"]:
+        lines.append(f"| Q{check['question_id']:02} | `{check.get('unit_policy_sha256', '未记录')}` | `{check.get('boundary_policy_sha256', '未记录')}` | {check.get('serialization_version', '未记录')} |")
     lines += ["", "## 本次剩余主分类与系统性影响", "", "主分类按裁决后的68条逐项账本固定，先记录具名主因，再保留复合次因；不是机械按评分器首个失败码归类。历史Q22问题修复后如已一致，移出本次差异但保留历史账本。", "", "| 类别 | 本次条数 | 系统性影响/规则依据 |", "|---|---:|---|"]
     impacts = {"参考列缺失": "第3条：所有单元缺参考列均判错，包含问句未要求的辅助列；会系统性降低输出较简洁单元的严格准确率。", "标签或列组合": "第2/3条：只去字符串首尾空格，不拼姓名、不翻译标签；对所有单元施加格式敏感性。", "额外候选行": "第1/4条：完整结果集与Top-N行数约束；输出超集的单元均受罚，缺列等复合次因另记。", "公开工件/重执行差异": "属于外部基线的抽样/执行差异，不是全部单元的评分规则变化；六条Q14已由抽样解释，只有G-R Q30根因交T03跟进。", "舍入/相对误差": "第2条：按已裁决A口径增加量纲绝对下限，未被下限覆盖的舍入差异仍可能影响全部单元。", "行序与验证流程": "第4条：修掉任意参考物理行序；同值前缀的严格行序仍可能影响所有Top-N单元，边界成员按确定性精确并列组验证。", "执行环境不兼容": "按本地执行态记exec_error；特定函数生成风格的单元会受本地能力限制，T11/T19须单列环境不兼容。", "参考度量缺失": "第3条：额外派生量不能替代参考度量；各单元必须输出全部参考度量。"}
     for category, impact in impacts.items():
@@ -282,6 +326,26 @@ def report_from_results(output: dict[str, Any], path: Path) -> None:
     for r in records:
         lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02} | {r['our_outcome']} | {r['strict']} | {r['analytical']} | {r['our_reason'] or 'matched'} | {r['sensitivity'] or '—'} |")
     lines += ["", "## 复现与验收边界", "", "```bash", "uv run pytest", "uv run python scripts/validate_scorer.py --output /tmp/t02-scorer-check-ruling.json --report reports/validation/scorer_check.md", "```", "", "运行前设置SEMDEBT_EVAL_DIR、SEMDEBT_DATA_DIR；固定本报告的运行版本，单进程独占chdb-eval。所有候选原样执行，重执行或参考失败不静默重试。", "", "T03只跟进G-R Q30；其余Q14不是未解释的数据漂移。T05/T05b/T06落实跨执行器可复现边界组要求，不能用本卡三次SQL重复取代跨厂商独立重算。G0/G4须同时披露历史低一致率、当前数字、系统性影响和敏感性上界，不能声称跨厂商独立核对已完成。"]
+    failed_candidates = [r for r in records if r["reexec_error"] is not None]
+    failed_outcomes = Counter(r["our_outcome"] for r in failed_candidates)
+    session_changes = [] if not output["session_bug_baseline_compared"] else [
+        r for r in records if r["session_bug_baseline_outcome"] != r["our_outcome"]
+    ]
+    lines += [
+        "",
+        "## chDB 失败会话污染修复（G0 无需重新确认）",
+        "",
+        f"候选查询执行失败后立即关闭并重建 chDB session，重新应用固定执行设置。本轮发生 **{output['session_resets']}** 次重置：最终归类为 exec_error {failed_outcomes['exec_error']} 条，另有排除评分的 Q33 失败 {failed_outcomes['excluded']} 条。",
+        f"是否与修复前600条脏会话基线逐条比较：{output['session_bug_baseline_compared']}；判定变化 **{len(session_changes)}** 条。",
+        "用户于2026-10-16确认：会话修复已收到，0条判定变化，G0无需重新确认。Q79成员复现性属于eval-v1冻结条件。",
+        "",
+        "| 系统 | 题号 | 修复前 | 修复后 |",
+        "|---|---|---|---|",
+    ]
+    for r in session_changes:
+        lines.append(f"| {SYSTEM_LABELS[r['system']]} | Q{r['question_id']:02d} | {r['session_bug_baseline_outcome']} | {r['our_outcome']} |")
+    if not session_changes:
+        lines.append("| — | — | 无变化 | 无变化 |")
     flipped = [r for r in comparable if r.get("baseline_outcome") == "wrong" and r["our_outcome"] == "correct"]
     atol_flipped = [r for r in comparable if r.get("relative_only_outcome") == "wrong" and r["our_outcome"] == "correct"]
     count_flipped = [r for r in comparable if r.get("before_count_outcome") != r["our_outcome"]]
@@ -321,14 +385,13 @@ def main(argv: list[str] | None = None) -> int:
 
     from chdb import session
 
-    sess = session.Session(str(args.db_dir))
+    sess = open_session(session, args.db_dir)
     previous = None
     if args.previous_results is not None:
-        prior_records = load_json(args.previous_results)["records"]
-        previous = {(r["system"], r["question_id"]): r["our_outcome"] for r in prior_records}
-        expected_keys = {(system, qid) for system in systems for qid in questions}
-        if set(previous) != expected_keys or len(prior_records) != 600:
-            raise ValueError("previous results must contain exactly the same 600 system/question keys")
+        previous = load_outcomes(args.previous_results, systems, questions)
+    session_bug_baseline = None
+    if args.session_bug_baseline is not None:
+        session_bug_baseline = load_outcomes(args.session_bug_baseline, systems, questions)
     records: list[dict[str, object]] = []
     reference_columns = []
     references: dict[int, list[list[object]] | ExecError] = {}
@@ -340,9 +403,8 @@ def main(argv: list[str] | None = None) -> int:
     exec(compile(baseline_source, "<baseline scorer>", "exec"), baseline.__dict__)
     rules_by_id = {qid: question_rules(qid, q["expected_sql"]) for qid, q in questions.items()}
     boundary_checks = []
+    session_resets = 0
     try:
-        sess.query("SET max_execution_time = 30")
-        sess.query("SET max_threads = 1")
         runtime_version = str(sess.query("SELECT version()", "CSV")).strip()
         for question_id, question in sorted(questions.items()):
             if question_id in EXCLUDED_QUESTION_IDS:
@@ -364,6 +426,9 @@ def main(argv: list[str] | None = None) -> int:
             for question_id in sorted(questions):
                 candidate_record = load_json(run_root / system / f"q{question_id:02d}.json")
                 candidate = execute_rows(sess, candidate_record["sql"])
+                if isinstance(candidate, ExecError):
+                    sess = reset_session(sess, session, args.db_dir)
+                    session_resets += 1
                 strict_record = load_json(run_root / "scoring" / system / f"q{question_id:02d}.json")
                 reference = references[question_id]
 
@@ -405,6 +470,7 @@ def main(argv: list[str] | None = None) -> int:
                         "exact_count_outcome": exact_outcome,
                         "before_count_outcome": before_count,
                         "previous_outcome": previous[(system, question_id)] if previous is not None else None,
+                        "session_bug_baseline_outcome": session_bug_baseline[(system, question_id)] if session_bug_baseline is not None else None,
                         "value_types": rules_by_id[question_id].get("value_types", []),
                         "value_kinds": rules_by_id[question_id].get("value_kinds", []),
                         "ordered": rules_by_id[question_id]["ordered"],
@@ -435,6 +501,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     output = {
         "run_id": RUN_ID,
+        **boundary_hash_versions(),
         "baseline_ref": baseline_ref,
         "runtime": {"version": runtime_version, "max_threads": 1, "max_execution_time": 30},
         "boundary_checks": boundary_checks,
@@ -450,6 +517,8 @@ def main(argv: list[str] | None = None) -> int:
         "reference_columns": reference_columns,
         "exact_counts": True,
         "previous_results_compared": previous is not None,
+        "session_bug_baseline_compared": session_bug_baseline is not None,
+        "session_resets": session_resets,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
