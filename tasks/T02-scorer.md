@@ -74,3 +74,15 @@
 - 守卫披露：99题37个count列、含Q33的100题38个count列均为整数返回类型，非整数豁免0列。数值other为43列，占99题198个数值列的21.72%；100题则43/199（21.61%），不能把含文本/日期的other比例当作数值覆盖缺口。维度数值列也包含其中，不据此声称43列都是金额/比率误判。
 - 复现：设置SEMDEBT_EVAL_DIR、SEMDEBT_DATA_DIR后，运行 `.venv/bin/python scripts/validate_scorer.py --previous-results /tmp/t02-unit-check-final.json --output /tmp/t02-integer-count-check.json --report reports/validation/scorer_check.md`；上一轮JSON保存于运行机/tmp。省略可选previous-results仍会核对同批收紧前后结果并拦截预期外翻转。
 - 偏离：无。#8已按用户裁决正式执行；未调整量纲词表或并列精度，未改其他任务状态。
+
+## 2026-10-16 逐参考rules及分组／嵌套选择追加实现
+
+用户已批准通用声明契约；实现前报告目标题集7/122，其中外部5题、直接涉及30/600条候选。新增可选reference_rules，完整逐参考字典整份覆盖题级，未提供才沿用；非法显式字典报错。selection v1以对象身份、分组、方向、N及父阶段声明选择，复用既有量化和结果容差；不扩大judge路径。
+
+现有T02快速测试初版137 passed、1 skipped；最终接口在最新main的评分器／校验／离线harness兼容检查124 passed、16 skipped。跳过数据库依赖项，不打开主chdb。另有合成测试覆盖合法边界任选、漏组、重复对象、N+k、严格前缀、嵌套耦合、双路方向及不足N。
+
+同批600条复执行完成：固定原公开参考，仅增加分组契约，翻转0，correct251/wrong304/exec_error39/excluded6；strict521/594、analytical487/594，按既有具名类别排除11条有意更宽后521/583。与干净会话基线的复执行变化0。会话重置补丁另在PR #35，不混入本提交。
+
+当前修订题库参考的联合诊断变化35条，包含此前参考修订与本次更正；与仅契约变化分开记录，不将其作为模型改善或T02原基准同口径一致率。详见reports/validation/rules_backfill_check.md。G0旧数字保留，后续参考影响提交审阅。
+
+通用实现PR #36；harness逐参考透传由Claude Code跟进。独立pandas成员复核、第二轮参考落地与eval-v1冻结不在此追加实现中宣告完成。

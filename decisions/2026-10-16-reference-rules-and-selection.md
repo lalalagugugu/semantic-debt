@@ -5,9 +5,9 @@
 
 ## 逐参考覆盖
 
-`score(candidate_rows, refs, rules, *, reference_rules=None)`及`score_detailed`增加可选参数。`reference_rules`与`refs`等长，每项为字典或None。每份参考的有效规则为`{**rules, **override}`；字段整体覆盖，不拼接量纲向量或selection的内部列表。None或未传参数沿用题级规则。先解析全部有效规则，然后逐参考匹配，任一正确即可；列宽及返回类型跟随对应参考。
+`score(candidate_rows, refs, rules, *, reference_rules=None)`及`score_detailed`增加可选参数。`reference_rules`与`refs`等长，每项为字典或None。非None的逐参考字典整份替代题级rules，必须包含完整必需字段；显式空字典或缺项报错，不逐字段合并。None或未传参数沿用题级规则。先解析全部有效规则，然后逐参考匹配，任一正确即可；列宽及返回类型跟随对应参考。
 
-题库ref.rules与题级rules的读取、覆盖字典和reference_rules的原样传递由harness完成；评分器不读取题库、SQL、列名或题号。缺失rules必须在输入校验时显式拒绝，不得用空值跳过保护。旧三参数接口保持可用。
+题库ref.rules与题级rules的读取、整份覆盖和reference_rules的原样传递由harness完成；评分器不读取题库、SQL、列名或题号。缺失rules必须在输入校验时显式拒绝，不得用空值跳过保护。旧三参数接口保持可用。
 
 ## rules.selection（version 1）
 

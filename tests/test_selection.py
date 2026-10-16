@@ -127,7 +127,7 @@ def test_inconsistent_parent_value_and_duplicate_leaf_are_rejected():
 def test_per_reference_rules_override_and_fallback_with_different_widths():
     common = {'ordered': False, 'top_n': None, 'value_kinds': ['count'], 'value_types': ['UInt64']}
     refs = [[[10000]], [['A', 1.0]]]
-    overrides = [None, {'value_kinds': ['other', 'amount'], 'value_types': ['String', 'Float64']}]
+    overrides = [None, {**common, 'value_kinds': ['other', 'amount'], 'value_types': ['String', 'Float64']}]
     assert score([['A', 1.009]], refs, common, reference_rules=overrides) == 'correct'
     assert score([[10001]], refs, common, reference_rules=overrides) == 'wrong'
     assert score_detailed([[10000]], refs, common, reference_rules=overrides).matched_ref == 0
@@ -148,3 +148,9 @@ def test_child_group_must_retain_parent_identity():
     metadata = rules([stage([], [0], 1, 1), stage([], [2], 3, 1, parent=0)], ['other', 'amount', 'other', 'amount'])
     with pytest.raises(ValueError, match='retain'):
         score([], [[]], metadata)
+
+
+def test_explicit_incomplete_reference_rules_do_not_silently_fall_back():
+    common = {'ordered': False, 'top_n': None}
+    with pytest.raises(ValueError, match='missing required'):
+        score([[1]], [[[1]]], common, reference_rules=[{}])

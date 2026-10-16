@@ -96,7 +96,7 @@ def score_detailed(
             raise ValueError("reference_rules must align with refs")
         if any(item is not None and not isinstance(item, Mapping) for item in reference_rules):
             raise TypeError("reference_rules entries must be mappings or None")
-    parsed_rules = tuple(_parse_rules({**rules, **(reference_rules[i] or {})}) if reference_rules is not None else _parse_rules(rules) for i in range(len(refs)))
+    parsed_rules = tuple(_parse_rules(reference_rules[i] if reference_rules is not None and reference_rules[i] is not None else rules) for i in range(len(refs)))
     if isinstance(candidate_rows, ExecError):
         return ScoreResult("exec_error", candidate_rows.message)
     if isinstance(candidate_rows, str):
