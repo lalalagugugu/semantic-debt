@@ -1,0 +1,422 @@
+{
+  "versions": {
+    "cube": "1.8.6",
+    "clickhouse": "25.8.20.4",
+    "images": {
+      "cube": [
+        "cubejs/cube@sha256:69707e09d95aa17a81b9f98edea22b45f77ab2cb6234bc953707aece6f1b0bf6"
+      ],
+      "clickhouse": [
+        "clickhouse/clickhouse-server@sha256:3124282c0c60bf3c1381a653475e82573d4f9a8dd5a487eb7371dcb91b3080c3"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "member": "sales.sales_amount_yoy_pct",
+      "interface": "cube_sql",
+      "query": "SELECT DATE_TRUNC('month', sales.\"DateKey\") AS period, MEASURE(sales.sales_amount_yoy_pct) AS value FROM sales WHERE sales.\"DateKey\" >= DATE '2009-01-01' AND sales.\"DateKey\" < DATE '2010-01-01' GROUP BY 1 ORDER BY 1",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 year WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": -0.03467556657879567,
+        "2009-02-01": -0.07910593558983972,
+        "2009-03-01": -0.06650543136126373,
+        "2009-04-01": -0.1319187079367772,
+        "2009-05-01": -0.027162488546996974,
+        "2009-06-01": -0.02020758623861483,
+        "2009-07-01": -0.13638979843585616,
+        "2009-08-01": -0.09698280208921946,
+        "2009-09-01": -0.11216517049866835,
+        "2009-10-01": 0.0017778045829575334,
+        "2009-11-01": -0.15897488485765798,
+        "2009-12-01": -0.17064723929912023
+      },
+      "actual": {
+        "2009-01-01": -0.03467556657879567,
+        "2009-02-01": -0.07910593558984219,
+        "2009-03-01": -0.06650543136126814,
+        "2009-04-01": -0.1319187079367772,
+        "2009-05-01": -0.027162488546997137,
+        "2009-06-01": -0.020207586238561805,
+        "2009-07-01": -0.13638979843585416,
+        "2009-08-01": -0.09698280208922873,
+        "2009-09-01": -0.11216517049867733,
+        "2009-10-01": 0.0017778045829793124,
+        "2009-11-01": -0.15897488485765798,
+        "2009-12-01": -0.17064723929912023
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "sales.sales_amount_yoy_pct",
+      "interface": "cube_json",
+      "query": "{\"measures\": [\"sales.sales_amount_yoy_pct\"], \"timeDimensions\": [{\"dimension\": \"sales.DateKey\", \"dateRange\": [\"2009-01-01\", \"2009-12-31\"], \"granularity\": \"month\"}], \"order\": {\"sales.DateKey\": \"asc\"}}",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 year WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": -0.03467556657879567,
+        "2009-02-01": -0.07910593558983972,
+        "2009-03-01": -0.06650543136126373,
+        "2009-04-01": -0.1319187079367772,
+        "2009-05-01": -0.027162488546996974,
+        "2009-06-01": -0.02020758623861483,
+        "2009-07-01": -0.13638979843585616,
+        "2009-08-01": -0.09698280208921946,
+        "2009-09-01": -0.11216517049866835,
+        "2009-10-01": 0.0017778045829575334,
+        "2009-11-01": -0.15897488485765798,
+        "2009-12-01": -0.17064723929912023
+      },
+      "actual": {
+        "2009-01-01": -0.03467556657879567,
+        "2009-02-01": -0.07910593558984219,
+        "2009-03-01": -0.06650543136126814,
+        "2009-04-01": -0.1319187079367772,
+        "2009-05-01": -0.027162488546997137,
+        "2009-06-01": -0.020207586238561805,
+        "2009-07-01": -0.13638979843585416,
+        "2009-08-01": -0.09698280208922873,
+        "2009-09-01": -0.11216517049867733,
+        "2009-10-01": 0.0017778045829793124,
+        "2009-11-01": -0.15897488485765798,
+        "2009-12-01": -0.17064723929912023
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "sales.sales_amount_mom_pct",
+      "interface": "cube_sql",
+      "query": "SELECT DATE_TRUNC('month', sales.\"DateKey\") AS period, MEASURE(sales.sales_amount_mom_pct) AS value FROM sales WHERE sales.\"DateKey\" >= DATE '2009-01-01' AND sales.\"DateKey\" < DATE '2010-01-01' GROUP BY 1 ORDER BY 1",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 month WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": -0.3235213170249717,
+        "2009-02-01": -0.013966208546574732,
+        "2009-03-01": 0.017921931542491134,
+        "2009-04-01": 0.14177271952782028,
+        "2009-05-01": 0.10480906528718585,
+        "2009-06-01": -0.030039520356365305,
+        "2009-07-01": 0.006261564482445827,
+        "2009-08-01": -0.02502919036497068,
+        "2009-09-01": -0.0346121608936925,
+        "2009-10-01": 0.04160887669008674,
+        "2009-11-01": -0.014289058151303083,
+        "2009-12-01": 0.026595619239932967
+      },
+      "actual": {
+        "2009-01-01": -0.3235213170249717,
+        "2009-02-01": -0.013966208546574732,
+        "2009-03-01": 0.017921931542485205,
+        "2009-04-01": 0.1417727195278155,
+        "2009-05-01": 0.10480906528718542,
+        "2009-06-01": -0.03003952035637258,
+        "2009-07-01": 0.006261564482453974,
+        "2009-08-01": -0.025029190364964576,
+        "2009-09-01": -0.0346121608936925,
+        "2009-10-01": 0.04160887669008674,
+        "2009-11-01": -0.014289058151303083,
+        "2009-12-01": 0.0265956192399248
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "sales.sales_amount_mom_pct",
+      "interface": "cube_json",
+      "query": "{\"measures\": [\"sales.sales_amount_mom_pct\"], \"timeDimensions\": [{\"dimension\": \"sales.DateKey\", \"dateRange\": [\"2009-01-01\", \"2009-12-31\"], \"granularity\": \"month\"}], \"order\": {\"sales.DateKey\": \"asc\"}}",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 month WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": -0.3235213170249717,
+        "2009-02-01": -0.013966208546574732,
+        "2009-03-01": 0.017921931542491134,
+        "2009-04-01": 0.14177271952782028,
+        "2009-05-01": 0.10480906528718585,
+        "2009-06-01": -0.030039520356365305,
+        "2009-07-01": 0.006261564482445827,
+        "2009-08-01": -0.02502919036497068,
+        "2009-09-01": -0.0346121608936925,
+        "2009-10-01": 0.04160887669008674,
+        "2009-11-01": -0.014289058151303083,
+        "2009-12-01": 0.026595619239932967
+      },
+      "actual": {
+        "2009-01-01": -0.3235213170249717,
+        "2009-02-01": -0.013966208546574732,
+        "2009-03-01": 0.017921931542485205,
+        "2009-04-01": 0.1417727195278155,
+        "2009-05-01": 0.10480906528718542,
+        "2009-06-01": -0.03003952035637258,
+        "2009-07-01": 0.006261564482453974,
+        "2009-08-01": -0.025029190364964576,
+        "2009-09-01": -0.0346121608936925,
+        "2009-10-01": 0.04160887669008674,
+        "2009-11-01": -0.014289058151303083,
+        "2009-12-01": 0.0265956192399248
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "sales.sales_amount_share",
+      "interface": "cube_sql",
+      "query": "SELECT sales.\"channelKey\" AS period, MEASURE(sales.sales_amount_share) AS value FROM sales WHERE sales.\"DateKey\" >= DATE '2009-01-01' AND sales.\"DateKey\" < DATE '2010-01-01' GROUP BY 1 ORDER BY 1",
+      "reference_sql": "SELECT toString(channelKey), sum(SalesAmount) / (SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey) = 2009) FROM retail.FactSales WHERE toYear(DateKey) = 2009 GROUP BY channelKey ORDER BY channelKey",
+      "expected": {
+        "1": 0.516300151027493,
+        "2": 0.2542853606407976,
+        "3": 0.08402744490893692,
+        "4": 0.14538704342277028
+      },
+      "actual": {
+        "1": 0.5163001510274942,
+        "2": 0.25428536064079815,
+        "3": 0.0840274449089371,
+        "4": 0.1453870434227706
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "sales.sales_amount_share",
+      "interface": "cube_json",
+      "query": "{\"measures\": [\"sales.sales_amount_share\"], \"timeDimensions\": [{\"dimension\": \"sales.DateKey\", \"dateRange\": [\"2009-01-01\", \"2009-12-31\"]}], \"dimensions\": [\"sales.channelKey\"], \"order\": {\"sales.channelKey\": \"asc\"}}",
+      "reference_sql": "SELECT toString(channelKey), sum(SalesAmount) / (SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey) = 2009) FROM retail.FactSales WHERE toYear(DateKey) = 2009 GROUP BY channelKey ORDER BY channelKey",
+      "expected": {
+        "1": 0.516300151027493,
+        "2": 0.2542853606407976,
+        "3": 0.08402744490893692,
+        "4": 0.14538704342277028
+      },
+      "actual": {
+        "1": 0.5163001510274942,
+        "2": 0.25428536064079815,
+        "3": 0.0840274449089371,
+        "4": 0.1453870434227706
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "online_sales.sales_amount_yoy_pct",
+      "interface": "cube_sql",
+      "query": "SELECT DATE_TRUNC('month', online_sales.\"DateKey\") AS period, MEASURE(online_sales.sales_amount_yoy_pct) AS value FROM online_sales WHERE online_sales.\"DateKey\" >= DATE '2009-01-01' AND online_sales.\"DateKey\" < DATE '2010-01-01' GROUP BY 1 ORDER BY 1",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactOnlineSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 year WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": 0.01260533703269364,
+        "2009-02-01": -0.012888138143424368,
+        "2009-03-01": 0.004095066838564471,
+        "2009-04-01": -0.07515029397818687,
+        "2009-05-01": 0.053695745711122636,
+        "2009-06-01": 0.06935846273989306,
+        "2009-07-01": -0.019192993452701337,
+        "2009-08-01": 0.03920406326651426,
+        "2009-09-01": 0.0369599676633158,
+        "2009-10-01": 0.08322476351982806,
+        "2009-11-01": -0.02889716539372508,
+        "2009-12-01": -0.05116616546587396
+      },
+      "actual": {
+        "2009-01-01": 0.01260533703269364,
+        "2009-02-01": -0.012888138143468366,
+        "2009-03-01": 0.004095066838679271,
+        "2009-04-01": -0.07515029397860505,
+        "2009-05-01": 0.05369574571107245,
+        "2009-06-01": 0.06935846273964592,
+        "2009-07-01": -0.019192993452817612,
+        "2009-08-01": 0.03920406326647403,
+        "2009-09-01": 0.036959967663278886,
+        "2009-10-01": 0.08322476351951819,
+        "2009-11-01": -0.028897165393540994,
+        "2009-12-01": -0.051166165465864534
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "online_sales.sales_amount_yoy_pct",
+      "interface": "cube_json",
+      "query": "{\"measures\": [\"online_sales.sales_amount_yoy_pct\"], \"timeDimensions\": [{\"dimension\": \"online_sales.DateKey\", \"dateRange\": [\"2009-01-01\", \"2009-12-31\"], \"granularity\": \"month\"}], \"order\": {\"online_sales.DateKey\": \"asc\"}}",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactOnlineSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 year WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": 0.01260533703269364,
+        "2009-02-01": -0.012888138143424368,
+        "2009-03-01": 0.004095066838564471,
+        "2009-04-01": -0.07515029397818687,
+        "2009-05-01": 0.053695745711122636,
+        "2009-06-01": 0.06935846273989306,
+        "2009-07-01": -0.019192993452701337,
+        "2009-08-01": 0.03920406326651426,
+        "2009-09-01": 0.0369599676633158,
+        "2009-10-01": 0.08322476351982806,
+        "2009-11-01": -0.02889716539372508,
+        "2009-12-01": -0.05116616546587396
+      },
+      "actual": {
+        "2009-01-01": 0.01260533703269364,
+        "2009-02-01": -0.012888138143468366,
+        "2009-03-01": 0.004095066838679271,
+        "2009-04-01": -0.07515029397860505,
+        "2009-05-01": 0.05369574571107245,
+        "2009-06-01": 0.06935846273964592,
+        "2009-07-01": -0.019192993452817612,
+        "2009-08-01": 0.03920406326647403,
+        "2009-09-01": 0.036959967663278886,
+        "2009-10-01": 0.08322476351951819,
+        "2009-11-01": -0.028897165393540994,
+        "2009-12-01": -0.051166165465864534
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "online_sales.sales_amount_mom_pct",
+      "interface": "cube_sql",
+      "query": "SELECT DATE_TRUNC('month', online_sales.\"DateKey\") AS period, MEASURE(online_sales.sales_amount_mom_pct) AS value FROM online_sales WHERE online_sales.\"DateKey\" >= DATE '2009-01-01' AND online_sales.\"DateKey\" < DATE '2010-01-01' GROUP BY 1 ORDER BY 1",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactOnlineSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 month WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": -0.2021959783572669,
+        "2009-02-01": 0.04243731012557051,
+        "2009-03-01": 0.01529550161515236,
+        "2009-04-01": 0.14933742588888557,
+        "2009-05-01": 0.17448378283898588,
+        "2009-06-01": -0.0031664238970162766,
+        "2009-07-01": 0.0116921643316549,
+        "2009-08-01": -0.06257216682624539,
+        "2009-09-01": -0.03756512470909028,
+        "2009-10-01": 0.007076604776680743,
+        "2009-11-01": -0.10687081238075981,
+        "2009-12-01": 0.01718495926199009
+      },
+      "actual": {
+        "2009-01-01": -0.2021959783572669,
+        "2009-02-01": 0.042437310125715305,
+        "2009-03-01": 0.01529550161512533,
+        "2009-04-01": 0.1493374258888295,
+        "2009-05-01": 0.1744837828393049,
+        "2009-06-01": -0.0031664238971844346,
+        "2009-07-01": 0.011692164331781517,
+        "2009-08-01": -0.06257216682640046,
+        "2009-09-01": -0.037565124709441976,
+        "2009-10-01": 0.007076604776542425,
+        "2009-11-01": -0.10687081238077376,
+        "2009-12-01": 0.01718495926199009
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "online_sales.sales_amount_mom_pct",
+      "interface": "cube_json",
+      "query": "{\"measures\": [\"online_sales.sales_amount_mom_pct\"], \"timeDimensions\": [{\"dimension\": \"online_sales.DateKey\", \"dateRange\": [\"2009-01-01\", \"2009-12-31\"], \"granularity\": \"month\"}], \"order\": {\"online_sales.DateKey\": \"asc\"}}",
+      "reference_sql": "WITH periods AS (SELECT toStartOfMonth(DateKey) AS period, sum(SalesAmount) AS amount FROM retail.FactOnlineSales GROUP BY period) SELECT toString(cur.period), (cur.amount - prev.amount) / nullIf(prev.amount, 0) FROM periods cur LEFT JOIN periods prev ON prev.period = cur.period - INTERVAL 1 month WHERE cur.period >= '2009-01-01' AND cur.period < '2010-01-01' ORDER BY cur.period",
+      "expected": {
+        "2009-01-01": -0.2021959783572669,
+        "2009-02-01": 0.04243731012557051,
+        "2009-03-01": 0.01529550161515236,
+        "2009-04-01": 0.14933742588888557,
+        "2009-05-01": 0.17448378283898588,
+        "2009-06-01": -0.0031664238970162766,
+        "2009-07-01": 0.0116921643316549,
+        "2009-08-01": -0.06257216682624539,
+        "2009-09-01": -0.03756512470909028,
+        "2009-10-01": 0.007076604776680743,
+        "2009-11-01": -0.10687081238075981,
+        "2009-12-01": 0.01718495926199009
+      },
+      "actual": {
+        "2009-01-01": -0.2021959783572669,
+        "2009-02-01": 0.042437310125715305,
+        "2009-03-01": 0.01529550161512533,
+        "2009-04-01": 0.1493374258888295,
+        "2009-05-01": 0.1744837828393049,
+        "2009-06-01": -0.0031664238971844346,
+        "2009-07-01": 0.011692164331781517,
+        "2009-08-01": -0.06257216682640046,
+        "2009-09-01": -0.037565124709441976,
+        "2009-10-01": 0.007076604776542425,
+        "2009-11-01": -0.10687081238077376,
+        "2009-12-01": 0.01718495926199009
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "online_sales.sales_amount_share",
+      "interface": "cube_sql",
+      "query": "SELECT online_sales.\"StoreKey\" AS period, MEASURE(online_sales.sales_amount_share) AS value FROM online_sales WHERE online_sales.\"DateKey\" >= DATE '2009-01-01' AND online_sales.\"DateKey\" < DATE '2010-01-01' GROUP BY 1 ORDER BY 1",
+      "reference_sql": "SELECT toString(StoreKey), sum(SalesAmount) / (SELECT sum(SalesAmount) FROM retail.FactOnlineSales WHERE toYear(DateKey) = 2009) FROM retail.FactOnlineSales WHERE toYear(DateKey) = 2009 GROUP BY StoreKey ORDER BY StoreKey",
+      "expected": {
+        "199": 0.35918871473161185,
+        "306": 0.28930860766990624,
+        "307": 0.35150267759842285
+      },
+      "actual": {
+        "199": 0.35918871473163044,
+        "306": 0.28930860766991945,
+        "307": 0.35150267759846693
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "online_sales.sales_amount_share",
+      "interface": "cube_json",
+      "query": "{\"measures\": [\"online_sales.sales_amount_share\"], \"timeDimensions\": [{\"dimension\": \"online_sales.DateKey\", \"dateRange\": [\"2009-01-01\", \"2009-12-31\"]}], \"dimensions\": [\"online_sales.StoreKey\"], \"order\": {\"online_sales.StoreKey\": \"asc\"}}",
+      "reference_sql": "SELECT toString(StoreKey), sum(SalesAmount) / (SELECT sum(SalesAmount) FROM retail.FactOnlineSales WHERE toYear(DateKey) = 2009) FROM retail.FactOnlineSales WHERE toYear(DateKey) = 2009 GROUP BY StoreKey ORDER BY StoreKey",
+      "expected": {
+        "199": 0.35918871473161185,
+        "306": 0.28930860766990624,
+        "307": 0.35150267759842285
+      },
+      "actual": {
+        "199": 0.35918871473163044,
+        "306": 0.28930860766991945,
+        "307": 0.35150267759846693
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "sales.same_store_sales_growth_pct",
+      "interface": "cube_sql",
+      "query": "SELECT DATE_TRUNC('year', sales.\"DateKey\") AS period, MEASURE(sales.same_store_sales_growth_pct) AS value FROM sales WHERE sales.\"DateKey\" >= DATE '2009-01-01' AND sales.\"DateKey\" < DATE '2010-01-01' GROUP BY 1 ORDER BY 1",
+      "reference_sql": "WITH same_stores AS (SELECT StoreKey FROM retail.FactSales WHERE toYear(DateKey) IN (2008, 2009) GROUP BY StoreKey HAVING uniqExact(toYear(DateKey)) = 2) SELECT '2009-01-01', (sumIf(SalesAmount, toYear(DateKey) = 2009) - sumIf(SalesAmount, toYear(DateKey) = 2008)) / nullIf(sumIf(SalesAmount, toYear(DateKey) = 2008), 0) FROM retail.FactSales WHERE StoreKey IN same_stores AND toYear(DateKey) IN (2008, 2009)",
+      "expected": {
+        "2009-01-01": -0.09536613090465768
+      },
+      "actual": {
+        "2009-01-01": -0.09536613090455956
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    },
+    {
+      "member": "sales.same_store_sales_growth_pct",
+      "interface": "cube_json",
+      "query": "{\"measures\": [\"sales.same_store_sales_growth_pct\"], \"timeDimensions\": [{\"dimension\": \"sales.DateKey\", \"granularity\": \"year\", \"dateRange\": [\"2009-01-01\", \"2009-12-31\"]}], \"order\": {\"sales.DateKey\": \"asc\"}}",
+      "reference_sql": "WITH same_stores AS (SELECT StoreKey FROM retail.FactSales WHERE toYear(DateKey) IN (2008, 2009) GROUP BY StoreKey HAVING uniqExact(toYear(DateKey)) = 2) SELECT '2009-01-01', (sumIf(SalesAmount, toYear(DateKey) = 2009) - sumIf(SalesAmount, toYear(DateKey) = 2008)) / nullIf(sumIf(SalesAmount, toYear(DateKey) = 2008), 0) FROM retail.FactSales WHERE StoreKey IN same_stores AND toYear(DateKey) IN (2008, 2009)",
+      "expected": {
+        "2009-01-01": -0.09536613090465768
+      },
+      "actual": {
+        "2009-01-01": -0.09536613090455956
+      },
+      "passed": true,
+      "error": null,
+      "error_class": null
+    }
+  ]
+}

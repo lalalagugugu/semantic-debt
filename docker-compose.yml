@@ -1,0 +1,48 @@
+name: semdebt-t16
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8.20.4
+    environment:
+      CLICKHOUSE_SKIP_USER_SETUP: "1"
+      CLICKHOUSE_DO_NOT_CHOWN: "1"
+    ports:
+      - "127.0.0.1:18123:8123"
+    volumes:
+      - ${SEMDEBT_DATA_DIR:?Set SEMDEBT_DATA_DIR}/clickhouse-t16:/var/lib/clickhouse
+      - ${SEMDEBT_DATA_DIR:?Set SEMDEBT_DATA_DIR}/parquet:/var/lib/clickhouse/user_files/parquet:ro
+      - ./templates/cube-clickhouse-init.sql:/docker-entrypoint-initdb.d/01-readonly.sql:ro
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  cube:
+    image: cubejs/cube:v1.8.6
+    ports:
+      - "127.0.0.1:14000:4000"
+      - "127.0.0.1:15432:5432"
+    environment:
+      CUBEJS_DEV_MODE: "true"
+      CUBEJS_TELEMETRY: "false"
+      CUBEJS_DB_TYPE: clickhouse
+      CUBEJS_DB_HOST: clickhouse
+      CUBEJS_DB_PORT: "8123"
+      CUBEJS_DB_NAME: retail
+      CUBEJS_DB_USER: cube
+      CUBEJS_PG_SQL_PORT: "5432"
+      CUBEJS_TESSERACT_SQL_PLANNER: "true"
+      CUBEJS_SCHEDULED_REFRESH_DEFAULT: "false"
+      CUBEJS_DB_QUERY_DEFAULT_LIMIT: "2000001"
+      CUBEJS_DB_QUERY_LIMIT: "2000001"
+    volumes:
+      - ./build/cube/model:/cube/conf/model:ro
+      - ./templates/cube.js:/cube/conf/cube.js:ro
+      - ${SEMDEBT_DATA_DIR:?Set SEMDEBT_DATA_DIR}/cubestore-t16:/cube/conf/.cubestore
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:4000/readyz', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 30

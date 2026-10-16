@@ -1,7 +1,7 @@
 """Query executors: ``execute(query) -> ExecResult``.
 
-Every stack gets the same interface. Only chDB is implemented here (T11); the
-Cube SQL, Cube JSON and DAX executors are placeholders for T16 / T17.
+Every stack gets the same interface. chDB (T11) and Cube SQL / JSON (T16) are
+implemented here; DAX is reserved for T17.
 
 The chDB executor enforces a per-cell *database scope* before execution
 (T11 card, carried-forward requirement 1): a query that names a table in a
@@ -14,12 +14,18 @@ count it separately (decisions/2026-10-16-l1_5s-lineage-and-execution-scope.md).
 from __future__ import annotations
 
 import hashlib
+import asyncio
 import json
 import os
 import re
+import secrets
 import threading
 import time
+import urllib.error
+import urllib.request
 from dataclasses import dataclass, field
+from datetime import date, datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Protocol
 
@@ -32,6 +38,9 @@ FORBIDDEN_STATEMENT = "forbidden_statement"
 TIMEOUT = "timeout"
 RESOURCE_LIMIT = "resource_limit"       # memory or result-row cap; ``limit`` says which
 ENGINE_ERROR = "engine_error"
+INTERFACE_LIMITATION = "interface_limitation"
+TRANSPORT_ERROR = "transport_error"
+INVALID_RESPONSE = "invalid_response"
 
 # Global resource caps: generous but bounded, one value for every question and
 # cell (never per question). The largest reference result has 561,293 rows; the
@@ -342,7 +351,247 @@ def _classify(text: str) -> tuple[str, str | None]:
 
 
 # ---------------------------------------------------------------------------
-# Reserved for later cards. Same interface; not implemented in T11.
+# Cube Core (T16)
+
+
+def _cube_error(message: str, start: float, *, sqlstate: str | None = None) -> ExecResult:
+    error_class, limit = _classify(message)
+    if error_class == ENGINE_ERROR:
+        if sqlstate == "57014" or re.search(r"timeout|timed out|time limit", message, re.IGNORECASE):
+            error_class = TIMEOUT
+        elif sqlstate == "0A000" or re.search(r"not supported|unsupported|can't find rewrite", message, re.IGNORECASE):
+            error_class = INTERFACE_LIMITATION
+    return ExecResult(error=message, error_class=error_class, limit=limit,
+                      detail=message, elapsed_s=time.monotonic() - start)
+
+
+def _pg_readonly(sql: str) -> bool:
+    # PostgreSQL also has dollar-quoted strings and nested block comments. Mask
+    # them before checking keywords, so a comment cannot hide a second statement.
+    pattern = re.compile(r"--[^\n]*|/\*|\$(?:[A-Za-z_]\w*)?\$|(?i:\bE)'(?:''|\\.|[^'\\])*'|'(?:''|[^'])*'|\"(?:\"\"|[^\"])*\"", re.DOTALL)
+    parts, offset = [], 0
+    while match := pattern.search(sql, offset):
+        parts.append(sql[offset:match.start()])
+        token, end = match.group(), match.end()
+        if token == "/*":
+            depth = 1
+            while depth:
+                nested = re.search(r"/\*|\*/", sql[end:])
+                if nested is None:
+                    return False
+                end += nested.end()
+                depth += 1 if nested.group() == "/*" else -1
+        elif token.startswith("$"):
+            close = sql.find(token, end)
+            if close < 0:
+                return False
+            end = close + len(token)
+        parts.append(" ")
+        offset = end
+    parts.append(sql[offset:])
+    masked = "".join(parts).strip()
+    if masked.endswith(";"):
+        masked = masked[:-1]
+    words = re.findall(r"\b[A-Za-z_]\w*\b", masked.upper())
+    forbidden = {"INSERT", "UPDATE", "DELETE", "MERGE", "UPSERT", "CREATE", "ALTER", "DROP", "TRUNCATE",
+                 "COPY", "DO", "CALL", "GRANT", "REVOKE", "SET", "RESET", "INTO", "EXECUTE", "PREPARE",
+                 "BEGIN", "COMMIT", "ROLLBACK", "VACUUM", "REINDEX", "LISTEN", "NOTIFY", "LOAD", "INSTALL"}
+    return bool(words) and words[0] in {"SELECT", "WITH"} and ";" not in masked and not forbidden.intersection(words)
+
+
+def _cube_scalar(value: object) -> object:
+    if isinstance(value, datetime):
+        return value.isoformat(sep=" ")
+    if isinstance(value, date):
+        return value.isoformat()
+    return value
+
+
+class CubeSqlExecutor:
+    """One read-only Postgres query per connection; safe to share across workers.
+
+    Defaults match docker-compose.yml. For an authenticated deployment supply
+    CUBE_SQL_HOST / PORT / USER / PASSWORD / DATABASE as environment variables.
+    Local Cube dev mode accepts any password; an ephemeral value makes libpq
+    send the authentication response without storing a development credential.
+    """
+
+    name = "cube_sql"
+
+    def __init__(self, *, timeout_s: int = 120, max_result_rows: int = DEFAULT_MAX_RESULT_ROWS) -> None:
+        if timeout_s <= 0 or max_result_rows < 1:
+            raise ValueError("timeout_s and max_result_rows must be positive")
+        self.timeout_s = timeout_s
+        self.max_result_rows = max_result_rows
+
+    async def _query(self, sql: str) -> ExecResult:
+        import psycopg
+
+        conn = await psycopg.AsyncConnection.connect(
+            host=os.environ.get("CUBE_SQL_HOST", "127.0.0.1"),
+            port=int(os.environ.get("CUBE_SQL_PORT", "15432")),
+            user=os.environ.get("CUBE_SQL_USER", "cube"),
+            password=os.environ.get("CUBE_SQL_PASSWORD") or secrets.token_urlsafe(),
+            dbname=os.environ.get("CUBE_SQL_DATABASE", "cube"),
+            connect_timeout=max(1, self.timeout_s), autocommit=True,
+        )
+        async with conn:
+            async with conn.cursor() as cur:
+                await cur.execute(sql)
+                if cur.description is None:
+                    return ExecResult(error="Query returned no result set.", error_class=INVALID_RESPONSE)
+                columns = [{"name": col.name, "type": f"pg:{col.type_code}"} for col in cur.description]
+                rows = []
+                while batch := await cur.fetchmany(min(4096, self.max_result_rows + 1 - len(rows))):
+                    rows.extend([_cube_scalar(value) for value in row] for row in batch)
+                    if len(rows) > self.max_result_rows:
+                        return ExecResult(error="Result row limit exceeded.", error_class=RESOURCE_LIMIT, limit="result_rows")
+                return ExecResult(rows=rows, columns=columns)
+
+    async def _timed_query(self, sql: str) -> ExecResult:
+        return await asyncio.wait_for(self._query(sql), timeout=self.timeout_s)
+
+    def execute(self, query: str) -> ExecResult:
+        start = time.monotonic()
+        if not _pg_readonly(query):
+            return ExecResult(error="Only a single read-only SELECT query is allowed.",
+                              error_class=FORBIDDEN_STATEMENT, elapsed_s=time.monotonic() - start)
+        try:
+            result = asyncio.run(self._timed_query(query))
+        except TimeoutError:
+            return ExecResult(error="Cube SQL query timed out.", error_class=TIMEOUT, elapsed_s=time.monotonic() - start)
+        except Exception as exc:
+            import psycopg
+
+            # Connection diagnostics may contain credentials from the connection
+            # string, so keep transport errors generic in both logs and prompts.
+            if isinstance(exc, psycopg.OperationalError) and not exc.sqlstate:
+                return ExecResult(error="Cube SQL connection failed.", error_class=TRANSPORT_ERROR,
+                                  elapsed_s=time.monotonic() - start)
+            return _cube_error(_clean_error(exc), start, sqlstate=getattr(exc, "sqlstate", None))
+        return ExecResult(rows=result.rows, columns=result.columns, error=result.error, error_class=result.error_class,
+                          limit=result.limit, detail=result.detail, elapsed_s=time.monotonic() - start)
+
+
+class CubeJsonExecutor:
+    """POST a single query object to /load; only Continue wait is polled again.
+
+    Keep Cube's query validation and errors intact. No synthetic expressions,
+    implicit pagination, or retries of failed queries are added here.
+    """
+
+    name = "cube_json"
+
+    def __init__(self, *, timeout_s: int = 120, max_result_rows: int = DEFAULT_MAX_RESULT_ROWS) -> None:
+        if timeout_s <= 0 or max_result_rows < 1:
+            raise ValueError("timeout_s and max_result_rows must be positive")
+        self.timeout_s = timeout_s
+        self.max_result_rows = max_result_rows
+
+    def execute(self, query: str) -> ExecResult:
+        start = time.monotonic()
+        try:
+            obj = json.loads(query)
+            if not isinstance(obj, dict):
+                raise ValueError("Cube JSON expects one query object.")
+        except ValueError as exc:
+            return ExecResult(error=str(exc), error_class=ENGINE_ERROR, elapsed_s=time.monotonic() - start)
+        base = os.environ.get("CUBE_REST_URL", "http://127.0.0.1:14000/cubejs-api/v1").rstrip("/")
+        headers = {"Content-Type": "application/json"}
+        if token := os.environ.get("CUBE_REST_TOKEN"):
+            headers["Authorization"] = f"Bearer {token}"
+        req = urllib.request.Request(base + "/load", data=json.dumps({"query": obj}).encode(), headers=headers)
+        deadline = start + self.timeout_s
+        while True:
+            try:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError
+                try:
+                    response = urllib.request.urlopen(req, timeout=remaining)
+                except urllib.error.HTTPError as exc:
+                    response = exc
+                with response:
+                    payload = json.load(response)
+                if not isinstance(payload, dict):
+                    raise ValueError("Cube response must be an object.")
+                error = payload.get("error")
+                if error == "Continue wait":
+                    time.sleep(min(0.2, max(0, deadline - time.monotonic())))
+                    continue
+                if error:
+                    return _cube_error(str(error), start)
+                if response.status >= 400:
+                    return ExecResult(error=f"Cube HTTP error {response.status}.", error_class=TRANSPORT_ERROR,
+                                      elapsed_s=time.monotonic() - start)
+                rows, columns = self._decode(payload, obj)
+                if len(rows) > self.max_result_rows:
+                    return ExecResult(error="Result row limit exceeded.", error_class=RESOURCE_LIMIT,
+                                      limit="result_rows", elapsed_s=time.monotonic() - start)
+                return ExecResult(rows=rows, columns=columns, elapsed_s=time.monotonic() - start)
+            except TimeoutError:
+                return ExecResult(error="Cube REST query timed out.", error_class=TIMEOUT, elapsed_s=time.monotonic() - start)
+            except urllib.error.URLError as exc:
+                kind = TIMEOUT if isinstance(exc.reason, TimeoutError) else TRANSPORT_ERROR
+                return ExecResult(error="Cube REST request failed.", error_class=kind, elapsed_s=time.monotonic() - start)
+            except (OSError, ValueError, KeyError, TypeError, InvalidOperation) as exc:
+                kind = TRANSPORT_ERROR if isinstance(exc, OSError) else INVALID_RESPONSE
+                return ExecResult(error=f"Cube REST {kind}.", error_class=kind, elapsed_s=time.monotonic() - start)
+
+    @staticmethod
+    def _decode(payload: dict, query: dict) -> tuple[list[list[object]], list[dict[str, str]]]:
+        data, annotation = payload["data"], payload["annotation"]
+        if not isinstance(data, list) or not isinstance(annotation, dict):
+            raise ValueError("Invalid Cube result shape")
+        members = []
+        # Cube annotates a time bucket twice (DateKey and DateKey.month).
+        # Keep the granular key, unless the base dimension was explicitly selected
+        # as well. An ungrouped timeDimensions entry is only a filter.
+        buckets = annotation.get("timeDimensions", {})
+        if not isinstance(buckets, dict):
+            raise ValueError("Invalid time dimension annotations")
+        for group in ("dimensions", "timeDimensions", "measures"):
+            entries = annotation.get(group, {})
+            if not isinstance(entries, dict):
+                raise ValueError("Invalid result annotations")
+            for name, info in entries.items():
+                if not isinstance(name, str) or not isinstance(info, dict) or not isinstance(info.get("type"), str):
+                    raise ValueError("Invalid member annotation")
+                if group in {"dimensions", "timeDimensions"} and name not in query.get("dimensions", []) and any(
+                    bucket.startswith(name + ".") for bucket in buckets
+                ):
+                    continue
+                if any(existing == name for existing, _ in members):
+                    continue
+                members.append((name, info["type"]))
+
+        def convert(value, kind):
+            if value is None:
+                return None
+            if kind == "number":
+                # Preserve exact integers and decimals; never turn numeric string
+                # dimensions into numbers without an explicit annotation.
+                number = Decimal(str(value))
+                return int(number) if number.is_finite() and number == number.to_integral_value() else number
+            if kind == "time":
+                return datetime.fromisoformat(value.replace("Z", "+00:00")).isoformat(sep=" ")
+            if kind == "boolean":
+                if value in (True, "true", "1", 1):
+                    return True
+                if value in (False, "false", "0", 0):
+                    return False
+                raise ValueError("Invalid boolean")
+            return value
+
+        if any(not isinstance(row, dict) for row in data):
+            raise ValueError("Invalid result row")
+        rows = [[convert(row[name], kind) for name, kind in members] for row in data]
+        if data and not members:
+            raise ValueError("Missing result annotations")
+        return rows, [{"name": name, "type": kind} for name, kind in members]
+
+
+# Reserved for T17.
 
 
 class _Reserved:
@@ -353,14 +602,6 @@ class _Reserved:
 
     def execute(self, query: str) -> ExecResult:  # pragma: no cover - placeholder
         raise NotImplementedError(f"{self.name} is implemented in {self.card}")
-
-
-class CubeSqlExecutor(_Reserved):
-    card = "T16"
-
-
-class CubeJsonExecutor(_Reserved):
-    card = "T16"
 
 
 class DaxExecutor(_Reserved):
