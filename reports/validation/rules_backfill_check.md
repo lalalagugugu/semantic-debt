@@ -81,3 +81,75 @@ G0已通过的历史事实保留；新的契约／参考影响交用户评估，
 再次rebase到main的9562d85；保留六列状态表及12项待办，第11、12项与该main逐字一致，补回本PR已实现及已复验的状态。相对前次已验证的0b2dcbb，评分器、选择器、校验脚本、测试及依赖文件均无差异；新上游只涉及文档与任务元数据。
 
 本次实际运行相关离线测试，126 passed、16 skipped，并校验表格列数、待办唯一性及冲突标记。没有再次执行600条；上一节两轮600条的证据对应相同的程序代码，判定变化0的结论保持。
+
+## 2026-10-16：T05正式参考收尾后的最终600条
+
+本轮主分支由已合并#36后的main新建，随后同步main21cacd9；评分器、选择器、全局量纲及validate_scorer与此前main95575fd逐字一致。题库也从最新main新开分支，未复用T05-work。
+
+- 条件(d)：7/122题包含分组／嵌套Top-N（外部Q22、Q71、Q74、Q85、Q98；新题Q117、Q119）。
+- 第二轮22题正式SQL落地；122题148份参考从头重算并另一次严格复算通过。外部100题119份，新题22题29份；类型来自实际返回meta，外部逐参考量纲推断表留题库供过目。
+- 购买事件全122题扫描，18题21份原参考执行两种算法；9题不同并新增9份去重参考（Q26、Q33、Q36、Q76、Q80、Q89、Q115、Q116、Q122）。全部订单总体保持冻结定义。依据2026-10-16-return-only-rows-and-purchase-events.md；已知冻结层口径选择及双解处理须由T19披露。
+- 20题24份INNER／LEFT全部实测；字面21份不同、3份相同。Q73保留事实对象粒度后Top-10相同，因此正确粒度为20份不同、4份无输出影响。包含Q42-1量化差分尾差，不宣称全是业务金额损失。剩余3条INNER路径有无影响证据；Q33当前两份SQL参考已完整离线复算，不是未验证。
+- Q79的306成员及量纲策略SHA已存题库，当前重算一致；冻结门槛为T05b独立pandas成员多重集一致，缺证据拒绝放行。T05b已开工，尚未取得独立通过结论。
+
+| 比较轴 | 变化条数 |
+|---|---:|
+| 基线复执行 vs 干净基线 | 0 |
+| 仅契约 vs 原公开参考旧契约 | 0 |
+| 仅参考 vs 原公开参考旧契约 | 73 |
+| 当前参考＋契约 vs 原公开参考旧契约 | 74 |
+| 当前参考＋契约 vs #36当时修订参考 | 43 |
+
+最后43条全部correct→wrong：37条行数不同、6条分组覆盖不全；是本轮参考修复后的增量，不是契约变化。联合74条相对原公开参考为49条correct→wrong、25条wrong→correct。起点不同，不能相加。
+
+仅契约轴correct251／wrong304／exec_error39／excluded6，strict521/594、analytical487/594，排除既定11条有意更宽后521/583，均保持历史数字。修订参考轴不以judge示例作闭集：原Q33六条排除、其他12题72条judge保持；522条确定性结果为correct220／wrong272／exec_error30，不能与594条原公开基线直接比较准确率。600条只覆盖外部100题。
+
+实际执行600条，失败后重置43次。原始候选及逐条四轴保存在外部数据目录／私有题库；主仓库只列题号及汇总。两个未完成轮次各执行121条，在大行集敏感性投影／列排列处中止；正式验收runner省去非判定的投影并加NULL必要条件等价早拒绝，合成对照正式评分器通过后从头执行全600，不改生产评分标准。最新main相关离线检查132 passed、1 skipped、15 deselected，明确排除主chdb集成函数。
+
+| 系统 | 题号 | #36修订参考 | 本轮修订参考 | 原因 |
+|---|---|---|---|---|
+| O-R | Q21 | correct | wrong | row_count |
+| O-R | Q61 | correct | wrong | row_count |
+| O-R | Q62 | correct | wrong | row_count |
+| O-R | Q67 | correct | wrong | row_count |
+| O-R | Q71 | correct | wrong | selection_group_coverage |
+| O-R | Q76 | correct | wrong | row_count |
+| O-S | Q11 | correct | wrong | row_count |
+| O-S | Q61 | correct | wrong | row_count |
+| O-S | Q62 | correct | wrong | row_count |
+| O-S | Q67 | correct | wrong | row_count |
+| O-S | Q71 | correct | wrong | selection_group_coverage |
+| O-S | Q76 | correct | wrong | row_count |
+| O-S | Q90 | correct | wrong | row_count |
+| S-R | Q61 | correct | wrong | row_count |
+| S-R | Q62 | correct | wrong | row_count |
+| S-R | Q67 | correct | wrong | row_count |
+| S-R | Q71 | correct | wrong | selection_group_coverage |
+| S-R | Q76 | correct | wrong | row_count |
+| S-S | Q11 | correct | wrong | row_count |
+| S-S | Q20 | correct | wrong | row_count |
+| S-S | Q21 | correct | wrong | row_count |
+| S-S | Q24 | correct | wrong | row_count |
+| S-S | Q34 | correct | wrong | row_count |
+| S-S | Q61 | correct | wrong | row_count |
+| S-S | Q62 | correct | wrong | row_count |
+| S-S | Q67 | correct | wrong | row_count |
+| S-S | Q71 | correct | wrong | selection_group_coverage |
+| S-S | Q76 | correct | wrong | row_count |
+| S-S | Q90 | correct | wrong | row_count |
+| S-S | Q99 | correct | wrong | row_count |
+| G-R | Q61 | correct | wrong | row_count |
+| G-R | Q62 | correct | wrong | row_count |
+| G-R | Q71 | correct | wrong | selection_group_coverage |
+| G-R | Q76 | correct | wrong | row_count |
+| G-S | Q11 | correct | wrong | row_count |
+| G-S | Q20 | correct | wrong | row_count |
+| G-S | Q21 | correct | wrong | row_count |
+| G-S | Q34 | correct | wrong | row_count |
+| G-S | Q61 | correct | wrong | row_count |
+| G-S | Q62 | correct | wrong | row_count |
+| G-S | Q71 | correct | wrong | selection_group_coverage |
+| G-S | Q76 | correct | wrong | row_count |
+| G-S | Q99 | correct | wrong | row_count |
+
+最终输出SHA256：5648377e268b201f1d6a55225847dc93c2c5c8550c0c148a06a20506e6236939；完整原始候选SHA256：b6cc390d63452b8c412cc0845dd7631a92e07a8b4b782b43cccde6a100e772fb。G0的历史原公开参考证据保留；修订参考的影响提交用户审阅，不当作模型能力变化或自动重批G0。T05b／T06及英文原始参考rules接线仍按分工推进。
