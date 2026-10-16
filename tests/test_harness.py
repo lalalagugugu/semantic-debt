@@ -568,6 +568,33 @@ def test_anchor_rules_follow_column_structure():
     assert anchor_rules([{"name": "c", "type": "UInt64"}], [[5]], current) == (r1, None)
     assert anchor_rules([{"name": "a", "type": "String"}, {"name": "b", "type": "Float64"}], [["x", 2.0]], current)[0] is r2
     assert anchor_rules([{"name": "c", "type": "Int64"}], [[5]], current) == (None, "structure_differs")
+    # §3.1: Nullable(...) is stripped before comparing
+    assert anchor_rules([{"name": "c", "type": "Nullable(UInt64)"}], [[5]], current) == (r1, None)
+    assert anchor_rules([{"name": "a", "type": "String"}, {"name": "b", "type": "Nullable(Float64)"}],
+                        [["x", None]], current)[0] is r2
+    # §3.2: an empty original reference is scored as empty only if the published artifact is empty too
+    wide = [{"name": "a", "type": "String"}, {"name": "b", "type": "Float64"}, {"name": "c", "type": "Float64"}]
+    assert anchor_rules(wide, [], current, published_rows=0) == (r1, None)
+    assert anchor_rules(wide, [], current, published_rows=3)[0] is None
+    assert anchor_rules(wide, [], current, published_rows=None)[0] is None
+
+
+@needs_eval
+def test_anchor_details_on_the_real_bank():
+    """decisions/2026-10-16-q79-release-and-anchor-refs.md §3 on the real anchors."""
+    from harness.anchor_refs import anchor_dir
+    from harness.questions import load_questions, load_zh, published_row_count
+    if not (anchor_dir() / "MANIFEST.json").exists():
+        pytest.skip("anchor references not built")
+    zh = {q.qid: q for q in load_zh(EVAL)}
+    en = {q.qid: q for q in load_questions(EVAL, lang="en")}
+    for qid in ("EN84", "EN100"):           # differ from the current refs only by Nullable(...)
+        assert en[qid].pending is None and en[qid].rules == zh[en[qid].meta["bank_qid"]].rules
+    for qid in ("EN39", "EN49"):            # empty locally and in the published artifact
+        assert en[qid].refs == [[]] and en[qid].meta["empty_original_ref"]
+        assert published_row_count(EVAL, en[qid].meta["vendor_id"]) == 0
+        assert en[qid].rules == zh[en[qid].meta["bank_qid"]].rules
+    assert en["EN49"].pending is None and en["EN39"].pending == "judge"
 
 
 def test_rescore_rebuilds_candidates_from_runs_raw(tmp_path):
