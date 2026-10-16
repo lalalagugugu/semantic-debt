@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts.validate_scorer import complete_boundary, final_order_clause, question_rules, reference_digest, verify_reference_digests, reviewed_categories
+from scripts.validate_scorer import complete_boundary, final_order_clause, question_rules, reference_digest, reset_session, verify_reference_digests, reviewed_categories
 
 
 def test_outer_order_excludes_window_subquery_and_comments() -> None:
@@ -35,6 +35,21 @@ def test_changed_reference_members_are_rejected() -> None:
     with pytest.raises(RuntimeError, match="not reproducible"):
         verify_reference_digests([first, changed, first], 25)
     verify_reference_digests([first, first, first], 25)
+
+
+def test_boundary_hash_versions_detect_policy_changes(tmp_path: Path, monkeypatch) -> None:
+    from scripts import validate_scorer
+
+    (tmp_path / "harness").mkdir()
+    policy = tmp_path / "harness/value_units.py"
+    policy.write_text("first policy")
+    monkeypatch.setattr(validate_scorer, "REPO", tmp_path)
+    first = validate_scorer.boundary_hash_versions()
+    policy.write_text("second policy")
+    second = validate_scorer.boundary_hash_versions()
+    assert first["unit_policy_sha256"] != second["unit_policy_sha256"]
+    assert first["boundary_policy_sha256"] == second["boundary_policy_sha256"]
+    assert first["serialization_version"] == "json-compact-utf8-v1"
 
 
 def test_reviewed_category_ledger_applies_ruling() -> None:
@@ -93,3 +108,35 @@ def test_reference_type_coverage_includes_numeric_other_and_guard_exemptions() -
     report = '\n'.join(reference_column_report(cols))
     assert '**1列**；占2个数值列的**50.00%**' in report
     assert '| Q01 | 1 | `customers` | `Float64` |' in report
+
+
+def test_reset_session_discards_failed_session_and_restores_settings(tmp_path: Path) -> None:
+    class FakeSession:
+        def __init__(self, path: str) -> None:
+            self.path = path
+            self.queries = []
+            self.closed = False
+
+        def query(self, sql: str) -> None:
+            self.queries.append(sql)
+
+        def close(self) -> None:
+            self.closed = True
+
+    class FakeSessionModule:
+        opened = []
+
+        @classmethod
+        def Session(cls, path: str) -> FakeSession:
+            created = FakeSession(path)
+            cls.opened.append(created)
+            return created
+
+    failed = FakeSession(str(tmp_path))
+    clean = reset_session(failed, FakeSessionModule, tmp_path)
+
+    assert failed.closed
+    assert clean is FakeSessionModule.opened[0]
+    assert clean.path == str(tmp_path)
+    assert clean.queries == ["SET max_execution_time = 30", "SET max_threads = 1"]
+    assert not clean.closed
