@@ -577,6 +577,43 @@ def test_anchor_rules_follow_column_structure():
     assert anchor_rules(wide, [], current, published_rows=0) == (r1, None)
     assert anchor_rules(wide, [], current, published_rows=3)[0] is None
     assert anchor_rules(wide, [], current, published_rows=None)[0] is None
+    # rules the question bank wrote for this original reference take precedence, still self-matched
+    own = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other"] * 3,
+           "value_types": ["String", "Float64", "Float64"]}
+    assert anchor_rules(wide, [["x", 1.0, 2.0]], current, original_rules=own) == (own, None)
+    assert anchor_rules(wide, [["x", 1.0]], current, original_rules=own)[0] is None
+
+
+def test_anchor_top_n_reference_is_boundary_complete():
+    """§4.3: a truncated original reference is completed to the whole tie group; any N tied rows score."""
+    from harness.anchor_refs import boundary_sql
+    from harness.questions import anchor_rules
+    assert boundary_sql("SELECT a FROM t ORDER BY a DESC LIMIT 10") == "SELECT a FROM t ORDER BY a DESC LIMIT 10 WITH TIES"
+    assert boundary_sql("SELECT x LIMIT 3 WITH TIES") == "SELECT x LIMIT 3 WITH TIES"
+    assert boundary_sql("SELECT ROW_NUMBER() OVER (ORDER BY s) AS rn") == "SELECT rank() OVER (ORDER BY s) AS rn"
+    top = {"ordered": True, "top_n": 2, "tie_columns": [1], "value_kinds": ["other", "other"],
+           "value_types": ["String", "Float64"]}
+    tied = [["a", 9.0], ["b", 5.0], ["c", 5.0], ["d", 5.0]]
+    current = Question("Q007", "", refs=[tied[:2]], rules=top)
+    meta = [{"name": "n", "type": "String"}, {"name": "v", "type": "Float64"}]
+    # the whole tie group is not a valid answer (scorer contract), so self-match uses N rows of it
+    assert anchor_rules(meta, tied, current)[0] is None
+    assert anchor_rules(meta, tied, current, pick=tied[:2]) == (top, None)
+    from harness.scorer import score_detailed
+    assert score_detailed([["a", 9.0], ["d", 5.0]], [tied], top).outcome == "correct"
+
+
+def test_bank_anchor_rules_are_read_by_id_and_hash(tmp_path):
+    from harness.questions import ANCHOR_RULES, bank_anchor_rules
+    rules = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other"], "value_types": ["Int32"]}
+    sql, payload = "a" * 64, "b" * 64
+    (tmp_path / ANCHOR_RULES).parent.mkdir(parents=True)
+    (tmp_path / ANCHOR_RULES).write_text(
+        "# x\n\n| t |\n\n## EN07\n\n"
+        f"原始SQL SHA256：`{sql}`；payload SHA256：`{payload}`。\n\n```json\n{json.dumps(rules, indent=2)}\n```\n",
+        encoding="utf-8")
+    assert bank_anchor_rules(tmp_path) == {7: {"sql_sha256": sql, "sha256": payload, "rules": rules}}
+    assert bank_anchor_rules(tmp_path / "missing") == {}
 
 
 @needs_eval
@@ -595,6 +632,32 @@ def test_anchor_details_on_the_real_bank():
         assert published_row_count(EVAL, en[qid].meta["vendor_id"]) == 0
         assert en[qid].rules == zh[en[qid].meta["bank_qid"]].rules
     assert en["EN49"].pending is None and en["EN39"].pending == "judge"
+
+
+@needs_eval
+def test_anchor_rules_from_the_bank_and_boundary_on_the_real_bank():
+    """Eval PR #12 rules for the 8 structure-differing anchors; §4.3 boundary for EN79."""
+    import random
+    from harness.anchor_refs import anchor_dir, anchor_manifest
+    from harness.questions import bank_anchor_rules, load_questions
+    from harness.scorer import score_detailed
+    if not (anchor_dir() / "MANIFEST.json").exists():
+        pytest.skip("anchor references not built")
+    written = bank_anchor_rules(EVAL)
+    if not written:
+        pytest.skip("question bank predates the original-anchor rules (eval PR #12)")
+    en = {q.qid: q for q in load_questions(EVAL, lang="en")}
+    built = anchor_manifest()
+    for vid, entry in written.items():          # picked by id, checked against both hashes, used whole
+        q = en[f"EN{vid:02d}"]
+        assert (entry["sql_sha256"], entry["sha256"]) == (built[vid]["sql_sha256"], built[vid]["sha256"])
+        assert q.pending is None and q.rules == entry["rules"]
+    assert all(q.pending in (None, "judge") for q in en.values())
+    q79 = en["EN79"]                            # 306 stores tie at the boundary; any 10 of them score
+    assert q79.meta["boundary_completed"]["original_rows"] == 10 and len(q79.refs[0]) > 10
+    pick = random.Random(0).sample(q79.refs[0], 10)
+    assert score_detailed(pick, q79.refs, q79.rules).outcome == "correct"
+    assert score_detailed(q79.refs[0][:11], q79.refs, q79.rules).outcome == "wrong"
 
 
 def test_rescore_rebuilds_candidates_from_runs_raw(tmp_path):

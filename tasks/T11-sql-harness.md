@@ -119,3 +119,14 @@ L1.5S 的列描述里保留了血缘注记（提到明细表名），这是**有
   - 结果：99 道锚点 81 道可评、12 道 judge、6 道列结构不同待 Codex 补 `rules`（EN13、EN14、EN20、EN74、EN83、EN87），见 `reports/validation/anchor_refs.md`。
   - 测试：全仓 238 过、1 跳过；新增剥 `Nullable`、空参考两种前提的单元测试、真实锚点上 EN84/EN100/EN39/EN49 的断言，锚点端到端加了一道空参考题（用外部原始 SQL 作答 → `correct`）。
 - 工时：第四段约 0.5 小时。
+- 第五段（2026-10-16，题库 #12 交接的 8 份原始参考 `rules`、裁决第四节第 3 条；分支 `T11-anchor-orig-rules`）：
+  - **题库读法**：没有在题库工作区 pull 或切分支（T05 在用）。`git fetch` 之后，从数据目录下 `origin/main` 的只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-dd5853d` 读，题库提交号 **dd5853d**（`eval_commit()` 记为 `dd5853d`）。这个 worktree 在我开工前已经存在，是干净的，检出的正是 `origin/main`，所以直接用了，没有再 `worktree add` 一份。
+  - **接入 8 份 `rules`**（EN13、14、20、21、34、74、83、87）：`harness/questions.py::bank_anchor_rules` 从题库 `audit/anchor-original-rules-review.md` 按外部题号取整份 `rules`，核对原始 SQL 与结果文件的两个 SHA256 都与本地 anchor MANIFEST 一致，再自比；不一致记 `pending: anchor_rules_hash_mismatch`。这些 `rules` 不进中文修订参考。`eval_commit()` 的比对范围加上了这个文件。
+  - **Top-N 补全边界**：`harness/anchor_refs.py` 对每道原始 SQL 另跑一遍「只把截断改为含并列」的版本（`LIMIT n WITH TIES`、`row_number()` 改为 `rank()`），行数多出来的存为 `qNN.boundary.json`。`rules` 是 Top-N 的锚点改用补全后的参考。有 5 道多出行：EN07（10→14）、EN27（10→444）、EN79（10→306）、EN85（10→97）、EN88（20→24）。EN74、EN87 的原始截断没有丢并列。`--check` 104/104 一致。
+  - **EN79**：评分器走 Top-N 并列规则（`top_n = 10`、`tie_columns = [3]`），306 家里任选 10 家判 `correct`，交 11 行判错，有测试。锚点报告里已标「低区分度」。
+  - **结果**：99 道锚点 **87 道可评、12 道 judge、0 道待定**。
+  - **发现的评分器问题**（记入 `decisions/open-questions.md` T11-4，待裁决）：Top-N 严格前缀按位置比，前缀内部并列的行必须同序，否则判 `wrong / values`。受影响的有中文 Q27、Q87、Q88，锚点 EN27、EN88。没有改评分器。
+  - **测试**：全仓 `uv run pytest`（`SEMDEBT_EVAL_DIR` 指向只读 worktree）**290 过、1 跳过**。新增：题库 `rules` 按编号与哈希读取、优先于结构沿用、补全边界的 SQL 改写与自比、真实题库上 8 份 `rules` 与 EN79 的断言；锚点端到端改为四道（普通、空参考、题库补写 `rules`、补全边界的 Top-N），都用外部原始 SQL 作答，全部判 `correct`。
+- 偏离与理由（第五段）：
+  - 补全边界改动了「原始参考」，但只改截断方式，不改口径；裁决第四节第 3 条对 EN79 明确要求这样做。只给 EN79 补，等于按题调，所以对所有 Top-N 锚点一律适用，由 MANIFEST 的 `boundary` 字段如实记录。
+- 工时：第五段约 1.5 小时。

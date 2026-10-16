@@ -145,9 +145,12 @@ def test_mock_end_to_end_english_anchors(tmp_path):
     en = load_questions(EVAL, lang="en")
     scorable = next(q for q in en if q.pending is None and q.refs[0])
     empty = next(q for q in en if q.pending is None and q.meta.get("empty_original_ref"))
-    differs = next(q for q in en if q.pending == "anchor_structure_differs")
+    own = next(q for q in en if q.pending is None and q.meta.get("rules_source"))
+    tied = next(q for q in en if q.pending is None and q.meta.get("boundary_completed")
+                and q.rules.get("top_n") is not None)
+    chosen = [scorable, empty, own, tied]
     vendor_sql = {f"EN{int(v['id']):02d}": v["expected_sql"].strip().rstrip(";") for v in vendor_questions(EVAL)}
-    by_text = {q.text: q.qid for q in (scorable, empty, differs)}
+    by_text = {q.text: q.qid for q in chosen}
 
     def respond(messages):
         return f"```sql\n{vendor_sql[by_text[messages[1]['content']]]}\n```\nAssumption: none"
@@ -157,12 +160,12 @@ def test_mock_end_to_end_english_anchors(tmp_path):
                        executor=R.make_executor(cell, timeout_s=120), system=R.system_for(cell),
                        eval_commit="test", harness_commit=R.harness_commit(), timeout_s=120,
                        raw_dir=tmp_path / "raw")
-    path = R.run_cell(ctx, [scorable, empty, differs], reps=1, concurrency=1, runs_root=tmp_path / "runs",
+    path = R.run_cell(ctx, chosen, reps=1, concurrency=1, runs_root=tmp_path / "runs",
                       progress=lambda *_: None)
     out = {r["qid"]: r for r in map(json.loads, path.read_text(encoding="utf-8").splitlines())}
     assert out[scorable.qid]["final"]["outcome"] == "correct"
     assert out[empty.qid]["final"]["outcome"] == "correct"      # the original SQL's empty result, scored as empty
-    assert out[differs.qid]["final"]["outcome"] == "pending"
-    assert out[differs.qid]["final"]["pending"] == "anchor_structure_differs"
+    assert out[own.qid]["final"]["outcome"] == "correct"        # rules written by the bank for the original
+    assert out[tied.qid]["final"]["outcome"] == "correct"       # the original's N rows, within the full tie group
     for r in out.values():
         assert r["final"]["revised"]["outcome"] in {"correct", "wrong", "pending"}
