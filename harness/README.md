@@ -6,9 +6,12 @@
 
 | 模块 | 卡 | 作用 |
 |---|---|---|
-| `client.py` | T11 | DeepSeek 官方 API（OpenAI 兼容）。key 只从 `DEEPSEEK_API_KEY` 读；思考模式开启，**不要设 temperature** |
-| `exec_sql.py` | T11 | chDB 只读执行 |
-| `run_direct.py` | T11 | 直答：一次调用写出查询；执行报错时发回报错、固定修一次 |
+| `client.py` | T11 | DeepSeek 官方 API（OpenAI 兼容，标准库 urllib）。key 只从 `DEEPSEEK_API_KEY` 读；思考模式开启（`reasoning_effort=high`），**不设 temperature**；429/5xx/网络错误指数退避，次数入日志。另有 `MockClient` 供离线测试 |
+| `executors.py` | T11 | 统一接口 `execute(query) -> ExecResult`。`ChdbExecutor`：只读、单条 SELECT、**按单元的允许库拒绝越界查询**（`EXPLAIN AST` 解析表名；引擎 `UNKNOWN_TABLE` 提示指向越界库的也算），回传给模型的是 harness 自己的固定消息、原始报错只进 runs-raw；超时 120 秒与全局资源闸（结果 200 万行、内存 16 GiB）；失败分 `timeout` / `resource_limit` / `engine_error` / `scope_violation` / `forbidden_statement`；报错后重新同步 session（T11-2）。裁决见 `decisions/2026-10-16-t11-exec-limits-and-scope-message.md`。Cube SQL / Cube JSON / DAX 留了同名接口的占位 |
+| `cells.py` | T11 | 单元清单（与 BOARD 一致）、每单元允许的库、上下文来源、价格表、默认超时 |
+| `prompt.py` | T11 | 系统提示（`harness-v1` 冻结范围）、稳定前缀的拼装（系统提示 → 语义上下文 → 语法说明；用户消息只放题目）、响应解析 |
+| `questions.py` | T11 | 中文题集读 `$SEMDEBT_EVAL_DIR/questions/*.yaml`，参考结果读 CSV 并按 `refs/MANIFEST.json` 的列类型还原；英文锚点读外部基准原题（99 道）。`rules` 原样透传，缺 `rules` / judge 题 / 无参考的返回行集记 `pending`，行集存 runs-raw 待离线重评 |
+| `run_direct.py` | T11 | 直答：一次调用写出查询；执行报错时发回报错、固定修一次。日志、断点续跑、`--dry-run`、并发 |
 | `run_agent.py` | T15 | 探查 agent（-E）：多一个只读工具 `run_sql`，最多 8 步 |
 | `scorer.py` | T02（Codex 写） | 确定性结果集评分器（纯函数，不执行查询） |
 | `exec_dax.py` | T17 | Windows 上经 ADOMD.NET 执行 DAX |
