@@ -1,5 +1,53 @@
 # harness
 
+## T16：Cube 执行器与本地搭建
+
+`harness/executors.py` 提供 `CubeSqlExecutor(timeout_s=120)` 与
+`CubeJsonExecutor(timeout_s=120)`，接口均为 `execute(query: str) -> ExecResult`。
+可直接供 T15 导入。SQL 使用 PostgreSQL 协议，JSON 使用 REST `/load`；
+`CANNOT_ANSWER` 继续由现有 harness 处理，不作为查询发给执行器。
+
+前置：Docker Desktop 已运行，`SEMDEBT_DATA_DIR` 指向 T01 数据目录。
+从本卡 clone 根目录依次执行（无 DeepSeek 调用）：
+
+```sh
+uv sync --locked
+uv run python render/cube.py
+uv run python data/build_chdb_copy.py "$SEMDEBT_DATA_DIR/chdb-t16"
+docker compose up -d --wait clickhouse
+uv run python data/clickhouse_t16.py --import-data
+docker compose up -d --wait cube
+uv run python scripts/verify_metric_layer.py
+uv run pytest tests/test_cube_executors.py
+```
+
+独立 chDB 副本只需建一次，已有时跳过第 3 行；不要用 `--force` 覆盖正在使用的目录。
+导入脚本保留已有非空表并重新核对。发生部分导入或数据不一致时会失败，不自动删表重导。
+核对报告写到 `reports/validation/clickhouse_t16.md`、`metric_layer_t16.md` 与同名 JSON。
+主 chDB 目录被其他会话占用时，不会尝试共享；独立副本还与 T01 原始报告交叉核对。
+
+服务固定为 Cube Core 1.8.6、ClickHouse 25.8.20.4，仅供本机实验；REST 开发模式不校验
+JWT，SQL 开发模式接受任意非空认证响应。两个接口都绑定 loopback：
+
+| 接口 | 默认地址 | 执行器配置环境变量 |
+|---|---|---|
+| SQL | `127.0.0.1:15432`，库/用户 `cube` | `CUBE_SQL_HOST`、`CUBE_SQL_PORT`、`CUBE_SQL_USER`、`CUBE_SQL_DATABASE`、`CUBE_SQL_PASSWORD` |
+| REST | `http://127.0.0.1:14000/cubejs-api/v1` | `CUBE_REST_URL`、`CUBE_REST_TOKEN`（有认证时） |
+| ClickHouse HTTP | `127.0.0.1:18123` | 只用于本地运维，模型不直接访问 |
+
+数据分别位于 `$SEMDEBT_DATA_DIR/clickhouse-t16`、`chdb-t16`、`cubestore-t16`；
+模型只读挂载 `build/cube/model`。Cube 的 ClickHouse 用户仅有 `retail.*` 的 SELECT 权限，
+`readonly=2` 允许驱动设置 `join_use_nulls`、同时禁止写入。SQL 执行器额外拒绝多语句、写语句与修改会话设置。
+
+两个执行器每次执行有总时限及 2,000,000 行上限。Cube 默认/最大查询行数配置为
+2,000,001（探测超限），避免默认 10,000 行静默截断。REST 只轮询协议要求的
+`Continue wait`，其他失败不重试；数值依注解转为整数或 Decimal，时间别名不重复输出。
+`interface_limitation`、`timeout`、`resource_limit`、`transport_error`、`invalid_response`
+与普通 `engine_error` 分开，供 T19 归类；只有明确的“不支持”错误自动标为接口限制。
+
+停服务用 `docker compose stop`，不删除数据。G3 和 T13 尚未完成，本轮不接通直答 runner、
+不跑题集；未来接通 SQL-L2 / JSON-L2 时仍须遵循任务卡的检查点与预算规则。
+
 调用模型、执行查询、评分。
 
 计划中的模块：
@@ -7,7 +55,7 @@
 | 模块 | 卡 | 作用 |
 |---|---|---|
 | `client.py` | T11 | DeepSeek 官方 API（OpenAI 兼容，标准库 urllib）。key 只从 `DEEPSEEK_API_KEY` 读；思考模式开启（`reasoning_effort=high`），**不设 temperature**；429/5xx/网络错误指数退避，次数入日志。另有 `MockClient` 供离线测试 |
-| `executors.py` | T11 | 统一接口 `execute(query) -> ExecResult`。`ChdbExecutor`：只读、单条 SELECT、**按单元的允许库拒绝越界查询**（`EXPLAIN AST` 解析表名；引擎 `UNKNOWN_TABLE` 提示指向越界库的也算），回传给模型的是 harness 自己的固定消息、原始报错只进 runs-raw；超时 120 秒与全局资源闸（结果 200 万行、内存 16 GiB）；失败分 `timeout` / `resource_limit` / `engine_error` / `scope_violation` / `forbidden_statement`；报错后重新同步 session（T11-2）。裁决见 `decisions/2026-10-16-t11-exec-limits-and-scope-message.md`。Cube SQL / Cube JSON / DAX 留了同名接口的占位 |
+| `executors.py` | T11、T16 | 统一接口 `execute(query) -> ExecResult`。`ChdbExecutor`：只读、单条 SELECT、**按单元的允许库拒绝越界查询**（`EXPLAIN AST` 解析表名；引擎 `UNKNOWN_TABLE` 提示指向越界库的也算），回传给模型的是 harness 自己的固定消息、原始报错只进 runs-raw；超时 120 秒与全局资源闸（结果 200 万行、内存 16 GiB）；失败分 `timeout` / `resource_limit` / `engine_error` / `scope_violation` / `forbidden_statement`；报错后重新同步 session（T11-2）。裁决见 `decisions/2026-10-16-t11-exec-limits-and-scope-message.md`。Cube SQL / Cube JSON 已实现（见上文 T16）；DAX 留占位给 T17 |
 | `cells.py` | T11 | 单元清单（与 BOARD 一致）、每单元允许的库、上下文来源、价格表、默认超时 |
 | `prompt.py` | T11 | 系统提示（`harness-v1` 冻结范围）、稳定前缀的拼装（系统提示 → 语义上下文 → 语法说明；用户消息只放题目）、响应解析 |
 | `questions.py` | T11 | 中文题集读 `$SEMDEBT_EVAL_DIR/questions/*.yaml`，参考结果读 CSV 并按 `refs/MANIFEST.json` 的列类型还原。题级 `rules` 与逐参考 `rules` 原样交给评分器（`reference_rules`），`selection` 等字段不读不改；题目文件与 MANIFEST 的有效 `rules` 不一致时拒绝加载。英文锚点（99 道）按英文原文对应到题库题号，按外部原始参考评分、另记修订后参考的对照列。judge 题 / 无参考 / 无 `rules` 的返回行集记 `pending`，行集存 runs-raw 待离线重评 |

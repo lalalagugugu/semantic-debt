@@ -1,6 +1,6 @@
 # T16 指标层（Cube Core：SQL-L2 与 JSON-L2）
 
-- 状态：未开始
+- 状态：搭建完成（第 1–3 步，2026-10-16）；实验待 G3 与 T13 完成
 - 负责：Codex
 - 模式：主仓库 clone（`scripts/start-card.sh T16`）
 - 依赖：搭建在 G1 之后（需要 `build/cube/`，T10）；跑单元在 G3 之后、T13 跑完之后（避免抢 API 并发）
@@ -43,5 +43,19 @@ T10-1 的裁决（23 个双表指标各有两个调用名，`online_sales.<成�
 ## 记录（完成后填写）
 
 - 产出：
+  - `docker-compose.yml`、`templates/cube.js`、`templates/cube-clickhouse-init.sql`：Cube Core / Cube SQL / Cube Store 1.8.6 与 ClickHouse 25.8.20.4，SQL、REST 均已启动并实测，端口只绑定本机。镜像 digest 见验证报告。
+  - `data/clickhouse_t16.py`：25 表、34,326,191 行导入；与独立 chDB 副本核对 147 项（行数、所有数值列合计），全部一致；另与 T01 主 chDB 原始报告交叉核对 49 项，全部一致。
+  - `scripts/verify_metric_layer.py`、`reports/validation/metric_layer_t16.{md,json}`：优先验证同比、环比、占比、同店增长。线上与全渠道共 7 个成员 × SQL/REST 两个接口，14/14 与独立 SQL 基线一致；这些查询的明确接口限制为 0。
+  - `harness/executors.py`：两个执行器沿用 `execute(query) -> ExecResult`；SQL 可供 T15 导入使用。只读检查、总时限、行数限制、结果类型转换与错误分类均已实现。
+  - `tests/test_cube_executors.py`：49 项 mock 测试通过，不需要 Docker、题库或模型 API。
+  - 兼容验证：`uv run pytest tests/test_cube_executors.py tests/test_harness.py -k 'not dry_run_matches_board_unit_list'` 为 73 passed、18 skipped、1 deselected；设置 `SEMDEBT_DATA_DIR` 后 `uv run pytest tests/test_repo_layout.py` 为 39 passed、1 skipped。跳过项依赖主 chDB/题库或 G1 前状态，唯一 deselected 项需要外部题库上下文，本轮未读取。`git diff --check` 通过。
+  - `pyproject.toml`、`uv.lock`：按用户批准用 `uv add 'psycopg[binary]'` 加入依赖，锁定 3.3.6；其他既有依赖未升级。
+  - 复现命令与配置环境变量见 `harness/README.md` T16 节；数据报告见 `reports/validation/clickhouse_t16.md`。
 - 偏离与理由：
-- 工时：建指标层 __ 小时
+  - 用户 2026-10-16 明确本轮只做第 1–3 步；不调用 DeepSeek，不跑 24 题冒烟或全量，不生成实验准确率报告，不将整张卡标为完成。后续实验仍等 G3 与 T13 完成。
+  - 卡片原写 `harness/executors/`，现有实现是单文件 `harness/executors.py`；按用户要求沿用单文件，不迁移目录。
+  - 主 chDB 目录被另一进程占用，首次核对被锁拒绝；用现有 `data/build_chdb_copy.py` 从 T01 Parquet 建 `chdb-t16` 独立副本，并追加与 T01 原主库报告的比较，未绕过锁或中断其他会话。
+  - 配置验证中曾遇到只读 Parquet 挂载被镜像入口脚本递归 chown、`readonly=1` 禁止 Cube 驱动设置 `join_use_nulls`、libpq 需要非空认证响应；均已修正为配置/连接层实现，不计作指标接口能力限制。临时探针曾误用线上表不存在的渠道列，正式验证改用已定义的门店维度。
+  - 兼容检查初次有两项因未设 `SEMDEBT_*` 环境变量失败，未改现有测试或 harness 逻辑；本轮不为测试读取题库，题库依赖检查另行记录。
+- 用户确认：后续实验由 G3 选定模型、冻结系统提示与评分，且 T13 完成后再启动。
+- 工时：本轮搭建与验证约 1 小时（估算）；实验未开始。
