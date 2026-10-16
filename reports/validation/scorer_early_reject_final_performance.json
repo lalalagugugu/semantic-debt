@@ -1,0 +1,117 @@
+{
+  "run_utc": "2026-10-16T09:40:20.953268+00:00",
+  "baseline_commit": "d8a4a9422d1291e6c846611d1c345292a4c5b00e",
+  "baseline_scorer_sha256": "3d7fb59b1ac205dce95883d266f35441fbc16f7cd7709189af9fea270a635838",
+  "current_scorer_sha256": "0b693d1a03f1c35961963abb6f2860f51fc9ecc8c4976f71ba7db5ce00a4094d",
+  "measurement": "full score_detailed; timer and scoring timeout exclude input construction; startup/construction have a separate 30-second limit; timeouts remain lower bounds",
+  "records": [
+    {
+      "case": "null_mismatch",
+      "rows": 100,
+      "before": {
+        "status": "completed",
+        "elapsed_seconds": 0.0004212500061839819,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 0.00014991709031164646,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "same_result": true
+    },
+    {
+      "case": "null_mismatch",
+      "rows": 600000,
+      "before": {
+        "status": "completed",
+        "elapsed_seconds": 3.2755761248990893,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 0.6015161250252277,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "same_result": true
+    },
+    {
+      "case": "numeric_projection",
+      "rows": 100,
+      "before": {
+        "status": "completed",
+        "elapsed_seconds": 0.014718750026077032,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "string_or_label_only"
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 0.0003224171232432127,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "string_or_label_only"
+      },
+      "same_result": true
+    },
+    {
+      "case": "numeric_projection",
+      "rows": 600000,
+      "before": {
+        "status": "timeout",
+        "phase": "score_detailed",
+        "timeout_seconds": 10.0
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 1.7823910841252655,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "string_or_label_only"
+      }
+    },
+    {
+      "case": "numeric_projection_unequal",
+      "rows": 100,
+      "before": {
+        "status": "completed",
+        "elapsed_seconds": 0.004546874901279807,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "numeric_mismatch"
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 0.000665958970785141,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "numeric_mismatch"
+      },
+      "same_result": true
+    },
+    {
+      "case": "numeric_projection_unequal",
+      "rows": 600000,
+      "before": {
+        "status": "timeout",
+        "phase": "score_detailed",
+        "timeout_seconds": 10.0
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 3.5815694159828126,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "numeric_mismatch"
+      }
+    }
+  ]
+}

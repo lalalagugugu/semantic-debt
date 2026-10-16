@@ -19,6 +19,61 @@ UNORDERED = {"ordered": False, "top_n": None}
 ORDERED = {"ordered": True, "top_n": None}
 
 
+def test_flat_null_rejection_preserves_numeric_sensitivity() -> None:
+    result = score_detailed([("missing", 1), ("missing", 2)],
+                            [[(None, 2), (None, 1)]], UNORDERED)
+    assert result.outcome == "wrong" and result.reason == "values"
+    assert result.sensitivity == "string_or_label_only"
+
+
+def test_null_can_match_an_extra_reordered_candidate_column() -> None:
+    assert score([(1, "extra", None)], [[(None, 1)]], UNORDERED) == "correct"
+
+
+def test_unselected_nullable_top_boundary_does_not_reject_candidate() -> None:
+    rules = {"ordered": True, "top_n": 1, "tie_columns": [1]}
+    assert score([("named", 10)], [[(None, 10), ("named", 10)]], rules) == "correct"
+
+
+def test_null_early_reject_retains_custom_scalar_comparison() -> None:
+    class NullEqual:
+        def __eq__(self, other):
+            return other is None
+
+    assert score([(NullEqual(),)], [[(None,)]], ORDERED) == "correct"
+
+
+def test_exact_projection_searches_all_column_mappings_before_tolerant_matching(monkeypatch) -> None:
+    from harness import scorer
+
+    def slow_path(*args):
+        pytest.fail("exact numeric projection must avoid the quadratic matcher")
+
+    monkeypatch.setattr(scorer, "_rows_match_unordered", slow_path)
+    candidate = [("missing", 99, 20, 2), ("missing", 99, 10, 1)]
+    result = score_detailed(candidate, [[(None, 1, 10), (None, 2, 20)]], UNORDERED)
+    assert result.outcome == "wrong" and result.sensitivity == "string_or_label_only"
+
+
+@pytest.mark.parametrize(("candidate", "reference", "expected"), [
+    ([("X", 100.4)], [("A", 100)], "string_or_label_only"),
+    ([("X", 1)], [("A", 100)], "string_or_label_only"),
+    ([("X", 1), ("Y", 1)], [("A", 1), ("B", 2)], "numeric_mismatch"),
+    ([("X", True), ("Y", 1)], [("A", 1), ("B", 1)], "numeric_mismatch"),
+    ([("X", float("nan"))], [("A", float("nan"))], "string_or_label_only"),
+])
+def test_projection_nonexact_or_unsupported_values_keep_original_diagnostic(candidate, reference, expected) -> None:
+    result = score_detailed(candidate, [reference], UNORDERED)
+    assert result.outcome == "wrong" and result.sensitivity == expected
+
+
+def test_exact_projection_preserves_multiplicity_nulls_and_string_normalization() -> None:
+    candidate = [("X", 1, " b "), ("Y", 1, " a "), ("Z", None, 2)]
+    reference = [("A", 1, "a"), ("B", None, 2), ("C", 1, "b")]
+    result = score_detailed(candidate, [reference], UNORDERED)
+    assert result.outcome == "wrong" and result.sensitivity == "string_or_label_only"
+
+
 def test_complete_result_set_matches_all_rows() -> None:
     assert score([(1,), (2,)], [[(2,), (1,)]], UNORDERED) == "correct"
 

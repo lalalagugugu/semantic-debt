@@ -7,7 +7,7 @@ one of three candidate states: rows, ``CANNOT_ANSWER``, or :class:`ExecError`.
 from __future__ import annotations
 
 import math
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
@@ -152,12 +152,42 @@ def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -
         projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts, tuple(rules.value_types[i] for i in numeric_ref) if rules.value_types else ())
         projected_candidate = tuple(tuple(row[i] for i in numeric_candidate) for row in candidate)
         projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
+        if _exact_projection_matches(projected_candidate, projected_reference, projected_rules):
+            return "string_or_label_only"
         matched, _ = _matches_reference(projected_candidate, projected_reference, projected_rules)
         if matched:
             return "string_or_label_only"
     if not saw_numeric:
         return "no_numeric_reference"
     return "numeric_mismatch"
+
+
+def _exact_projection_matches(candidate: Rows, reference: Rows, rules: _Rules) -> bool:
+    """Prove an exact diagnostic match; otherwise retain the tolerant matcher."""
+    if rules.top_n is not None:
+        return False
+
+    def key(value: Cell) -> object:
+        # Preserve numeric/non-numeric buckets: bool must not hash as 0/1.
+        # Unsupported objects and non-finite values keep their original path.
+        if type(value) not in (int, float, Decimal, str, bool, type(None)):
+            raise TypeError
+        if _is_numeric(value):
+            if not math.isfinite(float(value)):
+                raise ValueError
+            return value
+        return _nonnumeric_bucket(value)
+
+    try:
+        rows = (tuple(key(value) for value in row) for row in reference)
+        expected = tuple(rows) if rules.ordered else Counter(rows)
+        for mapping in permutations(range(len(candidate[0])), len(reference[0])):
+            projected = (tuple(key(row[i]) for i in mapping) for row in candidate)
+            if (tuple(projected) if rules.ordered else Counter(projected)) == expected:
+                return True
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return False
 
 
 def _parse_rules(rules: Mapping[str, object]) -> _Rules:
@@ -251,6 +281,16 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
     reference_width = len(reference[0])
     if candidate_width < reference_width:
         return False, "missing_columns"
+
+    # A flat reference consumes every row. None only matches None under the
+    # scalar comparator, regardless of column permutations or extra columns.
+    # Top-N may leave nullable boundary members unselected, so exclude it.
+    if (rules.top_n is None
+            and any(cell is None for row in reference for cell in row)
+            and not any(cell is None for row in candidate for cell in row)
+            and all(type(cell) in (str, bool, int, float, Decimal, list, tuple, dict, bytes)
+                    for row in candidate for cell in row)):
+        return False, "values"
 
     for mapping in permutations(range(candidate_width), reference_width):
         if rules.top_n is not None:
