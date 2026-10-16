@@ -78,4 +78,4 @@ def test_mock_end_to_end_five_questions(tmp_path):
     assert sum(r["usage"]["cache_hit_tokens"] for r in recs.values()) > 0
     summary = R.summarize(path)
     assert summary["outcomes"] == {"correct": 2, "wrong": 1, "refused": 1, "exec_error": 1}
-    assert summary["scope_violations_any_turn"] == 1
+    assert summary["attempts_with_scope_violation"] == 1

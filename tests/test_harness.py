@@ -366,3 +366,105 @@ def test_failed_query_does_not_leak_into_the_next_result():
     assert not failed.ok
     after = ex.execute("SELECT 'fresh' AS x")
     assert after.ok and after.rows == [["fresh"]]
+
+
+# ---------------------------------------------------------------------------
+# scope message and resource limits (decisions/2026-10-16-t11-exec-limits-and-scope-message.md)
+
+from harness.executors import RESOURCE_LIMIT, SCOPE_MESSAGE, ChdbExecutor  # noqa: E402
+
+
+@needs_chdb
+def test_scope_message_is_the_harness_message_not_the_engine_hint():
+    ex = R.make_executor(CELLS["SQL-L1.5S"], 30)
+    static = ex.execute("SELECT count() FROM retail.FactSales")
+    assert static.error == SCOPE_MESSAGE and "retail" in static.detail
+    # unqualified detail table: ClickHouse answers "Maybe you meant retail.FactOnlineSales?"
+    hinted = ex.execute("SELECT count() FROM FactOnlineSales")
+    assert hinted.error_class == SCOPE_VIOLATION and hinted.error == SCOPE_MESSAGE
+    assert "retail" not in hinted.error and "Maybe you meant" in hinted.detail
+    assert "retail" not in json.dumps(hinted.summary(), ensure_ascii=False)
+
+
+@needs_chdb
+def test_other_engine_errors_go_back_verbatim():
+    bad = R.make_executor(CELLS["SQL-L1"], 30).execute("SELECT nope FROM retail.DimStore")
+    assert bad.error_class == ENGINE_ERROR and "nope" in bad.error and bad.error == bad.detail
+
+
+@needs_chdb
+def test_resource_limits_are_classified_apart_from_timeouts_and_engine_errors():
+    rows = ChdbExecutor(("retail",), timeout_s=30, max_result_rows=10).execute("SELECT number FROM numbers(100)")
+    assert (rows.error_class, rows.limit) == (RESOURCE_LIMIT, "result_rows")
+    mem = ChdbExecutor(("retail",), timeout_s=30, max_memory_bytes=50 * 1024**2).execute(
+        "SELECT length(groupArray(number)) FROM numbers(100000000)")
+    assert (mem.error_class, mem.limit) == (RESOURCE_LIMIT, "memory")
+    assert mem.summary()["limit"] == "memory"
+    ok = R.make_executor(CELLS["SQL-L1"], 30).execute("SELECT number FROM numbers(100)")  # default caps restored
+    assert ok.ok and len(ok.rows) == 100
+    ex = R.make_executor(CELLS["SQL-L1"], 30)
+    assert ex.execute("SELECT 1 SETTINGS max_memory_usage = 0").error_class == "forbidden_statement"
+
+
+def test_limits_are_global_constants():
+    from harness import executors as E
+    assert E.DEFAULT_MAX_RESULT_ROWS >= 1_000_000
+    assert 0 < E.DEFAULT_MAX_MEMORY_BYTES
+
+
+# ---------------------------------------------------------------------------
+# pending scoring (judge / no rules / no refs)
+
+
+def test_rows_for_unscorable_questions_are_pending_but_errors_are_scored(tmp_path):
+    q = Question("Q002", QTEXT, refs=[[[1]]], rules=None)
+    respond, _ = _scripted("```sql\nSELECT 41\n```")
+    rec = R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 41": ExecResult(rows=[[41]])})), q, 1)
+    assert rec["final"]["outcome"] == "pending" and rec["final"]["pending"] == "no_rules"
+    assert (tmp_path / "raw" / "Q002_r1_t0.exec.json").exists()
+    judge = Question("Q003", QTEXT, refs=[[[1]]], rules={"ordered": False, "top_n": None}, scoring="judge")
+    respond, _ = _scripted("CANNOT_ANSWER")
+    rec = R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({})), judge, 1)
+    assert rec["final"]["outcome"] == "refused" and rec["scoring"] == "judge"
+
+
+# ---------------------------------------------------------------------------
+# the real question bank and the external contexts
+
+EVAL = Path(os.environ.get("SEMDEBT_EVAL_DIR", "/nonexistent")).expanduser()
+needs_eval = pytest.mark.skipif(not (EVAL / "questions").is_dir(), reason="question bank not available")
+
+
+def test_parse_value_types():
+    from harness.questions import parse_value
+    assert parse_value("\\N", "Nullable(Float64)") is None
+    assert parse_value("12", "UInt64") == 12 and isinstance(parse_value("12", "UInt64"), int)
+    assert parse_value("1.5", "Float64") == 1.5 and parse_value("inf", "Float64") == float("inf")
+    assert parse_value("2020-01-01", "Nullable(Date)") == "2020-01-01"
+    assert parse_value("7", "String") == "7"
+
+
+@needs_eval
+def test_load_real_bank_and_pass_rules_through():
+    import yaml
+    from harness.questions import load_questions
+    zh, en = load_questions(EVAL), load_questions(EVAL, lang="en")
+    assert len(en) == 99 and "EN33" not in {q.qid for q in en}
+    records = {r["id"]: r for p in sorted((EVAL / "questions").glob("*.yaml"))
+               for r in yaml.safe_load(p.read_text(encoding="utf-8"))["questions"]}
+    assert {q.qid for q in zh} == set(records)
+    for q in zh:
+        rec = records[q.qid]
+        assert q.text == rec["text_zh"] and len(q.refs) == len(rec["refs"])
+        assert q.rules is rec.get("rules") or q.rules == rec.get("rules")   # untouched
+        assert q.scoring == rec["scoring"]
+
+
+@needs_eval
+def test_external_contexts():
+    l1c, ren = R.system_for(CELLS["SQL-L1c"]), R.system_for(CELLS["SQL-R-EN"])
+    md = (EVAL / R.VENDOR_SEMANTIC_LAYER).read_text(encoding="utf-8").strip()
+    ddl = R.VENDOR_DDL.read_text(encoding="utf-8").strip()
+    assert md in l1c and ddl in l1c and l1c.index(md) < l1c.index(ddl) < l1c.index(P.SYNTAX_HEADER)
+    assert ddl in ren and md not in ren
+    assert R.system_for(CELLS["SQL-L1c-EN"]) == l1c

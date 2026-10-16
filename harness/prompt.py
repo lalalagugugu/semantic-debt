@@ -36,12 +36,13 @@ FIX_TEMPLATE = "查询执行报错：\n```\n{error}\n```\n请修正后重新输�
 MAX_ERROR_CHARS = 2000
 
 
-def system_message(context_text: str, syntax_text: str, context_lang: str = "yaml") -> str:
-    """The stable prefix: system prompt → semantic context → syntax notes."""
-    return (
-        f"{SYSTEM_PROMPT}\n\n{CONTEXT_HEADER}\n\n```{context_lang}\n{context_text.rstrip()}\n```\n\n"
-        f"{SYNTAX_HEADER}\n\n{syntax_text.strip()}\n"
-    )
+def system_message(context_text: str, syntax_text: str, context_lang: str | None = "yaml") -> str:
+    """The stable prefix: system prompt → semantic context → syntax notes.
+
+    ``context_lang=None`` inserts the context as-is (the external benchmark's
+    markdown + DDL, which carries its own code fences)."""
+    body = context_text.strip() if context_lang is None else f"```{context_lang}\n{context_text.rstrip()}\n```"
+    return f"{SYSTEM_PROMPT}\n\n{CONTEXT_HEADER}\n\n{body}\n\n{SYNTAX_HEADER}\n\n{syntax_text.strip()}\n"
 
 
 def first_messages(system: str, question: str) -> list[dict[str, str]]:

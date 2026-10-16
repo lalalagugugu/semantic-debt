@@ -39,7 +39,9 @@ from harness.cells import (  # noqa: E402
     PRICES_OFFPEAK, REPO, SYNTAX, Cell,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
-from harness.executors import ChdbExecutor, ExecResult, Executor  # noqa: E402
+from harness.executors import (  # noqa: E402
+    DEFAULT_MAX_MEMORY_BYTES, DEFAULT_MAX_RESULT_ROWS, ChdbExecutor, ExecResult, Executor,
+)
 from harness.questions import Question  # noqa: E402
 from harness.scorer import REFUSAL, ExecError, score_detailed  # noqa: E402
 
@@ -51,6 +53,24 @@ BEIJING = ZoneInfo("Asia/Shanghai")
 # Context
 
 
+# The external benchmark's files, used verbatim (design: L1c and the English
+# anchors reproduce the benchmark). Its own harness gives "raw" = DDL and
+# "+Sem" = semantic_layer.md prepended to the same DDL.
+VENDOR_DDL = REPO / "vendor" / "cube" / "retail_schema.sql"
+VENDOR_SEMANTIC_LAYER = Path("vendor") / "cube" / "fixtures" / "semantic_layer.md"   # under $SEMDEBT_EVAL_DIR
+
+
+def external_context(name: str) -> str:
+    from harness.questions import eval_dir
+
+    ddl = f"```sql\n{VENDOR_DDL.read_text(encoding='utf-8').strip()}\n```"
+    if name == "r-en":
+        return ddl
+    if name in {"l1c", "l1c-en"}:
+        return (eval_dir() / VENDOR_SEMANTIC_LAYER).read_text(encoding="utf-8").strip() + "\n\n" + ddl
+    raise KeyError(f"unknown external context {name!r}")
+
+
 def context_text(cell: Cell) -> str:
     kind, _, name = cell.context.partition(":")
     if kind == "build":
@@ -58,11 +78,11 @@ def context_text(cell: Cell) -> str:
         if not path.exists():
             raise FileNotFoundError(f"{path} missing: run `uv run python render/render_all.py`")
         return path.read_text(encoding="utf-8")
-    raise NotImplementedError(f"{cell.name}: external context '{name}' is not wired yet")
+    return external_context(name)
 
 
 def system_for(cell: Cell) -> str:
-    lang = "yaml" if cell.context.startswith("build:") else ""
+    lang = "yaml" if cell.context.startswith("build:") else None
     return P.system_message(context_text(cell), (SYNTAX / cell.syntax).read_text(encoding="utf-8"), lang)
 
 
@@ -106,6 +126,7 @@ class RunContext:
     harness_commit: str
     timeout_s: int
     raw_dir: Path
+    limits: dict | None = None      # global resource caps, logged with every attempt
 
 
 def _candidate(parsed: P.Parsed, result: ExecResult | None):
@@ -119,8 +140,18 @@ def _candidate(parsed: P.Parsed, result: ExecResult | None):
     return result.rows
 
 
+PENDING = "pending"
+
+
 def _score(candidate, q: Question) -> dict:
-    s = score_detailed(candidate, q.refs, q.rules)
+    """Score with T02's scorer. A returned row set for a question that cannot be
+    scored deterministically here (judge question, no rules, no refs) gets
+    ``outcome = "pending"`` with the reason; its rows are in runs-raw for later
+    scoring. Exec errors and refusals need no reference and are scored now."""
+    if q.pending and not isinstance(candidate, (ExecError, str)):
+        return {"outcome": PENDING, "pending": q.pending, "reason": None, "matched_ref": None, "sensitivity": None}
+    rules = q.rules if q.rules is not None else {"ordered": False, "top_n": None}  # unused for exec_error / refusal
+    s = score_detailed(candidate, q.refs or [[]], rules)
     return {"outcome": s.outcome, "reason": s.reason if s.outcome != "exec_error" else None,
             "matched_ref": s.matched_ref, "sensitivity": s.sensitivity}
 
@@ -132,6 +163,17 @@ def _save_raw(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply) -
     return sha256(reply.raw)
 
 
+def _save_exec(ctx: RunContext, q: Question, rep: int, turn: int, result: ExecResult) -> str:
+    """Full execution outcome (rows, or the unabridged engine message) for later scoring and audit."""
+    payload = json.dumps({"columns": result.columns, "rows": result.rows, "error": result.error,
+                          "error_class": result.error_class, "limit": result.limit, "detail": result.detail},
+                         ensure_ascii=False, default=str).encode()
+    path = ctx.raw_dir / f"{q.qid}_r{rep}_t{turn}.exec.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+    return sha256(payload)
+
+
 def _turn_record(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply,
                  parsed: P.Parsed, result: ExecResult | None) -> dict:
     if parsed.refused:
@@ -139,7 +181,7 @@ def _turn_record(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply
     elif parsed.query is None:
         execution = {"status": "error", "error_class": NO_QUERY}
     else:
-        execution = result.summary()
+        execution = {**result.summary(), "exec_raw_sha256": _save_exec(ctx, q, rep, turn, result)}
     return {
         "turn": turn,
         "query": parsed.query,
@@ -166,7 +208,7 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
         "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep,
         "eval_commit": ctx.eval_commit, "harness_commit": ctx.harness_commit,
         "model_requested": ctx.client.model, "system_sha256": sha256(ctx.system),
-        "exec_timeout_s": ctx.timeout_s, "started_at": started.isoformat(timespec="seconds"),
+        "exec_timeout_s": ctx.timeout_s, "exec_limits": ctx.limits, "scoring": q.scoring, "started_at": started.isoformat(timespec="seconds"),
     }
     try:
         reply = ctx.client.chat(messages)
@@ -195,6 +237,7 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
     final = _score(final_candidate, q)
     last_exec = turns[-1]["exec"]
     final["error_class"] = last_exec.get("error_class") if final["outcome"] == "exec_error" else None
+    final["limit"] = last_exec.get("limit") if final["outcome"] == "exec_error" else None
     return {
         **base,
         "status": "done",
@@ -257,23 +300,37 @@ def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency:
 
 
 def summarize(path: Path) -> dict:
-    """Accuracy = correct / attempts over the ``done`` lines of one cell log."""
+    """Per-cell summary over the ``done`` lines of one cell log.
+
+    Accuracy = correct / attempts (T11 spec 11). While some attempts are still
+    ``pending`` (judge / no rules / no refs), ``accuracy`` is None and
+    ``accuracy_scored`` covers only the scored attempts. The error counts are the
+    splits T19 reports separately: no_query (format failures), scope violations,
+    timeouts, resource limits (memory / result rows) and ordinary engine errors.
+    """
     recs = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     done = [r for r in recs if r.get("status") == "done"]
-    counts: dict[str, int] = {}
-    for r in done:
-        counts[r["final"]["outcome"]] = counts.get(r["final"]["outcome"], 0) + 1
+    counts = _count(r["final"]["outcome"] for r in done)
+    pending = counts.get(PENDING, 0)
+    scored = len(done) - pending
+    turns = [t for r in done for t in r["turns"]]
     tokens = {k: sum(r["usage"].get(k, 0) for r in done) for k in
-              ("cache_hit_tokens", "cache_miss_tokens", "completion_tokens", "reasoning_tokens")}
+              ("prompt_tokens", "cache_hit_tokens", "cache_miss_tokens", "completion_tokens", "reasoning_tokens")}
     return {
         "attempts": len(done),
-        "accuracy": counts.get("correct", 0) / len(done) if done else None,
+        "accuracy": counts.get("correct", 0) / len(done) if done and not pending else None,
+        "accuracy_scored": counts.get("correct", 0) / scored if scored else None,
         "outcomes": counts,
+        "pending_reasons": _count(r["final"].get("pending") for r in done if r["final"]["outcome"] == PENDING),
         "first_try_correct": sum(r["first"] == "correct" for r in done),
-        "exec_error_classes": _count(r["final"]["error_class"] for r in done if r["final"]["outcome"] == "exec_error"),
-        "scope_violations_any_turn": sum(any(t["exec"].get("error_class") == "scope_violation" for t in r["turns"]) for r in done),
+        "final_exec_error_classes": _count(r["final"]["error_class"] for r in done if r["final"]["outcome"] == "exec_error"),
+        "final_resource_limits": _count(r["final"]["limit"] for r in done if r["final"].get("limit")),
+        "turn_error_classes": _count(t["exec"]["error_class"] for t in turns if t["exec"].get("status") == "error"),
+        "attempts_with_no_query": sum(any(t["exec"].get("error_class") == NO_QUERY for t in r["turns"]) for r in done),
+        "attempts_with_scope_violation": sum(any(t["exec"].get("error_class") == "scope_violation" for t in r["turns"]) for r in done),
         "not_done_lines": len(recs) - len(done),
         "tokens": tokens,
+        "cache_hit_ratio": tokens["cache_hit_tokens"] / tokens["prompt_tokens"] if tokens["prompt_tokens"] else None,
         "cost_cny": round(sum(r.get("cost_cny") or 0 for r in done), 4),
     }
 
@@ -441,7 +498,8 @@ def main(argv: list[str] | None = None, load=None) -> int:
     for cell in cells:
         ctx = RunContext(run_id=args.run_id, cell=cell, client=client, executor=make_executor(cell, args.exec_timeout),
                          system=system_for(cell), eval_commit=commit, harness_commit=harness_commit(),
-                         timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name)
+                         timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name,
+                         limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES})
         path = run_cell(ctx, by_lang[cell.lang], args.reps, args.concurrency)
         print(json.dumps(summarize(path), ensure_ascii=False, indent=2))
     return 0
