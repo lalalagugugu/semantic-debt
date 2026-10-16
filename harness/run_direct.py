@@ -143,17 +143,32 @@ def _candidate(parsed: P.Parsed, result: ExecResult | None):
 PENDING = "pending"
 
 
-def _score(candidate, q: Question) -> dict:
-    """Score with T02's scorer. A returned row set for a question that cannot be
-    scored deterministically here (judge question, no rules, no refs) gets
-    ``outcome = "pending"`` with the reason; its rows are in runs-raw for later
-    scoring. Exec errors and refusals need no reference and are scored now."""
+def score_question(candidate, q: Question) -> dict:
+    """Score with T02's scorer. ``rules`` and per-reference ``reference_rules``
+    go to it exactly as the question bank carries them.
+
+    A returned row set for a question that cannot be scored deterministically
+    here (judge question, no rules, no refs) gets ``outcome = "pending"`` with the
+    reason; its rows are in runs-raw for later scoring. Exec errors and refusals
+    need no reference and are scored now."""
     if q.pending and not isinstance(candidate, (ExecError, str)):
         return {"outcome": PENDING, "pending": q.pending, "reason": None, "matched_ref": None, "sensitivity": None}
-    rules = q.rules if q.rules is not None else {"ordered": False, "top_n": None}  # unused for exec_error / refusal
-    s = score_detailed(candidate, q.refs or [[]], rules)
+    if q.refs is None or q.rules is None:      # only exec_error / refusal reach here; rules are not consulted
+        s = score_detailed(candidate, [[]], {"ordered": False, "top_n": None})
+    else:
+        s = score_detailed(candidate, q.refs, q.rules, reference_rules=q.ref_rules)
     return {"outcome": s.outcome, "reason": s.reason if s.outcome != "exec_error" else None,
             "matched_ref": s.matched_ref, "sensitivity": s.sensitivity}
+
+
+def final_score(candidate, q: Question, error_class: str | None, limit: str | None) -> dict:
+    """The ``final`` field of a log line; anchors also carry the revised-reference column."""
+    final = score_question(candidate, q)
+    final["error_class"] = error_class if final["outcome"] == "exec_error" else None
+    final["limit"] = limit if final["outcome"] == "exec_error" else None
+    if q.revised is not None:
+        final["revised"] = score_question(candidate, q.revised)
+    return final
 
 
 def _save_raw(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply) -> str:
@@ -205,7 +220,7 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
     turns: list[dict] = []
     replies: list[Reply] = []
     base = {
-        "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep,
+        "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep, "question_sha256": sha256(q.text),
         "eval_commit": ctx.eval_commit, "harness_commit": ctx.harness_commit,
         "model_requested": ctx.client.model, "system_sha256": sha256(ctx.system),
         "exec_timeout_s": ctx.timeout_s, "exec_limits": ctx.limits, "scoring": q.scoring, "started_at": started.isoformat(timespec="seconds"),
@@ -234,17 +249,15 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
                 "transport_retries": exc.transport_retries}
 
     usage = {k: sum(r.usage.get(k, 0) for r in replies) for k in replies[0].usage}
-    final = _score(final_candidate, q)
     last_exec = turns[-1]["exec"]
-    final["error_class"] = last_exec.get("error_class") if final["outcome"] == "exec_error" else None
-    final["limit"] = last_exec.get("limit") if final["outcome"] == "exec_error" else None
+    final = final_score(final_candidate, q, last_exec.get("error_class"), last_exec.get("limit"))
     return {
         **base,
         "status": "done",
         "model_version": replies[-1].model_version,
         "n_calls": len(replies),
         "fixed": fixed,
-        "first": _score(first_candidate, q)["outcome"],
+        "first": score_question(first_candidate, q)["outcome"],
         "final": final,
         "turns": turns,
         "usage": usage,
@@ -321,6 +334,7 @@ def summarize(path: Path) -> dict:
         "accuracy": counts.get("correct", 0) / len(done) if done and not pending else None,
         "accuracy_scored": counts.get("correct", 0) / scored if scored else None,
         "outcomes": counts,
+        "outcomes_on_revised_refs": _count(r["final"]["revised"]["outcome"] for r in done if "revised" in r["final"]) or None,
         "pending_reasons": _count(r["final"].get("pending") for r in done if r["final"]["outcome"] == PENDING),
         "first_try_correct": sum(r["first"] == "correct" for r in done),
         "final_exec_error_classes": _count(r["final"]["error_class"] for r in done if r["final"]["outcome"] == "exec_error"),
