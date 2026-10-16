@@ -39,6 +39,8 @@
 
 **六、`rules` 补齐之后可以离线重评。** T11 把完整行集存进了 `$SEMDEBT_DATA_DIR/runs-raw/`，所以题目**元数据**后补不需要重新调模型；只有**题目本身改写**才要重跑那些题。见 `decisions/2026-10-16-rules-backfill-for-vendored-questions.md`。
 
+**七、harness 只从固定版本读题库，不读共用工作区。** 题库目录（`$SEMDEBT_EVAL_DIR`）是 Codex 原地干活的工作树，可能停在别的分支、带未提交的改动（T11 接锚点时就遇到了，靠逐字节比对 `origin/main` 才确认没读错）。正式运行必须从 `eval-v1` tag 的内容读题（例如 `git worktree add` 到数据目录下的只读副本，或 `git archive eval-v1` 解出），日志记 tag 与提交号；读到的不是 tag 内容就拒绝开跑。T11 的发现，2026-10-16 协调会话写入。
+
 ## 交付物
 
 - `runs/<run-id>/` 下每个单元的 JSONL；`runs/INDEX.md` 一行记录。
