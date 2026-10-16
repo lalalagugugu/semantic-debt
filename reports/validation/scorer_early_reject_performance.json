@@ -1,0 +1,47 @@
+{
+  "run_utc": "2026-10-16T09:07:25.575654+00:00",
+  "baseline_commit": "2d2660f8ca94d026b48d47d7e15b8d51c218e08c",
+  "baseline_scorer_sha256": "3d7fb59b1ac205dce95883d266f35441fbc16f7cd7709189af9fea270a635838",
+  "current_scorer_sha256": "5d7847b5064828d7e46497fd3155a95bd3d0e27cf6a94bfc473c9ece804d020e",
+  "measurement": "full score_detailed; timer excludes input construction; timeout includes process startup/construction; timeouts remain lower bounds",
+  "records": [
+    {
+      "case": "null_mismatch",
+      "rows": 2000,
+      "before": {
+        "status": "completed",
+        "elapsed_seconds": 0.008074667071923614,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 0.0018176250159740448,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "same_result": true
+    },
+    {
+      "case": "null_mismatch",
+      "rows": 600000,
+      "before": {
+        "status": "completed",
+        "elapsed_seconds": 3.3521885839290917,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 0.5508067500777543,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "no_numeric_reference"
+      },
+      "same_result": true
+    }
+  ]
+}

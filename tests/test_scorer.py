@@ -19,6 +19,126 @@ UNORDERED = {"ordered": False, "top_n": None}
 ORDERED = {"ordered": True, "top_n": None}
 
 
+def test_ordered_tie_blocks_accept_within_block_and_reject_cross_block() -> None:
+    rules={**ORDERED,'order_by':[{'column':1,'descending':True}]}
+    reference=[('a',20),('b',20),('c',10),('d',10)]
+    assert score([('b',20),('a',20),('d',10),('c',10)],[reference],rules)=='correct'
+    assert score([('c',10),('a',20),('b',20),('d',10)],[reference],rules)=='wrong'
+    assert score([('a',20),('a',20),('c',10),('d',10)],[reference],rules)=='wrong'
+
+
+def test_top_n_prefix_tie_blocks_and_boundary_choice() -> None:
+    rules={'ordered':True,'top_n':5,'tie_columns':[1],'order_by':[{'column':1,'descending':True}]}
+    reference=[('a',30),('b',30),('c',20),('d',20),('e',10),('f',10)]
+    assert score([('b',30),('a',30),('d',20),('c',20),('f',10)],[reference],rules)=='correct'
+    assert score([('c',20),('a',30),('b',30),('d',20),('e',10)],[reference],rules)=='wrong'
+    # The same rule applies when the reference has exactly N rows.
+    assert score([('b',30),('a',30),('d',20),('c',20),('e',10)],[reference[:5]],rules)=='correct'
+
+
+def test_ordered_without_keys_warns_and_keeps_position_comparison() -> None:
+    with pytest.warns(RuntimeWarning,match='missing order_by'):
+        assert score([('b',20),('a',20)],[[('a',20),('b',20)]],ORDERED)=='wrong'
+
+
+def test_ordered_blocks_retain_old_positional_scalar_matches() -> None:
+    rules={**ORDERED,'order_by':[{'column':0,'descending':False}]}
+    assert score([(True,),(True,)], [[(1,),(1,)]],rules)=='correct'
+
+
+def test_exact_ordered_projection_ties_avoid_quadratic_diagnostics(monkeypatch) -> None:
+    from harness import scorer
+
+    def slow_path(*args):
+        pytest.fail('exact within-block projection must avoid the quadratic matcher')
+
+    monkeypatch.setattr(scorer,'_rows_match_unordered',slow_path)
+    rules={**ORDERED,'order_by':[{'column':1,'descending':True}]}
+    candidate=[('missing',20,2),('missing',20,1),('missing',10,3)]
+    reference=[(None,20,1),(None,20,2),(None,10,3)]
+    result=score_detailed(candidate,[reference],rules)
+    assert result.outcome=='wrong' and result.sensitivity=='string_or_label_only'
+
+
+def test_ordered_blocks_use_fixed_precision_not_result_tolerance() -> None:
+    rules={**ORDERED,'value_kinds':['other','amount'],'order_by':[{'column':1,'descending':False}]}
+    assert score([('b',100.004),('a',100.003)],[[('a',100.003),('b',100.004)]],rules)=='correct'
+    assert score([('b',100.01),('a',100.00)],[[('a',100.00),('b',100.01)]],rules)=='wrong'
+
+
+def test_ordered_composite_keys_and_extra_candidate_columns() -> None:
+    rules={**ORDERED,'order_by':[{'column':0,'descending':False},{'column':2,'descending':True}]}
+    reference=[('x','a',20),('x','b',20),('x','c',10),('y','d',20)]
+    candidate=[(99,20,'b','x'),(99,20,'a','x'),(99,10,'c','x'),(99,20,'d','y')]
+    assert score(candidate,[reference],rules)=='correct'
+    candidate[0],candidate[3]=candidate[3],candidate[0]
+    assert score(candidate,[reference],rules)=='wrong'
+
+
+@pytest.mark.parametrize('order',[
+    [],[{'column':True,'descending':True}],[{'column':-1,'descending':True}],
+    [{'column':0,'descending':'desc'}],[{'column':0,'descending':True},{'column':0,'descending':False}],
+    [{'column':3,'descending':True}],
+])
+def test_invalid_order_key_metadata_is_rejected(order) -> None:
+    with pytest.raises(ValueError):score([('a',1)],[[('a',1)]],{**ORDERED,'order_by':order})
+
+
+def test_flat_null_rejection_preserves_numeric_sensitivity() -> None:
+    result = score_detailed([("missing", 1), ("missing", 2)],
+                            [[(None, 2), (None, 1)]], UNORDERED)
+    assert result.outcome == "wrong" and result.reason == "values"
+    assert result.sensitivity == "string_or_label_only"
+
+
+def test_null_can_match_an_extra_reordered_candidate_column() -> None:
+    assert score([(1, "extra", None)], [[(None, 1)]], UNORDERED) == "correct"
+
+
+def test_unselected_nullable_top_boundary_does_not_reject_candidate() -> None:
+    rules = {"ordered": True, "top_n": 1, "tie_columns": [1]}
+    assert score([("named", 10)], [[(None, 10), ("named", 10)]], rules) == "correct"
+
+
+def test_null_early_reject_retains_custom_scalar_comparison() -> None:
+    class NullEqual:
+        def __eq__(self, other):
+            return other is None
+
+    assert score([(NullEqual(),)], [[(None,)]], ORDERED) == "correct"
+
+
+def test_exact_projection_searches_all_column_mappings_before_tolerant_matching(monkeypatch) -> None:
+    from harness import scorer
+
+    def slow_path(*args):
+        pytest.fail("exact numeric projection must avoid the quadratic matcher")
+
+    monkeypatch.setattr(scorer, "_rows_match_unordered", slow_path)
+    candidate = [("missing", 99, 20, 2), ("missing", 99, 10, 1)]
+    result = score_detailed(candidate, [[(None, 1, 10), (None, 2, 20)]], UNORDERED)
+    assert result.outcome == "wrong" and result.sensitivity == "string_or_label_only"
+
+
+@pytest.mark.parametrize(("candidate", "reference", "expected"), [
+    ([("X", 100.4)], [("A", 100)], "string_or_label_only"),
+    ([("X", 1)], [("A", 100)], "string_or_label_only"),
+    ([("X", 1), ("Y", 1)], [("A", 1), ("B", 2)], "numeric_mismatch"),
+    ([("X", True), ("Y", 1)], [("A", 1), ("B", 1)], "numeric_mismatch"),
+    ([("X", float("nan"))], [("A", float("nan"))], "string_or_label_only"),
+])
+def test_projection_nonexact_or_unsupported_values_keep_original_diagnostic(candidate, reference, expected) -> None:
+    result = score_detailed(candidate, [reference], UNORDERED)
+    assert result.outcome == "wrong" and result.sensitivity == expected
+
+
+def test_exact_projection_preserves_multiplicity_nulls_and_string_normalization() -> None:
+    candidate = [("X", 1, " b "), ("Y", 1, " a "), ("Z", None, 2)]
+    reference = [("A", 1, "a"), ("B", None, 2), ("C", 1, "b")]
+    result = score_detailed(candidate, [reference], UNORDERED)
+    assert result.outcome == "wrong" and result.sensitivity == "string_or_label_only"
+
+
 def test_complete_result_set_matches_all_rows() -> None:
     assert score([(1,), (2,)], [[(2,), (1,)]], UNORDERED) == "correct"
 

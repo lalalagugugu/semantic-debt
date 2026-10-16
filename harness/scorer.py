@@ -7,8 +7,9 @@ one of three candidate states: rows, ``CANNOT_ANSWER``, or :class:`ExecError`.
 from __future__ import annotations
 
 import math
-from collections import defaultdict
-from collections.abc import Mapping, Sequence
+import warnings
+from collections import Counter, defaultdict
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from itertools import permutations
@@ -63,6 +64,7 @@ class _Rules:
     exact_counts: bool = True
     value_types: tuple[str, ...] = ()
     selection: Mapping[str, object] | None = None
+    order_by: tuple[tuple[int, bool], ...] = ()
 
 
 def score(
@@ -149,15 +151,52 @@ def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -
             continue
         if any(i not in numeric_ref for i in rules.tie_columns):
             continue
-        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts, tuple(rules.value_types[i] for i in numeric_ref) if rules.value_types else ())
+        projected_order = tuple((numeric_ref.index(i), descending) for i, descending in rules.order_by) if all(i in numeric_ref for i, _ in rules.order_by) else ()
+        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts, tuple(rules.value_types[i] for i in numeric_ref) if rules.value_types else (), order_by=projected_order)
         projected_candidate = tuple(tuple(row[i] for i in numeric_candidate) for row in candidate)
         projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
+        if _exact_projection_matches(projected_candidate, projected_reference, projected_rules):
+            return "string_or_label_only"
         matched, _ = _matches_reference(projected_candidate, projected_reference, projected_rules)
         if matched:
             return "string_or_label_only"
     if not saw_numeric:
         return "no_numeric_reference"
     return "numeric_mismatch"
+
+
+def _exact_projection_matches(candidate: Rows, reference: Rows, rules: _Rules) -> bool:
+    """Prove an exact diagnostic match; otherwise retain the tolerant matcher."""
+    if rules.top_n is not None:
+        return False
+
+    def key(value: Cell) -> object:
+        # Preserve numeric/non-numeric buckets: bool must not hash as 0/1.
+        # Unsupported objects and non-finite values keep their original path.
+        if type(value) not in (int, float, Decimal, str, bool, type(None)):
+            raise TypeError
+        if _is_numeric(value):
+            if not math.isfinite(float(value)):
+                raise ValueError
+            return value
+        return _nonnumeric_bucket(value)
+
+    try:
+        rows = (tuple(key(value) for value in row) for row in reference)
+        expected = tuple(rows) if rules.ordered else Counter(rows)
+        for mapping in permutations(range(len(candidate[0])), len(reference[0])):
+            projected = (tuple(key(row[i]) for i in mapping) for row in candidate)
+            if rules.ordered and rules.order_by:
+                actual = tuple(projected)
+                exact = all(Counter(actual[start:end]) == Counter(expected[start:end])
+                            for start, end in _ordered_blocks(reference, rules))
+            else:
+                exact = (tuple(projected) if rules.ordered else Counter(projected)) == expected
+            if exact:
+                return True
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return False
 
 
 def _parse_rules(rules: Mapping[str, object]) -> _Rules:
@@ -199,7 +238,24 @@ def _parse_rules(rules: Mapping[str, object]) -> _Rules:
         if not value_kinds or len(value_types) != len(value_kinds):
             raise ValueError("selection requires complete value_kinds and value_types")
         validate_selection(selection, len(value_kinds), ordered=ordered)
-    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection)
+    order_by = rules.get("order_by")
+    if order_by is None and selection is not None and selection["output_order"]:
+        order_by = selection["output_order"]  # Already explicit reference metadata.
+    if order_by is not None:
+        if not ordered or not isinstance(order_by, list) or not order_by:
+            raise ValueError("order_by requires ordered=true and a nonempty list")
+        for item in order_by:
+            if not isinstance(item, Mapping) or set(item) != {"column", "descending"} or type(item["column"]) is not int or item["column"] < 0 or type(item["descending"]) is not bool:
+                raise ValueError("order_by requires nonnegative column and boolean descending")
+        positions = [item["column"] for item in order_by]
+        if len(set(positions)) != len(positions) or (value_kinds and any(i >= len(value_kinds) for i in positions)) or (value_types and any(i >= len(value_types) for i in positions)):
+            raise ValueError("order_by columns must be unique reference positions")
+        if selection is not None and order_by != selection["output_order"]:
+            raise ValueError("order_by must agree with selection.output_order")
+    elif ordered:
+        warnings.warn("ordered rules missing order_by; retaining positional comparison", RuntimeWarning, stacklevel=3)
+    parsed_order = tuple((item["column"], item["descending"]) for item in order_by or ())
+    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection, parsed_order)
 
 
 def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
@@ -225,6 +281,8 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
         raise ValueError("value_kinds must match reference column count")
     if rules.value_types and reference and len(rules.value_types) != len(reference[0]):
         raise ValueError("value_types must match reference column count")
+    if reference and any(i >= len(reference[0]) for i, _ in rules.order_by):
+        raise ValueError("order_by contains an index outside the reference rows")
     if rules.selection is not None:
         complete, _ = complete_selection(list(reference), rules.selection, rules.value_kinds)
         if len(complete) != len(reference):
@@ -252,16 +310,52 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
     if candidate_width < reference_width:
         return False, "missing_columns"
 
+    # A flat reference consumes every row. None only matches None under the
+    # scalar comparator, regardless of column permutations or extra columns.
+    # Top-N may leave nullable boundary members unselected, so exclude it.
+    if (rules.top_n is None
+            and any(cell is None for row in reference for cell in row)
+            and not any(cell is None for row in candidate for cell in row)
+            and all(type(cell) in (str, bool, int, float, Decimal, list, tuple, dict, bytes)
+                    for row in candidate for cell in row)):
+        return False, "values"
+
     for mapping in permutations(range(candidate_width), reference_width):
         if rules.top_n is not None:
             if _top_rows_match(candidate, reference, mapping, rules):
                 return True, "matched"
         elif rules.ordered:
-            if all(_rows_equal(candidate_row, reference_row, mapping, rules) for candidate_row, reference_row in zip(candidate, reference)):
+            if _ordered_rows_match(candidate, reference, mapping, rules):
                 return True, "matched"
         elif _rows_match_unordered(candidate, reference, mapping, rules):
             return True, "matched"
     return False, "values"
+
+
+def _ordered_blocks(reference: Rows, rules: _Rules) -> Iterator[tuple[int, int]]:
+    """Contiguous equal reference keys; result tolerance never defines a block."""
+    start = 0
+    previous = None
+    for index, row in enumerate(reference):
+        key = tuple(quantize_tie(row[i], rules.value_kinds[i] if rules.value_kinds else "other") for i, _ in rules.order_by)
+        if index and key != previous:
+            yield start, index
+            start = index
+        previous = key
+    if reference:
+        yield start, len(reference)
+
+
+def _ordered_rows_match(candidate: Rows, reference: Rows, mapping: tuple[int, ...], rules: _Rules) -> bool:
+    if not rules.order_by:
+        return all(_rows_equal(a, b, mapping, rules) for a, b in zip(candidate, reference))
+    for start, end in _ordered_blocks(reference, rules):
+        # Retain every old positional match, including custom scalar equality.
+        if all(_rows_equal(a, b, mapping, rules) for a, b in zip(candidate[start:end], reference[start:end])):
+            continue
+        if end - start == 1 or not _rows_match_unordered(candidate[start:end], reference[start:end], mapping, rules):
+            return False
+    return True
 
 
 def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple[bool, str]:
@@ -328,16 +422,10 @@ def _top_rows_match(
 ) -> bool:
     assert rules.top_n is not None
     if len(reference) == rules.top_n:
-        return all(
-            _rows_equal(candidate_row, reference_row, mapping, rules)
-            for candidate_row, reference_row in zip(candidate, reference)
-        )
+        return _ordered_rows_match(candidate, reference, mapping, rules)
 
     boundary_start = _boundary_start(reference, rules.top_n, rules.tie_columns, rules.value_kinds)
-    if not all(
-        _rows_equal(candidate[index], reference[index], mapping, rules)
-        for index in range(boundary_start)
-    ):
+    if not _ordered_rows_match(candidate[:boundary_start], reference[:boundary_start], mapping, rules):
         return False
     return _rows_match_subset(
         candidate[boundary_start:],

@@ -1,0 +1,40 @@
+{
+  "run_utc": "2026-10-16T09:09:16.470505+00:00",
+  "baseline_commit": "2d2660f8ca94d026b48d47d7e15b8d51c218e08c",
+  "baseline_scorer_sha256": "3d7fb59b1ac205dce95883d266f35441fbc16f7cd7709189af9fea270a635838",
+  "current_scorer_sha256": "5d7847b5064828d7e46497fd3155a95bd3d0e27cf6a94bfc473c9ece804d020e",
+  "measurement": "full score_detailed; timer excludes input construction; timeout includes process startup/construction; timeouts remain lower bounds",
+  "records": [
+    {
+      "case": "numeric_projection",
+      "rows": 100,
+      "before": {
+        "status": "completed",
+        "elapsed_seconds": 0.017202167073264718,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "string_or_label_only"
+      },
+      "after": {
+        "status": "completed",
+        "elapsed_seconds": 0.014512124937027693,
+        "outcome": "wrong",
+        "reason": "values",
+        "sensitivity": "string_or_label_only"
+      },
+      "same_result": true
+    },
+    {
+      "case": "numeric_projection",
+      "rows": 600000,
+      "before": {
+        "status": "timeout",
+        "wall_time_lower_bound_seconds": 10.0
+      },
+      "after": {
+        "status": "timeout",
+        "wall_time_lower_bound_seconds": 10.0
+      }
+    }
+  ]
+}
