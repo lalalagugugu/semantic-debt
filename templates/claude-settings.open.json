@@ -1,5 +1,13 @@
 {
   "permissions": {
-    "additionalDirectories": ["${SEMDEBT_DATA_DIR}", "${SEMDEBT_EVAL_DIR}"]
+    "additionalDirectories": [
+      "${SEMDEBT_DATA_DIR}",
+      "${SEMDEBT_EVAL_DIR}"
+    ],
+    "allow": [
+      "Read(/${SEMDEBT_EVAL_DIR}/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/**)",
+      "Bash(ls:*)"
+    ]
   }
 }
