@@ -52,3 +52,5 @@ uv run pytest -q tests/test_scorer.py tests/test_selection.py tests/test_validat
 ```
 
 题库独立PR #13负责Q79当前边界快照、可选参考及T06 A/B/C任务卡。T05b成员集合与全部新增参考的独立pandas核对仍为冻结前置；本轮不宣告T06标注、eval-v1或harness-v1冻结完成。
+
+补充：600条中的6条excluded全部是Q33在六个公开系统下各1条；因公开原始参考不可用而沿用历史排除，不是性能改动造成的执行失败。当前题库修订Q33参考已完整复算；同口径对齐分母仍为594。
