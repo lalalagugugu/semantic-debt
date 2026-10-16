@@ -42,7 +42,7 @@ cards:
   - {id: T14,  owner: claude, mode: open,          repo: main, card: tasks/T14-tuning.md, after: G3, note: "A 角 open；B 角另开 T14-B（packet）"}
   - {id: T14-B, owner: claude, mode: packet,       repo: none, card: tasks/T14-tuning.md}
   - {id: T15,  owner: claude, mode: open,          repo: main, card: tasks/T15-explorer-agent.md, after: G3}
-  - {id: T16,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T16-metric-layer.md, after: G3}
+  - {id: T16,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T16-metric-layer.md, after: G1, note: "G1 后可搭建与核对数据；跑单元要等 G3 且 T13 跑完"}
   - {id: T17,  owner: claude, mode: windows,       repo: main, card: tasks/T17-powerbi-dax.md, after: G1}
   - {id: T18,  owner: claude, mode: windows,       repo: main, card: tasks/T18-dax-full-and-tuning.md, after: G3}
   - {id: T19,  owner: claude, mode: open,          repo: main, card: tasks/T19-report.md}
