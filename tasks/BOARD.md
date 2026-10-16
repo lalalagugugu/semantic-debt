@@ -56,6 +56,7 @@
 | 11 | 英文锚点按外部基准**原始参考**评分，另报一列修订后参考的对照；按外部原题号对应 | Claude Code（并入 T11 遗留项）；列结构不同的题的 `rules` 由 Codex 补 | 挡 T13 的英文锚点单元 | `decisions/2026-10-16-q79-release-and-anchor-refs.md` 第二节 | 接线已做（PR #40 已合并）；第三节补充裁决已落实（分支 `T11-anchor-details`，PR 待合并）：81 道可评、12 道 judge、**6 道列结构不同待 Codex 补 `rules`**（EN13、14、20、74、83、87），见 `reports/validation/anchor_refs.md` |
 | 12 | Q79：存 306 个边界成员快照（带规则版本号）；T05b 独立复现成员集合即放行 | 快照：Codex（T05）；复现：Claude Code（T05b） | 卡 `eval-v1` 里 Q79 能否带 Top-N 并列 | 同上第一节 | 已裁决，待做 |
 | 13 | harness **只从 `eval-v1` tag 读题库**，不读 `$SEMDEBT_EVAL_DIR` 共用工作区（Codex 在那里原地干活，可能在别的分支、带未提交改动）；读到的不是 tag 内容就拒绝开跑 | Claude Code（T12 实现；T13、T15、T16、T18 的运行都走它） | 读错版本的题，整轮运行作废 | T12、T13 卡「题库版本」 | 待做（G2 之后） |
+| 14 | **纯退货行与购买事件**：受影响的题按「`SalesQuantity > 0`」与「全部行」各出一份参考；扫全部 122 题；T05b 两种都算 | Codex（T05）；T05b：Claude Code | 冻结的汇总层与 Cube 模型按全部行算购买日，只取一种会让 L1.5S / L2 因我们自己的口径选择被判错 | `decisions/2026-10-16-return-only-rows-and-purchase-events.md` | 已裁决，T05 进行中 |
 
 ### 第 3 项的四个批准条件（用户 2026-10-16）
 
