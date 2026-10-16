@@ -15,6 +15,7 @@ from itertools import permutations
 from numbers import Number
 from typing import Literal, TypeAlias
 
+from harness.selection import complete_selection, identity, matches_selection, validate_selection
 from harness.value_units import KINDS, ValueKind, absolute_tolerance, is_integer_type, quantize_tie
 
 
@@ -61,22 +62,27 @@ class _Rules:
     use_absolute_tolerance: bool = True
     exact_counts: bool = True
     value_types: tuple[str, ...] = ()
+    selection: Mapping[str, object] | None = None
 
 
 def score(
     candidate_rows: Sequence[Sequence[Cell]] | str | ExecError,
     refs: Sequence[Sequence[Sequence[Cell]]],
     rules: Mapping[str, object],
+    *,
+    reference_rules: Sequence[Mapping[str, object] | None] | None = None,
 ) -> Outcome:
     """Return one of the four outcomes required by the frozen scoring rules."""
 
-    return score_detailed(candidate_rows, refs, rules).outcome
+    return score_detailed(candidate_rows, refs, rules, reference_rules=reference_rules).outcome
 
 
 def score_detailed(
     candidate_rows: Sequence[Sequence[Cell]] | str | ExecError,
     refs: Sequence[Sequence[Sequence[Cell]]],
     rules: Mapping[str, object],
+    *,
+    reference_rules: Sequence[Mapping[str, object] | None] | None = None,
 ) -> ScoreResult:
     """Score a candidate and retain a stable diagnostic reason.
 
@@ -85,7 +91,12 @@ def score_detailed(
     tie group; it must never be truncated to N rows.
     """
 
-    parsed_rules = _parse_rules(rules)
+    if reference_rules is not None:
+        if isinstance(reference_rules, (str, bytes)) or not isinstance(reference_rules, Sequence) or len(reference_rules) != len(refs):
+            raise ValueError("reference_rules must align with refs")
+        if any(item is not None and not isinstance(item, Mapping) for item in reference_rules):
+            raise TypeError("reference_rules entries must be mappings or None")
+    parsed_rules = tuple(_parse_rules({**rules, **(reference_rules[i] or {})}) if reference_rules is not None else _parse_rules(rules) for i in range(len(refs)))
     if isinstance(candidate_rows, ExecError):
         return ScoreResult("exec_error", candidate_rows.message)
     if isinstance(candidate_rows, str):
@@ -100,14 +111,16 @@ def score_detailed(
 
     mismatch_reasons: list[str] = []
     for index, reference in enumerate(references):
-        matched, reason = _matches_reference(candidate, reference, parsed_rules)
+        matched, reason = _matches_reference(candidate, reference, parsed_rules[index])
         if matched:
             return ScoreResult("correct", matched_ref=index)
         mismatch_reasons.append(reason)
 
     if BOUNDARY_TIE_FULL_GROUP in mismatch_reasons:
         return ScoreResult("wrong", BOUNDARY_TIE_FULL_GROUP, sensitivity="structure_mismatch")
-    return ScoreResult("wrong", mismatch_reasons[0], sensitivity=_sensitivity(candidate, references, parsed_rules))
+    sensitivities = [_sensitivity(candidate, (reference,), rule) for reference, rule in zip(references, parsed_rules, strict=True)]
+    sensitivity = next((kind for kind in ("string_or_label_only", "numeric_mismatch", "no_numeric_reference") if kind in sensitivities), "structure_mismatch")
+    return ScoreResult("wrong", mismatch_reasons[0], sensitivity=sensitivity)
 
 
 def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -> Sensitivity:
@@ -116,6 +129,8 @@ def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -
     Keep row multiplicities, numeric NULLs, order, and Top-N constraints. Missing
     numeric columns remain failures; extra candidate columns are still allowed.
     """
+    if rules.selection is not None:
+        return "structure_mismatch"
     if not candidate or not any(references):
         return "structure_mismatch"
     expected_counts = {rules.top_n if rules.top_n is not None else len(ref) for ref in references}
@@ -177,7 +192,14 @@ def _parse_rules(rules: Mapping[str, object]) -> _Rules:
     value_types = rules.get("value_types", ())
     if isinstance(value_types, (str, bytes)) or not isinstance(value_types, Sequence) or any(not isinstance(t, str) or not t.strip() for t in value_types):
         raise ValueError("value_types must be a sequence of reference return-type strings")
-    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types))
+    selection = rules.get("selection")
+    if selection is not None:
+        if top_n is not None or tie_columns:
+            raise ValueError("selection cannot be combined with flat top_n/tie_columns")
+        if not value_kinds or len(value_types) != len(value_kinds):
+            raise ValueError("selection requires complete value_kinds and value_types")
+        validate_selection(selection, len(value_kinds), ordered=ordered)
+    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection)
 
 
 def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
@@ -203,6 +225,11 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
         raise ValueError("value_kinds must match reference column count")
     if rules.value_types and reference and len(rules.value_types) != len(reference[0]):
         raise ValueError("value_types must match reference column count")
+    if rules.selection is not None:
+        complete, _ = complete_selection(list(reference), rules.selection, rules.value_kinds)
+        if len(complete) != len(reference):
+            raise ValueError("selection reference contains rows below a boundary")
+        return _matches_selection_reference(candidate, reference, rules)
     if rules.top_n is None:
         if len(candidate) != len(reference):
             return False, "row_count"
@@ -235,6 +262,43 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
         elif _rows_match_unordered(candidate, reference, mapping, rules):
             return True, "matched"
     return False, "values"
+
+
+def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple[bool, str]:
+    if not reference:
+        return (not candidate, "matched" if not candidate else "selection_group_coverage")
+    if not candidate:
+        return False, "selection_group_coverage"
+    if len(candidate[0]) < len(reference[0]):
+        return False, "missing_columns"
+    spec = rules.selection
+    stages = spec["stages"]
+    identity_columns = sorted({column for stage in stages for column in stage["group_columns"] + stage["object_columns"] + [condition["column"] for condition in stage["where"]]})
+    indexed = defaultdict(list)
+    for row in reference:
+        indexed[identity(row, identity_columns)].append(row)
+    parents = {stage["parent"] for stage in stages}
+    for index, stage in enumerate(stages):
+        if index in parents:
+            continue
+        identities = [identity(row, stage["group_columns"] + stage["object_columns"]) for row in reference if all(row[c["column"]] == c["equals"] for c in stage["where"])]
+        if len(identities) != len(set(identities)):
+            raise ValueError("selection reference contains duplicate leaf objects")
+    reason = "selection_values"
+    for mapping in permutations(range(len(candidate[0])), len(reference[0])):
+        projected = [tuple(row[i] for i in mapping) for row in candidate]
+        matched = []
+        for row in projected:
+            choices = indexed.get(identity(row, identity_columns), ())
+            match = next((ref for ref in choices if _rows_equal(row, ref, tuple(range(len(ref))), rules)), None)
+            if match is None:
+                break
+            matched.append(match)
+        else:
+            valid, reason = matches_selection(matched, reference, spec, rules.value_kinds)
+            if valid:
+                return True, "matched"
+    return False, reason
 
 
 def _validate_top_reference(reference: Rows, rules: _Rules) -> str | None:
