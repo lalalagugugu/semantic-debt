@@ -269,13 +269,42 @@ def test_rules_are_passed_through_untouched(tmp_path, monkeypatch):
     seen = []
     real = R.score_detailed
 
-    def spy(candidate, refs, rules):
-        seen.append(rules)
-        return real(candidate, refs, rules)
+    def spy(candidate, refs, rules, **kw):
+        seen.append((rules, kw.get("reference_rules")))
+        return real(candidate, refs, rules, **kw)
     monkeypatch.setattr(R, "score_detailed", spy)
     respond, _ = _scripted("```sql\nSELECT 42\n```")
     R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])})), Q, 1)
-    assert seen and all(r is Q.rules for r in seen)
+    assert seen and all(r is Q.rules and rr is None for r, rr in seen)
+
+
+def test_per_reference_rules_are_passed_through_untouched(tmp_path, monkeypatch):
+    """decisions/2026-10-16-per-reference-rules.md: a ref's own rules replace the
+    question's wholesale; the harness hands both to the scorer as they are."""
+    one = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["count"], "value_types": ["UInt64"]}
+    two = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other", "count"],
+           "value_types": ["String", "UInt64"]}
+    q = Question("Q005", QTEXT, refs=[[[8]], [["a", 7]]], rules=one, ref_rules=[None, two])
+    seen = []
+    real = R.score_detailed
+
+    def spy(candidate, refs, rules, **kw):
+        seen.append((rules, kw.get("reference_rules")))
+        return real(candidate, refs, rules, **kw)
+    monkeypatch.setattr(R, "score_detailed", spy)
+    respond, _ = _scripted("```sql\nSELECT 'a', 7\n```")
+    rec = R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 'a', 7": ExecResult(rows=[["a", 7]])})), q, 1)
+    assert rec["final"]["outcome"] == "correct" and rec["final"]["matched_ref"] == 1
+    assert seen and all(r is one and rr is q.ref_rules for r, rr in seen)
+
+
+def test_anchor_carries_the_revised_column(tmp_path):
+    rules = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["count"], "value_types": ["UInt64"]}
+    revised = Question("Q006", "", refs=[[[8]]], rules=rules, lang="en")
+    q = Question("EN06", QTEXT, refs=[[[7]]], rules=rules, lang="en", revised=revised)
+    respond, _ = _scripted("```sql\nSELECT 7\n```")
+    rec = R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 7": ExecResult(rows=[[7]])})), q, 1)
+    assert rec["final"]["outcome"] == "correct" and rec["final"]["revised"]["outcome"] == "wrong"
 
 
 def test_api_error_is_recorded(tmp_path):
@@ -456,8 +485,32 @@ def test_load_real_bank_and_pass_rules_through():
     for q in zh:
         rec = records[q.qid]
         assert q.text == rec["text_zh"] and len(q.refs) == len(rec["refs"])
-        assert q.rules is rec.get("rules") or q.rules == rec.get("rules")   # untouched
+        assert q.rules == rec["rules"]                                         # untouched
+        own = [ref.get("rules") for ref in rec["refs"]]
+        assert q.ref_rules == (own if any(r is not None for r in own) else None)
         assert q.scoring == rec["scoring"]
+    # after the rules backfill only judge questions are pending among the 122
+    assert {q.qid for q in zh if q.pending} == {qid for qid, r in records.items() if r["scoring"] == "judge"}
+
+
+@needs_eval
+def test_anchor_mapping_follows_the_english_text_not_the_numbering():
+    import json as _json
+    from harness.questions import anchor_mapping, load_zh, vendor_questions
+    zh = {q.qid: q for q in load_zh(EVAL)}
+    vendor = {int(v["id"]): v for v in vendor_questions(EVAL)}
+    mapping = anchor_mapping(EVAL, list(zh.values()))
+    assert set(mapping) == set(vendor) and len(set(mapping.values())) == len(mapping)
+    for vid, qid in mapping.items():
+        assert zh[qid].meta["text_en"].strip() == vendor[vid]["question"].strip()
+    # robust to the bank's order: shuffling our questions changes nothing
+    assert anchor_mapping(EVAL, list(reversed(list(zh.values())))) == mapping
+    from harness.questions import load_questions
+    en = load_questions(EVAL, lang="en")
+    assert sorted(q.meta["vendor_id"] for q in en) == sorted(set(vendor) - {33})
+    for q in en:   # EN id = benchmark id, and the revised column is the mapped bank question
+        assert q.qid == f"EN{q.meta['vendor_id']:02d}" and q.meta["bank_qid"] == mapping[q.meta["vendor_id"]]
+        assert q.revised.refs == zh[q.meta["bank_qid"]].refs and q.revised.rules == zh[q.meta["bank_qid"]].rules
 
 
 @needs_eval
@@ -504,3 +557,43 @@ def test_transport_errors_mid_read_are_retried(monkeypatch):
     monkeypatch.setattr(C.time, "sleep", lambda s: None)
     reply = C.DeepSeekClient("deepseek-flash").chat([{"role": "user", "content": "hi"}])
     assert reply.content == "x" and reply.transport_retries == 1
+
+
+def test_anchor_rules_follow_column_structure():
+    from harness.questions import anchor_rules
+    r1 = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["count"], "value_types": ["UInt64"]}
+    r2 = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other", "amount"],
+          "value_types": ["String", "Float64"]}
+    current = Question("Q007", "", refs=[[[1]], [["a", 1.0]]], rules=r1, ref_rules=[None, r2])
+    assert anchor_rules([{"name": "c", "type": "UInt64"}], [[5]], current) == (r1, None)
+    assert anchor_rules([{"name": "a", "type": "String"}, {"name": "b", "type": "Float64"}], [["x", 2.0]], current)[0] is r2
+    assert anchor_rules([{"name": "c", "type": "Int64"}], [[5]], current) == (None, "structure_differs")
+
+
+def test_rescore_rebuilds_candidates_from_runs_raw(tmp_path):
+    """Offline re-scoring: no model call, candidates from runs-raw, new run dir, sha checked."""
+    from harness import rescore as RS
+    q_old = Question("Q008", QTEXT, refs=[[[42]]], rules=None)                 # pending: no rules yet
+    respond, _ = _scripted("```sql\nSELECT 42\n```")
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])}))
+    ctx.raw_dir = tmp_path / "raw" / "src" / "SQL-L1"
+    ctx.run_id = "src"
+    R.run_cell(ctx, [q_old], reps=1, concurrency=1, runs_root=tmp_path / "runs", progress=lambda *_: None)
+    q_new = Question("Q008", QTEXT, refs=[[[42]]], rules=Q.rules)
+    path = RS.rescore("src", "SQL-L1", "src-rescore", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
+                      questions={"Q008": q_new}, commit="evalnew")
+    rec = json.loads(path.read_text(encoding="utf-8"))
+    assert rec["final"]["outcome"] == "correct" and rec["rescored_from"]["final"]["outcome"] == "pending"
+    assert rec["run_id"] == "src-rescore" and rec["eval_commit"] == "evalnew" and rec["cost_cny"] == 0.0
+    with pytest.raises(SystemExit):              # append-only: never overwrite a run directory
+        RS.rescore("src", "SQL-L1", "src-rescore", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
+                   questions={"Q008": q_new}, commit="evalnew")
+    changed = Question("Q008", QTEXT + "改", refs=[[[42]]], rules=Q.rules)
+    with pytest.raises(ValueError):              # the answer belongs to a different question now
+        RS.rescore("src", "SQL-L1", "src-rescore-2", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
+                   questions={"Q008": changed}, commit="evalnew")
+    raw = tmp_path / "raw" / "src" / "SQL-L1" / "Q008_r1_t0.exec.json"
+    raw.write_bytes(raw.read_bytes() + b" ")
+    with pytest.raises(ValueError):              # tampered raw result
+        RS.rescore("src", "SQL-L1", "src-rescore-3", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
+                   questions={"Q008": q_new}, commit="evalnew")

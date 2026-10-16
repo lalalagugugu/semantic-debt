@@ -7,14 +7,18 @@ Two question sets:
   CSV at ``result_path``, typed with the column types in ``refs/MANIFEST.json``.
 - ``en`` (the English anchors R-EN / L1c-EN): the external benchmark's original
   questions from ``vendor/cube/text_to_sql_benchmark.json``, n = 99 (q33 excluded,
-  as in the benchmark's published numbers). Their reference results are not built
-  yet, so they are loaded without refs (scoring pending, see open question T11-3).
+  as in the benchmark's published numbers). Scored against the benchmark's own
+  original reference (built by ``harness/anchor_refs.py``), with our current
+  revised references as a second, comparison column
+  (decisions/2026-10-16-q79-release-and-anchor-refs.md §2).
 
-The harness never interprets ``rules``: it is passed to the scorer exactly as the
-question record carries it (decisions/2026-10-14-scorer-contract-and-acceptance.md).
-A record without ``rules`` (the 100 ``cube`` questions as of 2026-10-16) is loaded
-with ``rules=None`` and is not scored deterministically; the harness does not derive
-``ordered`` / ``top_n`` from SQL or CSV order (pipeline contract, correction 1).
+``rules`` are reference metadata and are passed to the scorer untouched
+(decisions/2026-10-14-scorer-contract-and-acceptance.md). A ref may carry its own
+``rules``, which replace the question's ``rules`` wholesale for that ref
+(decisions/2026-10-16-per-reference-rules.md); the harness hands both to the
+scorer as ``rules`` + ``reference_rules`` and never merges, infers or rewrites
+them (``selection`` included). The loader refuses a bank whose MANIFEST records
+a different effective ``rules`` for a ref than the question file.
 Question text never reaches a committed log; only ``qid`` does.
 """
 
@@ -41,10 +45,12 @@ class Question:
     qid: str
     text: str
     refs: list | None               # acceptable result sets, each a list of rows; None = not built
-    rules: dict | None              # passed through to the scorer untouched; None = absent in the bank
+    rules: dict | None              # question-level rules, untouched; None = not available
     lang: str = "zh"
     scoring: str = "deterministic"  # "deterministic" or "judge" (question-bank field)
     meta: dict = field(default_factory=dict)
+    ref_rules: list | None = None   # per ref: that ref's own rules, or None = use ``rules``
+    revised: "Question | None" = None   # anchors only: the same answer scored on our revised refs
 
     @property
     def pending(self) -> str | None:
@@ -54,7 +60,7 @@ class Question:
         if self.refs is None:
             return "no_refs"
         if self.rules is None:
-            return "no_rules"
+            return self.meta.get("rules_pending", "no_rules")
         return None
 
 
@@ -65,14 +71,30 @@ def eval_dir() -> Path:
     return Path(root).expanduser()
 
 
+BANK_PATHS = ("questions", "refs", "vendor")
+
+
+def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+
+
 def eval_commit(root: Path | None = None) -> str:
-    """Short commit of the question bank, with ``-dirty`` when the tree has local changes."""
+    """Short commit of the question bank's content that the harness reads.
+
+    Clean checkout → its HEAD. If ``questions/``, ``refs/`` or ``vendor/`` have local
+    changes but are byte-identical to ``origin/main`` (a checkout someone else is
+    working in), that commit is reported as ``<sha>@origin/main``; otherwise
+    ``<head>-dirty``.
+    """
     root = root or eval_dir()
-    head = subprocess.run(["git", "-C", str(root), "rev-parse", "--short", "HEAD"],
-                          capture_output=True, text=True, check=True).stdout.strip()
-    dirty = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--", "questions", "refs", "vendor"],
-                           capture_output=True, text=True, check=True).stdout.strip()
-    return f"{head}-dirty" if dirty else head
+    head = _git(root, "rev-parse", "--short", "HEAD").stdout.strip()
+    if not _git(root, "status", "--porcelain", "--", *BANK_PATHS).stdout.strip():
+        return head
+    untracked = _git(root, "ls-files", "--others", "--exclude-standard", "--", *BANK_PATHS).stdout.strip()
+    same = _git(root, "diff", "--quiet", "origin/main", "--", *BANK_PATHS).returncode == 0
+    if same and not untracked:
+        return _git(root, "rev-parse", "--short", "origin/main").stdout.strip() + "@origin/main"
+    return f"{head}-dirty"
 
 
 # ---------------------------------------------------------------------------
@@ -117,15 +139,23 @@ def _manifest(root: Path) -> dict[str, dict]:
 
 
 def from_record(record: dict, manifest: dict[str, dict], root: Path) -> Question:
-    refs = []
+    refs, ref_rules = [], []
     for ref in record["refs"]:
         entry = manifest.get(ref["result_path"])
         if entry is None:
             raise ValueError(f"{record['id']}: {ref['result_path']} is not in refs/MANIFEST.json")
+        own = ref.get("rules")
+        effective = own if own is not None else record.get("rules")
+        if "rules" in entry and entry["rules"] != effective:
+            raise ValueError(f"{record['id']}: rules for {ref['result_path']} differ between the question file "
+                             "and refs/MANIFEST.json; the question bank must fix this")
         refs.append(read_ref_csv(root / ref["result_path"], entry["columns"]))
+        ref_rules.append(own)
     return Question(qid=str(record["id"]), text=record["text_zh"], refs=refs, rules=record.get("rules"),
                     lang="zh", scoring=record["scoring"],
-                    meta={"source": record["source"], "type": record["type"], "split": record.get("split")})
+                    meta={"source": record["source"], "type": record["type"], "split": record.get("split"),
+                          "text_en": record["text_en"]},
+                    ref_rules=ref_rules if any(r is not None for r in ref_rules) else None)
 
 
 def load_zh(root: Path) -> list[Question]:
@@ -137,11 +167,80 @@ def load_zh(root: Path) -> list[Question]:
     return [from_record(r, manifest, root) for r in records]
 
 
-def load_en(root: Path) -> list[Question]:
-    data = json.loads((root / "vendor" / "cube" / "text_to_sql_benchmark.json").read_text(encoding="utf-8"))
-    return [Question(qid=f"EN{int(q['id']):02d}", text=q["question"], refs=None, rules=None, lang="en",
-                     meta={"level": q.get("level")})
-            for q in data["questions"] if int(q["id"]) not in EN_EXCLUDED]
+def vendor_questions(root: Path) -> list[dict]:
+    return json.loads((root / "vendor" / "cube" / "text_to_sql_benchmark.json").read_text(encoding="utf-8"))["questions"]
+
+
+def anchor_mapping(root: Path, zh: list[Question] | None = None) -> dict[int, str]:
+    """Benchmark question id → our question id, matched on the English text.
+
+    Built from the texts themselves (our ``text_en`` is the benchmark's question
+    verbatim), not from a numbering scheme, so an exclusion or renumbering cannot
+    shift it. Every benchmark question must match exactly one of ours.
+    """
+    zh = zh if zh is not None else load_zh(root)
+    by_text: dict[str, list[str]] = {}
+    for q in zh:
+        by_text.setdefault(q.meta["text_en"].strip(), []).append(q.qid)
+    mapping = {}
+    for vq in vendor_questions(root):
+        hits = by_text.get(vq["question"].strip(), [])
+        if len(hits) != 1:
+            raise ValueError(f"benchmark q{vq['id']}: {len(hits)} questions in the bank have its English text")
+        mapping[int(vq["id"])] = hits[0]
+    return mapping
+
+
+def effective_rules(q: Question) -> list[dict | None]:
+    return [own if own is not None else q.rules for own in (q.ref_rules or [None] * len(q.refs or []))]
+
+
+def anchor_rules(meta: list[dict], rows: list[list], current: Question) -> tuple[dict | None, str | None]:
+    """The current question's rules for the original reference, if it has the same
+    column structure (column count and return types) as one of the current refs.
+
+    Returns (rules, None) or (None, reason). The rules are taken as they are; the
+    scorer must also accept the original rows as a reference under them.
+    """
+    from harness.scorer import score_detailed
+
+    types = [c["type"] for c in meta]
+    for rules in effective_rules(current):
+        if rules is not None and list(rules.get("value_types", [])) == types:
+            try:
+                ok = score_detailed(rows, [rows], rules).outcome == "correct"
+            except (ValueError, TypeError) as exc:
+                return None, f"rules_invalid_for_original: {exc}"
+            return (rules, None) if ok else (None, "rules_invalid_for_original: self-match failed")
+    return None, "structure_differs"
+
+
+def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
+    from harness.anchor_refs import load_anchor_ref
+
+    zh = {q.qid: q for q in load_zh(root)}
+    mapping = anchor_mapping(root, list(zh.values()))
+    out = []
+    for vq in vendor_questions(root):
+        vid = int(vq["id"])
+        if vid in EN_EXCLUDED:
+            continue
+        current = zh[mapping[vid]]
+        revised = Question(qid=current.qid, text="", refs=current.refs, rules=current.rules, lang="en",
+                           scoring=current.scoring, ref_rules=current.ref_rules)
+        meta = {"vendor_id": vid, "bank_qid": current.qid, "level": vq.get("level")}
+        original = load_anchor_ref(vid, anchors)
+        refs, rules = None, None
+        if original is not None:
+            columns, rows = original
+            refs = [rows]
+            rules, reason = anchor_rules(columns, rows, current)
+            if reason:
+                meta["rules_pending"] = "anchor_" + reason.split(":")[0]
+                meta["rules_pending_detail"] = reason
+        out.append(Question(qid=f"EN{vid:02d}", text=vq["question"], refs=refs, rules=rules, lang="en",
+                            scoring=current.scoring, meta=meta, revised=revised))
+    return out
 
 
 def load_questions(root: Path | None = None, lang: str = "zh") -> list[Question]:
