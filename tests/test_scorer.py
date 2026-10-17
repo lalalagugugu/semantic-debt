@@ -387,3 +387,76 @@ def test_type_metadata_checked_and_projected_with_sensitivity() -> None:
         score([('A',10000)], [[('A',10000)]], {**rules, 'value_types': ['String']})
     with pytest.raises(ValueError, match='value_types'):
         score([(1,)], [[(1,)]], {**UNORDERED, 'value_types': 'UInt64'})
+
+
+@pytest.mark.parametrize("candidate", [[("A", 5)], [(5, "A", "extra")]])
+def test_required_columns_allow_missing_optional_and_permuted_columns(candidate):
+    rules = {**UNORDERED, "required_columns": [2, 0],
+             "value_kinds": ["count", "other", "other"],
+             "value_types": ["UInt64", "String", "String"]}
+    assert score(candidate, [[(5, "unasked", "A")]], rules) == "correct"
+    assert score([("A",)], [[(5, "unasked", "A")]], rules) == "wrong"
+    assert score([("A", 6)], [[(5, "unasked", "A")]], rules) == "wrong"
+
+
+def test_missing_required_columns_warns_and_requires_every_column():
+    with pytest.warns(RuntimeWarning, match="missing required_columns"):
+        result = score_detailed([("A",)], [[("A", 10)]], UNORDERED)
+    assert result.outcome == "wrong" and result.reason == "missing_columns"
+
+
+def test_hidden_order_key_defines_reference_blocks_only():
+    rules = {**ORDERED, "required_columns": [0],
+             "order_by": [{"column": 1, "descending": True}]}
+    ref = [("A", 10), ("B", 10), ("C", 5)]
+    assert score([("B",), ("A",), ("C",)], [ref], rules) == "correct"
+    assert score([("C",), ("A",), ("B",)], [ref], rules) == "wrong"
+    # Extra candidate keys cannot define or expand reference tie blocks.
+    assert score([("C", 10), ("A", 10), ("B", 10)], [ref], rules) == "wrong"
+
+
+def test_hidden_top_n_key_preserves_prefix_and_complete_boundary():
+    rules = {**ORDERED, "top_n": 3, "tie_columns": [1], "required_columns": [0],
+             "order_by": [{"column": 1, "descending": True}]}
+    ref = [("A", 20), ("B", 20), ("C", 10), ("D", 10)]
+    assert score([("B",), ("A",), ("D",)], [ref], rules) == "correct"
+    assert score([("A",), ("C",), ("D",)], [ref], rules) == "wrong"
+    assert score([("C",), ("A",), ("B",)], [ref], rules) == "wrong"
+    result = score_detailed([(name,) for name, _ in ref], [ref], rules)
+    assert result.reason == BOUNDARY_TIE_FULL_GROUP
+
+
+def test_optional_nulls_do_not_trigger_early_reject_and_duplicates_still_count():
+    rules = {**UNORDERED, "required_columns": [0]}
+    ref = [("A", None), ("A", 10), ("B", 20)]
+    assert score([("A",), ("B",), ("A",)], [ref], rules) == "correct"
+    assert score([("A",), ("B",), ("B",)], [ref], rules) == "wrong"
+    assert score([], [[]], rules) == "correct"
+
+
+def test_required_columns_reference_override():
+    base = {**UNORDERED, "required_columns": [0, 1]}
+    override = {**UNORDERED, "required_columns": [1]}
+    result = score_detailed([("B",)], [[("A", 10)], [(20, "B")]], base,
+                            reference_rules=[None, override])
+    assert result.outcome == "correct" and result.matched_ref == 1
+
+
+def test_required_columns_sensitivity_preserves_hidden_sort_blocks():
+    rules = {**ORDERED, "required_columns": [0, 2],
+             "order_by": [{"column": 1, "descending": True}]}
+    ref = [("A", 20, 1), ("B", 20, 2), ("C", 10, 3)]
+    assert score_detailed([("X", 2), ("Y", 1), ("Z", 3)], [ref], rules).sensitivity == "string_or_label_only"
+    assert score_detailed([("X", 3), ("Y", 1), ("Z", 2)], [ref], rules).sensitivity == "numeric_mismatch"
+
+
+@pytest.mark.parametrize("columns", [None, [], [True], [-1], [0, 0], "0", [1.5]])
+def test_invalid_required_columns_rejected(columns):
+    with pytest.raises(ValueError, match="required_columns"):
+        score([(1,)], [[(1,)]], {**UNORDERED, "required_columns": columns})
+
+
+@pytest.mark.parametrize("metadata", [{}, {"value_types": ["Int64"]}, {"value_kinds": ["count"]}])
+def test_required_columns_out_of_bounds_rejected(metadata):
+    with pytest.raises(ValueError, match="required_columns"):
+        score([(1,)], [[(1,)]], {**UNORDERED, **metadata, "required_columns": [1]})

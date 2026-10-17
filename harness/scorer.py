@@ -91,7 +91,10 @@ def score_detailed(
 
     ``refs`` is a sequence of acceptable result sets.  For Top-N questions, a
     reference must contain the strict prefix followed by the complete boundary
-    tie group; it must never be truncated to N rows.
+    tie group; it must never be truncated to N rows. ``required_columns`` lists
+    zero-based reference columns to compare (nonempty, unique indexes). Hidden
+    columns remain available to reference-side ordering and selection. Missing
+    metadata warns and requires every reference column.
     """
 
     if reference_rules is not None:
@@ -156,6 +159,11 @@ def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -
         projected_rules = replace(rules, required_columns=numeric_ref)
         projected_candidate = tuple(tuple(row[i] for i in numeric_candidate) for row in candidate)
         projected_reference = reference
+        if rules.required_columns is None:
+            # Missing metadata retains the previous diagnostic projection too.
+            projected_order = tuple((numeric_ref.index(i), descending) for i, descending in rules.order_by) if all(i in numeric_ref for i, _ in rules.order_by) else ()
+            projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts, tuple(rules.value_types[i] for i in numeric_ref) if rules.value_types else (), order_by=projected_order)
+            projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
         if _exact_projection_matches(projected_candidate, projected_reference, projected_rules):
             return "string_or_label_only"
         matched, _ = _matches_reference(projected_candidate, projected_reference, projected_rules)
@@ -385,19 +393,6 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
     if len(candidate[0]) < len(_comparison_columns(reference[0], rules)):
         return False, "missing_columns"
     spec = rules.selection
-    if rules.required_columns is not None and len(rules.required_columns) < len(reference[0]):
-        # Recover complete reference rows before validating group/Top-N coverage.
-        # Hidden selection keys must never be invented from candidate values.
-        reason = "selection_values"
-        for mapping in permutations(range(len(candidate[0])), len(rules.required_columns)):
-            choices = [tuple(ref for ref in reference if _rows_equal(row, ref, mapping, rules)) for row in candidate]
-            if not all(choices):
-                continue
-            for matched in product(*choices):
-                valid, reason = matches_selection(matched, reference, spec, rules.value_kinds)
-                if valid:
-                    return True, "matched"
-        return False, reason
     stages = spec["stages"]
     identity_columns = sorted({column for stage in stages for column in stage["group_columns"] + stage["object_columns"] + [condition["column"] for condition in stage["where"]]})
     indexed = defaultdict(list)
@@ -410,6 +405,23 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
         identities = [identity(row, stage["group_columns"] + stage["object_columns"]) for row in reference if all(row[c["column"]] == c["equals"] for c in stage["where"])]
         if len(identities) != len(set(identities)):
             raise ValueError("selection reference contains duplicate leaf objects")
+    if rules.required_columns is not None and len(rules.required_columns) < len(reference[0]):
+        # Recover complete reference rows before validating group/Top-N coverage.
+        # Hidden selection keys must never be invented from candidate values.
+        visible_identity = [i for i in identity_columns if i in rules.required_columns]
+        reason = "selection_values"
+        for mapping in permutations(range(len(candidate[0])), len(rules.required_columns)):
+            candidate_identity = [mapping[rules.required_columns.index(i)] for i in visible_identity]
+            choices = [tuple(ref for ref in reference
+                             if identity(row, candidate_identity) == identity(ref, visible_identity)
+                             and _rows_equal(row, ref, mapping, rules)) for row in candidate]
+            if not all(choices):
+                continue
+            for matched in product(*choices):
+                valid, reason = matches_selection(matched, reference, spec, rules.value_kinds)
+                if valid:
+                    return True, "matched"
+        return False, reason
     reason = "selection_values"
     for mapping in permutations(range(len(candidate[0])), len(_comparison_columns(reference[0], rules))):
         projected = [tuple(row[mapping[_comparison_columns(reference[0], rules).index(i)]] for i in range(len(reference[0]))) for row in candidate]
