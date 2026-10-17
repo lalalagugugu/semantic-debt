@@ -20,7 +20,7 @@ sys.path.insert(0, str(REPO))
 from harness import prompt as P
 from harness import run_direct as R
 from harness.cells import CELLS, SYNTAX, Cell
-from harness.client import APIError, MockClient
+from harness.client import APIError, MockClient, _reply
 from harness.executors import (
     ENGINE_ERROR, SCOPE_VIOLATION, TIMEOUT, ExecResult, ast_references, mask_sql, scope_violations,
 )
@@ -237,6 +237,40 @@ def test_exec_error_is_sent_back_exactly_once(tmp_path):
     assert "Unknown identifier" in fix[3]["content"]
     assert all("reasoning_content" not in m for m in fix)
     assert rec["turns"][0]["exec"]["status"] == "error" and rec["turns"][1]["exec"]["status"] == "ok"
+
+
+def test_system_fingerprint_is_read_from_the_response():
+    payload = {"model": "deepseek-flash", "system_fingerprint": "fp_e72d",
+               "choices": [{"message": {"content": "x"}, "finish_reason": "stop"}], "usage": {}}
+    assert _reply(json.dumps(payload).encode(), 0.0, 0).system_fingerprint == "fp_e72d"
+    del payload["system_fingerprint"]
+    assert _reply(json.dumps(payload).encode(), 0.0, 0).system_fingerprint is None
+
+
+def test_fingerprint_is_logged_per_call_and_counted_in_summary(tmp_path):
+    """The requested name stays the same; only the fingerprint shows the model behind it changed."""
+    scripted, _ = _scripted("```sql\nSELECT bad\n```", "```sql\nSELECT 42\n```")
+    client = MockClient(scripted, fingerprint="fp_old")
+
+    def respond(messages):
+        if len(messages) > 2:          # the fix call is served by a different deployment
+            client.fingerprint = "fp_new"
+        return scripted(messages)
+
+    client.respond = respond
+    ex = FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])})
+    ctx = _ctx(tmp_path, client, ex)
+    rec = R.run_attempt(ctx, Q, 1)
+    assert rec["model_version"] == "mock-version"
+    assert [t["system_fingerprint"] for t in rec["turns"]] == ["fp_old", "fp_new"]
+
+    path = R.log_path("test-run", "SQL-L1", tmp_path / "runs")
+    path.parent.mkdir(parents=True)
+    legacy = {**rec, "rep": 2, "turns": [{k: v for k, v in t.items() if k != "system_fingerprint"} for t in rec["turns"][:1]]}
+    path.write_text(json.dumps(rec) + "\n" + json.dumps(legacy) + "\n", encoding="utf-8")
+    s = R.summarize(path)
+    assert s["system_fingerprints"] == {"fp_old": 1, "fp_new": 1}
+    assert s["calls_without_fingerprint"] == 1
 
 
 def test_no_second_fix_and_no_retry_on_wrong(tmp_path):

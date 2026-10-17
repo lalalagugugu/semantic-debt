@@ -205,6 +205,7 @@ def _turn_record(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply
         "n_code_blocks": parsed.n_code_blocks,
         "exec": execution,
         "finish_reason": reply.finish_reason,
+        "system_fingerprint": reply.system_fingerprint,
         "usage": reply.usage,
         "latency_s": round(reply.latency_s, 3),
         "transport_retries": reply.transport_retries,
@@ -320,6 +321,9 @@ def summarize(path: Path) -> dict:
     ``accuracy_scored`` covers only the scored attempts. The error counts are the
     splits T19 reports separately: no_query (format failures), scope violations,
     timeouts, resource limits (memory / result rows) and ordinary engine errors.
+    ``system_fingerprints`` counts calls per fingerprint; more than one key means
+    the model behind the requested name may have changed mid-run. Logs from before
+    the fingerprint was recorded count as ``calls_without_fingerprint``.
     """
     recs = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     done = [r for r in recs if r.get("status") == "done"]
@@ -343,6 +347,8 @@ def summarize(path: Path) -> dict:
         "attempts_with_no_query": sum(any(t["exec"].get("error_class") == NO_QUERY for t in r["turns"]) for r in done),
         "attempts_with_scope_violation": sum(any(t["exec"].get("error_class") == "scope_violation" for t in r["turns"]) for r in done),
         "not_done_lines": len(recs) - len(done),
+        "system_fingerprints": _count(t["system_fingerprint"] for t in turns if t.get("system_fingerprint")),
+        "calls_without_fingerprint": sum(not t.get("system_fingerprint") for t in turns),
         "tokens": tokens,
         "cache_hit_ratio": tokens["cache_hit_tokens"] / tokens["prompt_tokens"] if tokens["prompt_tokens"] else None,
         "cost_cny": round(sum(r.get("cost_cny") or 0 for r in done), 4),
