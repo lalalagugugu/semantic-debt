@@ -33,3 +33,5 @@ Codex 建议「购买事件只算 `SalesQuantity > 0`，订单分母仍按全部
 ## 对 T05b 的要求
 
 T05b 用 pandas 从题意出发**两种算法都算**，与两份参考分别核对；不得只实现其中一种。
+
+> **2026-10-17 部分取代**：见 `decisions/2026-10-17-one-convention-one-answer.md`。
