@@ -508,6 +508,9 @@ def test_anchor_mapping_follows_the_english_text_not_the_numbering():
     from harness.questions import REVISED_EXCLUDED, load_questions
     en = load_questions(EVAL, lang="en")
     assert sorted(q.meta["vendor_id"] for q in en) == sorted(set(vendor) - {33})
+    # every excluded id is a real bank question with an anchor (a typo would silently exclude nothing)
+    assert REVISED_EXCLUDED <= set(mapping.values())
+    assert {q.meta["bank_qid"] for q in en if q.revised is None} == REVISED_EXCLUDED
     for q in en:   # EN id = benchmark id, and the revised column is the mapped bank question
         assert q.qid == f"EN{q.meta['vendor_id']:02d}" and q.meta["bank_qid"] == mapping[q.meta["vendor_id"]]
         if q.meta["bank_qid"] in REVISED_EXCLUDED:   # rewritten bank question: no revised column

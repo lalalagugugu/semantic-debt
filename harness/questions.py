@@ -44,7 +44,7 @@ EN_EXCLUDED = frozenset({33})
 # Bank questions rewritten to realistic phrasing no longer ask what the English
 # original asks, so their anchors drop the revised-reference column
 # (decisions/2026-10-17-semantic-gaps-and-realistic-questions.md, sections 3, 5-7).
-REVISED_EXCLUDED = frozenset({"Q013", "Q014", "Q021", "Q028", "Q036", "Q089"})
+REVISED_EXCLUDED = frozenset({"Q13", "Q14", "Q21", "Q28", "Q36", "Q89"})
 CSV_NULL = "\\N"
 
 
