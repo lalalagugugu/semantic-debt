@@ -41,6 +41,10 @@ import yaml
 # The benchmark's published n = 99 excludes q33 (its reference exceeds their
 # ClickHouse memory quota; vendor/cube/REPORT.md). The anchors reproduce that n.
 EN_EXCLUDED = frozenset({33})
+# Bank questions rewritten to realistic phrasing no longer ask what the English
+# original asks, so their anchors drop the revised-reference column
+# (decisions/2026-10-17-semantic-gaps-and-realistic-questions.md, sections 3, 5-7).
+REVISED_EXCLUDED = frozenset({"Q013", "Q014", "Q021", "Q028", "Q036", "Q089"})
 CSV_NULL = "\\N"
 
 
@@ -297,9 +301,12 @@ def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
         if vid in EN_EXCLUDED:
             continue
         current = zh[mapping[vid]]
-        revised = Question(qid=current.qid, text="", refs=current.refs, rules=current.rules, lang="en",
-                           scoring=current.scoring, ref_rules=current.ref_rules)
+        revised = None if current.qid in REVISED_EXCLUDED else Question(
+            qid=current.qid, text="", refs=current.refs, rules=current.rules, lang="en",
+            scoring=current.scoring, ref_rules=current.ref_rules)
         meta = {"vendor_id": vid, "bank_qid": current.qid, "level": vq.get("level")}
+        if revised is None:
+            meta["revised_excluded"] = "bank question rewritten"
         original = load_anchor_ref(vid, anchors)
         refs, rules = None, None
         if original is not None:
