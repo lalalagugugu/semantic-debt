@@ -26,7 +26,7 @@ sys.path.insert(0, str(REPO))
 from harness import run_direct as R  # noqa: E402
 from harness.cells import CELLS  # noqa: E402
 from harness.client import MockClient  # noqa: E402
-from harness.questions import load_questions  # noqa: E402
+from harness.questions import load_questions, question_files  # noqa: E402
 
 EVAL = Path(os.environ.get("SEMDEBT_EVAL_DIR", "/nonexistent")).expanduser()
 CHDB = Path(os.environ.get("SEMDEBT_DATA_DIR", "/nonexistent")).expanduser() / "chdb"
@@ -36,7 +36,7 @@ pytestmark = pytest.mark.skipif(not (EVAL / "questions").is_dir() or not CHDB.ex
 
 
 def _records() -> dict[str, dict]:
-    return {r["id"]: r for p in sorted((EVAL / "questions").glob("*.yaml"))
+    return {r["id"]: r for p in question_files(EVAL)
             for r in yaml.safe_load(p.read_text(encoding="utf-8"))["questions"]}
 
 
