@@ -9,6 +9,7 @@
 
 <!-- 追加格式：
 | 20261101-SQL-L1-01 | 2026-11-01 | SQL-L1 | T13 | 120 | deepseek-… | eval@a1b2c3d | 12.3 | $SEMDEBT_DATA_DIR/runs-raw/20261101-SQL-L1-01 | 首跑 |
+| 20261017-T11-smoke-1017-01 | 2026-10-17 | SQL-L1 | T11 | 2（Q02、Q101）× 3 次 | deepseek-flash（接口原样返回别名；`system_fingerprint` e72d3c7f…，旧冒烟为 aeb56401…；官方价格页称当前指向 DeepSeek-V4.1-Flash-1017） | eval@bf8e095（origin/main 只读 worktree） | 0.10 | $SEMDEBT_DATA_DIR/runs-raw/20261017-T11-smoke-1017-01 | deepseek-flash 换为 1017 后的复测。设置与 20261016-T11-smoke-01 相同（同 2 题、每题 3 次、并发 2、系统提示 sha256 相同 b31a67b8…），周六错峰。6/6 正确，8 次调用（Q02 两次首答把中文别名写成未加引号的标识符，报语法错，修一次后正确） |
 -->
 
 字段说明：
