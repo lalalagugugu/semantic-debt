@@ -66,7 +66,7 @@
 | 21 | **一个口径一个答案**：题面不写业务定义；口径歧义只留一份参考（以语义层为准，没写清的由用户拍板）；问法歧义可多解；购买事件按全部行（删 10 份 `SalesQuantity > 0` 参考）；空品类行只留「有」（删 13 份）；排序用未取整值，Q79 重确认 | Codex（T05，题库 #15）；拍板：用户；L1 文字澄清 `semantic-v1.1`：Claude Code；锚点 `order_by` 检查：T11 | 多解让语义层失去意义；定义写进题面会抹平档位差距 | `decisions/2026-10-17-one-convention-one-answer.md` | 已裁决；T11 完成（#56）；缺口清单已交，见第 22 项 |
 | 22 | **17 项口径缺口逐条裁决**（甲照已有答案、乙问法歧义保留多份、丙用户拍板，均不补 L1 文字）；**Q36、Q89 按真实问法改写**；排查参考超 50 行的题 | Codex（T05，题库 #15）；去留：用户；敏感性对照列剔除改写题：Claude Code；之后全量比对：T05b | 缺口不定，参考就有多解；不像真实问法的题测不出真实场景 | `decisions/2026-10-17-semantic-gaps-and-realistic-questions.md` | 已裁决（含第五节 Q13/Q28、第六节超 50 行：改写 Q14、Q21、Q122）；T05 执行中 |
 | 23 | T05b 全量比对（#15）：114/122 一致；pandas 改 Q34、Q40、Q86、Q87；参考改 Q86-1、Q89（存未取整值）、Q92（补空品牌行）、Q36/Q89/Q48-1（标签用语义层取值）；全库排查参考取整存值与常量标签列；Q79 再次放行 | Codex（T05）；pandas 与复比：Claude Code（T05b） | 不改就带着错参考冻结 | `decisions/2026-10-17-t05b-full-compare.md` | 已裁决，待 T05、T05b 执行 |
-| 24 | **模型版本以 `system_fingerprint` 为准**：harness 记录指纹；G3 记下选定模型的指纹；正式运行中指纹变化即停下问用户 | Claude Code（T11 遗留，G3 前） | 调用名 `deepseek-flash` 已被静默换成 1017，`model` 字段只回显调用名 | `decisions/2026-10-17-model-version-fingerprint.md` | 已裁决，待 T11 实现 |
+| 24 | **模型版本以 `system_fingerprint` 为准**：harness 记录指纹；G3 记下选定模型的指纹；正式运行中指纹变化即停下问用户 | Claude Code（T11 遗留，G3 前） | 调用名 `deepseek-flash` 已被静默换成 1017，`model` 字段只回显调用名 | `decisions/2026-10-17-model-version-fingerprint.md` | 已实现：每次调用记 `system_fingerprint`，summary 按指纹计调用数（T11 分支 `T11-log-fingerprint`，PR 待合并）；第 2、3 条待 T12 / G3 |
 
 ### 第 3 项的四个批准条件（用户 2026-10-16）
 

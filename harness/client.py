@@ -35,6 +35,9 @@ class Reply:
     latency_s: float
     raw: bytes
     transport_retries: int = 0
+    # ``model`` only echoes the requested name; the fingerprint is the version evidence
+    # (decisions/2026-10-17-model-version-fingerprint.md)
+    system_fingerprint: str | None = None
 
 
 class APIError(RuntimeError):
@@ -125,6 +128,7 @@ def _reply(raw: bytes, latency: float, retries: int) -> Reply:
         latency_s=latency,
         raw=raw,
         transport_retries=retries,
+        system_fingerprint=payload.get("system_fingerprint"),
     )
 
 
@@ -138,6 +142,7 @@ class MockClient:
 
     respond: Callable[[list[dict[str, str]]], str]
     model: str = "mock"
+    fingerprint: str | None = "fp_mock"
     _seen: set[str] = field(default_factory=set)
 
     def chat(self, messages: list[dict[str, str]]) -> Reply:
@@ -149,6 +154,7 @@ class MockClient:
         self._seen.add(system)
         payload = {
             "model": "mock-version",
+            **({"system_fingerprint": self.fingerprint} if self.fingerprint is not None else {}),
             "choices": [{"message": {"content": content, "reasoning_content": "(mock)"}, "finish_reason": "stop"}],
             "usage": {"prompt_tokens": prefix + rest, "prompt_cache_hit_tokens": hit,
                       "prompt_cache_miss_tokens": prefix + rest - hit, "completion_tokens": len(content) // 2,
