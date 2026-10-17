@@ -460,3 +460,16 @@ def test_invalid_required_columns_rejected(columns):
 def test_required_columns_out_of_bounds_rejected(metadata):
     with pytest.raises(ValueError, match="required_columns"):
         score([(1,)], [[(1,)]], {**UNORDERED, **metadata, "required_columns": [1]})
+
+
+
+def test_required_null_names_preserve_distinct_key_groups():
+    rules = {**UNORDERED, "required_columns": [1, 2],
+             "value_kinds": ["other", "other", "amount"],
+             "value_types": ["Int64", "Nullable(String)", "Float64"]}
+    reference = [(101, None, 10), (202, None, 20)]
+    # Group by entity key, but return only the required name and amount.
+    assert score([(None, 20), (None, 10)], [reference], rules) == "correct"
+    # Grouping by the NULL name instead merges two distinct entities.
+    merged = score_detailed([(None, 30)], [reference], rules)
+    assert merged.outcome == "wrong" and merged.reason == "row_count"
