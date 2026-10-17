@@ -114,6 +114,11 @@
 | 20261018-T12-cache-flash-01 | deepseek-flash | 5 min | 300.0 | 46080 | 182 |
 | 20261018-T12-cache-flash-01 | deepseek-flash | 15 min | 899.9 | 46080 | 182 |
 | 20261018-T12-cache-flash-01 | deepseek-flash | 30 min | 1799.9 | 46080 | 183 |
+| 20261018-T12-cache-flash-01 | deepseek-flash | 1 h | 3600.0 | 46080 | 183 |
+| 20261018-T12-cache-flash-01 | deepseek-flash | 2 h | 7200.5 | 46080 | 183 |
+| 20261018-T12-cache-flash-01 | deepseek-flash | 4 h | 14400.0 | 46080 | 183 |
+
+结论：Flash 的前缀缓存在测到的最长间隔 4 小时仍全部命中（46,080 token），未见过期；T13 按单元连续跑，冷启动次数可按「每单元一次」估。Pro 按裁决不测。
 
 ## 列口径诊断（`scripts/t12_column_diagnostic.py`，上界，非评分）
 
