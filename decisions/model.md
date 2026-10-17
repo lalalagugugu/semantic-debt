@@ -1,6 +1,7 @@
 # 第一期被测模型（T12 试跑）
 
-- 状态：**待用户裁决**（模型选择，以及 G3 之前要先裁的 `open-questions.md` T12-1）
+- 状态：**已裁决（2026-10-18，用户）：选 Flash**（`deepseek-flash`，指纹 `e72d3c7f663d3e1383b00b3884cb4501`）。依据 `decisions/2026-10-18-reference-columns-asked-only.md` 第四节
+- 待办：评分器支持 `required_columns`、题库 `eval-v1.1` 冻结后，用本次已存的作答离线重评，报严格口径与必答列口径两列对比；重评之前不打 `harness-v1`
 - 试跑：2026-10-18（周日，全天错峰），T12（Claude Code）
 - 题库：`eval-v1` = `07dca9af414295205b0ae5f4a220bda44682af71`，从只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1` 读；harness 开跑前校验「检出即 tag 内容」，不符就拒绝开跑
 - 语义层：`semantic-v1.1` 渲染；SQL-R、SQL-L1 上下文与在该 tag 上重新渲染的结果逐字节一致（sha256 `885fb585…`、`ceebd86f…`）
@@ -14,7 +15,9 @@
 | `deepseek-flash` | DeepSeek-V4.1-Flash-1017 | `e72d3c7f663d3e1383b00b3884cb4501` | 163（唯一） |
 | `deepseek-v4-pro` | DeepSeek-V4-Pro-0813 | `a307abda487cd1b463329ccb945ce396` | 153（唯一） |
 
-两次试跑内每个模型只出现一个指纹。G3 把选定模型的指纹写在这里，作为正式运行的比对基准（`decisions/2026-10-17-model-version-fingerprint.md`）。
+两次试跑内每个模型只出现一个指纹。
+
+**选定模型的指纹（正式运行的比对基准）：`deepseek-flash` → `e72d3c7f663d3e1383b00b3884cb4501`。** 正式运行中指纹与此不同，停下问用户（`decisions/2026-10-17-model-version-fingerprint.md` 第 3 条）。G3 确认时再核一次。
 
 价格表 `harness/cells.py` 与官方价格页逐项核对一致（错峰，元/百万 token）：Flash 命中 0.02 / 未命中 1 / 输出 4；Pro 0.15 / 4.5 / 13.5；高峰 ×2。
 
@@ -40,7 +43,7 @@ Q40 是 judge 题，返回的行集记 pending、不进分母。低区分度题 
 
 贴边检查：SQL-L1 最高 47.6%（< 95%），SQL-R 最低 11.7%（> 5%），不贴边。
 
-## Pro 为什么更低：列口径（open-questions T12-1）
+## Pro 为什么更低：列口径（open-questions T12-1，已裁决）
 
 Pro 的错判里 `missing_columns`（候选少了参考的某列）占大头：SQL-L1 上 16/42，Flash 4/32。逐题看，主要是**参考带着题目没问的列**（计数、总额），Pro 只答所问，按「参考每一列都要有」判错；Flash 倾向多列几列，于是判对。只把参考投影到候选返回的列上重评（`scripts/t12_column_diagnostic.py`，评分器不改，上界）：
 
@@ -50,6 +53,8 @@ Pro 的错判里 `missing_columns`（候选少了参考的某列）占大头：S
 | Pro | 32.3% | 约 47–52% |
 
 两种口径下 Pro 都不比 Flash 高。
+
+裁决（`decisions/2026-10-18-reference-columns-asked-only.md`）：只按题目问到的列判分，每份参考在 `rules` 里标 `required_columns`；Q50 一类缺列的参考补列。
 
 ## token 与费用（实测）
 
@@ -68,7 +73,7 @@ Pro 的错判里 `missing_columns`（候选少了参考的某列）占大头：S
 
 ## 缓存过期时间窗
 
-见 `reports/T12-pilot.md`「缓存过期时间窗」（`harness/cache_probe.py`，`runs/20261018-T12-cache-flash-01/`）。
+见 `reports/T12-pilot.md`「缓存过期时间窗」（`harness/cache_probe.py`，`runs/20261018-T12-cache-flash-01/`，只测 Flash；按裁决 Pro 不测）。
 
 ## T13 预算模型
 
@@ -81,16 +86,21 @@ Pro 的错判里 `missing_columns`（候选少了参考的某列）占大头：S
 
 （T13 单元 SQL-L0、R、L1、L1c、L1.5W、L1.5S 各 122 题 × 3，SQL-R-EN、L1c-EN 各 99 题 × 3；错峰价。全量里 Q3 题的比例与试跑相近，建议留 30% 余量。）
 
-## 建议（由用户拍板）
+## 选择与理由
 
 卡片规则：「默认选 Flash；Flash SQL-L1 < 50%，或 Pro 比 Flash 高 10 个点以上，就选 Pro。」
 
-- 严格口径下 Flash SQL-L1 = 47.6%，**字面触发第一条**，应选 Pro。
-- 但这条规则的前提是 Pro 更强，而试跑里 Pro 在两个单元上都比 Flash 低（SQL-L1 低 15 个点）。宽松口径下 Flash 约 54%，不触发；Pro 比 Flash 高 10 个点的条件在两种口径下都不成立。
-- **建议选 Flash**，理由：Pro 在任何口径下都不比 Flash 好，成本却是 7.5 倍；Flash 低于 50% 主要是列口径造成的，而这个口径在 G3 之前还要裁（T12-1）。样本只有 24 题 × 3 次，结论只够选模型用。
-- 不论选哪个，T12-1 都要在 G3 冻结评分之前裁决。
+- 严格口径下 Flash SQL-L1 = 47.6%，字面上触发第一条。
+- 这条规则的前提是 Pro 更强，试跑结果相反：严格口径 Flash 47.6%、Pro 32.3%；按必答列的上界 Flash 约 54%、Pro 约 47–52%。两种口径下 Pro 都不高于 Flash，Pro 比 Flash 高 10 个点的条件也都不成立。
+- Pro 每次调用的成本约为 Flash 的 7.5 倍（思考长 2.5–3 倍，单价约 3.4 倍）；T13 全量 Flash 约 24 元、Pro 约 181 元。
+- 字面触发（47.6% < 50%）来自这次要修的列口径（T12-1），**不作数**。
+- 样本只有 24 题 × 3 次，结论只用于选模型。
+
+**结论：选 Flash（`deepseek-flash`，指纹 `e72d3c7f663d3e1383b00b3884cb4501`）。** 用户 2026-10-18 裁决。
 
 ## 用户裁决
 
-- [ ] 模型：
-- [ ] T12-1：
+- [x] 模型：Flash（2026-10-18，`decisions/2026-10-18-reference-columns-asked-only.md` 第四节）
+- [x] T12-1：只按题目问到的列判分，参考标 `required_columns`（同一文件第一至三节）
+- [ ] 离线重评（等评分器支持 `required_columns` 与 `eval-v1.1` 冻结）→ 两种口径对比补进本文件
+- [ ] G3：冻结系统提示与评分，打 `harness-v1`（重评之后）
