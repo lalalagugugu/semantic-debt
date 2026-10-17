@@ -67,6 +67,7 @@
 | 22 | **17 项口径缺口逐条裁决**（甲照已有答案、乙问法歧义保留多份、丙用户拍板，均不补 L1 文字）；**Q36、Q89 按真实问法改写**；排查参考超 50 行的题 | Codex（T05，题库 #15）；去留：用户；敏感性对照列剔除改写题：Claude Code；之后全量比对：T05b | 缺口不定，参考就有多解；不像真实问法的题测不出真实场景 | `decisions/2026-10-17-semantic-gaps-and-realistic-questions.md` | 已完成（题库 #15、#16 合并；T05b 复比 120/122） |
 | 23 | T05b 全量比对（#15）：114/122 一致；pandas 改 Q34、Q40、Q86、Q87；参考改 Q86-1、Q89（存未取整值）、Q92（补空品牌行）、Q36/Q89（标签用语义层取值；Q48-1 是 judge 题，不改）；全库排查参考取整存值与常量标签列；Q79 再次放行 | Codex（T05）；pandas 与复比：Claude Code（T05b） | 不改就带着错参考冻结 | `decisions/2026-10-17-t05b-full-compare.md` | 已完成（题库 #15、#16 合并；T05b 复比 120/122） |
 | 24 | **模型版本以 `system_fingerprint` 为准**：harness 记录指纹；G3 记下选定模型的指纹；正式运行中指纹变化即停下问用户 | Claude Code（T11 遗留，G3 前） | 调用名 `deepseek-flash` 已被静默换成 1017，`model` 字段只回显调用名 | `decisions/2026-10-17-model-version-fingerprint.md` | 第 1 条已实现（#66 已合并）；第 2、3 条待 T12 / G3 |
+| 25 | **只按题目问到的列判分**（T12-1）：每份参考标 `required_columns`，非必答列只在参考侧用于排序块；Q50 一类补缺列；选 Flash | 标注：T05b 与 Codex 各自独立；评分器：Codex（10-22 后）；分歧与 `eval-v1.1`：用户；离线重评：T12 | 没问的列判错会系统性冤枉只答所问的模型（Pro 16 次） | `decisions/2026-10-18-reference-columns-asked-only.md` | 已裁决；T05b 标注可先做；G3 等评分器改完 |
 
 ### 第 3 项的四个批准条件（用户 2026-10-16）
 
