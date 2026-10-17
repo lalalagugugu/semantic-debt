@@ -289,7 +289,7 @@ metrics:
     dataset: FactOnlineSales
 
   - name: "客户最近购买月数"
-    definition: "从该客户最后一次购买日到 2009-12-31 的整月数（约定 13 的分层依据）。 按客户算，不是聚合指标。"
+    definition: "从该客户最后一次购买日到 2009-12-31 的整月数（约定 13 的分层依据）。 按客户算，不是聚合指标。 「购买」指客户在线上销售表里的任何一行，含只有退货的行。"
     additivity: 比率
     dax_measure: "[Customer Recency Months]"
     cube_member: "online_sales.customer_recency_months"
@@ -321,7 +321,7 @@ metrics:
     dataset: FactOnlineSales
 
   - name: "新客数"
-    definition: "首次购买日落在截止日前 90 天内的去重客户数；首次购买指该客户有史以来第一次购买； 截止日由时间窗口决定，按月看就是每个月的最后一天（约定 14）。"
+    definition: "首次购买日落在截止日前 90 天内的去重客户数；首次购买指该客户有史以来第一次购买； 截止日由时间窗口决定，按月看就是每个月的最后一天（约定 14）。 「购买」指客户在线上销售表里的任何一行，含只有退货的行。"
     additivity: 去重
     dax_measure: "[New Customer Count]"
     cube_member: "online_sales.new_customer_count"
