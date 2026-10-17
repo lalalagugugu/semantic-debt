@@ -592,7 +592,7 @@ def test_anchor_top_n_reference_is_boundary_complete():
     assert boundary_sql("SELECT x LIMIT 3 WITH TIES") == "SELECT x LIMIT 3 WITH TIES"
     assert boundary_sql("SELECT ROW_NUMBER() OVER (ORDER BY s) AS rn") == "SELECT rank() OVER (ORDER BY s) AS rn"
     top = {"ordered": True, "top_n": 2, "tie_columns": [1], "value_kinds": ["other", "other"],
-           "value_types": ["String", "Float64"]}
+           "value_types": ["String", "Float64"], "order_by": [{"column": 1, "descending": True}]}
     tied = [["a", 9.0], ["b", 5.0], ["c", 5.0], ["d", 5.0]]
     current = Question("Q007", "", refs=[tied[:2]], rules=top)
     meta = [{"name": "n", "type": "String"}, {"name": "v", "type": "Float64"}]
@@ -658,6 +658,27 @@ def test_anchor_rules_from_the_bank_and_boundary_on_the_real_bank():
     pick = random.Random(0).sample(q79.refs[0], 10)
     assert score_detailed(pick, q79.refs, q79.rules).outcome == "correct"
     assert score_detailed(q79.refs[0][:11], q79.refs, q79.rules).outcome == "wrong"
+
+
+@needs_eval
+def test_ordered_anchors_declare_their_sort_key():
+    """Scorer since main #52: ordered rules without order_by warn and fall back to positional
+    comparison. Every ordered anchor must carry a key, so loading and self-matching never warn."""
+    import warnings
+    from harness.anchor_refs import anchor_dir, load_anchor_ref
+    from harness.questions import load_questions
+    from harness.scorer import score_detailed
+    if not (anchor_dir() / "MANIFEST.json").exists():
+        pytest.skip("anchor references not built")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", RuntimeWarning)
+        en = load_questions(EVAL, lang="en")
+        for q in en:
+            if q.rules is None or not q.rules.get("ordered"):
+                continue
+            assert q.rules.get("order_by") or (q.rules.get("selection") or {}).get("output_order"), q.qid
+            pick = load_anchor_ref(q.meta["vendor_id"])[1] if q.meta.get("boundary_completed") else q.refs[0]
+            assert score_detailed(pick, q.refs, q.rules).outcome == "correct", q.qid
 
 
 def test_rescore_rebuilds_candidates_from_runs_raw(tmp_path):

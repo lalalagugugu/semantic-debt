@@ -88,3 +88,15 @@ Top-N 的严格前缀是按位置逐行比的，前缀内部的并列行必须�
 上述81／12／6属于题库491ef16的历史状态。本轮保留事实对象键后另有EN21、EN34出现列结构差异，因此现行待接的确定性原始参考规则为8份：EN13、14、20、21、34、74、83、87。Codex已在私有题库交付实际原始meta、固定推断量纲、SQL／payload哈希及完整逐参考rules字典，全部原始参考规则自比通过；只核验T11已有payload，不宣称重跑99份SQL。
 
 接线仍由Claude Code在T11完成，当前主仓库不读取该交接表；不能把它加入中文修订参考。接入后预计87道确定性、12道judge；以T11接入后的自比及完整边界核对为准，不在本文提前宣布可评。EN97仍为judge；不以规则交接改变评分路由。
+
+## 排序键 `order_by`（main #52 之后，题库 bf8e095，2026-10-17）
+
+评分器从 main #52 起读 `rules.order_by`：有序规则缺排序键会告警，并退回逐位置比较（`decisions/2026-10-16-tie-order-and-degenerate-new-questions.md` 第一节）。在最新 main（050e039）和题库 `origin/main`（bf8e095，只读 worktree `eval-ro-bf8e095`）上重跑锚点，结果是 87 道可评、12 道 judge，**没有缺排序键的有序锚点，加载和自比都不告警**。
+
+- `ordered = true` 的锚点共 17 道：EN07、25、27、45、46、67、69、73、74、78、79、85、87、88、92、94、98。
+  - 其中 15 道与同号题列结构相同，整份沿用同号题的 `rules`，`order_by` 也随之沿用，与同号题逐字相同。17 道全部显式写了 `order_by`；EN74、EN85、EN98 另有 `selection.output_order`，评分器要求两者一致，已通过。
+  - 另外 2 道（EN74、EN87）列结构不同，Codex 交接的 `rules` 已经写了 `order_by`。
+- 列结构不同、由题库补写 `rules` 的其余 6 道（EN13、14、20、21、34、83）都是无序题，不需要排序键。**没有需要转给 Codex 补的锚点。**
+- 原始参考的行确实按声明的键排好了序，17 道全部是。
+- T11-4 的修复在锚点上的效果：EN88、EN27 前缀里的并列行换序，判 `correct`；跨块换序判 `wrong`。
+- 回归测试：`tests/test_harness.py::test_ordered_anchors_declare_their_sort_key`，把 `RuntimeWarning` 视为错误来运行。
