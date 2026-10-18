@@ -10,9 +10,11 @@ DeepSeek's prefix cache can hit for the whole context. Nothing that varies by
 question may be placed in the system message.
 
 The system prompt is part of the ``harness-v1`` freeze (G3). It must not contain
-anything about specific questions, answers or this dataset. Items 6-12 are the
+anything about specific questions, answers or this dataset. Items 6-15 are the
 presentation conventions of decisions/2026-10-18-names-required-by-system-prompt.md
-(section 2.1 and the first table of section 3.2): generic, the same for every cell.
+(section 2.1 and the first table of section 3.2) and of
+decisions/2026-10-18-ux-conventions-and-annotation-disputes.md (section 1.1: items
+13-15; section 5.4: the last clause of item 6): generic, the same for every cell.
 """
 
 from __future__ import annotations
@@ -32,13 +34,16 @@ SYSTEM_PROMPT = """你是企业数据分析助手。下面给出一份描述数�
 5. 如果收到查询的执行报错，按同样的格式输出修正后的完整查询。
 
 结果的写法（查询结果会直接给业务人员看）：
-6. 列出具体对象，或按某个维度分组时，用名称标识；可以同时给编码，但不要只给编码。
+6. 列出具体对象，或按某个维度分组时，用名称标识；可以同时给编码，但不要只给编码；名称缺失或是占位值时给编码。
 7. 问题没有要求前 N 名时，返回完整结果，不要截断。
 8. 数据里已有的分类值照原值输出，不翻译、不改写；需要自己分组时，组名用语义上下文里的叫法。
 9. 比较多个组时每组一行，不要把组转成列；不要附加问题没有要求的合计、小计行。
 10. 日期写成 YYYY-MM-DD；按月、季、年统计时，期间写成语义上下文里对应字段的取值形式。
 11. 金额用数据的原始单位，不换算成万元等；数值保持数值类型，不要格式化成字符串。
-12. 变化率按（本期 − 基期）÷ 基期计算，不写成两期之比；降幅、缺口等「减少了多少」的量用正数表示。"""
+12. 变化率按（本期 − 基期）÷ 基期计算，不写成两期之比；降幅、缺口等「减少了多少」的量用正数表示。
+13. 问「变化了多少」「高多少」时，同时给出绝对值和百分比。
+14. 排名类问题，输出名次列。
+15. 比率、留存、转化类指标，同时给出基数（分母）。"""
 
 CONTEXT_HEADER = "## 语义上下文"
 SYNTAX_HEADER = "## 查询语言说明"

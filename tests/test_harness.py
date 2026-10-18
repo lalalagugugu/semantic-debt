@@ -58,10 +58,11 @@ def test_system_prompt_has_no_dataset_specific_content():
 
 
 def test_system_prompt_carries_the_presentation_conventions():
-    """decisions/2026-10-18-names-required-by-system-prompt.md §2.1 and §3.2: one generic line each."""
+    """names-required-by-system-prompt §2.1 / §3.2 and ux-conventions-and-annotation-disputes §1.1 / §5.4."""
     for phrase in ("用名称标识", "不要只给编码", "不要截断", "照原值输出", "组名用语义上下文里的叫法",
                    "每组一行", "合计、小计行", "YYYY-MM-DD", "原始单位", "不要格式化成字符串",
-                   "（本期 − 基期）÷ 基期", "用正数表示"):
+                   "（本期 − 基期）÷ 基期", "用正数表示", "名称缺失或是占位值时给编码",
+                   "同时给出绝对值和百分比", "输出名次列", "同时给出基数（分母）"):
         assert phrase in P.SYSTEM_PROMPT, phrase
     assert not re.search(r"Q\d{1,3}\b", P.SYSTEM_PROMPT)      # no question ids (hard rule 3)
 
