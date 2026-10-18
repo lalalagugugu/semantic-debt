@@ -10,9 +10,9 @@ import math
 import warnings
 from collections import Counter, defaultdict
 from collections.abc import Iterator, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
-from itertools import permutations
+from itertools import permutations, product
 from numbers import Number
 from typing import Literal, TypeAlias
 
@@ -65,6 +65,7 @@ class _Rules:
     value_types: tuple[str, ...] = ()
     selection: Mapping[str, object] | None = None
     order_by: tuple[tuple[int, bool], ...] = ()
+    required_columns: tuple[int, ...] | None = None
 
 
 def score(
@@ -90,7 +91,10 @@ def score_detailed(
 
     ``refs`` is a sequence of acceptable result sets.  For Top-N questions, a
     reference must contain the strict prefix followed by the complete boundary
-    tie group; it must never be truncated to N rows.
+    tie group; it must never be truncated to N rows. ``required_columns`` lists
+    zero-based reference columns to compare (nonempty, unique indexes). Hidden
+    columns remain available to reference-side ordering and selection. Missing
+    metadata warns and requires every reference column.
     """
 
     if reference_rules is not None:
@@ -142,19 +146,24 @@ def _sensitivity(candidate: Rows, references: tuple[Rows, ...], rules: _Rules) -
     for reference in references:
         if not reference:
             continue
-        numeric_ref = tuple(i for i in range(len(reference[0])) if any(_is_numeric(row[i]) for row in reference))
+        numeric_ref = tuple(i for i in _comparison_columns(reference[0], rules) if any(_is_numeric(row[i]) for row in reference))
         numeric_candidate = tuple(i for i in range(len(candidate[0])) if any(_is_numeric(row[i]) for row in candidate))
         if not numeric_ref:
             continue
         saw_numeric = True
         if len(numeric_candidate) < len(numeric_ref):
             continue
-        if any(i not in numeric_ref for i in rules.tie_columns):
+        if rules.required_columns is None and any(i not in numeric_ref for i in rules.tie_columns):
             continue
-        projected_order = tuple((numeric_ref.index(i), descending) for i, descending in rules.order_by) if all(i in numeric_ref for i, _ in rules.order_by) else ()
-        projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts, tuple(rules.value_types[i] for i in numeric_ref) if rules.value_types else (), order_by=projected_order)
+        # Keep original reference columns for hidden order and boundary keys.
+        projected_rules = replace(rules, required_columns=numeric_ref)
         projected_candidate = tuple(tuple(row[i] for i in numeric_candidate) for row in candidate)
-        projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
+        projected_reference = reference
+        if rules.required_columns is None:
+            # Missing metadata retains the previous diagnostic projection too.
+            projected_order = tuple((numeric_ref.index(i), descending) for i, descending in rules.order_by) if all(i in numeric_ref for i, _ in rules.order_by) else ()
+            projected_rules = _Rules(rules.ordered, rules.top_n, tuple(numeric_ref.index(i) for i in rules.tie_columns), tuple(rules.value_kinds[i] for i in numeric_ref) if rules.value_kinds else (), rules.use_absolute_tolerance, rules.exact_counts, tuple(rules.value_types[i] for i in numeric_ref) if rules.value_types else (), order_by=projected_order)
+            projected_reference = tuple(tuple(row[i] for i in numeric_ref) for row in reference)
         if _exact_projection_matches(projected_candidate, projected_reference, projected_rules):
             return "string_or_label_only"
         matched, _ = _matches_reference(projected_candidate, projected_reference, projected_rules)
@@ -182,9 +191,10 @@ def _exact_projection_matches(candidate: Rows, reference: Rows, rules: _Rules) -
         return _nonnumeric_bucket(value)
 
     try:
-        rows = (tuple(key(value) for value in row) for row in reference)
+        columns = _comparison_columns(reference[0], rules)
+        rows = (tuple(key(row[i]) for i in columns) for row in reference)
         expected = tuple(rows) if rules.ordered else Counter(rows)
-        for mapping in permutations(range(len(candidate[0])), len(reference[0])):
+        for mapping in permutations(range(len(candidate[0])), len(_comparison_columns(reference[0], rules))):
             projected = (tuple(key(row[i]) for i in mapping) for row in candidate)
             if rules.ordered and rules.order_by:
                 actual = tuple(projected)
@@ -254,8 +264,19 @@ def _parse_rules(rules: Mapping[str, object]) -> _Rules:
             raise ValueError("order_by must agree with selection.output_order")
     elif ordered:
         warnings.warn("ordered rules missing order_by; retaining positional comparison", RuntimeWarning, stacklevel=3)
+    required_columns = rules.get("required_columns")
+    if "required_columns" not in rules:
+        warnings.warn("rules missing required_columns; treating all reference columns as required", RuntimeWarning, stacklevel=3)
+    elif (isinstance(required_columns, (str, bytes)) or not isinstance(required_columns, Sequence)
+          or not required_columns or any(type(i) is not int or i < 0 for i in required_columns)
+          or len(set(required_columns)) != len(required_columns)):
+        raise ValueError("required_columns must be a nonempty sequence of unique nonnegative column indexes")
+    if required_columns is not None:
+        for metadata in (value_kinds, value_types):
+            if metadata and any(i >= len(metadata) for i in required_columns):
+                raise ValueError("required_columns contains an index outside reference metadata")
     parsed_order = tuple((item["column"], item["descending"]) for item in order_by or ())
-    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection, parsed_order)
+    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection, parsed_order, tuple(required_columns) if required_columns is not None else None)
 
 
 def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
@@ -276,6 +297,10 @@ def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
     return tuple(result)
 
 
+def _comparison_columns(row: Row, rules: _Rules) -> tuple[int, ...]:
+    return rules.required_columns if rules.required_columns is not None else tuple(range(len(row)))
+
+
 def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple[bool, str]:
     if rules.value_kinds and reference and len(rules.value_kinds) != len(reference[0]):
         raise ValueError("value_kinds must match reference column count")
@@ -283,6 +308,8 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
         raise ValueError("value_types must match reference column count")
     if reference and any(i >= len(reference[0]) for i, _ in rules.order_by):
         raise ValueError("order_by contains an index outside the reference rows")
+    if reference and rules.required_columns is not None and any(i >= len(reference[0]) for i in rules.required_columns):
+        raise ValueError("required_columns contains an index outside the reference rows")
     if rules.selection is not None:
         complete, _ = complete_selection(list(reference), rules.selection, rules.value_kinds)
         if len(complete) != len(reference):
@@ -306,7 +333,7 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
         return False, "row_count"
 
     candidate_width = len(candidate[0])
-    reference_width = len(reference[0])
+    reference_width = len(_comparison_columns(reference[0], rules))
     if candidate_width < reference_width:
         return False, "missing_columns"
 
@@ -314,7 +341,7 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
     # scalar comparator, regardless of column permutations or extra columns.
     # Top-N may leave nullable boundary members unselected, so exclude it.
     if (rules.top_n is None
-            and any(cell is None for row in reference for cell in row)
+            and any(row[i] is None for row in reference for i in _comparison_columns(row, rules))
             and not any(cell is None for row in candidate for cell in row)
             and all(type(cell) in (str, bool, int, float, Decimal, list, tuple, dict, bytes)
                     for row in candidate for cell in row)):
@@ -363,7 +390,7 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
         return (not candidate, "matched" if not candidate else "selection_group_coverage")
     if not candidate:
         return False, "selection_group_coverage"
-    if len(candidate[0]) < len(reference[0]):
+    if len(candidate[0]) < len(_comparison_columns(reference[0], rules)):
         return False, "missing_columns"
     spec = rules.selection
     stages = spec["stages"]
@@ -378,13 +405,30 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
         identities = [identity(row, stage["group_columns"] + stage["object_columns"]) for row in reference if all(row[c["column"]] == c["equals"] for c in stage["where"])]
         if len(identities) != len(set(identities)):
             raise ValueError("selection reference contains duplicate leaf objects")
+    if rules.required_columns is not None and len(rules.required_columns) < len(reference[0]):
+        # Recover complete reference rows before validating group/Top-N coverage.
+        # Hidden selection keys must never be invented from candidate values.
+        visible_identity = [i for i in identity_columns if i in rules.required_columns]
+        reason = "selection_values"
+        for mapping in permutations(range(len(candidate[0])), len(rules.required_columns)):
+            candidate_identity = [mapping[rules.required_columns.index(i)] for i in visible_identity]
+            choices = [tuple(ref for ref in reference
+                             if identity(row, candidate_identity) == identity(ref, visible_identity)
+                             and _rows_equal(row, ref, mapping, rules)) for row in candidate]
+            if not all(choices):
+                continue
+            for matched in product(*choices):
+                valid, reason = matches_selection(matched, reference, spec, rules.value_kinds)
+                if valid:
+                    return True, "matched"
+        return False, reason
     reason = "selection_values"
-    for mapping in permutations(range(len(candidate[0])), len(reference[0])):
-        projected = [tuple(row[i] for i in mapping) for row in candidate]
+    for mapping in permutations(range(len(candidate[0])), len(_comparison_columns(reference[0], rules))):
+        projected = [tuple(row[mapping[_comparison_columns(reference[0], rules).index(i)]] for i in range(len(reference[0]))) for row in candidate]
         matched = []
         for row in projected:
             choices = indexed.get(identity(row, identity_columns), ())
-            match = next((ref for ref in choices if _rows_equal(row, ref, tuple(range(len(ref))), rules)), None)
+            match = next((ref for ref in choices if _rows_equal(row, ref, _comparison_columns(ref, rules), rules)), None)
             if match is None:
                 break
             matched.append(match)
@@ -439,11 +483,11 @@ def _is_complete_boundary_group(candidate: Rows, reference: Rows, rules: _Rules)
     assert rules.top_n is not None
     if len(reference) <= rules.top_n or len(candidate) != len(reference):
         return False
-    if not candidate or len(candidate[0]) < len(reference[0]):
+    if not candidate or len(candidate[0]) < len(_comparison_columns(reference[0], rules)):
         return False
 
     boundary_start = _boundary_start(reference, rules.top_n, rules.tie_columns, rules.value_kinds)
-    for mapping in permutations(range(len(candidate[0])), len(reference[0])):
+    for mapping in permutations(range(len(candidate[0])), len(_comparison_columns(reference[0], rules))):
         prefix_matches = all(
             _rows_equal(candidate[index], reference[index], mapping, rules)
             for index in range(boundary_start)
@@ -481,9 +525,9 @@ def _rows_match_subset(candidate: Rows, reference: Rows, mapping: tuple[int, ...
     candidate_buckets: dict[tuple[object, ...], list[Row]] = defaultdict(list)
     reference_buckets: dict[tuple[object, ...], list[Row]] = defaultdict(list)
     for row in candidate:
-        candidate_buckets[_row_bucket(row, mapping, candidate=True)].append(row)
+        candidate_buckets[_row_bucket(row, mapping, rules, candidate=True)].append(row)
     for row in reference:
-        reference_buckets[_row_bucket(row, mapping, candidate=False)].append(row)
+        reference_buckets[_row_bucket(row, mapping, rules, candidate=False)].append(row)
 
     for bucket, candidate_rows in candidate_buckets.items():
         reference_rows = reference_buckets.get(bucket, [])
@@ -494,8 +538,8 @@ def _rows_match_subset(candidate: Rows, reference: Rows, mapping: tuple[int, ...
     return True
 
 
-def _row_bucket(row: Row, mapping: tuple[int, ...], *, candidate: bool) -> tuple[object, ...]:
-    values = (row[mapping[index]] if candidate else row[index] for index in range(len(mapping)))
+def _row_bucket(row: Row, mapping: tuple[int, ...], rules: _Rules, *, candidate: bool) -> tuple[object, ...]:
+    values = (row[i] for i in (mapping if candidate else _comparison_columns(row, rules)))
     return tuple(_nonnumeric_bucket(value) for value in values if not _is_numeric(value))
 
 
@@ -542,8 +586,8 @@ def _match_bucket(candidate: list[Row], reference: list[Row], mapping: tuple[int
 
 def _rows_equal(candidate: Row, reference: Row, mapping: tuple[int, ...], rules: _Rules) -> bool:
     return all(
-        _cells_equal(candidate[mapping[reference_index]], reference_value, kind=rules.value_kinds[reference_index] if rules.value_kinds else "other", use_absolute=rules.use_absolute_tolerance, exact_counts=rules.exact_counts and bool(rules.value_types) and is_integer_type(rules.value_types[reference_index]))
-        for reference_index, reference_value in enumerate(reference)
+        _cells_equal(candidate[mapping[position]], reference[reference_index], kind=rules.value_kinds[reference_index] if rules.value_kinds else "other", use_absolute=rules.use_absolute_tolerance, exact_counts=rules.exact_counts and bool(rules.value_types) and is_integer_type(rules.value_types[reference_index]))
+        for position, reference_index in enumerate(_comparison_columns(reference, rules))
     )
 
 

@@ -114,20 +114,22 @@ def main() -> int:
     meta = {q.qid: q for q in load_questions() if q.qid in set(pilot)}
     level = {qid: meta[qid].meta["q_level"] for qid in pilot}
     low = {qid for qid in pilot if meta[qid].meta["low_discrimination"]}
-    judge = {qid for qid in pilot if meta[qid].pending}
+    # judge questions are a stratum of their own: out of every accuracy denominator, together
+    # with their refusals and exec errors (decisions/2026-10-18-judge-stratum-and-t12-audit.md §1)
+    judge = {qid for qid in pilot if meta[qid].scoring == "judge"}
 
     out = [f"# T12 试跑结果（自动生成）\n",
            f"- 题库：`{args.eval_tag}` = `{commit}`；试跑 {len(pilot)} 题；低区分度 {sorted(low)}；"
-           f"judge 题（行集待离线评分、不进准确率分母）{sorted(judge)}",
+           f"judge 题（单列一档，所有单元都不进准确率分母，拒答、执行报错一并拿出）{sorted(judge)}",
            "- 运行：" + "；".join(f"{m} → `runs/{r}/`" for m, r in runs.items()), ""]
 
     data = {(m, c): [r for r in records(r_id, c)] for m, r_id in runs.items() for c in CELLS}
     done = {k: [r for r in v if r.get("status") == "done"] for k, v in data.items()}
 
-    out += ["## 准确率（correct / 可评作答）", "",
+    out += ["## 准确率（correct / 确定性评分题的作答；judge 题不计）", "",
             "| 模型 | 单元 | 含低区分度 | 不含低区分度（选模型用） | 首答即对（不含低区分度） |", "|---|---|---|---|---|"]
     for (m, c), recs in done.items():
-        scored = [r for r in recs if r["final"]["outcome"] != "pending"]
+        scored = [r for r in recs if r["qid"] not in judge]
         main_ = [r for r in scored if r["qid"] not in low]
         out.append(f"| {m} | {c} | {pct(sum(r['final']['outcome'] == 'correct' for r in scored), len(scored))} "
                    f"| {pct(sum(r['final']['outcome'] == 'correct' for r in main_), len(main_))} "
@@ -138,7 +140,7 @@ def main() -> int:
     for (m, c), recs in done.items():
         cells = []
         for lv in ("Q1", "Q2", "Q3"):
-            s = [r for r in recs if level[r["qid"]] == lv and r["final"]["outcome"] != "pending"]
+            s = [r for r in recs if level[r["qid"]] == lv and r["qid"] not in judge]
             sm = [r for r in s if r["qid"] not in low]
             cells.append(f"{pct(sum(r['final']['outcome'] == 'correct' for r in sm), len(sm))}"
                          f"（含 {pct(sum(r['final']['outcome'] == 'correct' for r in s), len(s))}）")

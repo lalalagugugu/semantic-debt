@@ -154,3 +154,37 @@ def test_explicit_incomplete_reference_rules_do_not_silently_fall_back():
     common = {'ordered': False, 'top_n': None}
     with pytest.raises(ValueError, match='missing required'):
         score([[1]], [[[1]]], common, reference_rules=[{}])
+
+
+
+def test_required_columns_keep_hidden_selection_keys_and_group_coverage():
+    metadata = {**GROUP_RULES, 'required_columns': [0, 1]}
+    assert score([['A', 'b'], ['B', 'c']], [GROUPS], metadata) == 'correct'
+    assert score([['A', 'a'], ['A', 'b']], [GROUPS], metadata) == 'wrong'
+    assert score([['A', 'a'], ['A', 'a'], ['B', 'c']], [GROUPS], metadata) == 'wrong'
+
+
+def test_required_columns_resolve_ambiguous_projection_using_reference_selection():
+    metadata = {**GROUP_RULES, 'required_columns': [1]}
+    ref = [['A', 'same', 10], ['B', 'same', 10]]
+    assert score([['same'], ['same']], [ref], metadata) == 'correct'
+    assert score([['same']], [ref], metadata) == 'wrong'
+
+
+def test_required_columns_can_reorder_all_selection_columns():
+    metadata = {**GROUP_RULES, 'required_columns': [2, 0, 1]}
+    assert score([['A', 'b', 10], ['B', 'c', 5]], [GROUPS], metadata) == 'correct'
+
+
+
+def test_required_columns_keep_exact_visible_selection_identity():
+    metadata = {**GROUP_RULES, 'required_columns': [0, 1]}
+    ref = [['A', 10000, 50]]
+    assert score([['A', 10001]], [ref], metadata) == 'wrong'
+    assert score([['A', 10000]], [ref], metadata) == 'correct'
+
+
+def test_required_columns_still_reject_duplicate_reference_leaf_objects():
+    metadata = {**GROUP_RULES, 'required_columns': [0, 1]}
+    with pytest.raises(ValueError, match='duplicate leaf objects'):
+        score([['A', 'a']], [[['A', 'a', 10], ['A', 'a', 10]]], metadata)
