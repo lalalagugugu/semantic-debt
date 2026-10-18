@@ -14,7 +14,8 @@ anything about specific questions, answers or this dataset. Items 6-15 are the
 presentation conventions of decisions/2026-10-18-names-required-by-system-prompt.md
 (section 2.1 and the first table of section 3.2) and of
 decisions/2026-10-18-ux-conventions-and-annotation-disputes.md (section 1.1: items
-13-15; section 5.4: the last clause of item 6): generic, the same for every cell.
+13-15, narrowed by section 8; section 5.4: the last clause of item 6): generic,
+the same for every cell.
 """
 
 from __future__ import annotations
@@ -41,9 +42,9 @@ SYSTEM_PROMPT = """你是企业数据分析助手。下面给出一份描述数�
 10. 日期写成 YYYY-MM-DD；按月、季、年统计时，期间写成语义上下文里对应字段的取值形式。
 11. 金额用数据的原始单位，不换算成万元等；数值保持数值类型，不要格式化成字符串。
 12. 变化率按（本期 − 基期）÷ 基期计算，不写成两期之比；降幅、缺口等「减少了多少」的量用正数表示。
-13. 问「变化了多少」「高多少」时，同时给出绝对值和百分比。
-14. 排名类问题，输出名次列。
-15. 比率、留存、转化类指标，同时给出基数（分母）。"""
+13. 问「变化了多少」「高多少」时，同时给出绝对值和百分比；变化量本身是百分点时不必再给百分比。
+14. 列出多行排名时，输出名次列。
+15. 比率、留存、转化类指标，同时给出基数（分母）；平均值不算比率。"""
 
 CONTEXT_HEADER = "## 语义上下文"
 SYNTAX_HEADER = "## 查询语言说明"
