@@ -43,8 +43,11 @@ import yaml
 EN_EXCLUDED = frozenset({33})
 # Bank questions rewritten to realistic phrasing no longer ask what the English
 # original asks, so their anchors drop the revised-reference column
-# (decisions/2026-10-17-semantic-gaps-and-realistic-questions.md, sections 3, 5-7).
-REVISED_EXCLUDED = frozenset({"Q13", "Q14", "Q21", "Q28", "Q36", "Q89"})
+# (decisions/2026-10-17-semantic-gaps-and-realistic-questions.md, sections 3, 5-7; and the
+# 「哪些……最高」 rewrites of decisions/2026-10-18-ux-conventions-and-annotation-disputes.md
+# section 4 item 4: Q45, Q67, Q69, Q92, Q97, Q98).
+REVISED_EXCLUDED = frozenset({"Q13", "Q14", "Q21", "Q28", "Q36", "Q89",
+                              "Q45", "Q67", "Q69", "Q92", "Q97", "Q98"})
 CSV_NULL = "\\N"
 
 
@@ -80,6 +83,11 @@ def eval_dir() -> Path:
 
 
 ANCHOR_RULES = Path("audit") / "anchor-original-rules-review.md"
+# Where anchors inherit the Chinese questions' rules (and scoring) from: a fixed tag of the
+# bank, never the current checkout, so that revisions of the Chinese references (e.g. the
+# eval-v1.1 presentation conventions: appended rank / base columns, quarter labels, long
+# tables, required_columns) cannot change how an anchor is scored on its original reference.
+ANCHOR_RULES_TAG = "eval-v1"
 BANK_PATHS = ("questions", "refs", "vendor", str(ANCHOR_RULES))
 # questions/*.yaml that are not question files: T06's pilot sample (a list of ids
 # plus its sampling trace), read by ``pilot_ids``.
@@ -332,10 +340,47 @@ def published_row_count(root: Path, vendor_id: int) -> int | None:
     return None if data.get("error") else int(data["row_count"])
 
 
-def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
+def zh_rules_at(root: Path, tag: str = ANCHOR_RULES_TAG) -> tuple[dict[str, Question], str]:
+    """The Chinese questions' rules, per-reference rules and scoring as of ``tag`` (no
+    reference rows), and the tag's full commit. Read with ``git show`` from the bank's
+    own repository. A missing tag raises: there is no fallback to the current checkout."""
+    found = _git(root, "rev-parse", "--verify", "--quiet", f"{tag}^{{commit}}")
+    if found.returncode != 0:
+        raise EvalVersionError(f"{root}: anchor rules tag {tag!r} not found (git fetch --tags in the question bank); "
+                               "anchors never inherit rules from the current checkout")
+    commit = found.stdout.strip()
+    listing = _git(root, "ls-tree", "--name-only", commit, "questions/")
+    if listing.returncode != 0:
+        raise EvalVersionError(f"{root}: cannot list questions/ at {tag}: {listing.stderr.strip()}")
+    out = {}
+    for name in sorted(listing.stdout.split()):
+        if not name.endswith(".yaml") or Path(name).name in NON_QUESTION_FILES:
+            continue
+        shown = _git(root, "show", f"{commit}:{name}")
+        if shown.returncode != 0:
+            raise EvalVersionError(f"{root}: cannot read {name} at {tag}: {shown.stderr.strip()}")
+        data = yaml.safe_load(shown.stdout)
+        for record in data["questions"] if isinstance(data, dict) else data:
+            ref_rules = [ref.get("rules") for ref in record.get("refs") or []]
+            out[str(record["id"])] = Question(
+                qid=str(record["id"]), text="", refs=[[] for _ in ref_rules], rules=record.get("rules"),
+                scoring=record["scoring"], ref_rules=ref_rules if any(r is not None for r in ref_rules) else None)
+    return out, commit
+
+
+def load_en(root: Path, anchors: Path | None = None, rules_tag: str = ANCHOR_RULES_TAG) -> list[Question]:
+    """English anchors, scored on the benchmark's original references.
+
+    Rules the bank wrote for an original reference (``ANCHOR_RULES``) are read from the
+    current checkout. Otherwise an anchor inherits the rules of the matching Chinese
+    question as of ``rules_tag`` (default eval-v1), not as of the current checkout; the
+    tag and its commit are in ``meta["rules_tag"]``. The revised-reference column
+    (``revised``) follows the current checkout.
+    """
     from harness.anchor_refs import anchor_manifest, load_anchor_ref
 
     zh = {q.qid: q for q in load_zh(root)}
+    inherited, inherited_commit = zh_rules_at(root, rules_tag)
     mapping = anchor_mapping(root, list(zh.values()))
     written = bank_anchor_rules(root)
     built = anchor_manifest(anchors)
@@ -344,11 +389,15 @@ def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
         vid = int(vq["id"])
         if vid in EN_EXCLUDED:
             continue
-        current = zh[mapping[vid]]
-        revised = None if current.qid in REVISED_EXCLUDED else Question(
-            qid=current.qid, text="", refs=current.refs, rules=current.rules, lang="en",
-            scoring=current.scoring, ref_rules=current.ref_rules)
-        meta = {"vendor_id": vid, "bank_qid": current.qid, "level": vq.get("level")}
+        now = zh[mapping[vid]]
+        revised = None if now.qid in REVISED_EXCLUDED else Question(
+            qid=now.qid, text="", refs=now.refs, rules=now.rules, lang="en",
+            scoring=now.scoring, ref_rules=now.ref_rules)
+        if now.qid not in inherited:
+            raise EvalVersionError(f"{now.qid} (anchor EN{vid:02d}) is not in the bank at {rules_tag}")
+        current = inherited[now.qid]
+        meta = {"vendor_id": vid, "bank_qid": now.qid, "level": vq.get("level"),
+                "rules_tag": {"tag": rules_tag, "commit": inherited_commit}}
         if revised is None:
             meta["revised_excluded"] = "bank question rewritten"
         original = load_anchor_ref(vid, anchors)
@@ -390,9 +439,15 @@ def load_en(root: Path, anchors: Path | None = None) -> list[Question]:
     return out
 
 
-def load_questions(root: Path | None = None, lang: str = "zh") -> list[Question]:
+def load_questions(root: Path | None = None, lang: str = "zh",
+                   anchor_rules_tag: str = ANCHOR_RULES_TAG) -> list[Question]:
     root = root or eval_dir()
-    questions = {"zh": load_zh, "en": load_en}[lang](root)
+    if lang == "zh":
+        questions = load_zh(root)
+    elif lang == "en":
+        questions = load_en(root, rules_tag=anchor_rules_tag)
+    else:
+        raise KeyError(lang)
     ids = [q.qid for q in questions]
     if len(ids) != len(set(ids)):
         raise ValueError("duplicate question ids in the question bank")
