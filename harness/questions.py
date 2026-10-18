@@ -81,6 +81,10 @@ def eval_dir() -> Path:
 
 ANCHOR_RULES = Path("audit") / "anchor-original-rules-review.md"
 BANK_PATHS = ("questions", "refs", "vendor", str(ANCHOR_RULES))
+# questions/*.yaml that are not question files: T06's pilot sample (a list of ids
+# plus its sampling trace), read by ``pilot_ids``.
+PILOT_FILE = "pilot.yaml"
+NON_QUESTION_FILES = frozenset({PILOT_FILE})
 
 
 def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
@@ -104,6 +108,39 @@ def eval_commit(root: Path | None = None) -> str:
     if same and not untracked:
         return _git(root, "rev-parse", "--short", "origin/main").stdout.strip() + "@origin/main"
     return f"{head}-dirty"
+
+
+class EvalVersionError(RuntimeError):
+    """The question bank checkout is not the content of the frozen tag."""
+
+
+def verify_eval_tag(tag: str, root: Path | None = None) -> str:
+    """Full commit of ``tag`` if the checkout the harness reads is exactly that tag's content.
+
+    The harness reads the bank only from a fixed tag (BOARD item 13, T12 card
+    「题库版本」), normally a detached worktree of it under ``$SEMDEBT_DATA_DIR``.
+    HEAD must be the tag's commit and the bank paths must carry no local change
+    or untracked file; anything else raises and the run does not start.
+    """
+    root = root or eval_dir()
+    tagged = _git(root, "rev-parse", "--verify", "--quiet", f"{tag}^{{commit}}")
+    if tagged.returncode != 0:
+        raise EvalVersionError(f"{root}: tag {tag!r} not found (git fetch --tags in the question bank)")
+    head = _git(root, "rev-parse", "HEAD").stdout.strip()
+    want = tagged.stdout.strip()
+    if head != want:
+        raise EvalVersionError(f"{root}: HEAD {head[:7]} is not {tag} ({want[:7]}); "
+                               f"read the bank from `git worktree add --detach <dir> {tag}`")
+    status = _git(root, "status", "--porcelain", "--untracked-files=all", "--", *BANK_PATHS)
+    if status.returncode != 0 or status.stdout.strip():
+        raise EvalVersionError(f"{root}: local changes under {', '.join(BANK_PATHS)}; not the content of {tag}")
+    return want
+
+
+def pilot_ids(root: Path | None = None) -> list[str]:
+    """T06's pilot sample (``questions/pilot.yaml``), in file order."""
+    data = yaml.safe_load(((root or eval_dir()) / "questions" / PILOT_FILE).read_text(encoding="utf-8"))
+    return [str(q) for q in data["questions"]]
 
 
 # ---------------------------------------------------------------------------
@@ -160,17 +197,24 @@ def from_record(record: dict, manifest: dict[str, dict], root: Path) -> Question
                              "and refs/MANIFEST.json; the question bank must fix this")
         refs.append(read_ref_csv(root / ref["result_path"], entry["columns"]))
         ref_rules.append(own)
+    labels = record.get("labels") or {}
+    low = labels.get("low_discrimination")
     return Question(qid=str(record["id"]), text=record["text_zh"], refs=refs, rules=record.get("rules"),
                     lang="zh", scoring=record["scoring"],
                     meta={"source": record["source"], "type": record["type"], "split": record.get("split"),
-                          "text_en": record["text_en"]},
+                          "text_en": record["text_en"], "q_level": labels.get("q_level"),
+                          "low_discrimination": low.get("criteria") if low else None},
                     ref_rules=ref_rules if any(r is not None for r in ref_rules) else None)
+
+
+def question_files(root: Path) -> list[Path]:
+    return [p for p in sorted((root / "questions").glob("*.yaml")) if p.name not in NON_QUESTION_FILES]
 
 
 def load_zh(root: Path) -> list[Question]:
     manifest = _manifest(root)
     records = []
-    for path in sorted((root / "questions").glob("*.yaml")):
+    for path in question_files(root):
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         records += data["questions"] if isinstance(data, dict) else data
     return [from_record(r, manifest, root) for r in records]

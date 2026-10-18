@@ -510,10 +510,10 @@ def test_parse_value_types():
 @needs_eval
 def test_load_real_bank_and_pass_rules_through():
     import yaml
-    from harness.questions import load_questions
+    from harness.questions import load_questions, question_files
     zh, en = load_questions(EVAL), load_questions(EVAL, lang="en")
     assert len(en) == 99 and "EN33" not in {q.qid for q in en}
-    records = {r["id"]: r for p in sorted((EVAL / "questions").glob("*.yaml"))
+    records = {r["id"]: r for p in question_files(EVAL)
                for r in yaml.safe_load(p.read_text(encoding="utf-8"))["questions"]}
     assert {q.qid for q in zh} == set(records)
     for q in zh:
@@ -703,7 +703,9 @@ def test_anchor_rules_from_the_bank_and_boundary_on_the_real_bank():
 @needs_eval
 def test_ordered_anchors_declare_their_sort_key():
     """Scorer since main #52: ordered rules without order_by warn and fall back to positional
-    comparison. Every ordered anchor must carry a key, so loading and self-matching never warn."""
+    comparison. Every ordered anchor must carry a key, so loading and self-matching never raise
+    that warning. Only that warning is an error: other scorer warnings (e.g. missing
+    required_columns before eval-v1.1) are not this test's concern."""
     import warnings
     from harness.anchor_refs import anchor_dir, load_anchor_ref
     from harness.questions import load_questions
@@ -711,7 +713,7 @@ def test_ordered_anchors_declare_their_sort_key():
     if not (anchor_dir() / "MANIFEST.json").exists():
         pytest.skip("anchor references not built")
     with warnings.catch_warnings():
-        warnings.simplefilter("error", RuntimeWarning)
+        warnings.filterwarnings("error", message="ordered rules missing order_by", category=RuntimeWarning)
         en = load_questions(EVAL, lang="en")
         for q in en:
             if q.rules is None or not q.rules.get("ordered"):
@@ -748,3 +750,102 @@ def test_rescore_rebuilds_candidates_from_runs_raw(tmp_path):
     with pytest.raises(ValueError):              # tampered raw result
         RS.rescore("src", "SQL-L1", "src-rescore-3", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
                    questions={"Q008": q_new}, commit="evalnew")
+
+
+# ---------------------------------------------------------------------------
+# T12: fingerprint guard, fixed bank tag, pilot sample
+
+
+def _questions(n):
+    return [Question(f"Q{i:03d}", QTEXT, refs=[[[42]]], rules=Q.rules) for i in range(1, n + 1)]
+
+
+def test_second_fingerprint_stops_the_run(tmp_path):
+    """After the fingerprint changes, attempts not yet started are not launched."""
+    client = MockClient(lambda m: "```sql\nSELECT 42\n```", fingerprint="fp_a")
+    seen = []
+
+    def respond(messages):
+        seen.append(1)
+        if len(seen) == 3:
+            client.fingerprint = "fp_b"
+        return "```sql\nSELECT 42\n```"
+
+    client.respond = respond
+    ex = FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])})
+    guard = R.FingerprintGuard()
+    path = R.run_cell(_ctx(tmp_path, client, ex), _questions(10), reps=1, concurrency=1,
+                      runs_root=tmp_path / "runs", progress=lambda *_: None, guard=guard)
+    lines = path.read_text(encoding="utf-8").splitlines()
+    assert guard.conflict and set(guard.seen) == {"fp_a", "fp_b"}
+    assert len(lines) < 10                      # stopped early; what ran is logged
+    assert len(lines) == len(seen)
+
+
+def test_fingerprint_guard_is_seeded_from_the_run_on_resume(tmp_path):
+    client = MockClient(lambda m: "```sql\nSELECT 42\n```", fingerprint="fp_a")
+    ex = FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])})
+    R.run_cell(_ctx(tmp_path, client, ex), _questions(2), reps=1, concurrency=1,
+               runs_root=tmp_path / "runs", progress=lambda *_: None)
+    guard = R.FingerprintGuard.from_logs(tmp_path / "runs" / "test-run", "mock")
+    assert guard.seen == {"fp_a": 2} and not guard.conflict
+    assert R.FingerprintGuard.from_logs(tmp_path / "runs" / "test-run", "other").seen == {}
+
+
+def test_first_attempt_runs_alone_before_the_pool(tmp_path):
+    """The first call writes the prefix cache before concurrent calls start."""
+    import threading
+
+    order = []
+    gate = threading.Event()
+
+    def respond(messages):
+        order.append(gate.is_set())
+        gate.set()
+        return "```sql\nSELECT 42\n```"
+
+    ex = FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])})
+    R.run_cell(_ctx(tmp_path, MockClient(respond), ex), _questions(5), reps=1, concurrency=4,
+               runs_root=tmp_path / "runs", progress=lambda *_: None)
+    assert order[0] is False and all(order[1:])
+
+
+def _git_repo(root: Path) -> None:
+    import subprocess
+
+    def git(*a):
+        subprocess.run(["git", "-C", str(root), *a], check=True, capture_output=True)
+    (root / "questions").mkdir(parents=True)
+    (root / "questions" / "a.yaml").write_text("questions: []\n", encoding="utf-8")
+    (root / "questions" / "pilot.yaml").write_text("seed: 1\nquestions: [Q2, Q1]\n", encoding="utf-8")
+    git("init", "-q")
+    git("-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qam", "x", "--allow-empty")
+    git("add", ".")
+    git("-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "bank")
+    git("tag", "eval-v1")
+
+
+def test_bank_must_be_the_clean_tag(tmp_path):
+    import subprocess
+
+    from harness.questions import EvalVersionError, pilot_ids, question_files, verify_eval_tag
+
+    root = tmp_path / "bank"
+    _git_repo(root)
+    full = verify_eval_tag("eval-v1", root)
+    assert len(full) == 40
+    assert pilot_ids(root) == ["Q2", "Q1"]
+    assert [p.name for p in question_files(root)] == ["a.yaml"]    # the pilot list is not a question file
+    with pytest.raises(EvalVersionError, match="not found"):
+        verify_eval_tag("eval-v9", root)
+    (root / "questions" / "a.yaml").write_text("questions: [x]\n", encoding="utf-8")
+    with pytest.raises(EvalVersionError, match="local changes"):
+        verify_eval_tag("eval-v1", root)
+    subprocess.run(["git", "-C", str(root), "checkout", "-q", "--", "."], check=True)
+    (root / "questions" / "new.yaml").write_text("questions: []\n", encoding="utf-8")
+    with pytest.raises(EvalVersionError, match="local changes"):
+        verify_eval_tag("eval-v1", root)
+    (root / "questions" / "new.yaml").unlink()
+    subprocess.run(["git", "-C", str(root), "checkout", "-q", "HEAD~1"], check=True)
+    with pytest.raises(EvalVersionError, match="is not eval-v1"):
+        verify_eval_tag("eval-v1", root)

@@ -9,6 +9,12 @@ Committed log  runs/<run-id>/<cell>.jsonl            one line per attempt, appen
 Raw responses  $SEMDEBT_DATA_DIR/runs-raw/<run-id>/<cell>/   full API responses incl. reasoning;
                                                      the log keeps their sha256
 
+The question bank is read only from a fixed tag (``--eval-tag``, default
+``eval-v1``): ``$SEMDEBT_EVAL_DIR`` must be a clean checkout of exactly that tag,
+otherwise nothing starts (dry run included). ``--pilot`` restricts to T06's pilot
+sample. If one requested model answers with a second ``system_fingerprint`` within
+a run, the run stops (decisions/2026-10-17-model-version-fingerprint.md).
+
 Resuming: rerunning the same run-id only runs (question, rep) pairs that have no
 ``status: done`` line. Lines with ``status: api_error`` (transport failure after
 backoff) stay in the log and the pair is run again; reports take the ``done`` line.
@@ -127,6 +133,7 @@ class RunContext:
     timeout_s: int
     raw_dir: Path
     limits: dict | None = None      # global resource caps, logged with every attempt
+    eval_tag: str | None = None     # the bank tag eval_commit was verified against
 
 
 def _candidate(parsed: P.Parsed, result: ExecResult | None):
@@ -222,7 +229,8 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
     replies: list[Reply] = []
     base = {
         "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep, "question_sha256": sha256(q.text),
-        "eval_commit": ctx.eval_commit, "harness_commit": ctx.harness_commit,
+        "eval_commit": ctx.eval_commit, **({"eval_tag": ctx.eval_tag} if ctx.eval_tag else {}),
+        "harness_commit": ctx.harness_commit,
         "model_requested": ctx.client.model, "system_sha256": sha256(ctx.system),
         "exec_timeout_s": ctx.timeout_s, "exec_limits": ctx.limits, "scoring": q.scoring, "started_at": started.isoformat(timespec="seconds"),
     }
@@ -288,28 +296,99 @@ def done_pairs(path: Path) -> set[tuple[str, int]]:
     return done
 
 
+class FingerprintGuard:
+    """Tracks the ``system_fingerprint`` values one requested model answers with in a run.
+
+    More than one value means the model behind the name may have changed mid-run:
+    ``run_cell`` stops launching attempts and the CLI stops and asks the user
+    (decisions/2026-10-17-model-version-fingerprint.md). Attempts already in
+    flight finish and are logged as usual.
+    """
+
+    def __init__(self, seen: dict[str, int] | None = None) -> None:
+        self.seen: dict[str, int] = dict(seen or {})
+        self._lock = threading.Lock()
+
+    def observe(self, record: dict) -> None:
+        with self._lock:
+            for t in record.get("turns") or []:
+                fp = t.get("system_fingerprint")
+                if fp:
+                    self.seen[fp] = self.seen.get(fp, 0) + 1
+
+    @property
+    def conflict(self) -> bool:
+        return len(self.seen) > 1
+
+    @classmethod
+    def from_logs(cls, run_dir: Path, model: str) -> "FingerprintGuard":
+        """Seeded from every cell log already in this run (resuming) for the same requested model."""
+        guard = cls()
+        for path in sorted(run_dir.glob("*.jsonl")) if run_dir.is_dir() else []:
+            for line in path.read_text(encoding="utf-8").splitlines():
+                rec = json.loads(line) if line.strip() else {}
+                if rec.get("model_requested") == model:
+                    guard.observe(rec)
+        return guard
+
+
 def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency: int,
-             runs_root: Path | None = None, progress=print) -> Path:
+             runs_root: Path | None = None, progress=print, guard: FingerprintGuard | None = None) -> Path:
+    """Run every missing (question, rep) of one cell.
+
+    The first attempt runs alone so that it writes the prefix cache before the
+    concurrent ones start (otherwise every worker's first call is a cache miss).
+    """
     path = log_path(ctx.run_id, ctx.cell.name, runs_root)
     path.parent.mkdir(parents=True, exist_ok=True)
     done = done_pairs(path)
     todo = [(q, rep) for q in questions for rep in range(1, reps + 1) if (q.qid, rep) not in done]
     progress(f"{ctx.cell.name}: {len(done)} done, {len(todo)} to run")
+    if guard is not None and guard.conflict:
+        progress(f"  stop: more than one system_fingerprint already in this run: {guard.seen}")
+        return path
     lock = threading.Lock()
-    with ThreadPoolExecutor(max_workers=max(1, concurrency)) as pool, path.open("a", encoding="utf-8") as out:
-        futures = {pool.submit(run_attempt, ctx, q, rep): (q.qid, rep) for q, rep in todo}
-        for n, future in enumerate(as_completed(futures), 1):
-            qid, rep = futures[future]
-            try:
-                record = future.result()
-            except Exception as exc:  # recorded, never swallowed
-                record = {"run_id": ctx.run_id, "cell": ctx.cell.name, "qid": qid, "rep": rep,
-                          "status": "harness_error", "error": f"{type(exc).__name__}: {exc}"[:500]}
-            with lock:
-                out.write(json.dumps(record, ensure_ascii=False) + "\n")
-                out.flush()
-            outcome = record.get("final", {}).get("outcome", record["status"])
-            progress(f"  [{n}/{len(todo)}] {qid} r{rep}: {outcome}")
+    n = 0
+
+    def emit(out, future_or_record, qid: str, rep: int) -> None:
+        nonlocal n
+        try:
+            record = future_or_record.result() if hasattr(future_or_record, "result") else future_or_record
+        except Exception as exc:  # recorded, never swallowed
+            record = {"run_id": ctx.run_id, "cell": ctx.cell.name, "qid": qid, "rep": rep,
+                      "status": "harness_error", "error": f"{type(exc).__name__}: {exc}"[:500]}
+        with lock:
+            out.write(json.dumps(record, ensure_ascii=False) + "\n")
+            out.flush()
+            n += 1
+        if guard is not None:
+            guard.observe(record)
+        outcome = record.get("final", {}).get("outcome", record["status"])
+        progress(f"  [{n}/{len(todo)}] {qid} r{rep}: {outcome}")
+
+    with path.open("a", encoding="utf-8") as out:
+        if todo:
+            (q0, rep0), todo_rest = todo[0], todo[1:]
+            with ThreadPoolExecutor(max_workers=1) as warm:
+                emit(out, warm.submit(run_attempt, ctx, q0, rep0), q0.qid, rep0)
+        else:
+            todo_rest = []
+        if guard is not None and guard.conflict:
+            progress(f"  stop: second system_fingerprint: {guard.seen}")
+            return path
+        with ThreadPoolExecutor(max_workers=max(1, concurrency)) as pool:
+            futures = {pool.submit(run_attempt, ctx, q, rep): (q.qid, rep) for q, rep in todo_rest}
+            stopped = False
+            for future in as_completed(futures):
+                if future.cancelled():
+                    continue
+                qid, rep = futures[future]
+                emit(out, future, qid, rep)
+                if guard is not None and guard.conflict and not stopped:
+                    stopped = True
+                    progress(f"  stop: second system_fingerprint: {guard.seen}; cancelling attempts not yet started")
+                    for f in futures:
+                        f.cancel()
     return path
 
 
@@ -390,14 +469,15 @@ def measured(cell: str, runs_root: Path | None = None) -> dict | None:
 
 
 def dry_run(cells: list[Cell], n_questions: dict[str, int], reps: int, model: str, *, fix_rate: float,
-            output_tokens: int, hit_ratio: float, question_tokens: int, runs_root: Path | None = None) -> tuple[list[dict], float]:
+            output_tokens: int, hit_ratio: float, question_tokens: int, runs_root: Path | None = None,
+            use_measured: bool = True) -> tuple[list[dict], float]:
     rows = []
     price = PRICES_OFFPEAK[model]
     for cell in cells:
         nq = n_questions.get(cell.lang, 0)
         attempts = nq * reps
         calls = round(attempts * (1 + fix_rate))
-        m = measured(cell.name, runs_root)
+        m = measured(cell.name, runs_root) if use_measured else None
         source = "measured" if m else "estimated"
         if m:
             prompt_tokens, hr, out_tokens = m["prompt"], m["hit_ratio"], m["output"]
@@ -464,6 +544,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY)
     ap.add_argument("--exec-timeout", type=int, default=DEFAULT_EXEC_TIMEOUT_S, help="seconds per query execution")
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
+    ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
+    ap.add_argument("--eval-tag", default="eval-v1",
+                    help="the question bank must be a clean checkout of this tag (BOARD item 13)")
     ap.add_argument("--limit", type=int, help="first N questions only")
     ap.add_argument("--dry-run", action="store_true", help="count calls and estimate cost; no API call")
     ap.add_argument("--budget", type=float, help="CNY; refuse to start if the estimate exceeds it")
@@ -472,13 +555,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--est-fix-rate", type=float, default=0.10)
     ap.add_argument("--est-hit-ratio", type=float, default=0.95)
     ap.add_argument("--est-question-tokens", type=int, default=60)
+    ap.add_argument("--est-from-args", action="store_true",
+                    help="estimate from the --est-* values even where committed logs have measurements")
     args = ap.parse_args(argv)
     if not args.dry_run and not args.run_id:
         ap.error("--run-id is required unless --dry-run")
     return args
 
 
-def select_questions(questions: list[Question], args: argparse.Namespace) -> list[Question]:
+def select_questions(questions: list[Question], args: argparse.Namespace, pilot: list[str] | None = None) -> list[Question]:
+    if pilot is not None:
+        questions = [q for q in questions if q.qid in set(pilot)]
+        missing = set(pilot) - {q.qid for q in questions}
+        if missing:
+            raise SystemExit(f"pilot ids not in the bank: {sorted(missing)}")
     if args.questions:
         wanted = {x.strip() for x in args.questions.split(",") if x.strip()}
         questions = [q for q in questions if q.qid in wanted]
@@ -489,17 +579,28 @@ def select_questions(questions: list[Question], args: argparse.Namespace) -> lis
 
 
 def main(argv: list[str] | None = None, load=None) -> int:
-    from harness.questions import eval_commit, load_questions
+    from harness.questions import EvalVersionError, eval_commit, load_questions, pilot_ids, verify_eval_tag
 
     args = parse_args(argv)
     names = args.cell or ["all"]
     cells = list(CELLS.values()) if "all" in names else [CELLS[n] for n in names]
+    if load is None:
+        try:
+            eval_full = verify_eval_tag(args.eval_tag)
+        except EvalVersionError as exc:
+            print(f"refusing to start: {exc}")
+            return 2
+        print(f"question bank: {args.eval_tag} = {eval_full}")
     load = load or load_questions
-    by_lang = {lang: select_questions(load(lang=lang), args) for lang in sorted({c.lang for c in cells})}
+    pilot = pilot_ids() if args.pilot else None
+    if pilot is not None and any(c.lang != "zh" for c in cells):
+        raise SystemExit("--pilot is a sample of the Chinese set")
+    by_lang = {lang: select_questions(load(lang=lang), args, pilot) for lang in sorted({c.lang for c in cells})}
 
     rows, total = dry_run([c for c in cells], {k: len(v) for k, v in by_lang.items()}, args.reps, args.model,
                           fix_rate=args.est_fix_rate, output_tokens=args.est_output_tokens,
-                          hit_ratio=args.est_hit_ratio, question_tokens=args.est_question_tokens)
+                          hit_ratio=args.est_hit_ratio, question_tokens=args.est_question_tokens,
+                          use_measured=not args.est_from_args)
     print_dry_run(rows, total, args.model, args.reps, args.est_fix_rate)
     if args.dry_run:
         return 0
@@ -515,13 +616,19 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     client = DeepSeekClient(args.model)
     commit = eval_commit()
+    guard = FingerprintGuard.from_logs(log_path(args.run_id, "x").parent, args.model)
     for cell in cells:
         ctx = RunContext(run_id=args.run_id, cell=cell, client=client, executor=make_executor(cell, args.exec_timeout),
                          system=system_for(cell), eval_commit=commit, harness_commit=harness_commit(),
                          timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name,
-                         limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES})
-        path = run_cell(ctx, by_lang[cell.lang], args.reps, args.concurrency)
+                         limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
+                         eval_tag=args.eval_tag)
+        path = run_cell(ctx, by_lang[cell.lang], args.reps, args.concurrency, guard=guard)
         print(json.dumps(summarize(path), ensure_ascii=False, indent=2))
+        if guard.conflict:
+            print(f"STOP: {args.model} answered with more than one system_fingerprint in this run: {guard.seen}. "
+                  "Ask the user before going on (decisions/2026-10-17-model-version-fingerprint.md).")
+            return 3
     return 0
 
 
