@@ -51,11 +51,11 @@ class FakeExecutor:
 OK42 = ExecResult(rows=[[42]], columns=[{"name": "n", "type": "UInt64"}])
 
 
-def _ctx(tmp_path, client, executor, cell="SQL-L1-E"):
+def _ctx(tmp_path, client, executor, cell="SQL-L1-E", tool_executor=None):
     direct = P.system_message("ctx", "syntax")
     return R.RunContext(run_id="test-run", cell=AG._named(AGENT_CELLS[cell], cell), client=client, executor=executor,
                         system=A.agent_system_message(direct), eval_commit="evalabc", harness_commit="h123",
-                        timeout_s=120, raw_dir=tmp_path / "raw")
+                        timeout_s=120, raw_dir=tmp_path / "raw", tool_executor=tool_executor)
 
 
 def tool(*queries, content=""):
@@ -183,6 +183,17 @@ def test_calls_beyond_the_limit_in_one_reply_are_not_executed(tmp_path):
     assert statuses == ["executed"] * 8 + ["limit_reached"] * 2
     assert calls[2][-1]["content"] == A.LIMIT_REACHED
     assert client.requests[-1]["tool_choice"] == "none" and rec["n_tool_calls"] == 8
+
+
+def test_run_sql_uses_its_own_executor_and_the_final_query_the_direct_one(tmp_path):
+    respond, _ = scripted(tool("SELECT 1"), ANSWER)
+    final_ex, tool_ex = FakeExecutor({"SELECT 42": OK42}), FakeExecutor({"SELECT 1": OK42})
+    tool_ex.timeout_s = 30
+    rec = AG.run_attempt(_ctx(tmp_path, MockClient(respond), final_ex, tool_executor=tool_ex), Q, 1)
+    assert tool_ex.seen == ["SELECT 1"] and final_ex.seen == ["SELECT 42"]
+    assert rec["agent"]["tool_timeout_s"] == 30 and rec["exec_timeout_s"] == 120
+    assert AG.parse_args(["--cell", "SQL-L1-E", "--dry-run"]).tool_timeout == 30
+    assert AG.parse_args(["--cell", "SQL-L1-E", "--dry-run"]).exec_timeout == 120
 
 
 def test_bad_arguments_and_unknown_tool_count_but_do_not_execute(tmp_path):

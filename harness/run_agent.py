@@ -7,8 +7,9 @@
 The model sees the direct cell's system message byte for byte (``harness-v1``) followed
 by the tool section of ``harness/agent_prompt.py`` (``harness-agent-v1``), and may call
 ``run_sql`` on the same backend and execution scope as the direct cell's final query:
-same static checks (single read-only SELECT, pinned settings, database scope), same
-120 s timeout and resource caps. At most ``MAX_TOOL_CALLS`` calls; each shows at most
+same static checks (single read-only SELECT, pinned settings, database scope) and
+resource caps; ``run_sql`` times out after ``--tool-timeout`` (30 s), the final query
+after ``--exec-timeout`` (120 s, as in direct answering). At most ``MAX_TOOL_CALLS`` calls; each shows at most
 ``ECHO_ROWS`` rows and says when it was cut. The tool runs only while ``tool_choice`` is
 left to the model; once the calls are used up the next request sends
 ``tool_choice: "none"``, so the model must answer. Calls beyond the limit inside one
@@ -62,6 +63,7 @@ from harness.questions import Question  # noqa: E402
 
 G3_FINGERPRINT = "e72d3c7f663d3e1383b00b3884cb4501"     # decisions/model.md, decisions/2026-10-18-g3-passed.md
 HARNESS_TAG = "harness-v1"
+TOOL_TIMEOUT_S = 30         # run_sql (user, 2026-10-19); the final query keeps DEFAULT_EXEC_TIMEOUT_S
 AGENT_TAG = "harness-agent-v1"
 
 
@@ -130,7 +132,7 @@ def _run_tool_calls(ctx: R.RunContext, q: Question, rep: int, call: int, reply: 
         else:
             used += 1
             start = time.monotonic()
-            result = ctx.executor.execute(query)
+            result = (ctx.tool_executor or ctx.executor).execute(query)
             spent += time.monotonic() - start
             content, shown, char_cut = A.render_result(result)
             rec["status"] = "executed"
@@ -166,7 +168,8 @@ def run_attempt(ctx: R.RunContext, q: Question, rep: int) -> dict:
     wall = time.monotonic()
     peak = R.is_peak(started)
     messages: list[dict] = P.first_messages(ctx.system, q.text)
-    base = {**R._base(ctx, q, rep, started), "agent": agent_settings()}
+    base = {**R._base(ctx, q, rep, started),
+            "agent": {**agent_settings(), "tool_timeout_s": getattr(ctx.tool_executor, "timeout_s", ctx.timeout_s)}}
     steps: list[dict] = []
     turns: list[dict] = []
     replies: list[Reply] = []
@@ -391,7 +394,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--reps", type=int, default=DEFAULT_REPS)
     ap.add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY)
     ap.add_argument("--exec-timeout", type=int, default=DEFAULT_EXEC_TIMEOUT_S,
-                    help="seconds per execution, run_sql and final query alike")
+                    help="seconds per execution of the final query (as in direct answering)")
+    ap.add_argument("--tool-timeout", type=int, default=TOOL_TIMEOUT_S, help="seconds per run_sql execution")
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--limit", type=int, help="first N questions only")
@@ -471,7 +475,8 @@ def main(argv: list[str] | None = None, load=None) -> int:
                                              args.expect_fingerprint or None)
     for cell_name, cell in zip(args.cell, cells):
         ctx = R.RunContext(run_id=args.run_id, cell=_named(cell, cell_name), client=client,
-                           executor=make_executor(cell, args.exec_timeout), system=agent_system_for(cell),
+                           executor=make_executor(cell, args.exec_timeout),
+                           tool_executor=make_executor(cell, args.tool_timeout), system=agent_system_for(cell),
                            eval_commit=commit, harness_commit=R.harness_commit(), timeout_s=args.exec_timeout,
                            raw_dir=R.raw_root() / args.run_id / cell_name,
                            limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS,

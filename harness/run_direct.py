@@ -144,6 +144,7 @@ class RunContext:
     limits: dict | None = None      # global resource caps, logged with every attempt
     eval_tag: str | None = None     # the bank tag eval_commit was verified against
     semantic_tag: str | None = None  # the semantic-layer tag the contexts were verified against
+    tool_executor: Executor | None = None  # explorer agent (T15): run_sql's own executor (shorter timeout)
 
 
 def _candidate(parsed: P.Parsed, result: ExecResult | None):
