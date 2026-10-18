@@ -899,8 +899,7 @@ def test_semantic_layer_must_be_the_tag_content(tmp_path):
     with pytest.raises(SemanticVersionError, match="stale"):
         check()
     (contexts / "SQL-L1.yaml").unlink()
-    with pytest.raises(SemanticVersionError, match="missing"):
-        check()
+    assert check() == full      # not built: left to system_for (the dry run shows "no context")
 
 
 def test_semantic_tag_is_checked_against_this_repo():

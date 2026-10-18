@@ -8,7 +8,8 @@ work), so the check is on content, not on HEAD:
    committed, staged or unstaged difference, no untracked file (hard rule 2: the
    ``semantic-v*`` tags freeze both the sources and the renderer);
 2. every ``build/contexts/<cell>.yaml`` a run will send is what the renderer makes
-   from those sources now, i.e. the build is not stale.
+   from those sources now, i.e. the build is not stale (a context that is not built
+   at all is left to ``system_for``, which refuses to send it).
 
 Anything else raises ``SemanticVersionError`` and the run does not start.
 """
@@ -61,7 +62,8 @@ def verify_semantic_tag(tag: str, contexts: Iterable[str], *, root: Path, contex
     for name in sorted(set(contexts)):
         path = contexts_dir / name
         if not path.exists():
-            raise SemanticVersionError(f"{path} missing: run `uv run python render/render_all.py`")
+            continue    # not built (e.g. a tuned cell before its tuning file): the dry run lists it as
+                        # "no context" and a real run fails on it in system_for, so nothing unchecked is sent
         if path.read_text(encoding="utf-8") != render(Path(name).stem):
             raise SemanticVersionError(f"{path} is stale (not rendered from {tag}): "
                                        "run `uv run python render/render_all.py`")
