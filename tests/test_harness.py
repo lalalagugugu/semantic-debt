@@ -668,6 +668,23 @@ def test_bank_anchor_rules_are_read_by_id_and_hash(tmp_path):
 
 
 @needs_eval
+def test_rewritten_bank_questions_drop_the_revised_column():
+    """The 12 rewritten bank questions: semantic-gaps-and-realistic-questions §3, §5–7 (6) and
+    ux-conventions-and-annotation-disputes §4 item 4 (Q45, Q67, Q69, Q92, Q97, Q98). Their
+    anchors are still scored on the original reference; only the revised column is dropped."""
+    from harness.anchor_refs import anchor_dir
+    from harness.questions import REVISED_EXCLUDED, load_questions
+    want = {"Q13", "Q14", "Q21", "Q28", "Q36", "Q89", "Q45", "Q67", "Q69", "Q92", "Q97", "Q98"}
+    assert REVISED_EXCLUDED == want
+    if not (anchor_dir() / "MANIFEST.json").exists():
+        pytest.skip("anchor references not built")
+    en = load_questions(EVAL, lang="en")
+    dropped = {q.meta["bank_qid"]: q for q in en if q.revised is None}
+    assert set(dropped) == want
+    assert all(q.meta["revised_excluded"] == "bank question rewritten" for q in dropped.values())
+
+
+@needs_eval
 def test_anchors_score_exactly_as_at_eval_v1_whatever_the_current_bank():
     """Anchors inherit the Chinese rules from the fixed tag (default eval-v1), never from the
     current checkout: the 87 scorable anchors, their effective rules (no required_columns,

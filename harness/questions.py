@@ -43,8 +43,11 @@ import yaml
 EN_EXCLUDED = frozenset({33})
 # Bank questions rewritten to realistic phrasing no longer ask what the English
 # original asks, so their anchors drop the revised-reference column
-# (decisions/2026-10-17-semantic-gaps-and-realistic-questions.md, sections 3, 5-7).
-REVISED_EXCLUDED = frozenset({"Q13", "Q14", "Q21", "Q28", "Q36", "Q89"})
+# (decisions/2026-10-17-semantic-gaps-and-realistic-questions.md, sections 3, 5-7; and the
+# 「哪些……最高」 rewrites of decisions/2026-10-18-ux-conventions-and-annotation-disputes.md
+# section 4 item 4: Q45, Q67, Q69, Q92, Q97, Q98).
+REVISED_EXCLUDED = frozenset({"Q13", "Q14", "Q21", "Q28", "Q36", "Q89",
+                              "Q45", "Q67", "Q69", "Q92", "Q97", "Q98"})
 CSV_NULL = "\\N"
 
 
