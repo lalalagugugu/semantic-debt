@@ -763,6 +763,43 @@ def test_rescore_rebuilds_candidates_from_runs_raw(tmp_path):
                    questions={"Q008": q_new}, commit="evalnew")
 
 
+def _rescore_source(tmp_path):
+    """One finished source run "src" (Q008 answered SELECT 42) and its runs-raw."""
+    respond, _ = _scripted("```sql\nSELECT 42\n```")
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])}))
+    ctx.raw_dir = tmp_path / "raw" / "src" / "SQL-L1"
+    ctx.run_id = "src"
+    R.run_cell(ctx, [Question("Q008", QTEXT, refs=[[[42]]], rules=Q.rules)], reps=1, concurrency=1,
+               runs_root=tmp_path / "runs", progress=lambda *_: None)
+    return Question("Q008", QTEXT + "改", refs=[[[42]]], rules=Q.rules)      # the wording changed since
+
+
+def test_rescore_refuses_a_changed_question_by_default(tmp_path):
+    from harness import rescore as RS
+    changed = _rescore_source(tmp_path)
+    with pytest.raises(ValueError, match="question text changed"):
+        RS.rescore("src", "SQL-L1", "src-rescore", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
+                   questions={"Q008": changed}, commit="evalnew")
+    assert not (tmp_path / "runs" / "src-rescore").exists()
+    import inspect                               # off unless the caller opts in (CLI: --allow-changed-question)
+    assert inspect.signature(RS.rescore).parameters["allow_changed"].default is False
+
+
+def test_rescore_scores_a_changed_question_only_when_allowed_and_marks_it(tmp_path):
+    from harness import rescore as RS
+    changed = _rescore_source(tmp_path)
+    path = RS.rescore("src", "SQL-L1", "src-rescore", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
+                      questions={"Q008": changed}, commit="evalnew", allow_changed=True)
+    rec = json.loads(path.read_text(encoding="utf-8"))
+    assert rec["question_changed"] is True
+    assert rec["final"]["outcome"] == "correct" and rec["first"] == "correct"
+    assert rec["question_sha256"] == R.sha256(QTEXT)  # the line keeps the wording it answered
+    unchanged = RS.rescore("src", "SQL-L1", "src-rescore-2", runs_root=tmp_path / "runs",
+                           raw_root=tmp_path / "raw", questions={"Q008": Question("Q008", QTEXT, refs=[[[42]]],
+                                                                                  rules=Q.rules)},
+                           commit="evalnew", allow_changed=True)
+    assert "question_changed" not in json.loads(unchanged.read_text(encoding="utf-8"))
+
 # ---------------------------------------------------------------------------
 # T12: fingerprint guard, fixed bank tag, pilot sample
 
@@ -927,3 +964,20 @@ def test_semantic_tag_is_checked_against_this_repo():
         pytest.skip("tag semantic-v1.1 not fetched")
     with pytest.raises(SemanticVersionError, match="differ from semantic-v1.1"):
         verify_semantic_tag("semantic-v1.1", [], root=REPO, contexts_dir=CONTEXTS)
+
+
+def test_final_rescore_swaps_a_key_only_for_its_own_entity_name():
+    """T12 final rescore: a key stands in for the name of the same entity, never for
+    another entity's name (swapping a selection group column made the scorer search
+    without end); dropping convention columns also drops their rank rules."""
+    from scripts.t12_final_rescore import key_variants, without
+    header = ["StoreName", "ProductName", "product_sales", "pct_of_store", "ProductKey", "store_total_sales", "rank"]
+    rules = {"ordered": False, "top_n": None, "required_columns": [0, 1, 3, 5, 6], "identifier_columns": [4],
+             "value_kinds": ["other", "other", "amount", "percentage", "other", "amount", "other"],
+             "value_types": ["String", "Nullable(String)", "Float64", "Nullable(Float64)", "Int32", "Float64", "UInt64"],
+             "rank_columns": [6], "rankings": [{"column": 6}]}
+    assert [v["required_columns"] for v in key_variants(rules, header)] == [[0, 4, 3, 5, 6]]
+    relaxed = without(rules, [5, 6])
+    assert relaxed["required_columns"] == [0, 1, 3] and "rank_columns" not in relaxed and "rankings" not in relaxed
+    assert without(rules, []) is rules
+    assert key_variants({**rules, "identifier_columns": [0]}, ["t.StoreKey", "StoreName", "x", "y", "z", "w", "v"]) == []

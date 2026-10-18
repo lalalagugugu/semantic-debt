@@ -1,0 +1,160 @@
+# T12 final rescore: hand verdicts on top of scripts/t12_final_rescore.py.
+#
+# Keys are "<model> <cell> <qid> <rep>". Only question ids, categories and short
+# evidence; no question text, no rows. Read by scripts/t12_final_report.py.
+#
+# presentation: answers that are still wrong after the generic relaxations but whose
+#   content was checked by hand and found right; they count correct under 「最终」
+#   (old system prompt; names-required-by-system-prompt §2.3 / §3, ux-conventions §1.4).
+#   kind: 季度写法 / 标签改写 / 宽表 / 约定列（变化量只给了一种）
+# attribution: every answer that is still not correct under 「最终」 (wrong, exec_error,
+#   refused), one category each:
+#   SQL 真错 / 语义层差距 / 指令遵循 / 参考问题 / 执行错误/超时/拒答
+#   On SQL-R, 语义层差距 is reported as 「缺约定（档位差距）」: the convention is in L1,
+#   not in R. 参考问题 with note 「题面歧义」 marks a wording that reads two ways.
+
+presentation:
+  # Q66: eval-v1.1 writes quarters as Q1–Q4; these answers return 1–4 with every amount right.
+  deepseek-flash SQL-L1 Q66 2: {kind: 季度写法, note: "季度写成 1–4，参考 Q1–Q4；4 个季度的折扣金额全对"}
+  deepseek-flash SQL-R Q66 1: {kind: 季度写法, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q66 1: {kind: 季度写法, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q66 2: {kind: 季度写法, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q66 3: {kind: 季度写法, note: "同上"}
+  # Q68 (low discrimination): IsHoliday Yes/No rewritten as 节假日/非节假日.
+  deepseek-flash SQL-L1 Q68 1: {kind: 标签改写, note: "Yes/No 写成 节假日/非节假日；订单数、营收全对"}
+  deepseek-flash SQL-R Q68 2: {kind: 标签改写, note: "同上"}
+  deepseek-flash SQL-R Q68 3: {kind: 标签改写, note: "同上"}
+  # Q17 (low discrimination): WeekEnd/WorkDay rewritten, or one wide row.
+  deepseek-flash SQL-L1 Q17 3: {kind: 标签改写, note: "WeekEnd/WorkDay 写成 周末/节假日、工作日；占比 28.47/71.53 全对"}
+  deepseek-flash SQL-R Q17 1: {kind: 标签改写, note: "写成 周末/工作日；全渠道口径，占比 28.5/71.5 落在评分器容差内"}
+  deepseek-flash SQL-R Q17 3: {kind: 标签改写, note: "写成 Weekend/Weekday；占比全对"}
+  deepseek-v4-pro SQL-R Q17 1: {kind: 标签改写, note: "写成 周末/工作日，占比写成小数 0.285/0.715（评分器接受）；全渠道口径，落在容差内"}
+  deepseek-v4-pro SQL-R Q17 2: {kind: 标签改写, note: "写成 周末/工作日；全渠道口径，占比落在容差内"}
+  deepseek-flash SQL-R Q17 2: {kind: 宽表, note: "一行两列（周末占比、工作日占比）28.5/71.5，参考两行；落在容差内"}
+  deepseek-v4-pro SQL-R Q17 3: {kind: 宽表, note: "同上"}
+  # Q28: one wide row with both channels' average unit price.
+  deepseek-v4-pro SQL-R Q28 3: {kind: 宽表, note: "一行两列 238.67 / 214.10，与参考两行 Store / Online 一致"}
+  # Q50: 「增长了多少」 answered with the amount only; the percent is the #13 partner column.
+  deepseek-flash SQL-R Q50 1: {kind: 约定列（变化量只给了一种）, note: "只给增长额 -392,072,435.45，与参考增长额一致；百分比与增长额互为第 13 条的约定列，只看有没有"}
+  deepseek-v4-pro SQL-R Q50 3: {kind: 约定列（变化量只给了一种）, note: "同上"}
+
+attribution:
+  # ---------------- SQL-L1 ----------------
+  deepseek-flash SQL-L1 Q34 2: {category: SQL 真错, note: "只列 2009 年有销售的产品（2,504 行），漏了 4 个有库存、无销售、周转率为 0 的产品（eval-v1.1 已收）；其余数值一致"}
+  deepseek-flash SQL-L1 Q34 3: {category: 执行错误/超时/拒答, note: "修一次后仍引用 CTE 里不存在的 ProductKey（UNKNOWN_IDENTIFIER）"}
+  deepseek-v4-pro SQL-L1 Q34 3: {category: SQL 真错, note: "同 Flash r2 漏 4 个周转率为 0 的产品；另外只给键、没给名称（展示差异，不单独计）"}
+  deepseek-flash SQL-L1 Q49 1: {category: 语义层差距, note: "集团实体父键指向自身，L1 没写；按层级汇总时集团算两次（17,884,462,022.63 对 12,413,657,608.89）；另输出成按层级的 4 行合计"}
+  deepseek-flash SQL-L1 Q49 2: {category: 执行错误/超时/拒答, note: "递归 CTE 撞 1000 层上限（TOO_DEEP_RECURSION），根因同上：集团自环（语义层差距）"}
+  deepseek-flash SQL-L1 Q49 3: {category: 语义层差距, note: "420 行中 417 行一致，3 个集团因自环重复计算"}
+  deepseek-v4-pro SQL-L1 Q49 1: {category: 语义层差距, note: "集团金额对，但没有州的门店归进一个 N/A「州」，多 1 行；根因同上（层级结构 L1 没写全）"}
+  deepseek-v4-pro SQL-L1 Q49 2: {category: 语义层差距, note: "3 个集团因自环重复计算"}
+  deepseek-v4-pro SQL-L1 Q49 3: {category: 执行错误/超时/拒答, note: "修一次后仍引用子查询外不可见的 EntityKey（UNKNOWN_IDENTIFIER）"}
+  deepseek-flash SQL-L1 Q74 3: {category: 语义层差距, note: "按 L1 对 7 家渠道虚拟门店的描述只保留实体店（897 行，参考 925 行含虚拟门店）；L1 没说「按门店」是否含虚拟门店，调优候选"}
+  deepseek-v4-pro SQL-L1 Q74 2: {category: 语义层差距, note: "同上，StoreType = 'Store'，897 行"}
+  deepseek-v4-pro SQL-L1 Q71 3: {category: 语义层差距, note: "照 L1「保住总额用左连接」把缺失产品归为「未知品类」一组（9 行），eval-v1.1 参考已去掉这一组；左连接说明的适用范围不清，调优候选"}
+  deepseek-flash SQL-L1 Q76 3: {category: 语义层差距, note: "丢掉缺失产品那一组（8 行），参考保留为 NULL 品类；与 Q71 相反，同一条左连接说明的适用范围不清"}
+  deepseek-v4-pro SQL-L1 Q76 1: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q76 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q17 3: {category: 语义层差距, note: "照约定 4 用日均销售算占比（50.01/49.99），参考按合计（28.47/71.53）；约定 4 没说占比类问题不适用，调优候选"}
+  deepseek-flash SQL-L1 Q82 2: {category: SQL 真错, note: "dateDiff('year') 取整年，平均任期 10.01 对参考 10.83"}
+  deepseek-v4-pro SQL-L1 Q82 3: {category: 参考问题, note: "题面歧义：把「团队」理解为全部下级（含间接下属）算平均任期，参考只算直属下属；直属人数全对"}
+  deepseek-v4-pro SQL-L1 Q73 3: {category: 参考问题, note: "题面歧义：「差额」取 安全库存 − 当前库存（缺口最大），参考取 当前库存 − 安全库存；当前库存口径照约定 11，正确"}
+  deepseek-flash SQL-L1 Q117 1: {category: 执行错误/超时/拒答, note: "修一次后仍引用不存在的 StoreKey（UNKNOWN_IDENTIFIER）"}
+  deepseek-v4-pro SQL-L1 Q117 1: {category: 执行错误/超时/拒答, note: "同上"}
+  deepseek-flash SQL-L1 Q69 1: {category: 参考问题, note: "题目退化（低区分度，已标）：按 PromotionCategory 排除无折扣后只剩 1 行，作答改按促销名分组（9 行）；作答针对旧题面"}
+  deepseek-flash SQL-L1 Q69 2: {category: 参考问题, note: "同上"}
+  deepseek-flash SQL-L1 Q69 3: {category: 参考问题, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q69 1: {category: 参考问题, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q69 2: {category: 参考问题, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q69 3: {category: 参考问题, note: "同上（同时输出了促销名和类别）"}
+  # Q40 is a judge question: out of every denominator; listed in the judge section.
+  deepseek-flash SQL-L1 Q40 1: {category: 执行错误/超时/拒答, note: "judge 题，拒答：L1 写着汇率表用不上，且缺日汇率没有约定（semantic-v1.2 已改）"}
+  deepseek-flash SQL-L1 Q40 2: {category: 执行错误/超时/拒答, note: "同上"}
+  deepseek-flash SQL-L1 Q40 3: {category: 执行错误/超时/拒答, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q40 2: {category: 执行错误/超时/拒答, note: "同上"}
+  deepseek-v4-pro SQL-L1 Q40 3: {category: 执行错误/超时/拒答, note: "同上"}
+
+  # ---------------- SQL-R ----------------
+  deepseek-v4-pro SQL-R Q08 1: {category: 语义层差距, note: "IsSalesPerson 猜成 'True'，0 行；R 没有枚举值"}
+  deepseek-v4-pro SQL-R Q08 2: {category: 语义层差距, note: "IsSalesPerson 猜成 '1'，0 行；R 没有枚举值"}
+  deepseek-flash SQL-R Q15 2: {category: 语义层差距, note: "国家按门店地理归属（3 行），参考按客户国家（29 行）；R 没有这条约定"}
+  deepseek-v4-pro SQL-R Q15 1: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q15 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q15 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q28 1: {category: 语义层差距, note: "平均单价取 UnitPrice 简单平均（329.85/287.68），参考按 销售额 ÷ 数量；另为宽表"}
+  deepseek-flash SQL-R Q28 2: {category: 语义层差距, note: "同上（简单平均）"}
+  deepseek-flash SQL-R Q28 3: {category: 语义层差距, note: "同上（简单平均）"}
+  deepseek-v4-pro SQL-R Q28 2: {category: 语义层差距, note: "线上取 FactOnlineSales（216.98），参考取全渠道表的 Online 渠道（214.10）"}
+  deepseek-flash SQL-R Q34 1: {category: 语义层差距, note: "内连接产品表丢掉缺失产品（2,220 行）；缺失产品与左连接的说明在 L1"}
+  deepseek-flash SQL-R Q34 2: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q34 3: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q34 1: {category: 语义层差距, note: "同上（2,220 行）"}
+  deepseek-v4-pro SQL-R Q34 2: {category: 语义层差距, note: "同上（2,220 行）"}
+  deepseek-v4-pro SQL-R Q34 3: {category: 语义层差距, note: "同上（2,233 行）"}
+  deepseek-flash SQL-R Q49 1: {category: 语义层差距, note: "只输出门店级 306 行，没有沿实体树上卷；层级结构说明在 L1"}
+  deepseek-flash SQL-R Q49 2: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q49 3: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q49 1: {category: 语义层差距, note: "同上（另把线上与全渠道销售相加）"}
+  deepseek-v4-pro SQL-R Q49 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q49 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q66 3: {category: 语义层差距, note: "未说明渠道时用了全渠道表；约定 1（默认线上）在 L1"}
+  deepseek-v4-pro SQL-R Q66 1: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q66 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q66 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q68 1: {category: 语义层差距, note: "IsHoliday 猜成 'Holiday'，只剩 1 行；R 没有枚举值"}
+  deepseek-flash SQL-R Q69 1: {category: 语义层差距, note: "保留了无折扣一行（2 行）；约定 10（排除无折扣）在 L1。题目已标低区分度，作答针对旧题面"}
+  deepseek-flash SQL-R Q69 2: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q69 3: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q69 1: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q69 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q69 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q70 3: {category: 语义层差距, note: "把全渠道表和线上表相加，线上重复计算；两表关系在 L1"}
+  deepseek-flash SQL-R Q73 2: {category: 语义层差距, note: "当前库存取全表最新日期的快照，参考按约定 11 取每个门店 × 产品最近一次快照"}
+  deepseek-flash SQL-R Q73 3: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q73 1: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q73 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q73 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q74 1: {category: 语义层差距, note: "内连接产品表丢掉缺失产品（918 行），部分门店前 3 名随之改变"}
+  deepseek-flash SQL-R Q74 2: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q74 3: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q74 3: {category: 语义层差距, note: "用线上表（9 行），按门店的问题应走全渠道（约定 2 在 L1）"}
+  deepseek-v4-pro SQL-R Q75 3: {category: 语义层差距, note: "消费额按扣退货的净额，1,488 行对参考 1,470 行；消费额口径在 L1"}
+  deepseek-flash SQL-R Q76 1: {category: 语义层差距, note: "丢掉缺失产品那一组（8 行）；左连接说明在 L1"}
+  deepseek-flash SQL-R Q76 2: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q76 3: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q76 1: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q76 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q76 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q80 2: {category: 语义层差距, note: "只算 SalesQuantity > 0 的行（988.14 对 988.28）；「全部行均算交易」的约定在 L1"}
+  deepseek-flash SQL-R Q81 3: {category: 语义层差距, note: "终身价值扣了退货（142,511.02 对 144,060.93）；口径在 L1"}
+  deepseek-v4-pro SQL-R Q81 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q82 1: {category: 语义层差距, note: "入职年限算到今天（27 年左右），约定 3 以 2009-12-31 为今天"}
+  deepseek-flash SQL-R Q82 2: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q82 3: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q82 1: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q82 2: {category: 语义层差距, note: "同上"}
+  deepseek-v4-pro SQL-R Q82 3: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q100 3: {category: SQL 真错, note: "用近似分位函数 quantile(0.9) 定门槛，109 行；同单元 r1 用 quantileExact 得 108 行"}
+  deepseek-flash SQL-R Q102 1: {category: 语义层差距, note: "全渠道表、内连接丢缺失产品（8 行）；约定 1 与缺失产品说明在 L1"}
+  deepseek-flash SQL-R Q102 2: {category: 语义层差距, note: "同上"}
+  deepseek-flash SQL-R Q102 3: {category: 语义层差距, note: "「今年」按当前自然年，0 行；约定 3 在 L1"}
+  deepseek-v4-pro SQL-R Q102 1: {category: 语义层差距, note: "全渠道表、另扣折扣、内连接（8 行）"}
+  deepseek-v4-pro SQL-R Q102 2: {category: 语义层差距, note: "「今年」按当前自然年，0 行"}
+  deepseek-v4-pro SQL-R Q102 3: {category: 语义层差距, note: "同上"}
+
+# Why answers wrong under the pilot's own verdict (eval-v1, scorer before #91) are
+# correct under strict (eval-v1.1 + #91), per question. Correct -> wrong changes get
+# their reason per answer in the report (from the relaxations and the hand verdicts).
+pilot_to_strict:
+  Q34: "参考补收 4 个有库存、无销售、周转率为 0 的产品（eval-v1.1）"
+  Q50: "必答列只剩增长率与增长额（两年销售额不再必答），参考补了增长额"
+  Q66: "季度统一写成 Q1–Q4，作答正用这种写法"
+  Q70: "必答列：没问的门店数不再必答"
+  Q71: "参考删去 NULL 品类那一行"
+  Q75: "必答列：增长率不再必答（只比姓名与客户键）"
+  Q76: "空值参考标签可匹配不冲突的字符串（#91）"
+  Q80: "必答列：没问的客户数不再必答"
+  Q81: "必答列：没问的终身价值总额不再必答"
+  Q82: "名、姓相邻两列可拼成全名（#91）；职位不再必答"
+  Q100: "参考补客户键并标为必答（姓名是占位值）"
+  Q102: "空值参考标签可匹配不冲突的字符串（#91）"

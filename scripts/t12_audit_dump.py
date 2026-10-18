@@ -2,7 +2,10 @@
 first rows, and every pilot attempt's final verdict, columns and first rows (from
 runs-raw). Read-only; no model call, no query execution.
 
-    uv run python scripts/t12_audit_dump.py Q82 [--sql]
+    uv run python scripts/t12_audit_dump.py Q82 [--sql] [--rescored] [--only flash:SQL-L1]
+
+``--rescored`` reads the verdicts of the final rescore runs (``<run>-rescore-01``)
+instead of the pilot's own.
 """
 import sys; from pathlib import Path; sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import json, os, warnings
@@ -12,6 +15,8 @@ qs = {q.qid: q for q in load_questions(lang="zh")}
 RAW = Path(os.environ["SEMDEBT_DATA_DIR"]) / "runs-raw"
 RUNS = {"flash": "20261018-T12-pilot-flash-01", "pro": "20261018-T12-pilot-pro-01"}
 qid = sys.argv[1]; show_sql = "--sql" in sys.argv; nrows = 4
+only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
+suffix = "-rescore-01" if "--rescored" in sys.argv else ""
 q = qs[qid]
 print("RULES", json.dumps(q.rules, ensure_ascii=False))
 if q.ref_rules: print("REF_RULES", json.dumps(q.ref_rules, ensure_ascii=False))
@@ -19,7 +24,8 @@ for i, ref in enumerate(q.refs or []):
     print(f"REF{i}: {len(ref)} rows; first {ref[:nrows]}")
 for m, run in RUNS.items():
     for cell in ("SQL-R", "SQL-L1"):
-        for line in open(Path(__file__).resolve().parent.parent / "runs" / run / f"{cell}.jsonl"):
+        if only and only != f"{m}:{cell}": continue
+        for line in open(Path(__file__).resolve().parent.parent / "runs" / (run + suffix) / f"{cell}.jsonl"):
             r = json.loads(line)
             if r["qid"] != qid: continue
             t = r["turns"][-1]; e = t["exec"]

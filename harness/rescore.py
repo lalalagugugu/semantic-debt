@@ -15,9 +15,13 @@ Each line is the source line with ``run_id``, ``eval_commit``, ``first`` and
 holding the source run id, its eval commit, and its ``first`` / ``final``.
 Lines of the source that are not ``status: done`` are not carried over. A line
 whose ``question_sha256`` (logged since 2026-10-16) differs from the current
-question text is refused: the answer belongs to a different question. Logs from
+question text is refused: the answer belongs to a different question. Only an
+explicit ``--allow-changed-question`` scores such lines anyway, against the
+current references, and marks them ``question_changed: true`` so that reports
+list them apart (used once: Q69 in the T12 final rescore). Logs from
 before that field must be checked by hand (done for the T11 smoke run: Q02 and
 Q101 have identical text, SQL and reference CSV in eval 4f13cb7 and 491ef16).
+``--eval-tag`` refuses to start unless the bank is exactly that tag's content.
 
     uv run python -m harness.rescore --source 20261016-T11-smoke-01 --cell SQL-L1 \\
         --run-id 20261016-T11-smoke-01-rescore-01
@@ -35,7 +39,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from harness import run_direct as R  # noqa: E402
-from harness.questions import Question, eval_commit, load_questions  # noqa: E402
+from harness.questions import EvalVersionError, Question, eval_commit, load_questions, verify_eval_tag  # noqa: E402
 from harness.scorer import REFUSAL, ExecError  # noqa: E402
 
 
@@ -56,15 +60,17 @@ def candidate_of(turn: dict, raw_dir: Path, qid: str, rep: int):
     return payload["rows"]
 
 
-def rescore_line(rec: dict, q: Question, raw_dir: Path, run_id: str, commit: str) -> dict:
-    if "question_sha256" in rec and rec["question_sha256"] != R.sha256(q.text):
+def rescore_line(rec: dict, q: Question, raw_dir: Path, run_id: str, commit: str,
+                 allow_changed: bool = False) -> dict:
+    changed = "question_sha256" in rec and rec["question_sha256"] != R.sha256(q.text)
+    if changed and not allow_changed:
         raise ValueError(f"{rec['qid']}: the question text changed since run {rec['run_id']}; "
                          "its answers cannot be re-scored against the current question")
     turns = rec["turns"]
     first = candidate_of(turns[0], raw_dir, rec["qid"], rec["rep"])
     last = candidate_of(turns[-1], raw_dir, rec["qid"], rec["rep"])
     last_exec = turns[-1]["exec"]
-    return {
+    out = {
         **rec,
         "run_id": run_id,
         "eval_commit": commit,
@@ -76,10 +82,14 @@ def rescore_line(rec: dict, q: Question, raw_dir: Path, run_id: str, commit: str
                           "rescored_at": datetime.now(R.BEIJING).isoformat(timespec="seconds"),
                           "harness_commit": R.harness_commit()},
     }
+    if changed:
+        out["question_changed"] = True         # answered an older wording; report apart
+    return out
 
 
 def rescore(source: str, cell: str, run_id: str, runs_root: Path | None = None, raw_root: Path | None = None,
-            questions: dict[str, Question] | None = None, commit: str | None = None) -> Path:
+            questions: dict[str, Question] | None = None, commit: str | None = None,
+            allow_changed: bool = False) -> Path:
     src = R.log_path(source, cell, runs_root)
     dst = R.log_path(run_id, cell, runs_root)
     if dst.exists():
@@ -89,7 +99,7 @@ def rescore(source: str, cell: str, run_id: str, runs_root: Path | None = None, 
     commit = commit or eval_commit()
     raw_dir = (raw_root or R.raw_root()) / source / cell
     lines = [json.loads(l) for l in src.read_text(encoding="utf-8").splitlines() if l.strip()]
-    out = [rescore_line(rec, questions[rec["qid"]], raw_dir, run_id, commit)
+    out = [rescore_line(rec, questions[rec["qid"]], raw_dir, run_id, commit, allow_changed)
            for rec in lines if rec.get("status") == "done"]
     dst.parent.mkdir(parents=True, exist_ok=True)
     with dst.open("x", encoding="utf-8") as fh:
@@ -103,10 +113,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--source", required=True, help="run id to re-score")
     ap.add_argument("--cell", required=True)
     ap.add_argument("--run-id", required=True, help="new run id (a new directory under runs/)")
+    ap.add_argument("--eval-tag", help="refuse to start unless the bank is exactly this tag's content")
+    ap.add_argument("--allow-changed-question", action="store_true",
+                    help="score lines whose question text changed since the source run "
+                         "(marked question_changed); off by default")
     args = ap.parse_args(argv)
-    path = rescore(args.source, args.cell, args.run_id)
+    if args.eval_tag:
+        try:
+            print(f"question bank: {args.eval_tag} = {verify_eval_tag(args.eval_tag)[:7]}")
+        except EvalVersionError as exc:
+            print(f"refusing to start: {exc}", file=sys.stderr)
+            return 2
+    path = rescore(args.source, args.cell, args.run_id, allow_changed=args.allow_changed_question)
     for rec in map(json.loads, path.read_text(encoding="utf-8").splitlines()):
-        print(f"{rec['qid']} r{rec['rep']}: {rec['rescored_from']['final']['outcome']} -> {rec['final']['outcome']}")
+        mark = "  (question changed)" if rec.get("question_changed") else ""
+        print(f"{rec['qid']} r{rec['rep']}: {rec['rescored_from']['final']['outcome']} -> {rec['final']['outcome']}{mark}")
     print(json.dumps(R.summarize(path), ensure_ascii=False, indent=2))
     return 0
 
