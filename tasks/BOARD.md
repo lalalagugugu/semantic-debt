@@ -35,6 +35,8 @@
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
+| T21 | 规划 agent（-P）：dsh 接同一份语义层，L0、L1 + 对照「dsh 只开 run_sql」 | Claude Code | 普通 | 可行性验证：`harness-agent-v1.1`；开跑：T15 的 L0-E、L1-E 全量 | 验证 ≤ 1 元；单元上限待估 | 卡片已起草（2026-10-19，`decisions/2026-10-19-t15-1-midreport-dsh.md`） |
+| T19a | SQL 线中期报告（T13、T14、T15 的 L0-E/L1-E、T21；T16 与 L2-E 赶上就纳入）；数字由 Codex 照 T20 复核 | Claude Code + 用户；复核 Codex | 普通 | T13 重评、T14、T15、T21 | 0 | 未开始；排在 DAX 线之前 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
 ## 当前进行中与待办（2026-10-16，T05b 开工后刷新）
