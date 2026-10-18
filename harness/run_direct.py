@@ -12,7 +12,10 @@ Raw responses  $SEMDEBT_DATA_DIR/runs-raw/<run-id>/<cell>/   full API responses 
 The question bank is read only from a fixed tag (``--eval-tag``, default
 ``eval-v1``): ``$SEMDEBT_EVAL_DIR`` must be a clean checkout of exactly that tag,
 otherwise nothing starts (dry run included). ``--pilot`` restricts to T06's pilot
-sample. If one requested model answers with a second ``system_fingerprint`` within
+sample. The semantic layer must be the content of a fixed tag too (``--semantic-tag``,
+default ``semantic-v1.2``): ``semantic/`` and ``render/`` equal the tag's tree and every
+built context the run sends is freshly rendered from them (harness/semantic_version.py).
+If one requested model answers with a second ``system_fingerprint`` within
 a run, the run stops (decisions/2026-10-17-model-version-fingerprint.md).
 
 Resuming: rerunning the same run-id only runs (question, rep) pairs that have no
@@ -134,6 +137,7 @@ class RunContext:
     raw_dir: Path
     limits: dict | None = None      # global resource caps, logged with every attempt
     eval_tag: str | None = None     # the bank tag eval_commit was verified against
+    semantic_tag: str | None = None  # the semantic-layer tag the contexts were verified against
 
 
 def _candidate(parsed: P.Parsed, result: ExecResult | None):
@@ -230,6 +234,7 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
     base = {
         "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep, "question_sha256": sha256(q.text),
         "eval_commit": ctx.eval_commit, **({"eval_tag": ctx.eval_tag} if ctx.eval_tag else {}),
+        **({"semantic_tag": ctx.semantic_tag} if ctx.semantic_tag else {}),
         "harness_commit": ctx.harness_commit,
         "model_requested": ctx.client.model, "system_sha256": sha256(ctx.system),
         "exec_timeout_s": ctx.timeout_s, "exec_limits": ctx.limits, "scoring": q.scoring, "started_at": started.isoformat(timespec="seconds"),
@@ -547,6 +552,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--eval-tag", default="eval-v1",
                     help="the question bank must be a clean checkout of this tag (BOARD item 13)")
+    ap.add_argument("--semantic-tag", default="semantic-v1.2",
+                    help="semantic/ and render/ must be this tag's content and build/contexts rendered from them")
     ap.add_argument("--limit", type=int, help="first N questions only")
     ap.add_argument("--dry-run", action="store_true", help="count calls and estimate cost; no API call")
     ap.add_argument("--budget", type=float, help="CNY; refuse to start if the estimate exceeds it")
@@ -591,6 +598,15 @@ def main(argv: list[str] | None = None, load=None) -> int:
             print(f"refusing to start: {exc}")
             return 2
         print(f"question bank: {args.eval_tag} = {eval_full}")
+        from harness.semantic_version import SemanticVersionError, verify_semantic_tag
+
+        built = [c.context.partition(":")[2] for c in cells if c.context.startswith("build:")]
+        try:
+            sem_full = verify_semantic_tag(args.semantic_tag, built, root=REPO, contexts_dir=CONTEXTS)
+        except SemanticVersionError as exc:
+            print(f"refusing to start: {exc}")
+            return 2
+        print(f"semantic layer: {args.semantic_tag} = {sem_full}")
     load = load or load_questions
     pilot = pilot_ids() if args.pilot else None
     if pilot is not None and any(c.lang != "zh" for c in cells):
@@ -622,7 +638,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
                          system=system_for(cell), eval_commit=commit, harness_commit=harness_commit(),
                          timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name,
                          limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
-                         eval_tag=args.eval_tag)
+                         eval_tag=args.eval_tag, semantic_tag=args.semantic_tag)
         path = run_cell(ctx, by_lang[cell.lang], args.reps, args.concurrency, guard=guard)
         print(json.dumps(summarize(path), ensure_ascii=False, indent=2))
         if guard.conflict:

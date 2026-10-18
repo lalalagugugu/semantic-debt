@@ -859,3 +859,70 @@ def test_bank_must_be_the_clean_tag(tmp_path):
     subprocess.run(["git", "-C", str(root), "checkout", "-q", "HEAD~1"], check=True)
     with pytest.raises(EvalVersionError, match="is not eval-v1"):
         verify_eval_tag("eval-v1", root)
+
+
+def test_semantic_layer_must_be_the_tag_content(tmp_path):
+    """--semantic-tag: semantic/ and render/ equal the tag's tree (HEAD may move on), contexts fresh."""
+    import subprocess
+
+    from harness.semantic_version import SemanticVersionError, verify_semantic_tag
+
+    root = tmp_path / "repo"
+
+    def git(*a):
+        subprocess.run(["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", *a],
+                       check=True, capture_output=True)
+    for rel, text in {"semantic/source.yaml": "a: 1\n", "render/context.py": "x = 1\n", "harness/h.py": "h = 1\n"}.items():
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text(text, encoding="utf-8")
+    git("init", "-q")
+    git("add", ".")
+    git("commit", "-qm", "v")
+    git("tag", "semantic-v9")
+    contexts = root / "build" / "contexts"
+    contexts.mkdir(parents=True)
+    (contexts / "SQL-L1.yaml").write_text("ctx a=1\n", encoding="utf-8")
+    render = lambda name: "ctx a=1\n" if name == "SQL-L1" else ""   # noqa: E731
+    check = lambda: verify_semantic_tag("semantic-v9", ["SQL-L1.yaml"], root=root, contexts_dir=contexts,  # noqa: E731
+                                        render=render)
+
+    full = check()
+    assert len(full) == 40
+    (root / "harness" / "h.py").write_text("h = 2\n", encoding="utf-8")      # harness work after the tag is fine
+    git("commit", "-qam", "harness")
+    assert check() == full
+    with pytest.raises(SemanticVersionError, match="not found"):
+        verify_semantic_tag("semantic-v8", [], root=root, contexts_dir=contexts, render=render)
+    (root / "semantic" / "source.yaml").write_text("a: 2\n", encoding="utf-8")   # unstaged edit
+    with pytest.raises(SemanticVersionError, match="differ from semantic-v9"):
+        check()
+    git("commit", "-qam", "edit semantic after the tag")                      # committed edit
+    with pytest.raises(SemanticVersionError, match="semantic/source.yaml"):
+        check()
+    git("revert", "--no-edit", "HEAD")
+    assert check() == full
+    (root / "render" / "new.py").write_text("", encoding="utf-8")             # untracked renderer file
+    with pytest.raises(SemanticVersionError, match="render/new.py"):
+        check()
+    (root / "render" / "new.py").unlink()
+    (contexts / "SQL-L1.yaml").write_text("ctx a=0\n", encoding="utf-8")        # stale build
+    with pytest.raises(SemanticVersionError, match="stale"):
+        check()
+    (contexts / "SQL-L1.yaml").unlink()
+    assert check() == full      # not built: left to system_for (the dry run shows "no context")
+
+
+def test_semantic_tag_is_checked_against_this_repo():
+    """The real repo: rendering is deterministic, and semantic-v1.1 is not the current content (v1.2 changed it)."""
+    import subprocess
+
+    from harness.cells import CONTEXTS, REPO
+    from harness.semantic_version import SemanticVersionError, render_context, verify_semantic_tag
+
+    assert render_context("SQL-R") == render_context("SQL-R")
+    has = subprocess.run(["git", "-C", str(REPO), "rev-parse", "-q", "--verify", "refs/tags/semantic-v1.1"],
+                         capture_output=True).returncode == 0
+    if not has:
+        pytest.skip("tag semantic-v1.1 not fetched")
+    with pytest.raises(SemanticVersionError, match="differ from semantic-v1.1"):
+        verify_semantic_tag("semantic-v1.1", [], root=REPO, contexts_dir=CONTEXTS)
