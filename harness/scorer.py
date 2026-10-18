@@ -585,9 +585,12 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
         columns = _comparison_columns(reference[0], rules)
         visible_identity = [i for i in identity_columns if i in columns]
         reason = "selection_values"
+        buckets = defaultdict(list)
+        for ref in reference:
+            buckets[_row_bucket(ref,tuple(range(len(columns))),rules,candidate=False)].append(ref)
         for mapping in permutations(range(len(candidate[0])), len(columns)):
             candidate_identity = [mapping[columns.index(i)] for i in visible_identity]
-            choices = [tuple(ref for ref in reference
+            choices = [tuple(ref for ref in buckets.get(_row_bucket(row,mapping,rules,candidate=True),())
                              if all(identity(row, [c]) == identity(ref, [i]) or _label_matches(row[c], ref[i], i, rules) for c,i in zip(candidate_identity,visible_identity))
                              and _rows_equal(row, ref, mapping, rules)) for row in candidate]
             if not all(choices):
