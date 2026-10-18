@@ -123,5 +123,5 @@ Pro 的错判里 `missing_columns`（候选少了参考的某列）占大头：S
 - [x] 模型：Flash（2026-10-18，`decisions/2026-10-18-reference-columns-asked-only.md` 第四节）→ 改为 G3 时按最终重评定（`decisions/2026-10-18-judge-stratum-and-t12-audit.md` 第二节）
 - [x] judge 题单列一档、不进分母（同一文件第一节）：本文件与 `reports/T12-pilot.md` 已重算
 - [x] T12-1：只按题目问到的列判分，参考标 `required_columns`（同一文件第一至三节）
-- [ ] 离线重评（等评分器支持 `required_columns` 与 `eval-v1.1` 冻结）→ 两种口径对比补进本文件
-- [ ] G3：冻结系统提示与评分，打 `harness-v1`（重评之后）
+- [x] 离线重评（#95）→ 见上「最终重评」一节
+- [x] G3：选 Flash，冻结系统提示与评分（`decisions/2026-10-18-g3-passed.md`）；`harness-v1` 在英文锚点修复合并后打
