@@ -50,7 +50,7 @@ TOOLS = [{
 LIMIT_REACHED = f"已达到 {TOOL_NAME} 的调用上限（{MAX_TOOL_CALLS} 次），本次未执行。请直接按作答要求输出最终答案。"
 # Sent once, as a user message, right before the forced answer (tool_choice "none") whenever the
 # calls are used up, whether the last one ran normally or a reply asked for more than remained
-# (decisions/2026-10-19-t15-1-tool-limit-message.md, harness-agent-v1.1).
+# (decisions/2026-10-19-t15-1-midreport-dsh.md section 1, harness-agent-v1.1).
 TOOLS_EXHAUSTED = f"{TOOL_NAME} 次数已用完，请直接按作答要求输出最终答案。"
 BAD_ARGUMENTS = f"调用参数无法解析：参数应为 JSON 对象 {{\"query\": \"<一条 SELECT 查询>\"}}。本次未执行。"
 UNKNOWN_TOOL = f"没有这个工具；可用的工具只有 {TOOL_NAME}。本次未执行。"
