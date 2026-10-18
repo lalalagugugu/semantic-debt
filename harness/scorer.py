@@ -68,7 +68,7 @@ class _Rules:
     selection: Mapping[str, object] | None = None
     order_by: tuple[tuple[int, bool], ...] = ()
     required_columns: tuple[int, ...] | None = None
-    label_values: tuple[frozenset[str] | None, ...] = ()
+    label_values: tuple[frozenset[object] | None, ...] = ()
     unordered_pairs: tuple[tuple[tuple[int, ...], tuple[int, ...]], ...] = ()
 
 
@@ -335,14 +335,14 @@ def _reference_labels(reference: Rows, rules: _Rules) -> _Rules:
         values = [row[i] for row in reference]
         is_string = ("String" in rules.value_types[i] if rules.value_types else any(isinstance(v, str) for v in values))
         wildcard = is_string and any(v is None or isinstance(v, str) and not v.strip() for v in values)
-        labels.append(frozenset(v.strip() for v in values if isinstance(v, str) and v.strip()) if wildcard else None)
+        labels.append(frozenset(_nonnumeric_bucket(v) for v in values if isinstance(v, str) and v.strip()) if wildcard else None)
     return replace(rules, label_values=tuple(labels))
 
 
 def _label_matches(value: Cell, expected: Cell, column: int, rules: _Rules) -> bool:
     labels = rules.label_values[column] if rules.label_values else None
     return (labels is not None and (expected is None or isinstance(expected, str) and not expected.strip())
-            and isinstance(value, str) and value.strip() not in labels)
+            and isinstance(value, str) and _nonnumeric_bucket(value) not in labels)
 
 
 def _candidate_forms(candidate: Rows, minimum_width: int) -> Iterator[Rows]:
@@ -657,9 +657,19 @@ def _rows_match_subset(candidate: Rows, reference: Rows, mapping: tuple[int, ...
 def _row_bucket(row: Row, mapping: tuple[int, ...], rules: _Rules, *, candidate: bool) -> tuple[object, ...]:
     pair_columns = {i for pair in rules.unordered_pairs for side in pair for i in side}
     columns = rules.required_columns if rules.required_columns is not None else tuple(range(len(mapping)))
-    values = (row[mapping[position]] if candidate else row[i] for position,i in enumerate(columns)
-              if i not in pair_columns and (not rules.label_values or rules.label_values[i] is None))
-    return tuple(_nonnumeric_bucket(value) for value in values if not _is_numeric(value))
+    bucket = []
+    for position,i in enumerate(columns):
+        if i in pair_columns:
+            continue
+        value = row[mapping[position]] if candidate else row[i]
+        if _is_numeric(value):
+            continue
+        key = _nonnumeric_bucket(value)
+        labels = rules.label_values[i] if rules.label_values else None
+        if labels is not None and (value is None or isinstance(value,str)) and key not in labels:
+            key = ('empty_reference_label',)
+        bucket.append(key)
+    return tuple(bucket)
 
 
 def _calendar_date(value: Cell) -> date | None:

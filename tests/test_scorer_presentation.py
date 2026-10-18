@@ -109,3 +109,11 @@ def test_zero_group_rule_does_not_relax_top_n_quota():
     metadata = rules(['String','UInt64'],value_kinds=['other','count'],ordered=True,top_n=2,
                      tie_columns=[1],order_by=[{'column':1,'descending':True}])
     assert score([['A',1]], [[['A',1],['B',0]]], metadata) == 'wrong'
+
+
+
+def test_label_conflicts_respect_date_normalization():
+    metadata = rules(['Nullable(String)','Int64'])
+    ref = [[None,10],['2008-01-01',20]]
+    assert score([['2008-01-01 00:00:00',10],['2008-01-01',20]], [ref], metadata) == 'wrong'
+    assert score([['Unknown',10],['2008-01-01 00:00:00',20]], [ref], metadata) == 'correct'

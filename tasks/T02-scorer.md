@@ -130,6 +130,6 @@
 
 - 状态：实现和合成测试完成，待PR合并；不改提示或题库，不冻结harness-v1。
 - 产出：harness/scorer.py、tests/test_scorer_presentation.py、reports/validation/presentation_scorer.md。空标签不冲突匹配、原相邻名姓拼接、日期与同日零点、双向可省略零计数组；无序对象对供题库规则显式声明。零计数的其余必答数值必须0/NULL，非零金额反例通过。
-- 验证：全套350 passed、23 skipped，未打开数据库；600条/T12复验待后续。
+- 验证：全套351 passed、23 skipped，未打开数据库；600条/T12复验待后续。
 - 用户澄清：既有列同样受必答列新定义约束；零组以全部必答数值为边界，不放宽非零事实。
 - 无模型调用或新依赖；工时未单独计时。
