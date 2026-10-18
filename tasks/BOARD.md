@@ -29,7 +29,7 @@
 | **G3** | **检查点：模型选定，系统提示与评分冻结（tag `harness-v1`）** | 用户 | — | T12 | — | **✅ 通过（2026-10-18）**：选 Flash（`e72d3c7f…`）；tag `harness-v1` 在 `6516fcc`（#87、#90、#91、#97）；英文锚点第一期不跑；见 `decisions/2026-10-18-g3-passed.md` |
 | T13 | SQL 直答全量（6 个中文单元；英文锚点第一期不跑，G3 第三节） | Claude Code | 普通 | G3 | 80 / 250 元 | 运行完成（2026-10-18，6 × 366 条齐全，24.80 元，指纹唯一）；Q79 打分卡死后运行器改为限时打分（PR #100）；报告暂定，待 `harness-v1.1` 离线重评定稿 |
 | T14 | 调优（SQL-L1 调优；DAX-L2 调优同法） | Claude Code（A 普通，B 调优包） | 普通 / 调优包 | T13 | 15 / 50 元 | 未开始 |
-| T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | 搭建完成（2026-10-19，未调用模型）：`harness/run_agent.py`、工具说明 `harness/agent_prompt.py` 用户已同意冻结，合并后打 `harness-agent-v1`；`run_sql` 30 秒、最终查询 120 秒（用户裁决）；小样本已跑（0.67 元，L0-E 29.2%、L1-E 58.3%，暂定）；**T15-1 待裁决**：L0-E 用满 8 次后强制交卷有 10/24 条无查询；按实测全量 L0-E+L1-E 约 10 元 |
+| T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | 搭建完成（2026-10-19，未调用模型）：`harness/run_agent.py`、工具说明 `harness/agent_prompt.py` 用户已同意冻结，合并后打 `harness-agent-v1`；`run_sql` 30 秒、最终查询 120 秒（用户裁决）；小样本已跑（0.67 元，L0-E 29.2%、L1-E 58.3%，暂定）；T15-1（L0-E 用满 8 次后强制交卷有 10/24 条无查询）已裁决选 ③，`harness-agent-v1.1`（#115）；下一步重跑小样本 L0-E，全量（按实测约 10 元）等用户批准 |
 | T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | 搭建完成（2026-10-16，PR #41 已合并；第 1–3 步，四类指标双接口 14/14 通过）；实验待 G3 与 T13 完成 |
 | T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | 未开始（用家里那台 Windows，装 Claude Code 后按卡片首选做法执行） |
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
