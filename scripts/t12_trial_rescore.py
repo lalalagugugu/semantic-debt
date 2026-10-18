@@ -8,6 +8,13 @@ harness/rescore.py) and scores its final turn three ways:
   required   the same rules plus T05b's ``required_columns`` per reference
   upper      strict correct, or a match after projecting the reference onto a subset of
              its columns (scripts/t12_column_diagnostic.py; an upper bound, not a score)
+  names      (--identifier-names) as ``required``, but where T05b marked a key column
+             required and the object's name as a non-required alt_identifier, the name is
+             required instead (decisions/2026-10-18-reference-columns-asked-only.md §5)
+
+Judge questions are out of every denominator, refusals and exec errors included
+(decisions/2026-10-18-judge-stratum-and-t12-audit.md §1). ``--from-json`` re-prints
+the tables from a saved ``--json-out`` without re-scoring.
 
 Run against the scorer under test by putting its tree first on the path:
 
@@ -47,7 +54,17 @@ def ref_paths(root: Path) -> dict[str, list[str]]:
     return out
 
 
-def inject(q, paths: list[str], ann: dict[tuple[str, str], dict]):
+def names_for_keys(a: dict) -> list[int]:
+    """§5: the object's identifier is its name; swap a required key for its alt_identifier name."""
+    req = list(a["required_columns"])
+    alts = [n["position"] for n in a.get("non_required", []) if n.get("role") == "alt_identifier"]
+    keys = [i for i in req if a["columns"][i].split(".")[-1].endswith("Key")]
+    if alts and keys:
+        req = sorted((set(req) - {keys[0]}) | {alts[0]})
+    return req
+
+
+def inject(q, paths: list[str], ann: dict[tuple[str, str], dict], names: bool = False):
     """A copy of q whose per-reference rules carry T05b's required_columns."""
     if q.refs is None or q.rules is None:
         return q, "no refs/rules"
@@ -59,7 +76,7 @@ def inject(q, paths: list[str], ann: dict[tuple[str, str], dict]):
             new.append(own)
             continue
         r = copy.deepcopy(own if own is not None else q.rules)
-        r["required_columns"] = list(a["required_columns"])
+        r["required_columns"] = names_for_keys(a) if names else list(a["required_columns"])
         new.append(r)
         hit += 1
     return dataclasses.replace(q, ref_rules=new if any(x is not None for x in new) else None), f"{hit}/{len(paths)}"
@@ -98,8 +115,13 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--annotation", required=True)
     ap.add_argument("--json-out")
+    ap.add_argument("--from-json", help="re-print the tables from a saved --json-out")
+    ap.add_argument("--identifier-names", action="store_true", help="also score with names as identifiers (§5)")
     args = ap.parse_args()
     warnings.filterwarnings("ignore", message="rules missing required_columns")
+    if args.from_json:
+        saved = json.loads(Path(args.from_json).read_text(encoding="utf-8"))
+        return report(saved["rows"], saved["coverage"])
     annotation = json.loads(Path(args.annotation).read_text(encoding="utf-8"))
     ann = {(a["question_id"], a["ref"]): a for a in annotation["references"]}
     root = eval_dir()
@@ -121,13 +143,24 @@ def main() -> int:
                 strict = R.final_score(cand, q, ec, lim)
                 req = R.final_score(cand, qi, ec, lim)
                 up = upper_bound(q, cand, strict) if isinstance(cand, list) else False
-                rows_out.append({"model": model, "cell": cell, "qid": q.qid, "rep": rec["rep"],
-                                 "q_level": q.meta.get("q_level"), "low": bool(q.meta.get("low_discrimination")),
-                                 "logged": rec["final"]["outcome"], "strict": strict["outcome"],
-                                 "strict_reason": strict.get("reason"), "required": req["outcome"],
-                                 "required_reason": req.get("reason"), "upper": up})
+                row = {"model": model, "cell": cell, "qid": q.qid, "rep": rec["rep"],
+                       "q_level": q.meta.get("q_level"), "low": bool(q.meta.get("low_discrimination")),
+                       "judge": q.scoring == "judge",
+                       "logged": rec["final"]["outcome"], "strict": strict["outcome"],
+                       "strict_reason": strict.get("reason"), "required": req["outcome"],
+                       "required_reason": req.get("reason"), "upper": up}
+                if args.identifier_names:
+                    qn, _ = inject(q, paths[q.qid], ann, names=True)
+                    same = qn.ref_rules == qi.ref_rules
+                    row["names"] = req["outcome"] if same else R.final_score(cand, qn, ec, lim)["outcome"]
+                rows_out.append(row)
     if args.json_out:
         Path(args.json_out).write_text(json.dumps({"coverage": coverage, "rows": rows_out}, ensure_ascii=False, indent=1))
+    return report(rows_out, coverage)
+
+
+def report(rows_out: list[dict], coverage: dict) -> int:
+    names = all("names" in r for r in rows_out)
 
     drift = [r for r in rows_out if r["logged"] != r["strict"]]
     print(f"strict vs logged final: {len(drift)} differences")
@@ -135,28 +168,26 @@ def main() -> int:
         print("  ", r["model"], r["cell"], r["qid"], r["rep"], r["logged"], "->", r["strict"])
 
     def acc(rs, key):
-        rs = [r for r in rs if r["strict"] != "pending"]
+        rs = [r for r in rs if not r["judge"]]
         ok = sum((r[key] is True) if key == "upper" else (r[key] == "correct") for r in rs)
         return f"{ok}/{len(rs)} = {100 * ok / len(rs):.1f}%" if rs else "-"
 
-    print("\n| 模型 | 单元 | 严格 | required_columns（T05b） | 诊断上界 |\n|---|---|---|---|---|")
-    for model in RUNS:
-        for cell in CELLS:
-            rs = [r for r in rows_out if r["model"] == model and r["cell"] == cell and not r["low"]]
-            print(f"| {model} | {cell} | {acc(rs, 'strict')} | {acc(rs, 'required')} | {acc(rs, 'upper')} |")
-    print("\n（不含低区分度；含低区分度：）")
-    for model in RUNS:
-        for cell in CELLS:
-            rs = [r for r in rows_out if r["model"] == model and r["cell"] == cell]
-            print(f"| {model} | {cell} | {acc(rs, 'strict')} | {acc(rs, 'required')} | {acc(rs, 'upper')} |")
+    cols = ["strict", "required", "upper"] + (["names"] if names else [])
+    head = "| 模型 | 单元 | 严格 | required_columns（T05b） | 诊断上界 |" + (" T05b + 第五节（标识用名称） |" if names else "")
+    for title, keep in (("不含低区分度（judge 题不计）", lambda r: not r["low"]), ("含低区分度（judge 题不计）", lambda r: True)):
+        print(f"\n{title}\n\n{head}\n|---|---|" + "---|" * len(cols))
+        for model in RUNS:
+            for cell in CELLS:
+                rs = [r for r in rows_out if r["model"] == model and r["cell"] == cell and keep(r)]
+                print(f"| {model} | {cell} | " + " | ".join(acc(rs, k) for k in cols) + " |")
 
-    print("\n按 Q 级（不含低区分度）：严格 → required")
+    print("\n按 Q 级（不含低区分度，judge 题不计）：严格 → required" + (" → 第五节" if names else ""))
     for model in RUNS:
         for cell in CELLS:
             parts = []
             for lv in ("Q1", "Q2", "Q3"):
                 rs = [r for r in rows_out if r["model"] == model and r["cell"] == cell and not r["low"] and r["q_level"] == lv]
-                parts.append(f"{lv} {acc(rs, 'strict')} → {acc(rs, 'required')}")
+                parts.append(f"{lv} {acc(rs, 'strict')} → {acc(rs, 'required')}" + (f" → {acc(rs, 'names')}" if names else ""))
             print(f"  {model} {cell}: " + "; ".join(parts))
 
     print("\n逐题（correct 次数 /3，严格 → required；上界）")

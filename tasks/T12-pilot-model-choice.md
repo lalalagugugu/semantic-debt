@@ -81,7 +81,7 @@
   - 语义层：在 `semantic-v1.1` 上重新渲染，SQL-R、SQL-L1 上下文逐字节一致
   - 费用：Flash 1.29 元、Pro 9.62 元、缓存探测 0.33 元（14 次，4 小时仍命中）、Pro 被叫停时很可能已发出的 1 次调用约 0.02 元，合计约 11.3 元（上限 20）
 - 偏离与理由：
-  - 选择规则字面触发「选 Pro」（Flash SQL-L1 47.6% < 50%），按用户裁决不作数：前提「Pro 更强」不成立，触发来自列口径（open-questions T12-1）
+  - 选择规则曾字面触发「选 Pro」（Flash SQL-L1 47.6% < 50%），按用户裁决不作数：前提「Pro 更强」不成立，触发来自列口径（open-questions T12-1）。judge 题拿出分母后（`decisions/2026-10-18-judge-stratum-and-t12-audit.md` 第一节）严格口径是 50.0%，不再触发；选模型改为 G3 按最终重评定（同一文件第二节）
   - Pro 第一次启动后被用户叫停（要先看 Flash 结果），日志为空；第二次用同一 run-id 跑完，见 `runs/INDEX.md`
   - venv 用 Homebrew Python 3.14 建（沙箱读不到 uv 管理的 Python），依赖按 `uv.lock` 锁定
   - 发现评分口径问题后按 AGENTS.md 停下、写进 open-questions，未改评分器、题库或提示
