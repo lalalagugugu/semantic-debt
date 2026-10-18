@@ -47,3 +47,4 @@ cards:
   - {id: T18,  owner: claude, mode: windows,       repo: main, card: tasks/T18-dax-full-and-tuning.md, after: G3}
   - {id: T19,  owner: claude, mode: open,          repo: main, card: tasks/T19-report.md}
   - {id: T20,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T20-independent-recheck.md}
+  - {id: T21,  owner: claude, mode: open,          repo: main, card: tasks/T21-dsh-planning-agent.md, after: T15, note: "可行性验证在 harness-agent-v1.1 后即可；开跑等 T15 全量"}
