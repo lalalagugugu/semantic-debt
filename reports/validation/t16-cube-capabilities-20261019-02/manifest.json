@@ -1,0 +1,359 @@
+[
+  {
+    "id": "F01",
+    "interface": "sql",
+    "claim": "SQL-9/reference",
+    "query": "SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS amount, MEASURE(sales.sales_quantity) AS quantity FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1 ORDER BY 1",
+    "note": ""
+  },
+  {
+    "id": "F02_same_alias",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_quantity) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT a.k, a.v AS a_value, b.v AS b_value FROM a JOIN b ON a.k=b.k ORDER BY a.k",
+    "note": "与 F01 按键比较两列数值，不只检查是否报错"
+  },
+  {
+    "id": "F02_distinct_alias",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS amount FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_quantity) AS quantity FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT a.k, a.amount AS a_value, b.quantity AS b_value FROM a JOIN b ON a.k=b.k ORDER BY a.k",
+    "note": "与 F01 按键比较两列数值，不只检查是否报错"
+  },
+  {
+    "id": "F03",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS amount FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_quantity) AS quantity FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT a.k, a.amount, b.quantity FROM a FULL OUTER JOIN b ON a.k=b.k ORDER BY a.k",
+    "note": ""
+  },
+  {
+    "id": "F04",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS amount FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_quantity) AS quantity FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), c AS (SELECT k, SUM(quantity) AS qty FROM b GROUP BY k) SELECT a.k,a.amount,c.qty FROM a JOIN c ON a.k=c.k ORDER BY a.k",
+    "note": ""
+  },
+  {
+    "id": "F05",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k FROM a GROUP BY k HAVING COUNT(*) > 0) SELECT a.k,SUM(a.v) FROM a JOIN b ON a.k=b.k GROUP BY a.k ORDER BY a.k",
+    "note": ""
+  },
+  {
+    "id": "F06",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k FROM a GROUP BY k HAVING COUNT(*) > 0) SELECT k,SUM(v) FROM a WHERE k IN (SELECT k FROM b) GROUP BY k ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "F10_ROW_NUMBER",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k,v,ROW_NUMBER() OVER (ORDER BY v DESC) AS n FROM a) SELECT k,v FROM b WHERE n <= 2 ORDER BY k",
+    "note": "窗口值只筛选、不作为输出列"
+  },
+  {
+    "id": "F11_ROW_NUMBER",
+    "interface": "sql",
+    "claim": "SQL-9/CAST",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k,v,CAST(ROW_NUMBER() OVER (ORDER BY v DESC) AS BIGINT) AS n FROM a) SELECT k,v,n FROM b WHERE n <= 2 ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "F10_RANK",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k,v,RANK() OVER (ORDER BY v DESC) AS n FROM a) SELECT k,v FROM b WHERE n <= 2 ORDER BY k",
+    "note": "窗口值只筛选、不作为输出列"
+  },
+  {
+    "id": "F11_RANK",
+    "interface": "sql",
+    "claim": "SQL-9/CAST",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k,v,CAST(RANK() OVER (ORDER BY v DESC) AS BIGINT) AS n FROM a) SELECT k,v,n FROM b WHERE n <= 2 ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "F20_round",
+    "interface": "sql",
+    "claim": "SQL-11/12",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k,ROUND(v,2) AS x FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "F20_pct",
+    "interface": "sql",
+    "claim": "SQL-11/12",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k,ROUND(v/NULLIF(v,0)*100,2) AS x FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "F20_coalesce",
+    "interface": "sql",
+    "claim": "SQL-11/12",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k,COALESCE(NULL,v) AS x FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "F20_coalesce_cast",
+    "interface": "sql",
+    "claim": "SQL-11/12",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k,COALESCE(CAST(NULL AS DOUBLE PRECISION),v) AS x FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "F21",
+    "interface": "sql",
+    "claim": "SQL-6",
+    "query": "SELECT EXTRACT(YEAR FROM DATE '2007-02-01')",
+    "note": ""
+  },
+  {
+    "id": "F22",
+    "interface": "sql",
+    "claim": "SQL-6",
+    "query": "WITH a AS (SELECT DATE_TRUNC('year',sales.\"DateKey\") AS p, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT EXTRACT(YEAR FROM p),v FROM a",
+    "note": ""
+  },
+  {
+    "id": "F23",
+    "interface": "sql",
+    "claim": "SQL-6",
+    "query": "SELECT calendar.\"CalendarYear\", MEASURE(sales.sales_amount) FROM sales CROSS JOIN calendar WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1",
+    "note": ""
+  },
+  {
+    "id": "F24",
+    "interface": "sql",
+    "claim": "SQL-5",
+    "query": "SELECT sales.channelkey, sales.\"channelKey\", MEASURE(sales.sales_amount) FROM sales GROUP BY 1,2 LIMIT 1",
+    "note": ""
+  },
+  {
+    "id": "F30_sales_store_channel_calendar",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM sales CROSS JOIN store CROSS JOIN channel CROSS JOIN calendar WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_sales_store_calendar_channel",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM sales CROSS JOIN store CROSS JOIN calendar CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_sales_channel_store_calendar",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM sales CROSS JOIN channel CROSS JOIN store CROSS JOIN calendar WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_sales_channel_calendar_store",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM sales CROSS JOIN channel CROSS JOIN calendar CROSS JOIN store WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_sales_calendar_store_channel",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM sales CROSS JOIN calendar CROSS JOIN store CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_sales_calendar_channel_store",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM sales CROSS JOIN calendar CROSS JOIN channel CROSS JOIN store WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_store_sales_channel_calendar",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM store CROSS JOIN sales CROSS JOIN channel CROSS JOIN calendar WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_store_sales_calendar_channel",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM store CROSS JOIN sales CROSS JOIN calendar CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_store_channel_sales_calendar",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM store CROSS JOIN channel CROSS JOIN sales CROSS JOIN calendar WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_store_channel_calendar_sales",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM store CROSS JOIN channel CROSS JOIN calendar CROSS JOIN sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_store_calendar_sales_channel",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM store CROSS JOIN calendar CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_store_calendar_channel_sales",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM store CROSS JOIN calendar CROSS JOIN channel CROSS JOIN sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_channel_sales_store_calendar",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM channel CROSS JOIN sales CROSS JOIN store CROSS JOIN calendar WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_channel_sales_calendar_store",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM channel CROSS JOIN sales CROSS JOIN calendar CROSS JOIN store WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_channel_store_sales_calendar",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM channel CROSS JOIN store CROSS JOIN sales CROSS JOIN calendar WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_channel_store_calendar_sales",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM channel CROSS JOIN store CROSS JOIN calendar CROSS JOIN sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_channel_calendar_sales_store",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM channel CROSS JOIN calendar CROSS JOIN sales CROSS JOIN store WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_channel_calendar_store_sales",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM channel CROSS JOIN calendar CROSS JOIN store CROSS JOIN sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_calendar_sales_store_channel",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM calendar CROSS JOIN sales CROSS JOIN store CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_calendar_sales_channel_store",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM calendar CROSS JOIN sales CROSS JOIN channel CROSS JOIN store WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_calendar_store_sales_channel",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM calendar CROSS JOIN store CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_calendar_store_channel_sales",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM calendar CROSS JOIN store CROSS JOIN channel CROSS JOIN sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_calendar_channel_sales_store",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM calendar CROSS JOIN channel CROSS JOIN sales CROSS JOIN store WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F30_calendar_channel_store_sales",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM calendar CROSS JOIN channel CROSS JOIN store CROSS JOIN sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F31",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM (store CROSS JOIN sales) CROSS JOIN (channel CROSS JOIN calendar) WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F32",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",channel.\"ChannelName\",calendar.\"CalendarYear\",MEASURE(sales.sales_amount) FROM store CROSS JOIN (channel CROSS JOIN (sales CROSS JOIN calendar)) WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "F33",
+    "interface": "sql",
+    "claim": "SQL-4",
+    "query": "SELECT store.\"StoreKey\",MEASURE(sales.sales_amount) FROM sales JOIN store ON sales.\"StoreKey\"=store.\"StoreKey\" WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1 LIMIT 4",
+    "note": "明确违反说明中 cube 连接不写 ON 的反例"
+  },
+  {
+    "id": "F34",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT a.k,a.v,channel.\"ChannelName\" FROM a LEFT JOIN channel ON a.k=channel.\"ChannelKey\" ORDER BY a.k",
+    "note": "聚合 CTE 后连接原始维度 cube"
+  },
+  {
+    "id": "F40",
+    "interface": "sql",
+    "claim": "PERCENTILE_CONT",
+    "query": "SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x) FROM (VALUES (1),(2),(3)) a(x)",
+    "note": "整数排序输入"
+  },
+  {
+    "id": "F41",
+    "interface": "sql",
+    "claim": "PERCENTILE_CONT",
+    "query": "SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY CAST(x AS DOUBLE PRECISION)) FROM (VALUES (1),(2),(3)) a(x)",
+    "note": "显式 Float64 排除参数类型问题"
+  },
+  {
+    "id": "F42",
+    "interface": "sql",
+    "claim": "CAST",
+    "query": "SELECT AVG(DATE '2007-02-02' - DATE '2007-02-01') FROM (VALUES (1),(2)) a(x)",
+    "note": "日期差默认是 interval，AVG 的类型限制"
+  },
+  {
+    "id": "F43",
+    "interface": "sql",
+    "claim": "CAST",
+    "query": "SELECT CAST(DATE '2007-02-02' - DATE '2007-02-01' AS DOUBLE PRECISION)",
+    "note": "interval 转浮点"
+  }
+]

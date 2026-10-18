@@ -1,0 +1,38 @@
+{
+  "started_utc": "2026-10-18T23:41:41.290444+00:00",
+  "manifest_sha256": "ff3b4b9efdc908b3b560f012d925e8db1a04ea1d5868ae840980f5b3a1fc683d",
+  "script_sha256": "65c1c04a7b14e66a7ef8d94776fc633c9e55bc3984df05d1bfcf1b7114e851ce",
+  "syntax_sha256": {
+    "render/syntax/cube_sql.md": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+    "render/syntax/cube_json.md": "426e382a0c474e2a492f29ac57ded25024bdec0f873bfcd6f8001288048329e0"
+  },
+  "model_sha256": {
+    "build/cube/model/cubes/account.yml": "6a768858ea27761d68e7a0d4fd6988ba2446bda43db8e72560606fe5edf932ea",
+    "build/cube/model/cubes/calendar.yml": "df513d0f2d2311251e7ead5eb9a81018e94afc5a50b2154f6f5666341f564269",
+    "build/cube/model/cubes/channel.yml": "f7dc69d2b83a4e7fa1e4a606e3ece6e43d8e7dff84c078e008b42e54a8c91a2c",
+    "build/cube/model/cubes/currency.yml": "a595d46ea4e823cf25400c59c67bbcac8031689c7abab0323f4a3e25d77698fd",
+    "build/cube/model/cubes/customer.yml": "9cb0fbeb5e54236e5b8987bd4ab3eba64e18320ab0f833891739c1ec1abe4849",
+    "build/cube/model/cubes/employee.yml": "191802552610ba4f4e0ef97fb53729f93b6e6f1b48c8cc844daba834ecf0d344",
+    "build/cube/model/cubes/entity.yml": "e02da552c5769626f24ae2900ec502f1243185c5dc92abdfd2ccf96f6d8e19a9",
+    "build/cube/model/cubes/exchange_rate.yml": "af6d293abc8fe3420589cf7d1014400ca08a8a514b524ee83b057172f7542120",
+    "build/cube/model/cubes/geography.yml": "fc415eed1c7721401a07753badb1041fb7e6527053ed97afb1ad1ce4d2330ed8",
+    "build/cube/model/cubes/inventory.yml": "83d4a0fa763d6e1312e7d2030c59b94f21a9392487b5db3d143d7d08dfaf7e7f",
+    "build/cube/model/cubes/it_machine.yml": "a93293cf517bd29d82d484dc077b8856895aff2f8e80fd58e15eb88194293ea8",
+    "build/cube/model/cubes/it_sla.yml": "56b3a9c8fab314ad3bb5672377837fef5d55d300b56e5371781f3f6307a54709",
+    "build/cube/model/cubes/machine.yml": "a0bfef59a60e6cd3d06b5cf842d014338903b85058bfa445fec2130e33dde0c8",
+    "build/cube/model/cubes/online_sales.yml": "a33f90abe663f2abc068e61741c875f2005725151f36d465495e9a1f83048040",
+    "build/cube/model/cubes/outage.yml": "fb0fafaaf3eee43a39b67f2cda67d87283fd46c7f6b2436e12eacc639a684f0c",
+    "build/cube/model/cubes/product.yml": "cb6779ba48b732f2edf5a14a080ece682324b58982985537c12ddf3c02758c90",
+    "build/cube/model/cubes/product_category.yml": "e587e43e6597ff7fd7dd51df0363925eaa19f6c5bd099b4cc281e71fa0596f71",
+    "build/cube/model/cubes/product_subcategory.yml": "56945bd87626240f789fc2f424665ddd5bb59ec5fe8a9926fe1598071618efac",
+    "build/cube/model/cubes/promotion.yml": "38feaa2e43cfd376a6006a0eedff373969af667a6fefa886af25c23b352368b0",
+    "build/cube/model/cubes/sales.yml": "fca4595db0e707e1aba8ab233a7f2fafc35818043ca318c1ee31eb8024facae2",
+    "build/cube/model/cubes/sales_quota.yml": "4dd64f8a6dfa89992e004f7ae26b027f72fb56000d44a83e702a9f509702ab66",
+    "build/cube/model/cubes/sales_territory.yml": "e90cb0a99b6a168b1418c5a61a302f20fea0da77eb6b2d020290876b8a2f1399",
+    "build/cube/model/cubes/scenario.yml": "969acffb5a6d8ab779a7ac32a8e834be4b8cddfb6e2b44da263caa4d92d83949",
+    "build/cube/model/cubes/store.yml": "cc963b5f6ba0d40fddd0b23926211b3eea82494834841078a0e38a6118be8524",
+    "build/cube/model/cubes/strategy_plan.yml": "870ab3d92714a0792ed5076b07d17795a9cf31b76a8d5a57d74d620572c043aa"
+  },
+  "commit": "522427031bf4c123cf7d6813101a4d34b4ea10f2",
+  "independence": "Only syntax documents and deployed model used; no evaluation-bank or model-response input."
+}

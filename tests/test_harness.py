@@ -39,6 +39,7 @@ needs_chdb = pytest.mark.skipif(not CHDB.exists(), reason="chDB data directory n
 @pytest.mark.parametrize("baseline", [
     "84f5e045dc9d3456c11c4453515c746047a69c74",  # experiment baseline, including PR #100
     "88fd81c9d743ef93d1e00f65c7f5f8faa95d72ec",  # main at PR preparation, including T15
+    "89ce1b31b22e009b726448ff23fe0f55d5a26a80",  # main at interface-audit delivery
 ])
 def test_t16_frozen_files_match_main_byte_for_byte(path, baseline):
     import subprocess
