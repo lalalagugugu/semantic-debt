@@ -7,6 +7,8 @@ one of three candidate states: rows, ``CANNOT_ANSWER``, or :class:`ExecError`.
 from __future__ import annotations
 
 import math
+import re
+from datetime import date, datetime, time
 import warnings
 from collections import Counter, defaultdict
 from collections.abc import Iterator, Mapping, Sequence
@@ -66,6 +68,8 @@ class _Rules:
     selection: Mapping[str, object] | None = None
     order_by: tuple[tuple[int, bool], ...] = ()
     required_columns: tuple[int, ...] | None = None
+    label_values: tuple[frozenset[str] | None, ...] = ()
+    unordered_pairs: tuple[tuple[tuple[int, ...], tuple[int, ...]], ...] = ()
 
 
 def score(
@@ -275,8 +279,30 @@ def _parse_rules(rules: Mapping[str, object]) -> _Rules:
         for metadata in (value_kinds, value_types):
             if metadata and any(i >= len(metadata) for i in required_columns):
                 raise ValueError("required_columns contains an index outside reference metadata")
+    unordered_pairs = rules.get("unordered_pairs", [])
+    if not isinstance(unordered_pairs, list):
+        raise ValueError("unordered_pairs must be a list of left/right column groups")
+    parsed_pairs = []
+    seen_pair_columns = set()
+    for pair in unordered_pairs:
+        if not isinstance(pair, Mapping) or set(pair) != {"left", "right"}:
+            raise ValueError("unordered_pairs entries require left and right")
+        left, right = pair["left"], pair["right"]
+        if (not isinstance(left, list) or not isinstance(right, list) or not left or len(left) != len(right)
+                or any(type(i) is not int or i < 0 for i in left + right)
+                or len(set(left + right)) != len(left + right)
+                or seen_pair_columns.intersection(left + right)):
+            raise ValueError("unordered_pairs requires disjoint equal-width nonempty column groups")
+        for metadata in (value_kinds, value_types):
+            if metadata and max(left + right) >= len(metadata):
+                raise ValueError("unordered_pairs contains an index outside reference metadata")
+        if required_columns is not None:
+            if any((a in required_columns) != (b in required_columns) for a,b in zip(left,right)):
+                raise ValueError("unordered_pairs requires both sides of each compared attribute")
+        seen_pair_columns.update(left + right)
+        parsed_pairs.append((tuple(left), tuple(right)))
     parsed_order = tuple((item["column"], item["descending"]) for item in order_by or ())
-    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection, parsed_order, tuple(required_columns) if required_columns is not None else None)
+    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection, parsed_order, tuple(required_columns) if required_columns is not None else None, unordered_pairs=tuple(parsed_pairs))
 
 
 def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
@@ -301,7 +327,58 @@ def _comparison_columns(row: Row, rules: _Rules) -> tuple[int, ...]:
     return rules.required_columns if rules.required_columns is not None else tuple(range(len(row)))
 
 
+def _reference_labels(reference: Rows, rules: _Rules) -> _Rules:
+    if not reference:
+        return rules
+    labels = []
+    for i in range(len(reference[0])):
+        values = [row[i] for row in reference]
+        is_string = ("String" in rules.value_types[i] if rules.value_types else any(isinstance(v, str) for v in values))
+        wildcard = is_string and any(v is None or isinstance(v, str) and not v.strip() for v in values)
+        labels.append(frozenset(v.strip() for v in values if isinstance(v, str) and v.strip()) if wildcard else None)
+    return replace(rules, label_values=tuple(labels))
+
+
+def _label_matches(value: Cell, expected: Cell, column: int, rules: _Rules) -> bool:
+    labels = rules.label_values[column] if rules.label_values else None
+    return (labels is not None and (expected is None or isinstance(expected, str) and not expected.strip())
+            and isinstance(value, str) and value.strip() not in labels)
+
+
+def _candidate_forms(candidate: Rows, minimum_width: int) -> Iterator[Rows]:
+    yield candidate
+    if not candidate or len(candidate[0]) <= minimum_width:
+        return
+    # Collapse original adjacent string columns, without reusing either column.
+    def forms(start: int, columns: list[tuple[int, ...]]) -> Iterator[Rows]:
+        width = len(candidate[0])
+        if start == width:
+            if any(len(c) == 2 for c in columns) and len(columns) >= minimum_width:
+                yield tuple(tuple(" ".join(row[i].strip() for i in col) if len(col) == 2 else row[col[0]] for col in columns) for row in candidate)
+            return
+        yield from forms(start + 1, columns + [(start,)])
+        if start + 1 < width and all(isinstance(row[start], str) and isinstance(row[start+1], str) for row in candidate):
+            yield from forms(start + 2, columns + [(start, start + 1)])
+    yield from forms(0, [])
+
+
 def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple[bool, str]:
+    # Validate column indexes/metadata before constructing reference label context.
+    if reference and rules.value_types and len(rules.value_types) != len(reference[0]):
+        raise ValueError("value_types must match reference column count")
+    rules = _reference_labels(reference, rules)
+    first_reason = None
+    minimum = len(_comparison_columns(reference[0], rules)) if reference else 0
+    for form in _candidate_forms(candidate, minimum):
+        matched, reason = _matches_reference_core(form, reference, rules)
+        if matched:
+            return True, reason
+        if first_reason is None:
+            first_reason = reason
+    return False, first_reason
+
+
+def _matches_reference_core(candidate: Rows, reference: Rows, rules: _Rules, fixed_mapping: tuple[int, ...] | None = None) -> tuple[bool, str]:
     if rules.value_kinds and reference and len(rules.value_kinds) != len(reference[0]):
         raise ValueError("value_kinds must match reference column count")
     if rules.value_types and reference and len(rules.value_types) != len(reference[0]):
@@ -310,6 +387,8 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
         raise ValueError("order_by contains an index outside the reference rows")
     if reference and rules.required_columns is not None and any(i >= len(reference[0]) for i in rules.required_columns):
         raise ValueError("required_columns contains an index outside the reference rows")
+    if reference and any(i >= len(reference[0]) for pair in rules.unordered_pairs for side in pair for i in side):
+        raise ValueError("unordered_pairs contains an index outside reference rows")
     if rules.selection is not None:
         complete, _ = complete_selection(list(reference), rules.selection, rules.value_kinds)
         if len(complete) != len(reference):
@@ -341,13 +420,13 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
     # scalar comparator, regardless of column permutations or extra columns.
     # Top-N may leave nullable boundary members unselected, so exclude it.
     if (rules.top_n is None
-            and any(row[i] is None for row in reference for i in _comparison_columns(row, rules))
+            and any(row[i] is None and (not rules.label_values or rules.label_values[i] is None) for row in reference for i in _comparison_columns(row, rules))
             and not any(cell is None for row in candidate for cell in row)
             and all(type(cell) in (str, bool, int, float, Decimal, list, tuple, dict, bytes)
                     for row in candidate for cell in row)):
         return False, "values"
 
-    for mapping in permutations(range(candidate_width), reference_width):
+    for mapping in (permutations(range(candidate_width), reference_width) if fixed_mapping is None else (fixed_mapping,)):
         if rules.top_n is not None:
             if _top_rows_match(candidate, reference, mapping, rules):
                 return True, "matched"
@@ -405,15 +484,16 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
         identities = [identity(row, stage["group_columns"] + stage["object_columns"]) for row in reference if all(row[c["column"]] == c["equals"] for c in stage["where"])]
         if len(identities) != len(set(identities)):
             raise ValueError("selection reference contains duplicate leaf objects")
-    if rules.required_columns is not None and len(rules.required_columns) < len(reference[0]):
+    if (rules.required_columns is not None and len(rules.required_columns) < len(reference[0])) or any(v is not None for v in rules.label_values):
         # Recover complete reference rows before validating group/Top-N coverage.
         # Hidden selection keys must never be invented from candidate values.
-        visible_identity = [i for i in identity_columns if i in rules.required_columns]
+        columns = _comparison_columns(reference[0], rules)
+        visible_identity = [i for i in identity_columns if i in columns]
         reason = "selection_values"
-        for mapping in permutations(range(len(candidate[0])), len(rules.required_columns)):
-            candidate_identity = [mapping[rules.required_columns.index(i)] for i in visible_identity]
+        for mapping in permutations(range(len(candidate[0])), len(columns)):
+            candidate_identity = [mapping[columns.index(i)] for i in visible_identity]
             choices = [tuple(ref for ref in reference
-                             if identity(row, candidate_identity) == identity(ref, visible_identity)
+                             if all(identity(row, [c]) == identity(ref, [i]) or _label_matches(row[c], ref[i], i, rules) for c,i in zip(candidate_identity,visible_identity))
                              and _rows_equal(row, ref, mapping, rules)) for row in candidate]
             if not all(choices):
                 continue
@@ -539,11 +619,32 @@ def _rows_match_subset(candidate: Rows, reference: Rows, mapping: tuple[int, ...
 
 
 def _row_bucket(row: Row, mapping: tuple[int, ...], rules: _Rules, *, candidate: bool) -> tuple[object, ...]:
-    values = (row[i] for i in (mapping if candidate else _comparison_columns(row, rules)))
+    pair_columns = {i for pair in rules.unordered_pairs for side in pair for i in side}
+    columns = rules.required_columns if rules.required_columns is not None else tuple(range(len(mapping)))
+    values = (row[mapping[position]] if candidate else row[i] for position,i in enumerate(columns)
+              if i not in pair_columns and (not rules.label_values or rules.label_values[i] is None))
     return tuple(_nonnumeric_bucket(value) for value in values if not _is_numeric(value))
 
 
+def _calendar_date(value: Cell) -> date | None:
+    if isinstance(value, datetime):
+        return value.date() if value.tzinfo is None and value.time() == time() else None
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        match = re.fullmatch(r"(\d{4}-\d{2}-\d{2})(?:[ T]00:00:00(?:\.0+)?)?", value.strip())
+        if match:
+            try:
+                return date.fromisoformat(match[1])
+            except ValueError:
+                pass
+    return None
+
+
 def _nonnumeric_bucket(value: object) -> object:
+    day = _calendar_date(value)
+    if day is not None:
+        return (date, day)
     if isinstance(value, str):
         return (str, value.strip())
     try:
@@ -585,10 +686,22 @@ def _match_bucket(candidate: list[Row], reference: list[Row], mapping: tuple[int
 
 
 def _rows_equal(candidate: Row, reference: Row, mapping: tuple[int, ...], rules: _Rules) -> bool:
-    return all(
-        _cells_equal(candidate[mapping[position]], reference[reference_index], kind=rules.value_kinds[reference_index] if rules.value_kinds else "other", use_absolute=rules.use_absolute_tolerance, exact_counts=rules.exact_counts and bool(rules.value_types) and is_integer_type(rules.value_types[reference_index]))
-        for position, reference_index in enumerate(_comparison_columns(reference, rules))
-    )
+    columns = _comparison_columns(reference, rules)
+    def equal(column: int, expected_column: int) -> bool:
+        value = candidate[mapping[columns.index(column)]]
+        expected = reference[expected_column]
+        return (_label_matches(value, expected, expected_column, rules)
+                or _cells_equal(value, expected, kind=rules.value_kinds[expected_column] if rules.value_kinds else "other",
+                                use_absolute=rules.use_absolute_tolerance,
+                                exact_counts=rules.exact_counts and bool(rules.value_types) and is_integer_type(rules.value_types[expected_column])))
+    paired = set()
+    for left,right in rules.unordered_pairs:
+        compared = [(a,b) for a,b in zip(left,right) if a in columns and b in columns]
+        if not (all(equal(a,a) and equal(b,b) for a,b in compared)
+                or all(equal(a,b) and equal(b,a) for a,b in compared)):
+            return False
+        paired.update(i for pair in compared for i in pair)
+    return all(equal(i,i) for i in columns if i not in paired)
 
 
 def _cells_equal(left: Cell, right: Cell, *, allow_percentage: bool = True, kind: ValueKind = "other", use_absolute: bool = True, exact_counts: bool = False) -> bool:
@@ -614,6 +727,9 @@ def _cells_equal(left: Cell, right: Cell, *, allow_percentage: bool = True, kind
             _relative_close(left_number * 100.0, right_number, atol)
             or _relative_close(left_number, right_number * 100.0, atol * 100.0)
         )
+    left_day, right_day = _calendar_date(left), _calendar_date(right)
+    if left_day is not None and right_day is not None:
+        return left_day == right_day
     if isinstance(left, str) and isinstance(right, str):
         return left.strip() == right.strip()
     return left == right
