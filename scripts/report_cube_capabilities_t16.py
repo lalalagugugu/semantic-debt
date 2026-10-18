@@ -238,10 +238,10 @@ def main():
               '# 同法分别以 --suite followup / boundary / types 执行到不同的新目录',
               'uv run python scripts/report_cube_capabilities_t16.py','```','',
               '报告脚本默认读取本次四个固定目录，并只执行固定 ClickHouse SELECT 基线。新的探针 run-id 不得覆盖旧目录。原始基线行集另存数据目录 interface-probes，不入库。','',
-              '## 逐条报错原文','', '成功查询无错误。以下为每个失败探针的完整错误文本，未按长度截断；成功结果、列 OID 和 Python 类型在 results.jsonl。','']
+              '## 逐条报错原文','', '成功查询无错误。以下完整错误以 JSON 字符串表示，保留换行及行尾空格而不触发 Markdown 尾随空白；没有截断，解码即为原文。成功结果、列 OID 和 Python 类型在 results.jsonl。','']
     for e in errors:
-        lines += [f"### {e['id']}", '',f"SQLSTATE：`{e.get('sqlstate')}`。",'', '```text',e['error'],'```','']
-    (VALIDATION/'t16_cube_capabilities.md').write_text('\n'.join(lines)+'\n')
+        lines += [f"### {e['id']}", '',f"SQLSTATE：`{e.get('sqlstate')}`。",'', '```json',json.dumps(e['error'],ensure_ascii=False),'```','']
+    (VALIDATION/'t16_cube_capabilities.md').write_text('\n'.join(lines).rstrip()+'\n')
 
     audit(cases)
     print(json.dumps({'probes':len(cases),'accepted':result['accepted'],'errors':result['errors'],
@@ -303,16 +303,16 @@ def audit(cases):
            '- **写法说明错误**：包括明确不成立或遗漏必要条件、将有限 SQL 后处理泛化为普通 SQL。底层可以确有 bug 或限制，但如果可用条件/替代形态存在且说明未提示，不能直接计成“业务接口做不到”或模型错。',
            '- **接口确实做不到**：仅限已实测的函数实现或算子/类型组合，不是对整个业务任务的不可表达证明。',
            '- **模型写错**：有明确说明约束且实际输入违反；不因出现 not supported、生成 SQL 语法错误或引擎内部 GROUP BY 错误就归罪模型。',
-           f"- 首要归因（互斥，仅用于这18次原始错误）：{counts}。复杂组合中存在多种潜在问题，表中列出置信度和因果边界。", 
+           f"- 首要归因（互斥，仅用于这18次原始错误）：{counts}。复杂组合中存在多种潜在问题，表中列出置信度和因果边界。",
            '- 最终失败的7条仍原样保留；其中6条的最终错误首要归因是说明/条件缺失，1条为 PERCENTILE_CONT 实现缺失。**原先自动分类的 4/7=57.1% 不再视为已经证实的能力限制比例，也不据新的主归类比例自动放行实验。** 用户尚未裁决，JSON 冒烟与全量暂停。',
            '- 后续正式运行固定使用用户指定的 eval-v1.2；旧 eval-v1.1 冒烟只作诊断，不能混入新版本正式结果。未修改 render/、语义层、提示或评分器；语法说明的任何更正须由 Claude Code 经用户裁决处理。','',
            '## 逐轮审计','', '| 题号/轮次 | 原自动类 | 首要归因 | 证据 | 依据与边界 | 置信度 |','|---|---|---|---|---|---|']
     lines += [f"| {e['qid']} / t{e['turn']} | {e['original_error_class']} | **{e['attribution']}** | `{','.join(e['evidence'])}` | {e['reason']} | {e['confidence']} |" for e in entries]
     lines += ['', '## 原始错误与哈希','',
-              f'源日志 SHA-256：`{source_hash}`。以下 error 文本逐字取自 runs-raw 执行文件；JSON 同时保留 detail。未抄题面、参考答案或候选完整 SQL 作为独立探针；错误原文本身若包含 QUERY，则按用户要求保留其原文，不代表该查询被重新执行。','']
+              f'源日志 SHA-256：`{source_hash}`。以下 error 逐字取自 runs-raw，并以可无损解码的 JSON 字符串表示（换行、行尾空格不删）；JSON 报告同时保留 detail。未抄题面、参考答案或候选完整 SQL 作为独立探针；错误原文本身若包含 QUERY，则按用户要求保留其原文，不代表该查询被重新执行。','']
     for e in entries:
-        lines += [f"### {e['qid']} t{e['turn']}", '',f"原执行文件：`{e['exec_raw_file']}`；SHA-256：`{e['exec_sha256']}`。",'', '```text',e['error_verbatim'],'```','']
-    (VALIDATION/'t16_sql_pilot_error_audit.md').write_text('\n'.join(lines)+'\n')
+        lines += [f"### {e['qid']} t{e['turn']}", '',f"原执行文件：`{e['exec_raw_file']}`；SHA-256：`{e['exec_sha256']}`。",'', '```json',json.dumps(e['error_verbatim'],ensure_ascii=False),'```','']
+    (VALIDATION/'t16_sql_pilot_error_audit.md').write_text('\n'.join(lines).rstrip()+'\n')
     print(json.dumps(dict(audit_errors=18,counts=counts,source_log_unchanged=source_hash),ensure_ascii=False))
 
 

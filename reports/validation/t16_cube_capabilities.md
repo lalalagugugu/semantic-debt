@@ -140,622 +140,612 @@ uv run python scripts/report_cube_capabilities_t16.py
 
 ## 逐条报错原文
 
-成功查询无错误。以下为每个失败探针的完整错误文本，未按长度截断；成功结果、列 OID 和 Python 类型在 results.jsonl。
+成功查询无错误。以下完整错误以 JSON 字符串表示，保留换行及行尾空格而不触发 Markdown 尾随空白；没有截断，解码即为原文。成功结果、列 OID 和 Python 类型在 results.jsonl。
 
 ### S03
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Query failed: Error: Aggregate function sum(sales.SalesAmount) is found inside another aggregate function in query. ; query id: e9c1bf76-ddd9-444e-b419-3cc0af5c42d5-54798450-6719-403b-9e87-78ca5896f661
+```json
+"Database Execution Error: Query failed: Error: Aggregate function sum(sales.SalesAmount) is found inside another aggregate function in query. ; query id: e9c1bf76-ddd9-444e-b419-3cc0af5c42d5-54798450-6719-403b-9e87-78ca5896f661"
 ```
 
 ### S11
 
 SQLSTATE：`22000`。
 
-```text
-Post-Processing Error: Database Execution Error: Query failed: Error: Column 'fk_aggregate.saleskey' is not under aggregate function and not in GROUP BY keys. In query cte_7 AS (SELECT fk_aggregate.saleskey AS saleskey, fk_aggregate.datekey AS datekey, fk_aggregate.channelkey AS channelkey, fk_aggregate.storekey AS storekey, fk_aggregate.productkey AS productkey, fk_aggregate.promotionkey AS promotionkey, fk_aggregate.currencykey AS currencykey, fk_aggregate.unitcost AS unitcost, fk_aggregate.unitprice AS unitprice, fk_aggregate.salesquantity AS salesquantity, fk_aggregate.returnquantity AS returnquantity, fk_aggregate.returnamount AS returnamount, fk_aggregate.discountquantity AS discountquantity, fk_aggregate.discountamount AS discountamount, fk_aggregate.totalcost AS totalcost, fk_aggregate.salesamount AS salesamount, fk_aggregate.__user AS __user, fk_aggregate.__cubejoinfield AS __cubejoinfield, sum(sum(fk_aggregate.sales__sales_amount)) OVER () AS sales__sales_amount_in_scope FROM cte_0 AS fk_aggregate). ; query id: 2092275a-e3e5-492a-af66-b6156fbc265a-b44eb48e-655b-44e4-9ba1-cc895388a676
+```json
+"Post-Processing Error: Database Execution Error: Query failed: Error: Column 'fk_aggregate.saleskey' is not under aggregate function and not in GROUP BY keys. In query cte_7 AS (SELECT fk_aggregate.saleskey AS saleskey, fk_aggregate.datekey AS datekey, fk_aggregate.channelkey AS channelkey, fk_aggregate.storekey AS storekey, fk_aggregate.productkey AS productkey, fk_aggregate.promotionkey AS promotionkey, fk_aggregate.currencykey AS currencykey, fk_aggregate.unitcost AS unitcost, fk_aggregate.unitprice AS unitprice, fk_aggregate.salesquantity AS salesquantity, fk_aggregate.returnquantity AS returnquantity, fk_aggregate.returnamount AS returnamount, fk_aggregate.discountquantity AS discountquantity, fk_aggregate.discountamount AS discountamount, fk_aggregate.totalcost AS totalcost, fk_aggregate.salesamount AS salesamount, fk_aggregate.__user AS __user, fk_aggregate.__cubejoinfield AS __cubejoinfield, sum(sum(fk_aggregate.sales__sales_amount)) OVER () AS sales__sales_amount_in_scope FROM cte_0 AS fk_aggregate). ; query id: 2092275a-e3e5-492a-af66-b6156fbc265a-b44eb48e-655b-44e4-9ba1-cc895388a676"
 ```
 
 ### S35_ROW_NUMBER_native
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Type UInt64 is not supported in response transformation from Cube
+```json
+"Database Execution Error: Type UInt64 is not supported in response transformation from Cube"
 ```
 
 ### S36_ROW_NUMBER
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Type UInt64 is not supported in response transformation from Cube
+```json
+"Database Execution Error: Type UInt64 is not supported in response transformation from Cube"
 ```
 
 ### S35_RANK_native
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Type UInt64 is not supported in response transformation from Cube
+```json
+"Database Execution Error: Type UInt64 is not supported in response transformation from Cube"
 ```
 
 ### S36_RANK
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Type UInt64 is not supported in response transformation from Cube
+```json
+"Database Execution Error: Type UInt64 is not supported in response transformation from Cube"
 ```
 
 ### S41
 
 SQLSTATE：`22000`。
 
-```text
-Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length
+```json
+"Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length"
 ```
 
 ### S50_sales_store_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'store', 'channel', 'store', 'channel', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'store', 'channel', 'store', 'channel', 'sales'"
 ```
 
 ### S50_sales_channel_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'channel', 'store', 'channel', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'channel', 'store', 'channel', 'sales'"
 ```
 
 ### S50_store_channel_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'store', 'channel', 'store', 'channel', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'store', 'channel', 'store', 'channel', 'sales'"
 ```
 
 ### S50_channel_store_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'channel,store', 'store,sales', 'store', 'channel', 'store', 'channel', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'channel,store', 'store,sales', 'store', 'channel', 'store', 'channel', 'sales'"
 ```
 
 ### S50_sales_store_channel_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_sales_store_calendar_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,store', 'store,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,store', 'store,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_sales_channel_store_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_sales_channel_calendar_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,channel', 'channel,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,channel', 'channel,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_sales_calendar_store_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_sales_calendar_channel_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_store_sales_channel_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,sales', 'sales,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,sales', 'sales,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_store_channel_sales_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S50_store_channel_calendar_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,channel', 'channel,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,channel', 'channel,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### S51
 
 SQLSTATE：`42000`。
 
-```text
-Planning Error: Initial planning error: Error during planning: Schema contains duplicate qualified field name 'sales.sales_amount'
-QUERY: SELECT store."StoreKey", channel."ChannelName", MEASURE(sales.sales_amount) AS v FROM sales CROSS JOIN store CROSS JOIN sales CROSS JOIN channel WHERE sales."DateKey" >= DATE '2007-02-01' AND sales."DateKey" < DATE '2007-03-01' GROUP BY 1, 2 ORDER BY 1, 2 LIMIT 4
+```json
+"Planning Error: Initial planning error: Error during planning: Schema contains duplicate qualified field name 'sales.sales_amount'\nQUERY: SELECT store.\"StoreKey\", channel.\"ChannelName\", MEASURE(sales.sales_amount) AS v FROM sales CROSS JOIN store CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1, 2 ORDER BY 1, 2 LIMIT 4"
 ```
 
 ### S52_sales_online_sales_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,online_sales', 'online_sales,calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,online_sales', 'online_sales,calendar', 'sales'"
 ```
 
 ### S52_sales_calendar_online_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,online_sales', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,online_sales', 'calendar', 'sales'"
 ```
 
 ### S52_online_sales_sales_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'online_sales,sales', 'sales,calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'online_sales,sales', 'sales,calendar', 'sales'"
 ```
 
 ### S52_online_sales_calendar_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'online_sales,calendar', 'calendar,sales', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'online_sales,calendar', 'calendar,sales', 'calendar', 'sales'"
 ```
 
 ### S52_calendar_sales_online_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,online_sales', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,online_sales', 'calendar', 'sales'"
 ```
 
 ### S52_calendar_online_sales_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,online_sales', 'online_sales,sales', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,online_sales', 'online_sales,sales', 'calendar', 'sales'"
 ```
 
 ### S53
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,online_sales', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,online_sales', 'sales'"
 ```
 
 ### S60
 
 SQLSTATE：`0A000`。
 
-```text
-Unsupported Error: percentile_cont(...) execution is not implemented
+```json
+"Unsupported Error: percentile_cont(...) execution is not implemented"
 ```
 
 ### S61
 
 SQLSTATE：`0A000`。
 
-```text
-Unsupported Error: percentile_cont(...) execution is not implemented
+```json
+"Unsupported Error: percentile_cont(...) execution is not implemented"
 ```
 
 ### S62
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Query failed: Error: Column 'fk_aggregate.saleskey' is not under aggregate function and not in GROUP BY keys. In query cte_7 AS (SELECT fk_aggregate.saleskey AS saleskey, fk_aggregate.datekey AS datekey, fk_aggregate.channelkey AS channelkey, fk_aggregate.storekey AS storekey, fk_aggregate.productkey AS productkey, fk_aggregate.promotionkey AS promotionkey, fk_aggregate.currencykey AS currencykey, fk_aggregate.unitcost AS unitcost, fk_aggregate.unitprice AS unitprice, fk_aggregate.salesquantity AS salesquantity, fk_aggregate.returnquantity AS returnquantity, fk_aggregate.returnamount AS returnamount, fk_aggregate.discountquantity AS discountquantity, fk_aggregate.discountamount AS discountamount, fk_aggregate.totalcost AS totalcost, fk_aggregate.salesamount AS salesamount, fk_aggregate.__user AS __user, fk_aggregate.__cubejoinfield AS __cubejoinfield, sum(sum(fk_aggregate.sales__sales_amount)) OVER () AS sales__sales_amount_in_scope FROM cte_0 AS fk_aggregate). ; query id: 581f7c34-43c0-4571-98e4-1d26623e2e3f-9df68a26-6be7-4f7c-8cb7-90446f480e03
+```json
+"Database Execution Error: Query failed: Error: Column 'fk_aggregate.saleskey' is not under aggregate function and not in GROUP BY keys. In query cte_7 AS (SELECT fk_aggregate.saleskey AS saleskey, fk_aggregate.datekey AS datekey, fk_aggregate.channelkey AS channelkey, fk_aggregate.storekey AS storekey, fk_aggregate.productkey AS productkey, fk_aggregate.promotionkey AS promotionkey, fk_aggregate.currencykey AS currencykey, fk_aggregate.unitcost AS unitcost, fk_aggregate.unitprice AS unitprice, fk_aggregate.salesquantity AS salesquantity, fk_aggregate.returnquantity AS returnquantity, fk_aggregate.returnamount AS returnamount, fk_aggregate.discountquantity AS discountquantity, fk_aggregate.discountamount AS discountamount, fk_aggregate.totalcost AS totalcost, fk_aggregate.salesamount AS salesamount, fk_aggregate.__user AS __user, fk_aggregate.__cubejoinfield AS __cubejoinfield, sum(sum(fk_aggregate.sales__sales_amount)) OVER () AS sales__sales_amount_in_scope FROM cte_0 AS fk_aggregate). ; query id: 581f7c34-43c0-4571-98e4-1d26623e2e3f-9df68a26-6be7-4f7c-8cb7-90446f480e03"
 ```
 
 ### J02
 
 SQLSTATE：`None`。
 
-```text
-'not_a_member' not found for path 'sales.not_a_member'
+```json
+"'not_a_member' not found for path 'sales.not_a_member'"
 ```
 
 ### J05
 
 SQLSTATE：`None`。
 
-```text
-Invalid query format: "join" is not allowed
+```json
+"Invalid query format: \"join\" is not allowed"
 ```
 
 ### J30
 
 SQLSTATE：`None`。
 
-```text
-Invalid query format: "measures[0]" with value "sales.sales_amount + sales.sales_quantity" fails to match the required pattern: /^[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+$/
+```json
+"Invalid query format: \"measures[0]\" with value \"sales.sales_amount + sales.sales_quantity\" fails to match the required pattern: /^[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+$/"
 ```
 
 ### J31
 
 SQLSTATE：`None`。
 
-```text
-Invalid query format: "dimensions[0]" with value "CAST(sales.channelKey AS TEXT)" fails to match the required pattern: /^[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)?$/
+```json
+"Invalid query format: \"dimensions[0]\" with value \"CAST(sales.channelKey AS TEXT)\" fails to match the required pattern: /^[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+(\\.[a-zA-Z0-9_]+)?$/"
 ```
 
 ### J32
 
 SQLSTATE：`None`。
 
-```text
-Invalid query format: "expression" is not allowed
+```json
+"Invalid query format: \"expression\" is not allowed"
 ```
 
 ### F20_coalesce
 
 SQLSTATE：`22000`。
 
-```text
-Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length
+```json
+"Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length"
 ```
 
 ### F20_coalesce_cast
 
 SQLSTATE：`22000`。
 
-```text
-Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length
+```json
+"Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length"
 ```
 
 ### F24
 
 SQLSTATE：`XX000`。
 
-```text
-Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information
-QUERY: SELECT sales.channelkey, sales."channelKey", MEASURE(sales.sales_amount) FROM sales GROUP BY 1, 2 LIMIT 1
+```json
+"Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information\nQUERY: SELECT sales.channelkey, sales.\"channelKey\", MEASURE(sales.sales_amount) FROM sales GROUP BY 1, 2 LIMIT 1"
 ```
 
 ### F30_sales_store_channel_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_sales_store_calendar_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,store', 'store,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,store', 'store,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_sales_channel_store_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_sales_channel_calendar_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,channel', 'channel,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,channel', 'channel,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_sales_calendar_store_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_sales_calendar_channel_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_store_sales_channel_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,sales', 'sales,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,sales', 'sales,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_store_sales_calendar_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,sales', 'sales,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,sales', 'sales,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_store_channel_sales_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_store_channel_calendar_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,channel', 'channel,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,channel', 'channel,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_store_calendar_sales_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,calendar', 'calendar,sales', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,calendar', 'calendar,sales', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_store_calendar_channel_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,calendar', 'calendar,channel', 'channel,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,calendar', 'calendar,channel', 'channel,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_channel_sales_store_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'channel,sales', 'sales,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'channel,sales', 'sales,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_channel_sales_calendar_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'channel,sales', 'sales,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'channel,sales', 'sales,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_channel_store_sales_calendar
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'channel,store', 'store,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'channel,store', 'store,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_channel_store_calendar_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'channel,store', 'store,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'channel,store', 'store,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_channel_calendar_sales_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'channel,calendar', 'calendar,sales', 'sales,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'channel,calendar', 'calendar,sales', 'sales,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_channel_calendar_store_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'channel,calendar', 'calendar,store', 'store,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'channel,calendar', 'calendar,store', 'store,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_calendar_sales_store_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_calendar_sales_channel_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_calendar_store_sales_channel
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,store', 'store,sales', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,store', 'store,sales', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_calendar_store_channel_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,store', 'store,channel', 'channel,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,store', 'store,channel', 'channel,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_calendar_channel_sales_store
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,channel', 'channel,sales', 'sales,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,channel', 'channel,sales', 'sales,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F30_calendar_channel_store_sales
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,channel', 'channel,store', 'store,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,channel', 'channel,store', 'store,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F31
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'store,sales', 'channel,calendar', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'store,sales', 'channel,calendar', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'"
 ```
 
 ### F33
 
 SQLSTATE：`XX000`。
 
-```text
-Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information
-QUERY: SELECT store."StoreKey", MEASURE(sales.sales_amount) FROM sales JOIN store ON sales."StoreKey" = store."StoreKey" WHERE sales."DateKey" >= DATE '2007-02-01' AND sales."DateKey" < DATE '2007-03-01' GROUP BY 1 LIMIT 4
+```json
+"Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information\nQUERY: SELECT store.\"StoreKey\", MEASURE(sales.sales_amount) FROM sales JOIN store ON sales.\"StoreKey\" = store.\"StoreKey\" WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1 LIMIT 4"
 ```
 
 ### F34
 
 SQLSTATE：`XX000`。
 
-```text
-Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information
-QUERY: WITH a AS (SELECT sales."channelKey" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales."DateKey" >= DATE '2007-02-01' AND sales."DateKey" < DATE '2007-03-01' GROUP BY 1) SELECT a.k, a.v, channel."ChannelName" FROM a LEFT JOIN channel ON a.k = channel."ChannelKey" ORDER BY a.k
+```json
+"Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information\nQUERY: WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT a.k, a.v, channel.\"ChannelName\" FROM a LEFT JOIN channel ON a.k = channel.\"ChannelKey\" ORDER BY a.k"
 ```
 
 ### F40
 
 SQLSTATE：`42000`。
 
-```text
-Planning Error: WITHIN GROUP (ORDER BY ...) must be Float64 or Interval, got Int64
+```json
+"Planning Error: WITHIN GROUP (ORDER BY ...) must be Float64 or Interval, got Int64"
 ```
 
 ### F41
 
 SQLSTATE：`0A000`。
 
-```text
-Unsupported Error: percentile_cont(...) execution is not implemented
+```json
+"Unsupported Error: percentile_cont(...) execution is not implemented"
 ```
 
 ### B03
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Can't find join path to join 'calendar,online_sales', 'sales,calendar', 'sales'
+```json
+"Database Execution Error: Can't find join path to join 'calendar,online_sales', 'sales,calendar', 'sales'"
 ```
 
 ### B11
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Type UInt64 is not supported in response transformation from Cube
+```json
+"Database Execution Error: Type UInt64 is not supported in response transformation from Cube"
 ```
 
 ### B20
 
 SQLSTATE：`42000`。
 
-```text
-Planning Error: Initial planning error: This feature is not implemented: Unsupported value TypedString(TypedString { data_type: Timestamp(None, None), value: ValueWithSpan { value: SingleQuotedString("2007-02-01 00:00:00"), span: Span(Location(1,41)..Location(1,62)) }, uses_odbc_syntax: false }) in a values list expression
-QUERY: SELECT AVG(b - a) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00', TIMESTAMP '2007-02-03 00:00:00'), (TIMESTAMP '2007-02-02 00:00:00', TIMESTAMP '2007-02-03 00:00:00')) t (a, b)
+```json
+"Planning Error: Initial planning error: This feature is not implemented: Unsupported value TypedString(TypedString { data_type: Timestamp(None, None), value: ValueWithSpan { value: SingleQuotedString(\"2007-02-01 00:00:00\"), span: Span(Location(1,41)..Location(1,62)) }, uses_odbc_syntax: false }) in a values list expression\nQUERY: SELECT AVG(b - a) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00', TIMESTAMP '2007-02-03 00:00:00'), (TIMESTAMP '2007-02-02 00:00:00', TIMESTAMP '2007-02-03 00:00:00')) t (a, b)"
 ```
 
 ### B21
 
 SQLSTATE：`42000`。
 
-```text
-Planning Error: Initial planning error: This feature is not implemented: Unsupported value TypedString(TypedString { data_type: Timestamp(None, None), value: ValueWithSpan { value: SingleQuotedString("2007-02-01 00:00:00"), span: Span(Location(1,67)..Location(1,88)) }, uses_odbc_syntax: false }) in a values list expression
-QUERY: SELECT AVG(CAST(b - a AS DOUBLE PRECISION)) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00', TIMESTAMP '2007-02-03 00:00:00'), (TIMESTAMP '2007-02-02 00:00:00', TIMESTAMP '2007-02-03 00:00:00')) t (a, b)
+```json
+"Planning Error: Initial planning error: This feature is not implemented: Unsupported value TypedString(TypedString { data_type: Timestamp(None, None), value: ValueWithSpan { value: SingleQuotedString(\"2007-02-01 00:00:00\"), span: Span(Location(1,67)..Location(1,88)) }, uses_odbc_syntax: false }) in a values list expression\nQUERY: SELECT AVG(CAST(b - a AS DOUBLE PRECISION)) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00', TIMESTAMP '2007-02-03 00:00:00'), (TIMESTAMP '2007-02-02 00:00:00', TIMESTAMP '2007-02-03 00:00:00')) t (a, b)"
 ```
 
 ### B22
 
 SQLSTATE：`22000`。
 
-```text
-Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length
+```json
+"Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length"
 ```
 
 ### T01
 
 SQLSTATE：`42000`。
 
-```text
-Planning Error: Initial planning error: Error during planning: The function Avg does not support inputs of type Interval(MonthDayNano).
-QUERY: SELECT AVG(CAST(b AS TIMESTAMP) - CAST(a AS TIMESTAMP)) FROM (VALUES ('2007-02-01', '2007-02-03'), ('2007-02-02', '2007-02-03')) t (a, b)
+```json
+"Planning Error: Initial planning error: Error during planning: The function Avg does not support inputs of type Interval(MonthDayNano).\nQUERY: SELECT AVG(CAST(b AS TIMESTAMP) - CAST(a AS TIMESTAMP)) FROM (VALUES ('2007-02-01', '2007-02-03'), ('2007-02-02', '2007-02-03')) t (a, b)"
 ```
 
 ### T02
 
 SQLSTATE：`XX000`。
 
-```text
-Internal Error: Unsupported CAST from Interval(MonthDayNano) to Float64
+```json
+"Internal Error: Unsupported CAST from Interval(MonthDayNano) to Float64"
 ```
 
 ### T05
 
 SQLSTATE：`58000`。
 
-```text
-Database Execution Error: Query failed: Error: Syntax error: failed at position 16 (``) (line 1, col 16): ``, `a`.`v` `_1`, CAST(`a`.`row_number_order` AS BIGINT) `_2` 
-FROM (
-  SELECT ROW_NUMBER() OVER (ORDER BY `sales`.`measure_sales_sa` DESC NULLS FIRST) `row_numbe... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 84a457ad-e596-4cd5-b271-fbbf9ce6fa32-dc7a995e-fe99-4159-879f-8eccbb914167
+```json
+"Database Execution Error: Query failed: Error: Syntax error: failed at position 16 (``) (line 1, col 16): ``, `a`.`v` `_1`, CAST(`a`.`row_number_order` AS BIGINT) `_2` \nFROM (\n  SELECT ROW_NUMBER() OVER (ORDER BY `sales`.`measure_sales_sa` DESC NULLS FIRST) `row_numbe... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 84a457ad-e596-4cd5-b271-fbbf9ce6fa32-dc7a995e-fe99-4159-879f-8eccbb914167"
 ```
-
