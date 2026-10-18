@@ -235,6 +235,7 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
         "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep, "question_sha256": sha256(q.text),
         "eval_commit": ctx.eval_commit, **({"eval_tag": ctx.eval_tag} if ctx.eval_tag else {}),
         **({"semantic_tag": ctx.semantic_tag} if ctx.semantic_tag else {}),
+        **({"anchor_rules": q.meta["rules_tag"]} if "rules_tag" in q.meta else {}),
         "harness_commit": ctx.harness_commit,
         "model_requested": ctx.client.model, "system_sha256": sha256(ctx.system),
         "exec_timeout_s": ctx.timeout_s, "exec_limits": ctx.limits, "scoring": q.scoring, "started_at": started.isoformat(timespec="seconds"),
@@ -552,6 +553,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--eval-tag", default="eval-v1",
                     help="the question bank must be a clean checkout of this tag (BOARD item 13)")
+    ap.add_argument("--anchor-rules-tag", default="eval-v1",
+                    help="English anchors inherit the Chinese questions' rules from this bank tag, never from the "
+                         "current checkout; refuse to start if the tag is missing")
     ap.add_argument("--semantic-tag", default="semantic-v1.2",
                     help="semantic/ and render/ must be this tag's content and build/contexts rendered from them")
     ap.add_argument("--limit", type=int, help="first N questions only")
@@ -611,7 +615,16 @@ def main(argv: list[str] | None = None, load=None) -> int:
     pilot = pilot_ids() if args.pilot else None
     if pilot is not None and any(c.lang != "zh" for c in cells):
         raise SystemExit("--pilot is a sample of the Chinese set")
-    by_lang = {lang: select_questions(load(lang=lang), args, pilot) for lang in sorted({c.lang for c in cells})}
+    try:
+        by_lang = {lang: select_questions(load(lang=lang, **({"anchor_rules_tag": args.anchor_rules_tag}
+                                                             if lang == "en" else {})), args, pilot)
+                   for lang in sorted({c.lang for c in cells})}
+    except EvalVersionError as exc:
+        print(f"refusing to start: {exc}")
+        return 2
+    if "en" in by_lang:
+        print(f"anchor rules: {args.anchor_rules_tag} = "
+              f"{next((q.meta['rules_tag']['commit'] for q in by_lang['en'] if 'rules_tag' in q.meta), '—')}")
 
     rows, total = dry_run([c for c in cells], {k: len(v) for k, v in by_lang.items()}, args.reps, args.model,
                           fix_rate=args.est_fix_rate, output_tokens=args.est_output_tokens,

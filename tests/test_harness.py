@@ -668,15 +668,75 @@ def test_bank_anchor_rules_are_read_by_id_and_hash(tmp_path):
 
 
 @needs_eval
-def test_anchor_details_on_the_real_bank():
-    """decisions/2026-10-16-q79-release-and-anchor-refs.md §3 on the real anchors."""
+def test_anchors_score_exactly_as_at_eval_v1_whatever_the_current_bank():
+    """Anchors inherit the Chinese rules from the fixed tag (default eval-v1), never from the
+    current checkout: the 87 scorable anchors, their effective rules (no required_columns,
+    i.e. every column required), boundary completion and pending set are the same as with
+    the eval-v1 bank (snapshot from the loader before the change), on eval-v1 or eval-v1.1."""
+    import hashlib
     from harness.anchor_refs import anchor_dir
-    from harness.questions import load_questions, load_zh, published_row_count
+    from harness.questions import bank_anchor_rules, load_questions
     if not (anchor_dir() / "MANIFEST.json").exists():
         pytest.skip("anchor references not built")
-    zh = {q.qid: q for q in load_zh(EVAL)}
+    snap = json.loads((Path(__file__).parent / "anchor_rules_eval_v1.json").read_text(encoding="utf-8"))
     en = {q.qid: q for q in load_questions(EVAL, lang="en")}
-    for qid in ("EN84", "EN100"):           # differ from the current refs only by Nullable(...)
+    assert set(en) == set(snap["anchors"])
+    assert sum(q.pending is None for q in en.values()) == snap["scorable"] == 87
+    tag = _git_rev(EVAL, "eval-v1")
+    written = bank_anchor_rules(EVAL)
+    for qid, q in en.items():
+        want = snap["anchors"][qid]
+        digest = hashlib.sha256(json.dumps(q.rules, sort_keys=True, ensure_ascii=False).encode()).hexdigest() if q.rules else None
+        assert (q.pending, digest, bool(q.meta.get("boundary_completed"))) == \
+            (want["pending"], want["rules_sha256"], want["boundary_completed"]), qid
+        assert not (q.rules and "required_columns" in q.rules), qid
+        assert q.meta["rules_tag"] == {"tag": "eval-v1", "commit": tag}
+        if q.meta.get("rules_source"):         # the bank's own rules for original references: current checkout
+            assert q.rules == written[q.meta["vendor_id"]]["rules"]
+
+
+def _git_rev(root, tag):
+    import subprocess
+    return subprocess.run(["git", "-C", str(root), "rev-parse", f"{tag}^{{commit}}"],
+                          capture_output=True, text=True, check=True).stdout.strip()
+
+
+@needs_eval
+def test_anchor_rules_tag_is_explicit_and_never_falls_back():
+    from harness.anchor_refs import anchor_dir
+    from harness.questions import EvalVersionError, load_questions, zh_rules_at
+    with pytest.raises(EvalVersionError, match="never inherit rules from the current checkout"):
+        zh_rules_at(EVAL, "no-such-tag")
+    if not (anchor_dir() / "MANIFEST.json").exists():
+        pytest.skip("anchor references not built")
+    with pytest.raises(EvalVersionError):
+        load_questions(EVAL, lang="en", anchor_rules_tag="no-such-tag")
+    rules, commit = zh_rules_at(EVAL, "eval-v1")
+    assert commit == _git_rev(EVAL, "eval-v1") and "Q01" in rules and all(q.text == "" for q in rules.values())
+
+
+def test_anchor_log_lines_carry_the_rules_tag(tmp_path):
+    respond, _ = _scripted("```sql\nSELECT 42\n```")
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])}))
+    tag = {"tag": "eval-v1", "commit": "07dca9a" + "0" * 33}
+    anchor = Question("EN08", QTEXT, refs=[[[42]]], rules=Q.rules, lang="en", meta={"rules_tag": tag})
+    assert R.run_attempt(ctx, anchor, 1)["anchor_rules"] == tag
+    respond, _ = _scripted("```sql\nSELECT 42\n```")
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])}))
+    assert "anchor_rules" not in R.run_attempt(ctx, Question("Q008", QTEXT, refs=[[[42]]], rules=Q.rules), 1)
+
+
+@needs_eval
+def test_anchor_details_on_the_real_bank():
+    """decisions/2026-10-16-q79-release-and-anchor-refs.md §3 on the real anchors; the Chinese
+    rules they inherit are those of the anchor rules tag (eval-v1), not of the current checkout."""
+    from harness.anchor_refs import anchor_dir
+    from harness.questions import load_questions, published_row_count, zh_rules_at
+    if not (anchor_dir() / "MANIFEST.json").exists():
+        pytest.skip("anchor references not built")
+    zh, _ = zh_rules_at(EVAL, "eval-v1")
+    en = {q.qid: q for q in load_questions(EVAL, lang="en")}
+    for qid in ("EN84", "EN100"):           # differ from the eval-v1 refs only by Nullable(...)
         assert en[qid].pending is None and en[qid].rules == zh[en[qid].meta["bank_qid"]].rules
     for qid in ("EN39", "EN49"):            # empty locally and in the published artifact
         assert en[qid].refs == [[]] and en[qid].meta["empty_original_ref"]

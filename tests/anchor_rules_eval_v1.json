@@ -1,0 +1,699 @@
+{
+ "anchors": {
+  "EN01": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN02": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "7c45587606e0b459029105449954465a75d3665a5b55c775fed15e23ae2f7f7a",
+   "rules_source": "inherited"
+  },
+  "EN03": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN04": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "528effbe844f24b4466ee78ecb178072954d08ddc41f1413d5efd599223cdce8",
+   "rules_source": "inherited"
+  },
+  "EN05": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "860f11f5d22848740318112d785b572686167170bc5c8ee214d6e8dd322b63aa",
+   "rules_source": "inherited"
+  },
+  "EN06": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "7c45587606e0b459029105449954465a75d3665a5b55c775fed15e23ae2f7f7a",
+   "rules_source": "inherited"
+  },
+  "EN07": {
+   "boundary_completed": true,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "c61f78398bd810c7ac14806821139669f692f89b263567a481d8b8d1a172b71c",
+   "rules_source": "inherited"
+  },
+  "EN08": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "ec3164e65910504739a134bfa36645a58c371da848e193b943db4aa3f33b7ba8",
+   "rules_source": "inherited"
+  },
+  "EN09": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "57b0291bc8a4ce108da80ca8c1e0f77d2a5a408000391dd77de2b15ba7e81c85",
+   "rules_source": "inherited"
+  },
+  "EN10": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN100": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "4554100f0fac97ab3f51f55220c6a770f1e6a3f2874b753a9822f78cff0742a4",
+   "rules_source": "inherited"
+  },
+  "EN11": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "d5b965ca268e35e9cd732fa365b57ba565ad3383ecb32a48b0fca47c64452f76",
+   "rules_source": "inherited"
+  },
+  "EN12": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "be4d3d9199c2190f0c84795a6867fd4514bd91f575525f1e895803d91f1e9c39",
+   "rules_source": "inherited"
+  },
+  "EN13": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "3b7f9cbb4477eae427e942db0166ed875f8aa4e3de258fcfb49917e21bf9fe2d",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN14": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "7316beabd38ddff3b1413c76aaab05a50e991c1b86115aa84c7c49c81b2498ff",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN15": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "4d2b3370edecbd6129b228bd4ea1130b4e05fcba7d243bc09436c6f21d8aa28a",
+   "rules_source": "inherited"
+  },
+  "EN16": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "25629c11925be72b3a12be363d64400c38103f991b9d96d15e56a628af76711d",
+   "rules_source": "inherited"
+  },
+  "EN17": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "0153d8ed423d130c8872429d9cb071f79a4ba0d3f34fb9a940c7bdd26b3cc24b",
+   "rules_source": "inherited"
+  },
+  "EN18": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "d5b965ca268e35e9cd732fa365b57ba565ad3383ecb32a48b0fca47c64452f76",
+   "rules_source": "inherited"
+  },
+  "EN19": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "d5b965ca268e35e9cd732fa365b57ba565ad3383ecb32a48b0fca47c64452f76",
+   "rules_source": "inherited"
+  },
+  "EN20": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "cebd2e82cd5e7956712309c4aa1c451a412294d008bf5ee32d9c7b9141956295",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN21": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "64f389da3480c305cafde43e1ea7a580d8c7cbff4f07875e891594f10634dd1e",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN22": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "9a48d12b1ddadd856a2c97174c1b7b38c0ebfe52d8113cbec79ecf06d1ff9fa3",
+   "rules_source": "inherited"
+  },
+  "EN23": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "f23e925e0f5c87ff3ddd7c28bd845a6c632bd11b964fd5e44b816a090bac6a25",
+   "rules_source": "inherited"
+  },
+  "EN24": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "28616a2750cb4443e47083929a8f81133bcaf9f57841298d865e341d32ea548f",
+   "rules_source": "inherited"
+  },
+  "EN25": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "e009e2a6dccd9ba2c144566dd9093f533469c552c33403039bf991be455222d8",
+   "rules_source": "inherited"
+  },
+  "EN26": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "47c3208ecdf8722ef217362fd1ace0732bb0cafb05b2b1d5fa1478de652232da",
+   "rules_source": "inherited"
+  },
+  "EN27": {
+   "boundary_completed": true,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "2e5ac96a16344acebbaa5785ab26eb231ca4b266d32a0498020c4f017adc9003",
+   "rules_source": "inherited"
+  },
+  "EN28": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a199d9f55277ada21e441a2932efcb4c98beef6154ff8ea3e191c5066acffaa0",
+   "rules_source": "inherited"
+  },
+  "EN29": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "56bb5fdd87e5a8b14fec2ad832eb1358687e6894386cd88a32b96e0ac35ebcb3",
+   "rules_source": "inherited"
+  },
+  "EN30": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "1cd5b4cdc58fdb49c1a17dbbe9df78a7a23185f2851c20c04431945b8ac4bd83",
+   "rules_source": "inherited"
+  },
+  "EN31": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "d13dfff93cbb82f4b3eec40e8a59f3dd8f3e8239cbbf7d3e47dcefb07c5944ff",
+   "rules_source": "inherited"
+  },
+  "EN32": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "eb923efe10af7e5c0bb2865692dedb6a86a724893d61aa50083448c8e1e2752f",
+   "rules_source": "inherited"
+  },
+  "EN34": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "aac34bc8415b5693b747c8bba000fe5d4fde320353d2347d3b5cd19accd1b2ca",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN35": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "582da45721b1b0a7a8ee426571cdc9e31009b2f576504d6d87d06d2546727408",
+   "rules_source": "inherited"
+  },
+  "EN36": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "860f11f5d22848740318112d785b572686167170bc5c8ee214d6e8dd322b63aa",
+   "rules_source": "inherited"
+  },
+  "EN37": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "ad443c1f77a9708fb48d2e071272d4281efc3bf9f7971aec5da0c51ba86ab255",
+   "rules_source": "inherited"
+  },
+  "EN38": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "d2e1917620e4820bcb992933a0e53629466932c4218b9547f7413922977531ee",
+   "rules_source": "inherited"
+  },
+  "EN39": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "1343de59b781b87579ac1c856ca4cb5932184b2397221dbabc2ad3c554167f96",
+   "rules_source": "inherited"
+  },
+  "EN40": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "7c45587606e0b459029105449954465a75d3665a5b55c775fed15e23ae2f7f7a",
+   "rules_source": "inherited"
+  },
+  "EN41": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "7c45587606e0b459029105449954465a75d3665a5b55c775fed15e23ae2f7f7a",
+   "rules_source": "inherited"
+  },
+  "EN42": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "54634c16456807773d4f697c3e5f7df72c4e97c9e5bc01ebb3ab20ac675cbcb3",
+   "rules_source": "inherited"
+  },
+  "EN43": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "4d2b3370edecbd6129b228bd4ea1130b4e05fcba7d243bc09436c6f21d8aa28a",
+   "rules_source": "inherited"
+  },
+  "EN44": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "81b498c8a196b2a74b7a8613eb4abb46f863603bc771344a03fd6497101b4a7d",
+   "rules_source": "inherited"
+  },
+  "EN45": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "6525dedf505e1119aa704e8160a8e0e61853857de2e23427ebcd92eac68ff606",
+   "rules_source": "inherited"
+  },
+  "EN46": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "e6872e294af99855d9e3314aefd98ab879892bda104f3020609fc0bc9ef0b509",
+   "rules_source": "inherited"
+  },
+  "EN47": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "87a6aeec23e191e2cc154ab02657d50ba5df9c8c6c9bc909c617456e329061a2",
+   "rules_source": "inherited"
+  },
+  "EN48": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "6b0006831013949cfe016e0292db0e9f00a2a081a0edc5bcbe853ebcf65b1d7f",
+   "rules_source": "inherited"
+  },
+  "EN49": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "59170917a07e48df687d9627b2decdb428e16715e4e335c011b8b618ff1bf7d8",
+   "rules_source": "inherited"
+  },
+  "EN50": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "4801599993c389e0b8cf769784ed3ef5148d41e46cb2fa9403abc767ce63b1f9",
+   "rules_source": "inherited"
+  },
+  "EN51": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN52": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "57b0291bc8a4ce108da80ca8c1e0f77d2a5a408000391dd77de2b15ba7e81c85",
+   "rules_source": "inherited"
+  },
+  "EN53": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN54": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "7c45587606e0b459029105449954465a75d3665a5b55c775fed15e23ae2f7f7a",
+   "rules_source": "inherited"
+  },
+  "EN55": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN56": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "57b0291bc8a4ce108da80ca8c1e0f77d2a5a408000391dd77de2b15ba7e81c85",
+   "rules_source": "inherited"
+  },
+  "EN57": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN58": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "7c45587606e0b459029105449954465a75d3665a5b55c775fed15e23ae2f7f7a",
+   "rules_source": "inherited"
+  },
+  "EN59": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN60": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a5a9fc4f5cd934b8b4ee210d2fc6cc0d54986c27e323c9b1d0560c6f01a9ef39",
+   "rules_source": "inherited"
+  },
+  "EN61": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "d5b965ca268e35e9cd732fa365b57ba565ad3383ecb32a48b0fca47c64452f76",
+   "rules_source": "inherited"
+  },
+  "EN62": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "3389d457343ecc80c693bb638f3ce4bd77c9ec311e0125cb334e950b2c10f167",
+   "rules_source": "inherited"
+  },
+  "EN63": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "66c86338d090f3840e5841e1864ed7cd8455bbfbd68141fcd951749c6af68f29",
+   "rules_source": "inherited"
+  },
+  "EN64": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "8625918d52c325a88160b96a22476337c6951813e92e18dffac2c5b0c2a9d43a",
+   "rules_source": "inherited"
+  },
+  "EN65": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "a8f8f268ce13b95bc944e69dcc53d0a3f2d2ad9618d148acbd5725e09da77c19",
+   "rules_source": "inherited"
+  },
+  "EN66": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "cda1cc06baec7623b2f940916506fd68ed0afcf65c63627c4604a20a9b9a167d",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN67": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "9cf5e042f536e2046000a0110cbafd740e4dd878496142e7564326d91bab8fcf",
+   "rules_source": "inherited"
+  },
+  "EN68": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "e8e13bf071117bf8ee56bfa5fce2fc3cac074bbbaf16df00f07a0dac70c816d0",
+   "rules_source": "inherited"
+  },
+  "EN69": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "d060cb7df0b6868d27261063560e5b4dabe4cf2c5b968a5ab3623b56f48ffa1b",
+   "rules_source": "inherited"
+  },
+  "EN70": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "230b71a061ffb6eb07f5feeda0a6aca1d475fde6e5eb0fa9f9b376440eeac7d4",
+   "rules_source": "inherited"
+  },
+  "EN71": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "0d7e7e689cc934fa2326fa48a011de34a3a370b334476f4c7234b77cd3a383d9",
+   "rules_source": "inherited"
+  },
+  "EN72": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "715ec33a95f954d89e7a18d1e73e0a9d58b84d55f202ce6407761c8303d22dc4",
+   "rules_source": "inherited"
+  },
+  "EN73": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "cedf7e6715b79e5dc8fff5cbddd34bf09811c1fa141b2edff2f7759d16133b85",
+   "rules_source": "inherited"
+  },
+  "EN74": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "c4ffec1e26f526121237ff9e859222b56497f39cc7b7aa207a51c33aa19a6cae",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN75": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "3a6f9113774cfa9b83cfd586c640af462dfd4a4b1d89d0e6e5f115136bf312a7",
+   "rules_source": "inherited"
+  },
+  "EN76": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "4216b692bef9985542fcabb5adfdc966c790f11f6ef5e108f3023ceb39cec320",
+   "rules_source": "inherited"
+  },
+  "EN77": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "7a48daf290929b7dc5e6ff719120ba99184885a5357768144b5d175657eb5647",
+   "rules_source": "inherited"
+  },
+  "EN78": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "2b7d0b8d8676dfb0e29ddd8cb51858d5d78614b8b8a7622b857489636b12083c",
+   "rules_source": "inherited"
+  },
+  "EN79": {
+   "boundary_completed": true,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "82b0388d39613c915c18efd9b8bdc53e20565f9c3ac090870375011da5038b8f",
+   "rules_source": "inherited"
+  },
+  "EN80": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "fe2a570fcf434213c0f9fc09f2d58f0790073dff980957899d5d9dc2f59a6317",
+   "rules_source": "inherited"
+  },
+  "EN81": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "05bbdfed20a709c602d7fc59397b0f70e3de5397ca673e37b5c151c5f2420f95",
+   "rules_source": "inherited"
+  },
+  "EN82": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "2bfcad44e0d1cd6b9592fb6330294c09c9ce30f6ad4fff2c59c5bad017bec985",
+   "rules_source": "inherited"
+  },
+  "EN83": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "703c6a8886bbd43369ea0f0ba81b9ec8fb650289ff768eb99675b11b938fe811",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN84": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "c4e539ccf396afd1a02af8c0ece135b37fedbb629f78d8990a89dfbec46358b6",
+   "rules_source": "inherited"
+  },
+  "EN85": {
+   "boundary_completed": true,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "bab92659b1a4d055c42ac786a92c99cc85b80afad3d58530d78b3770a4ba0c13",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN86": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "a36520b4614ac0db32f8c9523765c3da93e1b5f69928441fb7ceb91c49f9e697",
+   "rules_source": "inherited"
+  },
+  "EN87": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "1fb629e3536a757d46558e38c21ea35d590c34f3738111f2a8bfb8687a5af92c",
+   "rules_source": "bank_anchor_rules"
+  },
+  "EN88": {
+   "boundary_completed": true,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "2d6b7db4293b69f013cfaf30843f9d7b9f1b2496cc836c1157906952fad67a2a",
+   "rules_source": "inherited"
+  },
+  "EN89": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "b7ac20bccf4140f4f1f65b76d3b09b2a71bfbeec286f2f570f20baa311299834",
+   "rules_source": "inherited"
+  },
+  "EN90": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "167a4414dca14e5b61053ef0bcb1e4fe921b14e7f86f2a06b2569d3d7bf4d008",
+   "rules_source": "inherited"
+  },
+  "EN91": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "a015655bd8b62827c721b86e28c20357e94947f969b884a15babc0bd8e1fb5f6",
+   "rules_source": "inherited"
+  },
+  "EN92": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "60062af9db211cb244a4c556f0dfd1a5ccaf096e8d0f80751a841d186a60e041",
+   "rules_source": "inherited"
+  },
+  "EN93": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": "16268a1e12906dbfd1b83529eb1cfe0fc98a9716e91d6baa5cf962704608e470",
+   "rules_source": "inherited"
+  },
+  "EN94": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "4675f659cdeb77ab0cab7fe8d8f80f989e7e3b879ea8a645e97fd68fcad0c409",
+   "rules_source": "inherited"
+  },
+  "EN95": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": null,
+   "rules_source": null
+  },
+  "EN96": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "03e770f80d51f270582f2e6564f772307249475786887ca690b541be93ba9b4d",
+   "rules_source": "inherited"
+  },
+  "EN97": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": "judge",
+   "rules_sha256": null,
+   "rules_source": null
+  },
+  "EN98": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "39320e19bfd49ab85f2a92e262a4590867aec941b0b21d8b07d9471006997f82",
+   "rules_source": "inherited"
+  },
+  "EN99": {
+   "boundary_completed": false,
+   "has_required_columns": false,
+   "pending": null,
+   "rules_sha256": "396f998ef8b930347865775eeec0a562b9e1c14c6c37ea55e1eac068c40e4c47",
+   "rules_source": "inherited"
+  }
+ },
+ "scorable": 87,
+ "source": "anchor loader at main ea90587 (before anchors pinned their inherited rules), bank eval-v1 = 07dca9a; question ids, digests and flags only"
+}
