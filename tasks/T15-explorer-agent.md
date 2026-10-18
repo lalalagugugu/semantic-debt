@@ -1,6 +1,6 @@
 # T15 探查 agent（L0-E、L1-E、L2-E）
 
-- 状态：未开始
+- 状态：搭建完成（2026-10-19，未调用模型）；工具说明待用户审定后打 `harness-agent-v1`，之后先跑小样本测步数分布（需用户确认花费）
 - 负责：Claude Code
 - 模式：普通（`scripts/start-card.sh T15`）
 - 依赖：G3；L2-E 另需 T16 的 `cube_sql` 执行器
@@ -42,6 +42,38 @@
 
 ## 记录（完成后填写）
 
-- 产出：
+### 搭建（2026-10-19，不调用模型）
+
+协调会话的开工要求：题库 `eval-v1.1`（938957f）、语义层 `semantic-v1.2`、系统提示与 `harness-v1` 逐字节相同（只在后面追加工具说明）、Flash 指纹 `e72d3c7f663d3e1383b00b3884cb4501`；先做 SQL-L0-E、SQL-L1-E，SQL-L2-E 接好先不跑。
+
+**固定参数（三个单元同一个值，不得逐题或逐单元调整）**
+
+| 参数 | 值 | 说明 |
+|---|---|---|
+| 回显行数上限 `ECHO_ROWS` | **50** | 超出时只回显前 50 行，第一行写明「结果已截断，共 N 行，以下只显示前 50 行。」 |
+| 单次回显字符上限 `ECHO_MAX_CHARS` | 20,000 | 防止单个超长值（如 `groupArray`）撑爆上下文；截断时注明。不是行数上限的替代 |
+| `run_sql` 次数上限 `MAX_TOOL_CALLS` | 8 | 格式错误、未知工具的调用也计数；同一回复里超出上限的调用不执行，回「已达上限」；用完后下一次请求带 `tool_choice: "none"`，模型只能交卷 |
+| 执行超时 | 120 秒（`run_sql` 与最终查询相同） | 见偏离第 1 条 |
+| 资源闸 | 200 万行 / 16 GiB，`throw` 不截断 | 同直答；回显上限与执行上限是两回事 |
+| 库范围、只读检查 | 同直答（`ChdbExecutor`：单条 SELECT、禁止改会话设置、按单元的库范围、表函数白名单） | 每一次 `run_sql` 都过同一道检查 |
+
+**实现**
+
+- `harness/agent_prompt.py`：工具说明 `TOOL_SECTION`、`run_sql` 的函数定义、截断与报错的回显写法。**整个文件是 `harness-agent-v1` 的冻结范围**。系统消息 = 对应直答单元的系统消息（逐字节）+ 工具说明。
+- `harness/run_agent.py`：运行器。最终答案（不带工具调用的回复）照直答规则解析、执行、报错修一次（修正请求带 `tool_choice: "none"`）；打分照 PR #100 放子进程、10 秒超时记 `pending/score_timeout`。思考模式下 API 要求工具对话里每条 assistant 消息带回 `reasoning_content`（否则 400），全部带回。
+- 版本闸：题库不是 `--eval-tag`、语义层不是 `--semantic-tag`、`harness/prompt.py` 不是 `harness-v1` 的、`harness/agent_prompt.py` 不是 `harness-agent-v1` 的，都拒绝开跑（dry run 对最后一条只警告）。任何一次调用的指纹不是 G3 的就停。
+- 日志：直答的全部字段，另加 `steps`（每次带工具调用的模型调用：每个工具调用的查询、执行摘要、回显行数、是否截断、原始结果哈希）、`n_tool_calls`、`n_steps`、`hit_tool_limit`、`tool_time_s`、`wall_s`、`agent`（上限与工具说明哈希）。`turns` 只放最终答案与修正，`harness.rescore` 不用改即可离线重评。runs-raw 另存每次工具执行的完整结果 `<qid>_r<rep>_t<call>_c<k>.exec.json`。
+- `harness.run_agent.summarize`：直答汇总 + 步数分布、工具调用状态、只读核对（`tool_forbidden_statements`）、每题平均 token / 耗时 / 费用。
+- SQL-L2-E：执行器 `CubeSqlExecutor` 已接好；不带 `--allow-cube` 拒绝开跑，等 T16 确认 Cube 指标。
+- 测试 `tests/test_agent.py`（29 条，含真实 chDB 上的写语句、DDL、多语句、改设置、越界库、`file()` 拒绝和 1000 行截断）；全套 467 通过、1 跳过。
+
+**费用（dry run，未测步数，按每题 5 次调用、每步新增 2,500 token、每次输出 2,000 token 估）**：三个单元全量约 58.5 元（错峰）；只有 L0-E、L1-E 约 38.5 元。小样本（试跑 24 题 × 1 次 × L0-E、L1-E）约 2.5 元，最坏（每题都用满 8 步、每步 4,000 token）约 7 元。正式开跑前用小样本的实测替换估算（`measured` 自动读已提交日志）。
+
+    uv run python -m harness.run_agent --cell SQL-L0-E --cell SQL-L1-E --dry-run
+    uv run python -m harness.run_agent --cell SQL-L0-E --cell SQL-L1-E --pilot --reps 1 --run-id <run-id> --budget 8
+
+- 产出：见上
 - 偏离与理由：
-- 工时：
+  1. **`run_sql` 超时 120 秒，不是规格写的 30 秒**。卡片「来自 T11 的交接」第三条写「超时与资源闸同直答（120 秒…）」，与规格第 1 条的 30 秒矛盾；协调会话的开工要求按 120 秒。取 120 秒的理由：同一条查询在探查时超时、交卷时却能跑完，会让探查结果和最终结果不一致。
+  2. 新增单次回显字符上限 20,000（规格未写）：只防单个超长值；三个单元同一个值，写进工具说明。
+- 工时：搭建约 1 小时

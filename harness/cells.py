@@ -46,6 +46,11 @@ CELLS: dict[str, Cell] = {c.name: c for c in [
 ]}
 
 
+# Explorer agent cells (-E, T15): the direct cell's prompt, context and execution scope,
+# plus the read-only ``run_sql`` tool on the same backend. Kept apart from CELLS so that
+# ``run_direct --cell all`` never picks them up.
+AGENT_CELLS: dict[str, Cell] = {f"{base}-E": CELLS[base] for base in ("SQL-L0", "SQL-L1", "SQL-L2")}
+
 # DeepSeek official prices, CNY per 1M tokens, off-peak (peak = 2x).
 # Source: https://api-docs.deepseek.com/zh-cn/quick_start/pricing, read 2026-10-16.
 PRICES_OFFPEAK: dict[str, dict[str, float]] = {

@@ -392,7 +392,8 @@ class FingerprintGuard:
 
     def observe(self, record: dict) -> None:
         with self._lock:
-            for t in record.get("turns") or []:
+            # explorer agent lines (T15) also carry their tool-calling model calls in ``steps``
+            for t in (record.get("steps") or []) + (record.get("turns") or []):
                 fp = t.get("system_fingerprint")
                 if fp:
                     self.seen[fp] = self.seen.get(fp, 0) + 1
@@ -437,12 +438,15 @@ def backfill_cell(ctx: RunContext, questions: list[Question], pairs: list[tuple[
 
 
 def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency: int,
-             runs_root: Path | None = None, progress=print, guard: FingerprintGuard | None = None) -> Path:
+             runs_root: Path | None = None, progress=print, guard: FingerprintGuard | None = None,
+             attempt=None) -> Path:
     """Run every missing (question, rep) of one cell.
 
     The first attempt runs alone so that it writes the prefix cache before the
     concurrent ones start (otherwise every worker's first call is a cache miss).
+    ``attempt(ctx, q, rep) -> line`` defaults to ``run_attempt`` (the explorer agent passes its own).
     """
+    run_attempt_ = attempt or run_attempt
     path = log_path(ctx.run_id, ctx.cell.name, runs_root)
     path.parent.mkdir(parents=True, exist_ok=True)
     done = done_pairs(path)
@@ -474,14 +478,14 @@ def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency:
         if todo:
             (q0, rep0), todo_rest = todo[0], todo[1:]
             with ThreadPoolExecutor(max_workers=1) as warm:
-                emit(out, warm.submit(run_attempt, ctx, q0, rep0), q0.qid, rep0)
+                emit(out, warm.submit(run_attempt_, ctx, q0, rep0), q0.qid, rep0)
         else:
             todo_rest = []
         if guard is not None and guard.conflict:
             progress(f"  stop: second system_fingerprint: {guard.seen}")
             return path
         with ThreadPoolExecutor(max_workers=max(1, concurrency)) as pool:
-            futures = {pool.submit(run_attempt, ctx, q, rep): (q.qid, rep) for q, rep in todo_rest}
+            futures = {pool.submit(run_attempt_, ctx, q, rep): (q.qid, rep) for q, rep in todo_rest}
             stopped = False
             for future in as_completed(futures):
                 if future.cancelled():
