@@ -62,7 +62,7 @@ JWT，SQL 开发模式接受任意非空认证响应。两个接口都绑定 loo
 | `anchor_refs.py` | T11 | 英文锚点的原始参考：外部 `expected_sql` 原样在本地完整执行，存 `$SEMDEBT_DATA_DIR/anchor-refs/`（不入库）；`--check` 逐字节复核 |
 | `rescore.py` | T11、T12 | 离线重评：从 runs-raw 的执行结果重建候选（核 sha256），按当前题库重评，写进新 run 目录；`--eval-tag` 校验题库是该 tag 的内容；题干变过的行默认拒绝，只有显式 `--allow-changed-question` 才照评并在行内标 `question_changed`（T12 最终重评只用于 Q69） |
 | `run_direct.py` | T11 | 直答：一次调用写出查询；执行报错时发回报错、固定修一次。日志、断点续跑、`--dry-run`、并发 |
-| `run_agent.py` | T15 | 探查 agent（-E）：多一个只读工具 `run_sql`，最多 8 步 |
+| `run_agent.py`、`agent_prompt.py` | T15 | 探查 agent（-E）：直答系统消息逐字节 + 一段工具说明（`agent_prompt.py`，`harness-agent-v1` 冻结）；只读工具 `run_sql` 过与最终查询相同的检查，每次回显至多 50 行（截断时写明总行数），最多 8 次，之后 `tool_choice: "none"` 强制交卷；最终答案照直答规则执行、修一次、限时打分。日志另记 `steps`。见 `tasks/T15-explorer-agent.md` |
 | `scorer.py` | T02（Codex 写） | 确定性结果集评分器（纯函数，不执行查询） |
 | `exec_dax.py` | T17 | Windows 上经 ADOMD.NET 执行 DAX |
 
