@@ -1,0 +1,41 @@
+{
+  "scorer_commit": "42a01fb",
+  "scorer_sha256": "3be6d29f5a11fafa5843c086362b6ddcfd3b2391413e82e3a98c09f09de50efd",
+  "formal_input_round": "baseline_bank",
+  "rounds": [
+    {
+      "label": "baseline_bank",
+      "executed": 600,
+      "session_resets": 43,
+      "raw_candidates_sha256": "f629285de6f00f423443e45985f9eb171ee72cbbe634c8f987e27e54428f2213",
+      "counts": {
+        "correct": 219,
+        "wrong": 273,
+        "judge": 78,
+        "exec_error": 30
+      }
+    },
+    {
+      "label": "current_bank",
+      "executed": 600,
+      "session_resets": 43,
+      "raw_candidates_sha256": "ddb4e32bcf8e90170e9a295335688279affa670e5863769c49153c3646555b5f",
+      "counts": {
+        "correct": 209,
+        "wrong": 283,
+        "judge": 78,
+        "exec_error": 30
+      }
+    }
+  ],
+  "first_round_bank_revision": "455e96f",
+  "second_round_bank_revision": "6234d29",
+  "second_round_scope": "completed before stop request; auxiliary only; not used for corrected PR19 comparison",
+  "source_audit_sha256": "89937e96395202c1b1ba37c34b1cd399e3579ced670838f53e9d6ec4e287185c",
+  "preflight": {
+    "executed": 75,
+    "stopped_at": "Q75 optional numeric sensitivity diagnostic",
+    "lock_failure_executed": 0
+  },
+  "candidate_SQL_executions_after_cache_only_instruction": 0
+}
