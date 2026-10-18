@@ -1,0 +1,682 @@
+# T13 SQL-L0 failure attribution (hand verdicts), read by scripts/t13_failure_report.py.
+#
+# One entry per question with a non-correct attempt (judge questions excluded). Only question
+# ids, categories and short evidence (table / column names and numbers); no question text.
+# Categories: a 找错表或字段 / b 连接错 / c 口径 / d 技术字段或脏数据 / e SQL 逻辑错 /
+#   f 展示差异（指令遵循） / g 拒答 / h 判不清（单列）.
+# Drafted per batch by sub-agents from scripts/t13_failure_dump.py output, then reviewed in the
+# T13 session: Q22, Q35, Q75 (name merged into one column; scorer covers only the split
+# direction) and Q88 r1–r2, Q119 moved to h; Q94 moved from f to c.
+
+Q05:
+  attempts:
+    - {rep: 3, cat: b, evidence: "LEFT JOIN d_prd_cat 到 d_prd_sub 到 d_prd，配 uniqExact(p.prk)，会为空子品类计入一个默认 0 的键，Audio/Cameras/Computers 得 116/359/460，参考 115/358/459"}
+  summary_cat: b
+  consistent: true
+  evidence: "从品类经子品类到产品的外连接，为每个空子品类多出一个虚假产品（3 个品类计数各 +1）。"
+
+Q08:
+  attempts:
+    - {rep: 1, cat: a, evidence: "对 l0.d_emp 按 dpt_nm/ttl LIKE sale 过滤（293 行），而非用 l0.d_emp.sp_flg（IsSalesPerson）；参考为 17 行"}
+    - {rep: 2, cat: a, evidence: "同样按 dpt_nm/ttl LIKE 过滤，293 行，从未使用 sp_flg；参考 17 行"}
+    - {rep: 3, cat: a, evidence: "dpt_nm = sales OR ttl LIKE sales 得 293 行，忽略了 sp_flg；参考 17 行"}
+  summary_cat: a
+  consistent: true
+  evidence: "销售人员标志是晦涩列 l0.d_emp.sp_flg，三次作答都忽略它，改用 dpt_nm/ttl 文本匹配（293 行对 17 行）。"
+
+Q10:
+  attempts:
+    - {rep: 2, cat: d, evidence: "过滤 d_str.cls_dt IS NULL OR = ''，得 0 家门店，但未关闭门店的哨兵值是 2090-12-31 而非 NULL（参考：Status = 'On'，294）"}
+    - {rep: 3, cat: d, evidence: "同样的过滤 d_str.cls_dt IS NULL OR = '' 返回 0，参考 294，原因是 2090-12-31 哨兵值"}
+  summary_cat: d
+  consistent: true
+  evidence: "关闭日期的哨兵值 2090-12-31 不是 NULL，所以 NULL/空值判断匹配 0 行，而非 Status = 'On' 的 294 家门店"
+
+Q11:
+  attempts:
+    - {rep: 1, cat: c, evidence: "对 fct_sls.amt1 求和（全渠道，最高品类约 3.9e9），参考用 FactOnlineSales（最高约 6e8），另外内连接丢掉 NULL 品类（8 行对 9 行）"}
+    - {rep: 2, cat: c, evidence: "9 行一致，但金额来自 fct_sls.amt1（Home Appliances 3.92e9）而非线上事实表 SalesAmount"}
+    - {rep: 3, cat: c, evidence: "用 fct_sls.amt1 而非线上事实表，且对 d_prd 的内连接得 8 行，参考 9 行含 NULL 品类"}
+  summary_cat: c
+  consistent: true
+  evidence: "未限定的销售默认取线上渠道，但所有作答都对 fct_sls 求和；rep1/rep3 还因 INNER JOIN 丢了 NULL 品类行"
+
+Q12:
+  attempts:
+    - {rep: 1, cat: f, evidence: "各月合计与参考一致（1 月 56738060.41），但月份显示为 c_mo_lb 标签 January 而非月份数字"}
+    - {rep: 2, cat: f, evidence: "各月合计与参考一致（56738060.41），但月份显示为 c_mo_lb 标签 January 而非月份数字"}
+    - {rep: 3, cat: f, evidence: "各月合计与参考一致（56738060.41），但月份显示为 c_mo_lb 标签 January 而非月份数字"}
+  summary_cat: f
+  consistent: true
+  evidence: "fct_ol_sls.amt1 合计正确；不一致仅在月份标签与数字月份的呈现（浮点噪声 1e-6）"
+
+Q13:
+  attempts:
+    - {rep: 3, cat: c, evidence: "average_unit_price 按 avg(fct_sls.up) 计算，门店 1 为 324.94，参考 sum(SalesAmount)/sum(SalesQuantity) = 249.95；销售合计和数量一致"}
+  summary_cat: c
+  consistent: true
+  evidence: "平均单价是已定义的指标（金额除以数量）；对标价列做简单平均是错的。"
+
+Q15:
+  attempts:
+    - {rep: 1, cat: c, evidence: "国家经 fct_ol_sls.stk -> d_str.gk -> d_geo 取得（3 行，门店所在地），参考用 DimCustomer.GeographyKey（29 行）"}
+    - {rep: 2, cat: c, evidence: "国家经 d_str.gk 门店地理取得，3 行，参考为 29 个客户地理国家"}
+  summary_cat: c
+  consistent: true
+  evidence: "不知道默认客户所在地（conventions 5）；用门店地理得 3 个国家而非 29 个。"
+
+Q16:
+  attempts:
+    - {rep: 2, cat: f, evidence: "合计一致（2009 年 857728031），但年份列是 d_dt.c_yr_lb 字符串 'Year 2009'，而参考返回数值年份 2009"}
+  summary_cat: f
+  consistent: true
+  evidence: "值相同，年份以标签字符串 'Year 2008' 输出，而非 2008"
+
+Q17:
+  attempts:
+    - {rep: 1, cat: c, evidence: "对 l0.fct_sls.amt1 求和（合计 1.2414e10），而参考用 FactOnlineSales.SalesAmount（合计 2.7182e9）；占比 28.5/71.5 对 28.47/71.53"}
+    - {rep: 2, cat: c, evidence: "用 l0.fct_sls.amt1 且 dow_no in (6,7)，合计 1.2414e10 对参考线上合计 2.7182e9"}
+    - {rep: 3, cat: c, evidence: "用 l0.fct_sls.amt1 且 toDayOfWeek in (6,7)，合计 1.2414e10 对参考 2.7182e9"}
+  summary_cat: c
+  consistent: true
+  evidence: "全部用全渠道 fct_sls，而未限定渠道的销售默认应为线上事实表（金额 3.54e9/8.88e9 对 7.74e8/1.94e9）。"
+
+Q18:
+  attempts:
+    - {rep: 1, cat: a, evidence: "把 l0.fct_ol_sls.amt4（TotalCost）当折扣求和，而参考用 DiscountAmount（amt3）；还包含了 No Discount 行"}
+    - {rep: 2, cat: a, evidence: "把门店事实表的 l0.fct_sls.amt4（TotalCost）当折扣求和，参考用线上 DiscountAmount（amt3）；合计 3.59e9 对 2.69e8"}
+    - {rep: 3, cat: a, evidence: "把 l0.fct_sls.amt2（ReturnAmount）当折扣求和，参考用线上 DiscountAmount（amt3）"}
+  summary_cat: a
+  consistent: true
+  evidence: "L0 中折扣度量是 amt3，但作答选了 amt4 或 amt2（成本/退货），合计错误。"
+
+Q20:
+  attempts:
+    - {rep: 1, cat: g, evidence: "返回 CANNOT_ANSWER"}
+    - {rep: 2, cat: g, evidence: "返回 CANNOT_ANSWER"}
+    - {rep: 3, cat: g, evidence: "返回 CANNOT_ANSWER"}
+  summary_cat: g
+  consistent: true
+  evidence: "三次作答全部拒答；参考需要对每个 stk 和 prk 的最新快照取 fct_inv_snp 的 qty1 与 qty3。"
+
+Q21:
+  attempts:
+    - {rep: 1, cat: c, evidence: "按每个门店取最新快照（stk 上的 max dk）并对 qty1 求和，参考按门店 x 产品取最新 dk（如门店 1：41633）"}
+    - {rep: 2, cat: c, evidence: "用了单一全局 max(dk)=2009-12-26 快照，门店 199 合计 43676，参考为按门店 x 产品的最新值"}
+    - {rep: 3, cat: c, evidence: "只过滤全局 max(dk) 快照（门店 1 = 1887，参考 41633），而非按门店 x 产品取最新"}
+  summary_cat: c
+  consistent: true
+  evidence: "当前库存应取按门店 x 产品的最新快照，作答用了按门店的最新日期或全局最新日期"
+
+Q22:
+  attempts:
+    - {rep: 1, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+    - {rep: 2, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+    - {rep: 3, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+  summary_cat: h
+  consistent: true
+  evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明；其余列与行数与参考一致"
+
+Q23:
+  attempts:
+    - {rep: 1, cat: c, evidence: "对 l0.fct_sls.amt1（线下）累计求和，1 月为 269770345，参考 FactOnlineSales 累计 57453262.78"}
+    - {rep: 2, cat: c, evidence: "对 l0.fct_sls.amt1（线下）累计求和，1 月为 269770345，参考 FactOnlineSales 累计 57453262.78"}
+    - {rep: 3, cat: c, evidence: "用了 l0.fct_sls.amt1（1 月 cum_amt 269770345）而非 fct_ol_sls（参考 57453262.78）；其假设本身写明不做渠道过滤"}
+  summary_cat: c
+  consistent: true
+  evidence: "未限定的销售即线上渠道（约定 1）；所有作答都读了 fct_sls 而非 fct_ol_sls。"
+
+Q24:
+  attempts:
+    - {rep: 1, cat: c, evidence: "读了 l0.fct_sls（线下，Audio 比率 1.18），参考为 FactOnlineSales（0.77），且 INNER JOIN 得 8 行，参考 9 行含 NULL 品类"}
+    - {rep: 2, cat: c, evidence: "读了 l0.fct_sls（线下，Audio 比率 1.18），参考为 FactOnlineSales（0.77），且 INNER JOIN 得 8 行，参考 9 行含 NULL 品类"}
+    - {rep: 3, cat: g, evidence: "返回 CANNOT_ANSWER"}
+  summary_cat: c
+  consistent: false
+  evidence: "两次作答用了线下 fct_sls 和内连接，而非带外连接的 fct_ol_sls；一次拒答。"
+
+Q25:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 fct_sls 配 d_str.gk 门店所在地，Holiday 7687343，参考为按客户所在地的线上事实表（d_cst.gk），No Season 1005957"}
+    - {rep: 2, cat: c, evidence: "全渠道 fct_sls 上用门店地理 d_str.gk，Holiday 7687343，参考为 FactOnlineSales 上的客户洲，1005957"}
+    - {rep: 3, cat: c, evidence: "fct_sls 经 d_str.gk 连接，而非 fct_ol_sls 经 d_cst.gk，Holiday 7687343，参考 No Season 1005957"}
+  summary_cat: c
+  consistent: true
+  evidence: "区域默认取线上销售的客户所在地，但作答在全渠道 fct_sls 上用了门店所在地"
+
+Q27:
+  attempts:
+    - {rep: 1, cat: c, evidence: "毛利率按每个产品的 fct_sls amt1 - qty1*uc 计算（最高 66.84 pct），而非 DimProduct 的 UnitPrice/UnitCost 毛利率（66.885 pct）"}
+    - {rep: 2, cat: c, evidence: "毛利率取自销售汇总 fct_sls 的 rev 对 qty1*uc，参考用 d_prd.up 与 d_prd.uc（conventions 9）"}
+    - {rep: 3, cat: c, evidence: "毛利率取自 fct_ol_sls 汇总，最高 65.4 pct（产品 148），参考用 d_prd 的标价和成本"}
+  summary_cat: c
+  consistent: true
+  evidence: "产品毛利率须用产品表的价格与成本（conventions 9），所有作答都由交易数据推导。"
+
+Q28:
+  attempts:
+    - {rep: 1, cat: a, evidence: "d_chn.ch_nm LIKE 中文字面量 门店/线上 过滤，0 行；真实值为 Store 与 Online"}
+    - {rep: 2, cat: c, evidence: "按币种比较 fct_ol_sls 与 fct_sls（216.98 对 232.81），而参考通过 channelKey 比较 fct_sls 中 Online（214.10）与 Store（238.67）渠道行"}
+    - {rep: 3, cat: c, evidence: "把 fct_ol_sls 当作线上渠道（216.98），而非 fct_sls 的 Online 渠道（214.10）"}
+  summary_cat: c
+  consistent: false
+  evidence: "渠道比较应使用 fct_sls 的渠道维度（conventions 2）；两次作答把 fct_ol_sls 当线上渠道，一次猜了中文渠道名。"
+
+Q29:
+  attempts:
+    - {rep: 1, cat: c, evidence: "d_dt.hol_flg 与 'Y' 比较，但取值是 'Yes'/'No'，假日组为空；另外用了 fct_sls 而非 fct_ol_sls（normal_avg 11326329.9）"}
+    - {rep: 2, cat: c, evidence: "基准过滤 hol_flg = 'N' 匹配不到任何行（取值为 'No'），结果 0 行；另外用了 fct_sls 而非 fct_ol_sls"}
+    - {rep: 3, cat: c, evidence: "hol_flg = 'Y' 永不成立，只返回 1096 天的普通日组（1 行，参考 1 行 diff 651.7）；用了 fct_sls 而非 fct_ol_sls"}
+  summary_cat: c
+  consistent: true
+  evidence: "L0 没有给枚举值，所以 hol_flg 被猜成 Y/N（实际为 Yes/No），且用了全渠道 fct_sls 而非线上事实表。"
+
+Q30:
+  attempts:
+    - {rep: 2, cat: e, evidence: "窗口日历从 2009-11-24 开始，所以 12 月 1 日均值为 2208205，参考 2044409 只用 12 月的行"}
+    - {rep: 3, cat: e, evidence: "把 11 月 25-30 日拉入 7 天窗口，2009-12-01 得 2208205，参考 2044409"}
+  summary_cat: e
+  consistent: true
+  evidence: "移动平均用了 12 月 1 日之前的 11 月数据，而参考窗口从 2009-12-01 开始"
+
+Q31:
+  attempts:
+    - {rep: 1, cat: c, evidence: "实际值取自 fct_sls（Cameras 636.57M 对计划实际值 641.43M），预算为 0，因为 acct_tp = revenue 永远匹配不上 Sale Revenue；场景实际值未取自 fct_stg_pln"}
+    - {rep: 2, cat: c, evidence: "预算对 fct_stg_pln 所有场景和科目求和（Audio 350M 对 66.38M），没有 Sale Revenue 过滤"}
+    - {rep: 3, cat: c, evidence: "实际值取自 fct_sls（Cameras 636.57M 对计划 Actual 641.43M）；预算与参考一致，Audio 66.38M"}
+  summary_cat: c
+  consistent: true
+  evidence: "实际与预算场景及 Sale Revenue 科目（conventions 12）未被一致使用，导致实际或预算金额错误。"
+
+Q34:
+  attempts:
+    - {rep: 1, cat: b, evidence: "sales_2009、inv_avg_2009 与 d_prd 的 INNER JOIN 得 2220 行，参考 2508 行（以库存为主、用 LEFT JOIN）；COGS 也用 qty1*uc 而非 fct_sls.amt4"}
+    - {rep: 2, cat: c, evidence: "周转率 = sls_qty / avg_inv_qty（首个产品 18.83），参考 TotalCost / avg(qty1*uc)（18.65）；INNER JOIN d_prd 也得 2224 行对 2508"}
+    - {rep: 3, cat: c, evidence: "周转率 = 销售数量 / 平均库存数量（17.42），参考 amt4 / avg(qty1*uc)；以销售为主的 LEFT JOIN 得 2504 行对 2508"}
+  summary_cat: c
+  consistent: false
+  evidence: "参考是对有库存产品的基于成本的周转率；作答用了基于数量的周转率或丢产品的内连接"
+
+Q35:
+  attempts:
+    - {rep: 1, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+    - {rep: 2, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+    - {rep: 3, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+  summary_cat: h
+  consistent: true
+  evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明；其余列与行数与参考一致"
+
+Q36:
+  attempts:
+    - {rep: 1, cat: g, evidence: "拒答（未返回代码）"}
+    - {rep: 2, cat: g, evidence: "拒答（未返回代码）"}
+    - {rep: 3, cat: c, evidence: "按 dateDiff 90/180 天（自 max(dk)）分段并左连接所有 d_cst 客户（丢了从未购买者），而参考对购买者按 6/12 个月；计数 16815/58/1996 对 16890/1841/138"}
+  summary_cat: g
+  consistent: false
+  evidence: "三次中两次拒答；作答的一次用了 90/180 天阈值和全部 d_cst 客户，而非对线上购买者按 6/12 个月。"
+
+Q38:
+  attempts:
+    - {rep: 1, cat: a, evidence: "预测取自 fct_sls_qta（配额，866.5M），而非 fct_stg_pln 的 Forecast 场景（986.1M）；准确率 88.44 对 99.35"}
+    - {rep: 2, cat: c, evidence: "fct_stg_pln 按场景对所有科目求和（Forecast 1.749e9），没有 Sale Revenue 科目过滤，实际值取自 fct_sls；准确率 21.44 对 99.35"}
+  summary_cat: c
+  consistent: false
+  evidence: "预测与实际须取自 fct_stg_pln 各场景在 Sale Revenue 科目上的值（conventions 12）；作答用了配额表或未过滤科目。"
+
+Q41:
+  attempts:
+    - {rep: 1, cat: c, evidence: "最近一个季度由 max(fct_sls.dk) 推出 Q3，全渠道 fct_sls 为 972185118，参考 2009 年 Q4 线上 210717984"}
+    - {rep: 2, cat: c, evidence: "同样的 Q3 窗口，fct_sls 合计 972185118，参考 2009-10-01..2009-12-31 线上 210717984"}
+    - {rep: 3, cat: c, evidence: "Q3 窗口和 fct_sls.amt1，972185118 对参考 210717984"}
+  summary_cat: c
+  consistent: true
+  evidence: "不知道 today=2009-12-31 的锚点（选了 Q3），且用了全渠道 fct_sls 而非默认线上事实表"
+
+Q43:
+  attempts:
+    - {rep: 1, cat: c, evidence: "区域取自门店省份（d_str.gk -> d_geo.prov_nm），而非客户的洲/国家地理；最高 Maryland 5.54e8，参考为洲 North America 5.24e8"}
+    - {rep: 2, cat: c, evidence: "区域取自 fct_sls 上按 gk 连接的 d_sls_ter.ter_rgn（78 行），而非 fct_ol_sls 上的客户地理"}
+    - {rep: 3, cat: a, evidence: "毛利按 amt1 - amt2（ReturnAmount）计算，而非 amt1 - amt4（TotalCost），并在 fct_sls 上用 ter_rgn 区域；78 行"}
+  summary_cat: c
+  consistent: false
+  evidence: "区域须取线上销售的客户所在地（conventions 1 和 5）；作答用了门店或销售区域地理（一次还用错了成本列）。"
+
+Q49:
+  attempts:
+    - {rep: 1, cat: c, evidence: "收入取自 fct_sls.amt1，经 d_str.enk 只上卷一层（306 行），参考为 FactStrategyPlan Sale Revenue 场景 1 递归上卷（420 行）"}
+    - {rep: 2, cat: c, evidence: "fct_sls.amt1 按门店实体分组 306 行，参考为 fct_stg_pln Sale Revenue 带层级祖先 420 行"}
+    - {rep: 3, cat: c, evidence: "fct_sls.amt1 按 d_str.enk 带 parent 列，306 行，参考为战略计划 Sale Revenue 上卷到 420 个实体"}
+  summary_cat: c
+  consistent: true
+  evidence: "按组织层级的收入定义在战略计划科目 Sale Revenue 上，作答用了门店销售且没有递归上卷（306 行对 420 行）"
+
+Q50:
+  attempts:
+    - {rep: 2, cat: c, evidence: "同店集合按 d_str.opn_dt <= 2008-01-01 且 cls_dt 为空/晚于 2009-12-31 定义，而非两年都有销售的门店；2008 合计 4000968558.2 对参考 4111233534.7"}
+  summary_cat: c
+  consistent: true
+  evidence: "同店约定（两年均有销售）被 d_str 上的开业/关店日期过滤替代，改变了 2008 与 2009 合计。"
+
+Q59:
+  attempts:
+    - {rep: 1, cat: c, evidence: "WHERE d_dt.hol_flg = 'Y' 返回 0，参考 731，因为取值是 'Yes'/'No'"}
+    - {rep: 2, cat: c, evidence: "count(DISTINCT dk) WHERE hol_flg = 'Y' 返回 0，参考 731（取值为 'Yes'）"}
+    - {rep: 3, cat: c, evidence: "hol_flg = 'Y' 匹配不到任何行，0 对参考 731（IsHoliday = 'Yes'）"}
+  summary_cat: c
+  consistent: true
+  evidence: "L0 不显示枚举值，猜的字面量 'Y' 而非 'Yes' 得 0 而非 731。"
+
+Q60:
+  attempts:
+    - {rep: 2, cat: e, evidence: "dpt_nm LIKE %production% 还匹配到 Production Control（7 行），返回 2 个分组行，而非单个计数 176"}
+    - {rep: 3, cat: a, evidence: "过滤 d_emp.dpt_nm = 猜测的中文字面量，计数 0 对 Production 的 176"}
+  summary_cat: a
+  consistent: false
+  evidence: "部门取值是猜的、没有取值信息：一次用 LIKE 过度匹配（2 行），一次用中文字面量（0 对 176）。"
+
+Q61:
+  attempts:
+    - {rep: 1, cat: b, evidence: "INNER JOIN d_prd_sub 丢掉子品类为 NULL 的销售；30 行对参考 31 行（LEFT JOIN 保留 NULL 组）"}
+    - {rep: 2, cat: b, evidence: "INNER JOIN d_prd_sub on p.psck = ps.psck（该关系在 L0 中被去掉）丢掉未分类产品；30 行对 31 行"}
+    - {rep: 3, cat: b, evidence: "INNER JOIN d_prd 与 d_prd_sub 去掉子品类为 NULL 的销售；30 行对参考 31 行"}
+  summary_cat: b
+  consistent: true
+  evidence: "经 d_prd 到 d_prd_sub 的内连接丢掉 NULL/未分类子品类组，得 30 行而非 31 行。"
+
+Q62:
+  attempts:
+    - {rep: 1, cat: b, evidence: "INNER JOIN fct_ol_sls 到 d_prd 丢掉没有产品行的事实，11 行对参考 12（缺 NULL 品牌组）"}
+    - {rep: 2, cat: b, evidence: "INNER JOIN fct_ol_sls 到 d_prd 丢掉没有产品行的事实，11 行对参考 12（缺 NULL 品牌组）"}
+    - {rep: 3, cat: b, evidence: "INNER JOIN d_prd 加 brd IS NOT NULL 过滤得 11 行，参考 12 行含 NULL 品牌"}
+  summary_cat: b
+  consistent: true
+  evidence: "对 d_prd 的内连接丢掉 prk 不在产品表中的事实行；参考把它们保留为 NULL 品牌"
+
+Q64:
+  attempts:
+    - {rep: 1, cat: a, evidence: "毛利 = amt1 - qty1*uc（1 月 28555614.68），参考 SalesAmount - TotalCost（28206957.48），即 amt1 - amt4"}
+    - {rep: 2, cat: a, evidence: "毛利 = amt1 - qty1*uc（1 月 28555614.68），参考 amt1 - amt4（28206957.48）"}
+    - {rep: 3, cat: f, evidence: "amt1 - amt4 与参考一致（28206957.48），仅毛利率四舍五入到 2 位小数（49.1 对 49.0955），且月份以 c_mo_lb 标签显示"}
+  summary_cat: a
+  consistent: false
+  evidence: "两次作答由 qty1*uc 推导成本，而非 amt4 总成本列；第三次值一致，只有舍入和标签差异。"
+
+Q65:
+  attempts:
+    - {rep: 1, cat: b, evidence: "输出 d_str.mgr 编码（'292'）作经理姓名，没有连接员工表，仅按 mgr 分组 260 行，参考为姓名+门店 303 行"}
+    - {rep: 2, cat: b, evidence: "d_str.mgr 以编码 '292' 返回，没有连接员工表，260 行对参考 303"}
+    - {rep: 3, cat: b, evidence: "mgr 键被当成姓名显示（'292'），因为没有使用到员工姓名的关系，260 行对参考 303"}
+  summary_cat: b
+  consistent: true
+  evidence: "经理列是员工键，从未连接到姓名（L0 中去掉了到员工表的连接），且仅按经理分组（260 行对 303 行）"
+
+Q66:
+  attempts:
+    - {rep: 1, cat: a, evidence: "对全渠道的 fct_sls.amt2（ReturnAmount）求和，而参考对 FactOnlineSales.DiscountAmount（amt3）求和并带 PromotionKey<>1；Q1 10597428 对 23354773"}
+    - {rep: 2, cat: a, evidence: "对 fct_ol_sls.amt2（ReturnAmount）而非 amt3（DiscountAmount）求和，且没有 pmk<>1 过滤；Q1 2234472.3 对 23354773.0"}
+    - {rep: 3, cat: a, evidence: "累计对 fct_sls.amt4（TotalCost）求和，而非 fct_ol_sls.amt3；Q1 352758524 对 23354773"}
+  summary_cat: a
+  consistent: true
+  evidence: "没有一次选对 amt3（DiscountAmount）；因为 L0 度量名晦涩，用了 amt2（ReturnAmount）或 amt4（TotalCost）。"
+
+Q67:
+  attempts:
+    - {rep: 1, cat: b, evidence: "INNER JOIN d_prd 加 clr_id IS NOT NULL 丢掉孤立产品键，17 行对参考 18 行（LEFT JOIN）"}
+    - {rep: 2, cat: b, evidence: "INNER JOIN fct_ol_sls 到 d_prd 丢掉不匹配的 ProductKey 行，17 行对参考 18"}
+    - {rep: 3, cat: b, evidence: "INNER JOIN 到 d_prd 丢掉 NULL 颜色组，17 行对参考 18"}
+  summary_cat: b
+  consistent: true
+  evidence: "对产品维度的内连接去掉了缺产品的事实，得 17 行而非 18 行（价格一致）"
+
+Q69:
+  attempts:
+    - {rep: 1, cat: c, evidence: "avg_discount_pct = avg(d_prm.dsc_pct) = 0.13，参考 sum(amt3)/sum(amt1+amt3)*100 = 13.11；缺少 original_sales_amount 2051334098 与 total_discount"}
+    - {rep: 2, cat: c, evidence: "对明细行 avg(dsc_pct) = 0.1300，参考为折扣额除以折前销售额 13.11%；没有原始销售额列"}
+    - {rep: 3, cat: c, evidence: "avg(d_prm.dsc_pct) 0.12996，参考 13.1087（sum amt3 / sum(amt1+amt3)）；没有折前金额列"}
+  summary_cat: c
+  consistent: true
+  evidence: "折扣率按 dsc_pct 的简单平均（0.13）计算，而非总折扣除以折前销售额（13.11%），同时漏了原始销售额列。"
+
+Q70:
+  attempts:
+    - {rep: 2, cat: c, evidence: "销售额只取 fct_ol_sls（Store 0、Online 2.72e9），而非全渠道 fct_sls（Store 6.94e9）"}
+    - {rep: 3, cat: c, evidence: "fct_sls 与 fct_ol_sls UNION ALL 导致线上重复计算（Online 5.40e9 对 2.68e9）；参考只用 fct_sls"}
+  summary_cat: c
+  consistent: true
+  evidence: "门店类问题的全渠道销售额只用 fct_sls（conventions 2）；作答用了线上表或把两表合并。"
+
+Q72:
+  attempts:
+    - {rep: 3, cat: e, evidence: "只返回季度 amt1（12 行），没有累计列，参考通过累计求和有 cumulative_sales；年份还是 'Year 2007' 标签"}
+  summary_cat: e
+  consistent: true
+  evidence: "要求的累计列被遗漏，季度值与参考一致（2007 年 Q1 245958338.86）"
+
+Q73:
+  attempts:
+    - {rep: 1, cat: g, evidence: "返回 CANNOT_ANSWER"}
+    - {rep: 2, cat: a, evidence: "安全库存取自 fct_inv_snp.d1（DaysInStock）而非 qty3，快照只取全局 max(dk) 而非按 stk 和 prk 取最新；最大缺口 11190 对参考 35666"}
+    - {rep: 3, cat: a, evidence: "安全库存取自 fct_inv_snp.qty2（OnOrderQuantity）而非 qty3，且只取全局 max(dk) 快照；最大缺口 8395 对参考 35666"}
+  summary_cat: a
+  consistent: false
+  evidence: "未拒答的作答用错了安全库存列（d1/qty2 而非 qty3），并只用单一全局快照日期；一次拒答。"
+
+Q74:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 l0.fct_ol_sls（线上），2 家线上门店得 9 行，参考 l0.fct_sls 全渠道 306 家门店 925 行"}
+    - {rep: 2, cat: b, evidence: "fct_sls 正确，但 INNER JOIN d_prd 丢掉维度中缺失的产品，918 行对参考 925"}
+  summary_cat: c
+  consistent: false
+  evidence: "门店级问题用全渠道 fct_sls（约定 2）；一次作答用了线上表，另一次因内连接丢了孤立产品。"
+
+Q75:
+  attempts:
+    - {rep: 1, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+    - {rep: 2, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+    - {rep: 3, cat: h, evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明"}
+  summary_cat: h
+  consistent: true
+  evidence: "姓名合成一列（参考为名、姓两列）；提示未要求拆列，评分器只兜底「候选拆列→参考合列」一个方向（label-scoring 裁决第二节第 2 条），反方向未覆盖；按 G3 第二节只在报告注明；其余列与行数与参考一致"
+
+Q76:
+  attempts:
+    - {rep: 1, cat: b, evidence: "INNER JOIN d_prd 到 d_prd_sub 到 d_prd_cat 丢掉未分类事实，8 行对参考 9 行（含 NULL 品类）"}
+    - {rep: 3, cat: a, evidence: "用 d_prd.cls_nm（Regular/Deluxe/Economy，3 行）作产品品类，而非 d_prd_cat.pc_nm 层级，参考 9 个品类"}
+  summary_cat: b
+  consistent: false
+  evidence: "rep1 因内连接丢了 NULL 品类（8 行对 9 行）；rep3 按产品等级列 cls_nm 分组（3 行）"
+
+Q77:
+  attempts:
+    - {rep: 1, cat: e, evidence: "销售限定 c_yr = 2009，导致 1 月 prev_sales_amt = 0（参考 prev 72014255.7 来自 2008 年 12 月），得 mom_change 57453262.8 与空 pct，参考 -14560992.9 / -20.22"}
+    - {rep: 2, cat: f, evidence: "pct 与 prev 与参考一致（1 月 -20.22，prev 72014255.7），但缺少绝对环比变化列，且多了年份列"}
+    - {rep: 3, cat: e, evidence: "GROUP BY c_mo_lb 把 2008 年 12 月与 2009 年 12 月合并（1 月 prev 140343818.0 对 72014255.7），11 行对 12 行"}
+  summary_cat: e
+  consistent: false
+  evidence: "两次作答有月窗口/分组错误（2008 年 12 月的滞后值丢失或与 2009 年 12 月合并），一次只缺绝对变化列。"
+
+Q78:
+  attempts:
+    - {rep: 1, cat: a, evidence: "折扣按 fct_sls.amt1*d_prm.dsc_pct/100 计算（3.10e6），而非 fct_ol_sls.amt3（DiscountAmount，8.42e7）；包含 No Discount 行"}
+    - {rep: 2, cat: a, evidence: "把 fct_sls.amt2（ReturnAmount）当折扣求和（合计 4.67e7），而非 fct_ol_sls.amt3；包含 No Discount 行"}
+    - {rep: 3, cat: a, evidence: "把 fct_ol_sls.amt4（TotalCost）当折扣求和（合计 4.09e8），而非 amt3（8.42e7）；包含 No Discount 行"}
+  summary_cat: a
+  consistent: true
+  evidence: "折扣度量是 fct_ol_sls 的 amt3；作答用了推导比率、amt2 或 amt4，且保留了无折扣促销。"
+
+Q82:
+  attempts:
+    - {rep: 1, cat: c, evidence: "任职年限用 today()，所以 avg_tenure_years 为 27.2-28.4，参考锚定 2009-12-31 为 10.4-11.6；直接下属人数一致（33、44）"}
+    - {rep: 2, cat: c, evidence: "dateDiff(hr_dt, today())/365.25 对 Terry Adams 级别经理得 27.63，参考锚定 2009-12-31 约为 11"}
+    - {rep: 3, cat: c, evidence: "toDateOrNull(hr_dt) 到 today() 对 p_emp 8 得 27.72，参考以 2009-12-31 为终点得 10.93"}
+  summary_cat: c
+  consistent: true
+  evidence: "全部用 today() 而非 2009-12-31 作日期锚点，把平均任职年限抬高约 17 年；经 toFloat64(emk) 的连接本身是对的。"
+
+Q83:
+  attempts:
+    - {rep: 1, cat: f, evidence: "计数 18868/18723/17671 与参考一致，但返回 1 个宽行并带额外比率列，参考为 3 个长行（cohort_year、activity_year、customers）"}
+    - {rep: 2, cat: f, evidence: "计数 18868/18723/17671 与参考一致，但返回 1 个 3 列的宽行，参考为 3 个长行"}
+    - {rep: 3, cat: f, evidence: "计数 18868/18723/17671 与参考一致，但返回 1 个宽行并带额外比率列，参考为 3 个长行"}
+  summary_cat: f
+  consistent: true
+  evidence: "队列计数与参考相同；仅宽表对长表的布局和额外比率列不同。"
+
+Q84:
+  attempts:
+    - {rep: 1, cat: c, evidence: "收入取自 l0.fct_sls（线下），A/B/C = 1120/672/712，参考 FactOnlineSales 1132/666/706"}
+    - {rep: 2, cat: c, evidence: "收入取自 l0.fct_sls（线下），A/B/C = 1120/672/712，参考 FactOnlineSales 1132/666/706"}
+    - {rep: 3, cat: c, evidence: "收入取自 l0.fct_sls（线下），A/B/C = 1120/672/712，参考 FactOnlineSales 1132/666/706"}
+  summary_cat: c
+  consistent: true
+  evidence: "未限定的收入指线上渠道；所有作答用了 fct_sls 而非 fct_ol_sls。"
+
+Q85:
+  attempts:
+    - {rep: 1, cat: c, evidence: "对 fct_sls_qta.amt1 的所有场景求和（没有 scnk=2 预算过滤），最高比率 37.91，参考约 118.45；另外只取 top5/bottom5，参考 97 行"}
+    - {rep: 2, cat: c, evidence: "对 fct_sls_qta.amt1 的所有场景求和（没有 scnk=2 过滤），比率 37.91，参考约 118.45；另外每组限 5 行"}
+    - {rep: 3, cat: c, evidence: "对 fct_sls_qta.amt1 的所有场景求和（没有 scnk=2 过滤），比率 37.91，参考约 118.45；另外每组限 5 行"}
+  summary_cat: c
+  consistent: true
+  evidence: "目标必须是预算场景（ScenarioKey=2，约定 12）；未过滤的合计约为目标的 3 倍。"
+
+Q87:
+  attempts:
+    - {rep: 1, cat: c, evidence: "库存取全局 max(dk) 而非按门店 x 产品取最新，销售取 fct_sls 除以 90 天，最高项库存 0，参考为线上按销售日销量（如在库 433）"}
+    - {rep: 2, cat: c, evidence: "全局最新快照库存和 fct_sls qty1/90，而非线上按不同销售日的数量，最高覆盖 1.29 对参考 5.79"}
+    - {rep: 3, cat: c, evidence: "全局 max(dk) 库存，fct_sls qty1 求和 /90 并与销售 INNER JOIN，最高天数 0.58 对参考 5.79"}
+  summary_cat: c
+  consistent: true
+  evidence: "当前库存约定（按门店 x 产品取最新）、默认线上销售以及按销售日的分母均未采用"
+
+Q88:
+  attempts:
+    - {rep: 1, cat: h, evidence: "rank() 写法正确，浮点求和噪声（22724.466500000006 对 …02）把并列拆成 3、4"}
+    - {rep: 2, cat: h, evidence: "row_number 给并列编 3,4,5,6，参考竞赛排名 3,3,3；提示第 14 条只要求名次列、未规定并列写法"}
+    - {rep: 3, cat: f, evidence: "首位客户名是占位值 Not Provided，未给客户键（提示第 6 条：名称是占位值时给编码），且 row_number 拆并列"}
+  summary_cat: h
+  consistent: false
+  evidence: "客户集合与金额与参考一致（3755230.34、22980.88、22724.47）；差在并列名次与占位名称的键，见各轮"
+
+Q89:
+  attempts:
+    - {rep: 1, cat: c, evidence: "按 last_dt >= max(dk)-90 / -365 天分段，而非 6/12 个月；avg_spend 55132.3 / 875379.2 / 868879.9，参考 76861.8 / 344026.7 / 5700390.4"}
+    - {rep: 2, cat: c, evidence: "按 dateDiff 天数 <= 90 / <= 180 分段，而非 6/12 个月；风险组 avg_spend 4716601.5 对参考 344026.7"}
+    - {rep: 3, cat: g, evidence: "拒答（未返回代码）"}
+  summary_cat: c
+  consistent: false
+  evidence: "客户生命周期阈值被猜成天数（90/180 或 90/365）而非 6/12 个月，且有一次拒答。"
+
+Q90:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 fct_sls（Audio 2007 收入 29.7M），成本为 qty1*uc，并做内连接，24 行，参考为线上 FactOnlineSales TotalCost（10.3M，27 行）"}
+    - {rep: 2, cat: a, evidence: "按 d_prd.cls_nm 分组（Deluxe/Economy，9 行），而非产品品类层级，另外用了 fct_sls 与 qty1*uc 成本"}
+    - {rep: 3, cat: c, evidence: "fct_sls 收入（Audio 2007 29.7M 对参考线上 10.3M），成本为 qty1*uc 而非 amt4，内连接得 24 行对 27 行"}
+  summary_cat: c
+  consistent: false
+  evidence: "用了全渠道 fct_sls 而非线上事实表（并用 qty1*uc 成本、内连接丢掉 NULL 品类）；rep2 还按产品等级 cls_nm 分组"
+
+Q92:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 fct_sls 利润（Fabrikam 1.099e8 对线上 2.03e7）按利润额排序，而非毛利率；未采用线上默认"}
+    - {rep: 2, cat: c, evidence: "fct_sls 毛利率（A. Datum 58.66 对 52.05），因 max(dk) 规则取了上一季度 Q3，而非 Q4 线上"}
+    - {rep: 3, cat: c, evidence: "fct_sls 毛利率（A. Datum 收入 4.26e7 对参考线上 9.28e6），而非带 amt4 的 fct_ol_sls"}
+  summary_cat: c
+  consistent: true
+  evidence: "未采用线上渠道默认（conventions 1）：所有作答都用了 fct_sls；一次还错移了季度。"
+
+Q94:
+  attempts:
+    - {rep: 1, cat: c, evidence: "按减少额排序，参考按变化率升序（qoq_pct）；「降幅」指金额还是比率，L0 没有口径"}
+    - {rep: 2, cat: c, evidence: "按减少额排序，参考按变化率升序（qoq_pct）；「降幅」指金额还是比率，L0 没有口径"}
+    - {rep: 3, cat: c, evidence: "按减少额排序，参考按变化率升序（qoq_pct）；「降幅」指金额还是比率，L0 没有口径"}
+  summary_cat: c
+  consistent: true
+  evidence: "99 家门店与 Q3/Q4 销售额一致，排序按减少额而非变化率（ordered，order_by 第 3 列）；r1 另把降幅写成正数"
+
+Q98:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 l0.fct_sls.amt1（全渠道）并内连接 d_prd_cat；2009 年 Games and Toys 为 Q4 30.55，参考线上为 Q3 30.31，8 行对参考 9 行（含 NULL 品类）"}
+    - {rep: 2, cat: c, evidence: "用 l0.fct_sls.amt1 而非 fct_ol_sls；Games and Toys 最高季度 Q4 30.55 对参考 Q3 30.31，年度 8873229.9 对参考 2057197.9"}
+    - {rep: 3, cat: c, evidence: "用 l0.fct_sls.amt1，经 d_prd_sub/d_prd_cat 内连接；annual_sales 8873229.9 对参考 2057197.9，8 行对 9 行"}
+  summary_cat: c
+  consistent: true
+  evidence: "全部用全渠道 fct_sls（Games and Toys 年度 8.87e6）而非线上事实表（2.06e6）；作答 1 和 3 还因内连接丢了 NULL 品类组。"
+
+Q99:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 l0.fct_sls（线下）配 INNER JOIN 得 8 行，参考 FactOnlineSales 9 行（Audio 周末均值 140382 对 34031）"}
+    - {rep: 2, cat: c, evidence: "用 l0.fct_sls（线下）配 INNER JOIN 得 8 行，参考 FactOnlineSales 9 行（Audio 周末均值 140382 对 34031）"}
+    - {rep: 3, cat: a, evidence: "过滤 d_dt.wd_flg = Y/N，而参考 IsWorkDay 取值为 WorkDay/WeekEnd，所以所有均值为 NULL；另外用了 fct_sls 与 INNER JOIN（8 行对 9 行）"}
+  summary_cat: c
+  consistent: false
+  evidence: "全部用线下 fct_sls 而非 fct_ol_sls，且做内连接；一次还猜错 wd_flg 取值，结果为 NULL。"
+
+Q101:
+  attempts:
+    - {rep: 1, cat: c, evidence: "最近一个季度锚定 max(fct_ol_sls.dk)，返回 Q3（235064027），而参考固定 today = 2009-12-31，即 2009-10-01..2009-12-31（210717984）"}
+    - {rep: 2, cat: c, evidence: "同样以 max(dk) 作相对季度锚点，得 235064027（Q3），参考 210717984（2009 年 Q4）"}
+    - {rep: 3, cat: c, evidence: "用 l0.fct_sls（全渠道）和 Q3 窗口，972185118，参考仅线上 2009 年 Q4 210717984"}
+  summary_cat: c
+  consistent: true
+  evidence: "相对季度锚点不等于 2009-12-31，且（rep3）用了全渠道 fct_sls 而非默认线上事实表"
+
+Q102:
+  attempts:
+    - {rep: 1, cat: a, evidence: "净销售额取全渠道事实表的 fct_sls.amt3（DiscountAmount），8 个品类，值约 2.3e7，参考为线上 SalesAmount-ReturnAmount，9 行含 NULL 品类"}
+    - {rep: 2, cat: c, evidence: "过滤 dt.c_yr = toYear(today())，所以返回 0 行，且用了 fct_sls.amt1（毛额，全渠道），而参考用 2009 年线上 SalesAmount-ReturnAmount"}
+    - {rep: 3, cat: a, evidence: "净销售额取 fct_sls.amt3（DiscountAmount），带内连接，8 行对参考 9 行（基于 FactOnlineSales 的 amt1-amt2）"}
+  summary_cat: a
+  consistent: false
+  evidence: "三次中两次在全渠道事实表上把 amt3（折扣）当净额；第三次用了 today() 和毛额 amt1，都没有采用 2009 年线上净额约定"
+
+Q104:
+  attempts:
+    - {rep: 1, cat: c, evidence: "读了 l0.fct_sls（线下，返回 0 行），而参考用 retail.FactOnlineSales（默认线上渠道）返回 1 行；成本也按 qty1*uc 构造而非 TotalCost"}
+    - {rep: 2, cat: a, evidence: "用 l0.fct_sls.amt3（DiscountAmount）作收入、amt3-amt4 作利润，得 2 个品类，gp 约 -2.1e7，参考为 FactOnlineSales SalesAmount 上的 1 个品类（Games and Toys）"}
+    - {rep: 3, cat: a, evidence: "用 l0.fct_sls.amt3（DiscountAmount）作 gross_profit，返回 Cell phones，参考为 FactOnlineSales 的 Games and Toys"}
+  summary_cat: a
+  consistent: false
+  evidence: "三次都读了 fct_sls 而非 fct_ol_sls；两次还把 amt3（折扣）当利润，晦涩的度量列决定了结果。"
+
+Q105:
+  attempts:
+    - {rep: 1, cat: a, evidence: "过滤 l0.d_str.st_nm IN 猜测的中英文变体，0 行；真实值为 Contoso Seattle No.2 Store"}
+    - {rep: 2, cat: a, evidence: "过滤 l0.d_str.st_nm = 猜测的中文字面量，0 行；真实门店名为 Contoso Seattle No.2 Store"}
+    - {rep: 3, cat: a, evidence: "过滤 l0.d_str.st_nm = 猜测的中文字面量，0 行（另多出币种/数量列）"}
+  summary_cat: a
+  consistent: true
+  evidence: "L0 没有取值信息，门店名字面量只能猜，每次作答都返回 0 行，而非 5829718.99。"
+
+Q106:
+  attempts:
+    - {rep: 1, cat: f, evidence: "growth_pct -21.22 与参考 -21.2244 一致，但输出缺少绝对变化列（参考 sales_change_amount -3027577.8；作答只有 sales_2008 14264579.9 与 sales_2009 11237002.1）"}
+  summary_cat: f
+  consistent: true
+  evidence: "l0.fct_sls.amt1 合计和 Miami 过滤与参考相同；只缺绝对变化列，且 growth_pct 四舍五入到 2 位小数。"
+
+Q107:
+  attempts:
+    - {rep: 1, cat: c, evidence: "过滤 d_geo.cty_nm = 中文字面量、d_str.st_nm LIKE 中文前缀，而数据是英文值（Contoso New York No.2 Store）；结果 0 行/合计 0，参考 5656028.9 / 11321223.6，且用的是 amt1 毛额而非 SalesAmount-ReturnAmount"}
+    - {rep: 2, cat: c, evidence: "d_str.st_nm = 中文字面量、d_geo.cty_nm = 中文字面量均无匹配，合计 0 对参考 11321223.6；用了 amt1 而未减 amt2"}
+    - {rep: 3, cat: c, evidence: "st_nm LIKE 中文前缀匹配不到任何门店，两个合计都是 0，参考为 5656028.9 与 11321223.6；用 amt1 毛额，未减 amt2"}
+  summary_cat: c
+  consistent: true
+  evidence: "三次作答都猜了英文数据中不存在的中文城市/门店字面量（且用毛额 amt1 而非 amt1-amt2），返回 0 而非占比 49.96。"
+
+Q108:
+  attempts:
+    - {rep: 1, cat: c, evidence: "国家取自 fct_ol_sls.stk -> d_str.gk -> d_geo（门店所在地，3 个国家），而参考用 DimCustomer.GeographyKey（29 个国家）"}
+    - {rep: 2, cat: c, evidence: "国家经 d_str.gk（门店地理）取得，3 行，参考为 29 个客户地理国家"}
+    - {rep: 3, cat: c, evidence: "国家经 d_str.gk（门店地理）取得，3 行，参考为 29 个客户地理国家"}
+  summary_cat: c
+  consistent: true
+  evidence: "不知道默认客户所在地约定（conventions 5）；用了门店地理，得 3 个国家而非 29 个。"
+
+Q109:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 l0.fct_sls.amt1，年份锚定 max(dk)，天数为 uniqExact 销售日期，而参考在完整 DimDate 日历上用 FactOnlineSales 算 2008/2009；Q1 日均 8961588.7 对参考增长 1.21%"}
+    - {rep: 2, cat: c, evidence: "用 l0.fct_sls.amt1（全渠道），以 fct_sls 的最大年份为当前年，同比 Q1 -4.99% 对参考 +1.21%（线上销售 2009 对 2008）"}
+    - {rep: 3, cat: c, evidence: "按有销售的天数用 l0.fct_sls.amt1，而非按全部日历日用 fct_ol_sls；Q1 -4.99% 对参考 1.21%"}
+  summary_cat: c
+  consistent: true
+  evidence: "每次作答都用全渠道 fct_sls 而非线上事实表（默认渠道约定），所以报出负增长，而参考是小幅正增长。"
+
+Q110:
+  attempts:
+    - {rep: 1, cat: b, evidence: "分子取自 fct_ol_sls（857.7M，占比 22.93%），没有把 fct_sls.chnk 连到 d_chn.chk，参考用 FactSales 渠道 Online 得 25.43%"}
+    - {rep: 2, cat: b, evidence: "线上占比 22.93% 来自 fct_ol_sls 除以 fct_sls 合计，参考 25.43% 来自 FactSales channelKey 连接；L0 中没有 chnk-chk 关联"}
+    - {rep: 3, cat: b, evidence: "线上金额取自 fct_ol_sls，而非按渠道过滤的 fct_sls，占比 22.93% 对参考 25.43%"}
+  summary_cat: b
+  consistent: true
+  evidence: "L0 中没有渠道关系 fct_sls.chnk 到 d_chn.chk，所以分子与分母来自不同的事实表（20.67/22.93 对 22.79/25.43）"
+
+Q111:
+  attempts:
+    - {rep: 1, cat: c, evidence: "对 fct_sls_qta.amt1 的所有 scnk 值求和（达成率 36.52%），参考过滤 ScenarioKey=2（121.83%）"}
+    - {rep: 2, cat: c, evidence: "fct_sls_qta 上没有 scnk 过滤，目标跨场景求和，36.52% 对参考 121.83%"}
+    - {rep: 3, cat: c, evidence: "过滤 d_scn.scn_nm = 'Target'，匹配不到任何行，目标为 0、比率为 NULL，参考为 ScenarioKey=2 配额"}
+  summary_cat: c
+  consistent: true
+  evidence: "没有识别出正式目标场景 ScenarioKey=2：对所有场景求和（rep1、2）或猜的名称匹配不到任何行（rep3）"
+
+Q112:
+  attempts:
+    - {rep: 1, cat: c, evidence: "过滤 l0.d_scn.scn_nm = 一个猜测的正式目标标签，匹配不到任何场景，0 行对参考 262（ScenarioKey=2 预算，经 DimStore LEFT JOIN 覆盖所有门店）"}
+    - {rep: 2, cat: c, evidence: "过滤 l0.d_scn.scn_nm = 一个猜测的正式目标标签，匹配不到任何场景，0 行对参考 262（ScenarioKey=2）"}
+    - {rep: 3, cat: c, evidence: "过滤 l0.d_scn.scn_nm LIKE 一个猜测的标签前缀，匹配不到任何场景，0 行对参考 262（ScenarioKey=2）"}
+  summary_cat: c
+  consistent: true
+  evidence: "按约定 12，正式目标即 ScenarioKey=2（预算）；猜的 scn_nm 字面量匹配不到任何行，所以每次作答都返回 0 行。"
+
+Q113:
+  attempts:
+    - {rep: 1, cat: c, evidence: "过滤 d_scn.scn_nm LIKE '正式%'，匹配不到任何场景，0 行对参考 33（ScenarioKey=2 预算配额）"}
+    - {rep: 2, cat: c, evidence: "同样猜测场景名过滤，返回 0 行，参考 ScenarioKey=2 下 33 行"}
+    - {rep: 3, cat: c, evidence: "d_scn.scn_nm = '正式' 的猜测返回 0 行，参考 33，参考用 ScenarioKey=2"}
+  summary_cat: c
+  consistent: true
+  evidence: "场景名是猜的，而非采用预算 ScenarioKey=2 约定，所以没有目标行，结果 0 行对 33 行"
+
+Q115:
+  attempts:
+    - {rep: 1, cat: c, evidence: "状态按日历年分桶（同年/上一年有活动），而非 conventions 13 的月差 <=6/<=12；活跃->活跃 17671，与参考不同"}
+    - {rep: 2, cat: c, evidence: "状态按 90/365 天阈值判定，并对 2008 与 2009 队列做 INNER JOIN，而非 6/12 个月规则；活跃->活跃 16741"}
+    - {rep: 3, cat: c, evidence: "状态按 90/180 天阈值判定，带 csk>0 与 qty1>0 过滤，而非 6/12 个月规则；活跃->已流失 1882"}
+  summary_cat: c
+  consistent: true
+  evidence: "L0 不含客户状态阈值（6/12 个月，conventions 13），每次作答各自编了不同的阈值。"
+
+Q116:
+  attempts:
+    - {rep: 1, cat: f, evidence: "计数 13140/2770/2105/853 与参考一致，但复购率四舍五入到 2 位小数（66.23 对 66.2328767），多了复购人数列，月份是标签 January"}
+    - {rep: 2, cat: f, evidence: "队列规模 13140/2770/2105/853 与参考相同；只是比率做了 round(...,2)，月份以 d_dt.c_mo_lb 标签显示"}
+    - {rep: 3, cat: f, evidence: "队列规模与参考相同；比率四舍五入到 2 位小数，月份以 Year 2007-January 标签显示，参考为月份数值"}
+  summary_cat: f
+  consistent: true
+  evidence: "逻辑和计数与参考相同；差异仅在四舍五入和月份标签格式"
+
+Q117:
+  attempts:
+    - {rep: 1, cat: f, evidence: "分组层面的值与参考一致（Fond du Lac 38.47 pct、978662.57、32.57 pct），但缺少 category_decline_pct 列（相对品类基数销售额）"}
+    - {rep: 2, cat: f, evidence: "3 家门店的值均与参考一致，但缺少相对品类基数销售额的品类降幅百分比列"}
+    - {rep: 3, cat: a, evidence: "用 l0.d_prd.cls_nm（Regular/Deluxe/Economy 等级）作品类，而非经 d_prd_sub 的 d_prd_cat.pc_nm；category_decrease 为 2026181.36，参考 978662.57"}
+  summary_cat: f
+  consistent: false
+  evidence: "两次作答复现了参考的筛选与金额，但漏了品类占比基数列；一次把 cls_nm 当作品类。"
+
+Q118:
+  attempts:
+    - {rep: 1, cat: c, evidence: "用 l0.fct_sls.amt1（全渠道），按 row_number 取前 10% 即 ceil(count*0.1)；2009 合计 3740483119.2 对参考 FactOnlineSales 合计 857728031.3，占比 26.46 对参考 26.27"}
+    - {rep: 2, cat: c, evidence: "用 l0.fct_sls.amt1，取前 ceil(n*0.1) 个产品；total_sales_2009 3740483119.2 对参考 857728031.3（FactOnlineSales）"}
+    - {rep: 3, cat: c, evidence: "用 l0.fct_sls.amt1，以 quantileExact(0.9) 作临界值；合计 3740483119.2 对参考线上合计 857728031.3"}
+  summary_cat: c
+  consistent: true
+  evidence: "所有作答都用全渠道 fct_sls（合计 3.74e9），而未指明渠道时默认应为线上 FactOnlineSales（合计 8.58e8）；分位数方法也与参考的插值 P90 不同。"
+
+Q119:
+  attempts:
+    - {rep: 1, cat: h, evidence: "作答未输出 StoreKey；参考的 selection 按第 0 列 StoreKey 分组，StoreKey 不在 required_columns [1,3,5]，评分器无法重建按门店的分组，报 selection_object_count；310 行与首行均与参考一致"}
+    - {rep: 2, cat: h, evidence: "作答未输出 StoreKey；参考的 selection 按第 0 列 StoreKey 分组，StoreKey 不在 required_columns [1,3,5]，评分器无法重建按门店的分组，报 selection_object_count；310 行与首行均与参考一致"}
+    - {rep: 3, cat: h, evidence: "作答未输出 StoreKey；参考的 selection 按第 0 列 StoreKey 分组，StoreKey 不在 required_columns [1,3,5]，评分器无法重建按门店的分组，报 selection_object_count；310 行与首行均与参考一致"}
+  summary_cat: h
+  consistent: true
+  evidence: "疑为题库 rules 与评分器的交互：selection 分组列 StoreKey 不必答，作答不给它即判错；需 Codex 核对，不是模型错误"
+
+Q121:
+  attempts:
+    - {rep: 1, cat: b, evidence: "INNER JOIN d_prd -> d_prd_sub -> d_prd_cat 丢掉无品类产品，8 行对 9 行（缺 NULL 品类组）；Audio 均值 5745608 对参考 1341308 也不同（fct_sls 对 fct_ol_sls）"}
+    - {rep: 2, cat: b, evidence: "INNER JOIN 到 d_prd_sub/d_prd_cat 丢掉未分类销售，8 行对 9 行；另外没有对月份补零，且用了 fct_sls"}
+    - {rep: 3, cat: a, evidence: "用 l0.d_prd.cls_nm 作品类，得 3 组（Deluxe、Economy、Regular），而非 9 个 d_prd_cat 组"}
+  summary_cat: b
+  consistent: false
+  evidence: "两次作答因产品品类链上的内连接丢失未分类组，一次用 cls_nm 作品类。"
+
+Q122:
+  attempts:
+    - {rep: 1, cat: a, evidence: "过滤 l0.d_prd.mfr = 'Contoso'，而参考过滤 BrandName（l0.d_prd.brd）；结果 0 行，参考 17 行"}
+    - {rep: 2, cat: a, evidence: "l0.d_prd.mfr = 'Contoso'（Manufacturer）而非 brd（BrandName）；0 行，参考 17 行"}
+    - {rep: 3, cat: a, evidence: "p.mfr = 'Contoso' 匹配不到任何行，参考用 BrandName=brd；0 行对 17 行"}
+  summary_cat: a
+  consistent: true
+  evidence: "全部选了晦涩的 mfr（Manufacturer）列而非 brd（BrandName）来识别 Contoso 产品，结果为空。"
