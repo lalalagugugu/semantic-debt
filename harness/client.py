@@ -19,7 +19,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
-from typing import Callable, Protocol
+from typing import Any, Callable, Protocol
 
 API_URL = "https://api.deepseek.com/chat/completions"
 DEFAULT_EFFORT = "high"
@@ -38,6 +38,8 @@ class Reply:
     # ``model`` only echoes the requested name; the fingerprint is the version evidence
     # (decisions/2026-10-17-model-version-fingerprint.md)
     system_fingerprint: str | None = None
+    # function calls of the explorer agent (T15), as the API returned them; None for direct answering
+    tool_calls: list[dict] | None = None
 
 
 class APIError(RuntimeError):
@@ -49,7 +51,8 @@ class APIError(RuntimeError):
 class ModelClient(Protocol):
     model: str
 
-    def chat(self, messages: list[dict[str, str]]) -> Reply: ...
+    def chat(self, messages: list[dict[str, Any]], *, tools: list[dict] | None = None,
+             tool_choice: str | None = None) -> Reply: ...
 
 
 def usage_summary(usage: dict) -> dict[str, int]:
@@ -80,14 +83,22 @@ class DeepSeekClient:
         self.request_timeout_s = request_timeout_s
         self.url = url
 
-    def chat(self, messages: list[dict[str, str]]) -> Reply:
-        body = json.dumps({
+    def chat(self, messages: list[dict[str, Any]], *, tools: list[dict] | None = None,
+             tool_choice: str | None = None) -> Reply:
+        """``tools`` / ``tool_choice`` are sent only when given, so a direct-answer request is
+        byte-for-byte what it was before the explorer agent (T15) existed."""
+        request_body: dict[str, Any] = {
             "model": self.model,
             "messages": messages,
             "thinking": {"type": "enabled"},
             "reasoning_effort": self.effort,
             "stream": False,
-        }, ensure_ascii=False).encode()
+        }
+        if tools is not None:
+            request_body["tools"] = tools
+        if tool_choice is not None:
+            request_body["tool_choice"] = tool_choice
+        body = json.dumps(request_body, ensure_ascii=False).encode()
         retries = 0
         last_error = ""
         for attempt in range(self.max_attempts):
@@ -129,6 +140,7 @@ def _reply(raw: bytes, latency: float, retries: int) -> Reply:
         raw=raw,
         transport_retries=retries,
         system_fingerprint=payload.get("system_fingerprint"),
+        tool_calls=message.get("tool_calls") or None,
     )
 
 
@@ -136,6 +148,8 @@ def _reply(raw: bytes, latency: float, retries: int) -> Reply:
 class MockClient:
     """Offline stand-in. ``respond(messages) -> content`` decides the answer.
 
+    ``respond`` may also return a dict ``{"content": ..., "tool_calls": [...]}`` (explorer
+    agent tests); ``tools`` / ``tool_choice`` of each call are kept in ``requests``.
     Usage figures imitate prefix caching: the system message counts as a cache
     hit after the first call with the same system text.
     """
@@ -144,18 +158,25 @@ class MockClient:
     model: str = "mock"
     fingerprint: str | None = "fp_mock"
     _seen: set[str] = field(default_factory=set)
+    requests: list[dict] = field(default_factory=list)
 
-    def chat(self, messages: list[dict[str, str]]) -> Reply:
-        content = self.respond(messages)
+    def chat(self, messages: list[dict[str, Any]], *, tools: list[dict] | None = None,
+             tool_choice: str | None = None) -> Reply:
+        self.requests.append({"tools": tools, "tool_choice": tool_choice})
+        answer = self.respond(messages)
+        content, tool_calls = (answer.get("content") or "", answer.get("tool_calls")) if isinstance(answer, dict) \
+            else (answer, None)
         system = messages[0]["content"]
         prefix = len(system) // 2
-        rest = sum(len(m["content"]) for m in messages[1:]) // 2
+        rest = sum(len(m.get("content") or "") for m in messages[1:]) // 2
         hit = prefix if system in self._seen else 0
         self._seen.add(system)
         payload = {
             "model": "mock-version",
             **({"system_fingerprint": self.fingerprint} if self.fingerprint is not None else {}),
-            "choices": [{"message": {"content": content, "reasoning_content": "(mock)"}, "finish_reason": "stop"}],
+            "choices": [{"message": {"content": content, "reasoning_content": "(mock)",
+                                     **({"tool_calls": tool_calls} if tool_calls else {})},
+                         "finish_reason": "tool_calls" if tool_calls else "stop"}],
             "usage": {"prompt_tokens": prefix + rest, "prompt_cache_hit_tokens": hit,
                       "prompt_cache_miss_tokens": prefix + rest - hit, "completion_tokens": len(content) // 2,
                       "completion_tokens_details": {"reasoning_tokens": 3}},

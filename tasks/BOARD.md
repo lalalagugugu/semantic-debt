@@ -29,12 +29,14 @@
 | **G3** | **检查点：模型选定，系统提示与评分冻结（tag `harness-v1`）** | 用户 | — | T12 | — | **✅ 通过（2026-10-18）**：选 Flash（`e72d3c7f…`）；tag `harness-v1` 在 `6516fcc`（#87、#90、#91、#97）；英文锚点第一期不跑；见 `decisions/2026-10-18-g3-passed.md` |
 | T13 | SQL 直答全量（6 个中文单元；英文锚点第一期不跑，G3 第三节） | Claude Code | 普通 | G3 | 80 / 250 元 | 运行完成（2026-10-18，6 × 366 条齐全，24.80 元，指纹唯一）；Q79 打分卡死后运行器改为限时打分（PR #100）；报告暂定，待 `harness-v1.1` 离线重评定稿 |
 | T14 | 调优（SQL-L1 调优；DAX-L2 调优同法） | Claude Code（A 普通，B 调优包） | 普通 / 调优包 | T13 | 15 / 50 元 | 未开始 |
-| T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | 未开始 |
+| T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | `harness-agent-v1`（`88fd81c`，#112）；小样本完成（2026-10-19，0.67 元，#113）；T15-1 裁决方案 ③ → `harness-agent-v1.1`，重跑 L0-E 小样本后再定全量（实测估约 10 元） |
 | T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | 搭建完成（2026-10-16，PR #41 已合并；第 1–3 步，四类指标双接口 14/14 通过）；实验待 G3 与 T13 完成 |
 | T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | 未开始（用家里那台 Windows，装 Claude Code 后按卡片首选做法执行） |
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
+| T21 | 规划 agent（-P）：dsh 接同一份语义层，L0、L1 + 对照「dsh 只开 run_sql」 | Claude Code | 普通 | 可行性验证：`harness-agent-v1.1`；开跑：T15 的 L0-E、L1-E 全量 | 验证 ≤ 1 元；单元上限待估 | 卡片已起草（2026-10-19，`decisions/2026-10-19-t15-1-midreport-dsh.md`） |
+| T19a | SQL 线中期报告（T13、T14、T15 的 L0-E/L1-E、T21；T16 与 L2-E 赶上就纳入）；数字由 Codex 照 T20 复核 | Claude Code + 用户；复核 Codex | 普通 | T13 重评、T14、T15、T21 | 0 | 未开始；排在 DAX 线之前 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
 ## 当前进行中与待办（2026-10-16，T05b 开工后刷新）
