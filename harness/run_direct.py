@@ -19,7 +19,7 @@ If one requested model answers with a second ``system_fingerprint`` within
 a run, the run stops (decisions/2026-10-17-model-version-fingerprint.md).
 
 Scoring never holds a run up: a returned row set is scored in a child process with a
-time limit (harness/score_guard.py, 120 s); a slower one is logged ``pending`` with
+time limit (harness/score_guard.py, 10 s); a slower one is logged ``pending`` with
 reason ``score_timeout`` and rescored offline (harness.rescore). ``--backfill-from-raw``
 writes the missing lines of attempts that are complete in runs-raw (no model call).
 

@@ -8,6 +8,10 @@ is logged as ``pending`` with reason ``score_timeout``; its rows are in runs-raw
 is scored offline (``harness.rescore``) once the scorer is fixed. A timeout is never a
 verdict. The scorer itself and the system prompt are unchanged.
 
+The limit is 10 s (user, 2026-10-18): model calls must not wait on scoring at all; every
+verdict made during the run is a progress figure only, and the reported numbers come
+from the offline rescore with the fixed scorer (harness-v1.1).
+
 The child is started with ``spawn`` (never ``fork``: the parent holds a chDB session and
 worker threads) and imports only the scorer.
 """
@@ -17,7 +21,7 @@ from __future__ import annotations
 import multiprocessing as mp
 from dataclasses import dataclass
 
-SCORE_TIMEOUT_S = 120.0
+SCORE_TIMEOUT_S = 10.0
 SCORE_TIMEOUT = "score_timeout"
 
 
