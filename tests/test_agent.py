@@ -105,6 +105,20 @@ def test_prompt_py_is_byte_identical_to_harness_v1():
     assert AG.verify_file_at_tag("harness/prompt.py", "harness-v1")
 
 
+def test_runner_requires_harness_agent_v1_1():
+    assert AG.AGENT_TAG == "harness-agent-v1.1" and AG.parse_args(["--cell", "SQL-L1-E", "--dry-run"]).agent_tag == AG.AGENT_TAG
+    # the only change from harness-agent-v1 is the added TOOLS_EXHAUSTED text
+    old = subprocess.run(["git", "-C", str(REPO), "show", "harness-agent-v1:harness/agent_prompt.py"],
+                         capture_output=True, text=True)
+    if old.returncode != 0:
+        pytest.skip("tag harness-agent-v1 not fetched")
+    now = (REPO / "harness/agent_prompt.py").read_text(encoding="utf-8")
+    removed = [l for l in old.stdout.splitlines() if l not in now.splitlines()]
+    added = [l for l in now.splitlines() if l not in old.stdout.splitlines()]
+    assert removed == [] and any("TOOLS_EXHAUSTED" in l for l in added)
+    assert all(l.startswith("#") or "TOOLS_EXHAUSTED" in l for l in added)
+
+
 def test_render_result_cuts_at_the_echo_cap_and_says_so():
     rows = [[i, f"名{i}", None] for i in range(120)]
     text, shown, cut = A.render_result(ExecResult(rows=rows, columns=[{"name": "k"}, {"name": "名称"}, {"name": "v"}]))
@@ -170,6 +184,13 @@ def test_eight_tool_calls_then_the_model_must_answer(tmp_path):
     assert [r["tool_choice"] for r in client.requests] == [None] * 8 + ["none"]
     assert rec["n_tool_calls"] == 8 and rec["hit_tool_limit"] and rec["n_calls"] == 9
     assert rec["final"]["outcome"] == "correct" and rec["turns"][0]["tool_choice"] == "none"
+    # T15-1: the forced answer is announced once, after the 8th result, before tool_choice "none"
+    final_request = calls[-1]
+    assert final_request[-1] == {"role": "user", "content": A.TOOLS_EXHAUSTED}
+    assert final_request[-2]["role"] == "tool"
+    assert all(A.TOOLS_EXHAUSTED not in json.dumps(c, ensure_ascii=False) for c in calls[:-1])
+    assert sum(m.get("content") == A.TOOLS_EXHAUSTED for m in final_request) == 1
+    assert rec["limit_message_sent"] is True
 
 
 def test_calls_beyond_the_limit_in_one_reply_are_not_executed(tmp_path):
@@ -181,8 +202,74 @@ def test_calls_beyond_the_limit_in_one_reply_are_not_executed(tmp_path):
     assert ex.seen == [f"SELECT {i}" for i in range(8)] + ["SELECT 42"]
     statuses = [c["status"] for s in rec["steps"] for c in s["tool_calls"]]
     assert statuses == ["executed"] * 8 + ["limit_reached"] * 2
-    assert calls[2][-1]["content"] == A.LIMIT_REACHED
+    assert [m["content"] for m in calls[2][-3:]] == [A.LIMIT_REACHED, A.LIMIT_REACHED, A.TOOLS_EXHAUSTED]
+    assert calls[2][-1]["role"] == "user" and sum(m.get("content") == A.TOOLS_EXHAUSTED for m in calls[2]) == 1
+    assert A.TOOLS_EXHAUSTED not in json.dumps(calls[1], ensure_ascii=False)
     assert client.requests[-1]["tool_choice"] == "none" and rec["n_tool_calls"] == 8
+    assert rec["limit_message_sent"] is True
+
+
+def test_no_limit_message_below_the_limit_even_after_a_fix(tmp_path):
+    respond, calls = scripted(*[tool(f"SELECT {i}") for i in range(7)], "```sql\nSELECT bad\n```\n假设：无", ANSWER)
+    client = MockClient(respond)
+    ex = FakeExecutor({**{f"SELECT {i}": ExecResult(rows=[[i]]) for i in range(7)}, "SELECT 42": OK42})
+    rec = AG.run_attempt(_ctx(tmp_path, client, ex), Q, 1)
+    assert rec["n_tool_calls"] == 7 and not rec["hit_tool_limit"] and rec["limit_message_sent"] is False
+    assert all(A.TOOLS_EXHAUSTED not in json.dumps(c, ensure_ascii=False) for c in calls)
+    assert [r["tool_choice"] for r in client.requests] == [None] * 8 + ["none"]      # the fix forbids tools
+
+
+def test_limit_message_is_sent_once_when_the_fix_follows_a_forced_answer(tmp_path):
+    respond, calls = scripted(*[tool(f"SELECT {i}") for i in range(8)], "```sql\nSELECT bad\n```\n假设：无", ANSWER)
+    ex = FakeExecutor({**{f"SELECT {i}": ExecResult(rows=[[i]]) for i in range(8)}, "SELECT 42": OK42})
+    rec = AG.run_attempt(_ctx(tmp_path, MockClient(respond), ex), Q, 1)
+    assert rec["fixed"] and rec["final"]["outcome"] == "correct"
+    assert sum(m.get("content") == A.TOOLS_EXHAUSTED for m in calls[-1]) == 1
+
+
+def test_direct_answer_request_is_byte_identical_to_before_the_agent(monkeypatch):
+    """A direct call sends exactly the pre-T15 body: no tools / tool_choice keys, same key order."""
+    import harness.client as C
+
+    sent = []
+
+    class Resp:
+        def __init__(self, body):
+            self.body = body
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return json.dumps({"model": "deepseek-flash", "choices": [{"message": {"content": "x"},
+                                                                       "finish_reason": "stop"}], "usage": {}}).encode()
+
+    def urlopen(request, timeout):
+        sent.append(request.data)
+        return Resp(request.data)
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    monkeypatch.setattr(C.urllib.request, "urlopen", urlopen)
+    messages = P.first_messages(P.system_message("ctx", "syntax"), "问题")
+    C.DeepSeekClient("deepseek-flash").chat(messages)
+    before_t15 = json.dumps({"model": "deepseek-flash", "messages": messages, "thinking": {"type": "enabled"},
+                             "reasoning_effort": "high", "stream": False}, ensure_ascii=False).encode()
+    assert sent == [before_t15]
+    C.DeepSeekClient("deepseek-flash").chat(messages, tools=A.TOOLS, tool_choice="none")
+    agent_body = json.loads(sent[1])
+    assert agent_body["tools"] == A.TOOLS and agent_body["tool_choice"] == "none"
+
+
+def test_run_direct_never_offers_tools(tmp_path):
+    client = MockClient(lambda m: ANSWER)
+    ctx = R.RunContext(run_id="t", cell=CELLS["SQL-L1"], client=client, executor=FakeExecutor({"SELECT 42": OK42}),
+                       system=P.system_message("ctx", "syntax"), eval_commit="e", harness_commit="h", timeout_s=120,
+                       raw_dir=tmp_path / "raw")
+    rec = R.run_attempt(ctx, Q, 1)
+    assert client.requests == [{"tools": None, "tool_choice": None}]
+    assert "limit_message_sent" not in rec and "steps" not in rec
 
 
 def test_run_sql_uses_its_own_executor_and_the_final_query_the_direct_one(tmp_path):
