@@ -95,8 +95,8 @@ conventions:
     applies_to_datasets: [FactOnlineSales, FactSales, FactInventory, FactSalesQuota, FactStrategyPlan, DimCurrency]
     applies_to_columns: [FactOnlineSales.CurrencyKey, FactSales.CurrencyKey]
     note: >-
-      五张带币种的事实表里 CurrencyKey 都只有一个取值 1 = USD，所以任何金额都不需要换算，
-      汇率表（FactExchangeRate）在本库里用不上。
+      五张带币种的事实表里 CurrencyKey 都只有一个取值 1 = USD，所以事实表里的金额都是美元，
+      本身不需要换算。
 
   - id: 7
     group: "口径与业务词"
@@ -681,9 +681,8 @@ datasets:
     grain: "一行 = 一个日期 × 一种币种（DateKey × CurrencyKey 唯一）。"
     description: >-
       25 种币种对美元的汇率，31 个日期（2007-01-01 ~ 2009-07-01，不是每天）。
-      **本库用不上这张表**：所有带币种的事实表 CurrencyKey 都只有 1 = USD，
-      金额无需换算（约定 6）。
-    when_to_use: "本期实验里没有需要用到它的场景。保留是为了完整描述这个库。"
+      所有带币种的事实表 CurrencyKey 都只有 1 = USD（约定 6）。
+    when_to_use: "需要把美元金额换算成其他币种时。"
     date_column: DateKey
     columns:
       - name: ExchangeRateKey
@@ -1468,9 +1467,8 @@ datasets:
     rows: 28
     grain: "一行 = 一种币种（CurrencyKey 唯一）。"
     description: >-
-      28 种币种。**本库里所有事实表的 CurrencyKey 都只有 1 = USD**，所以这张表
-      实际只用到一行，金额无需换算（约定 6）。
-    when_to_use: "本期实验里没有需要用到它的场景。"
+      28 种币种。**本库里所有事实表的 CurrencyKey 都只有 1 = USD**（约定 6）。
+    when_to_use: "查币种名称，或配合汇率表换算币种时。"
     columns:
       - name: CurrencyKey
         description: "币种键 1 ~ 28。**1 = USD**，是全库唯一被事实表用到的币种。"
@@ -1783,7 +1781,7 @@ datasets:
       **没有任何事实表挂在辖区上**——销售事实走的是门店和客户，不是辖区。
       所以这张表在销售分析里用不上；它只能提供「某个城市属于哪个辖区、辖区负责人是谁」
       这类信息。
-    when_to_use: "本期实验里没有需要用到它的场景。保留是为了完整描述这个库。"
+    when_to_use: "查某个城市属于哪个销售辖区、辖区负责人是谁时。"
     columns:
       - name: SalesTerritoryKey
         description: "辖区键。1 ~ 274，265 行。"
@@ -2209,12 +2207,12 @@ relationships:
     to: DimCurrency.CurrencyKey
     cardinality: 多对一
     orphan_rows: 0
-    use: "本库用不上（约定 6）。"
+    use: "汇率对应的币种。"
   - from: FactExchangeRate.DateKey
     to: DimDate.DateKey
     cardinality: 多对一
     orphan_rows: 0
-    use: "本库用不上。"
+    use: "汇率的日期。"
   - from: FactITMachine.MachineKey
     to: DimMachine.MachineKey
     cardinality: 多对一
