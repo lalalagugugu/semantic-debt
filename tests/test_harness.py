@@ -57,6 +57,15 @@ def test_system_prompt_has_no_dataset_specific_content():
     assert "Contoso" not in P.SYSTEM_PROMPT
 
 
+def test_system_prompt_carries_the_presentation_conventions():
+    """decisions/2026-10-18-names-required-by-system-prompt.md §2.1 and §3.2: one generic line each."""
+    for phrase in ("用名称标识", "不要只给编码", "不要截断", "照原值输出", "组名用语义上下文里的叫法",
+                   "每组一行", "合计、小计行", "YYYY-MM-DD", "原始单位", "不要格式化成字符串",
+                   "（本期 − 基期）÷ 基期", "用正数表示"):
+        assert phrase in P.SYSTEM_PROMPT, phrase
+    assert not re.search(r"Q\d{1,3}\b", P.SYSTEM_PROMPT)      # no question ids (hard rule 3)
+
+
 def test_system_message_for_real_cell_contains_context_and_syntax():
     cell = CELLS["SQL-R"]
     if not (REPO / "build" / "contexts" / "SQL-R.yaml").exists():
