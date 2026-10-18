@@ -1,6 +1,6 @@
 # T15 探查 agent（L0-E、L1-E、L2-E）
 
-- 状态：搭建完成（2026-10-19，未调用模型）；用户已同意冻结工具说明，PR 合并后由协调会话打 `harness-agent-v1`；小样本（试跑 24 题 × 1 次 × L0-E、L1-E，`--budget 8` 为整个小样本的上限）用户已批准，打 tag 后错峰跑
+- 状态：搭建完成（2026-10-19，未调用模型）；用户已同意冻结工具说明，PR 合并后由协调会话打 `harness-agent-v1`；小样本已跑（`20261019-T15-pilot-01`，0.67 元）；T15-1 已裁决（选 ③，`harness-agent-v1.1`，PR #115）；下一步重跑小样本 L0-E，全量等用户批准
 - 负责：Claude Code
 - 模式：普通（`scripts/start-card.sh T15`）
 - 依赖：G3；L2-E 另需 T16 的 `cube_sql` 执行器
@@ -71,6 +71,22 @@
 
     uv run python -m harness.run_agent --cell SQL-L0-E --cell SQL-L1-E --dry-run
     uv run python -m harness.run_agent --cell SQL-L0-E --cell SQL-L1-E --pilot --reps 1 --run-id <run-id> --budget 8
+
+### 小样本（2026-10-19，`20261019-T15-pilot-01`，暂定判定）
+
+试跑 24 题 × 1 次，harness `88fd81c`（`harness-agent-v1`），错峰 06:50–07:15，花 0.67 元（L0-E 0.27、L1-E 0.40），指纹唯一且与 G3 一致。判定是 harness-v1 评分器的当场判定，**暂定**，最终数字等 harness-v1.1 离线重评。
+
+| 单元 | 模型调用 | `run_sql` | 对 / 错 / 执行错 / pending | 准确率 | 同 24 题直答（T13，×3） |
+|---|---|---|---|---|---|
+| SQL-L0-E | 104 | 163 | 7 / 7 / 10 / 0 | 7/24 = 29.2% | SQL-L0 24/72 = 33.3%（另 3 pending、1 拒答） |
+| SQL-L1-E | 94 | 77 | 14 / 7 / 0 / 3 | 14/24 = 58.3%（已评分 14/21 = 66.7%） | SQL-L1 48/72 = 66.7%（另 3 pending） |
+
+- 工具调用次数分布：L0-E 0 次 0、1–3 次 2、4–7 次 6、用满 8 次 16；L1-E 0 次 0、1–3 次 17、4–7 次 7、用满 0。
+- 超时 0（工具与最终查询都没有）；拒答 0；工具调用全部只读（`forbidden_statement` 0），工具执行报错全是 engine_error（L0-E 9、L1-E 8），回显截断 1 次。
+- pending：L1-E Q40（judge）、Q117 与 Q74（score_timeout）。
+- **L0-E 的 10 条 exec_error 全是用满 8 次后强制交卷的 no_query**：模型在 `tool_choice: "none"` 下仍想调用工具，把工具调用标记当正文输出。是工具设计的问题，记 `decisions/open-questions.md` T15-1。**已裁决（2026-10-19，用户选 ③）**：用完 8 次时、强制交卷前发一条固定用户消息「run_sql 次数已用完，请直接按作答要求输出最终答案。」，两种用完的情形都发；冻结为 `harness-agent-v1.1`（PR #115），见 `decisions/2026-10-19-t15-1-midreport-dsh.md` 第一节。之后只重跑小样本的 L0-E（新 run id），全量等用户另行批准。
+- 每题平均（agent 税）：L0-E 输入 33k token、输出 1.9k、13.2 秒、0.011 元；L1-E 输入 192k、输出 2.9k、18.8 秒、0.017 元。缓存命中率 91% / 99%。
+- 按实测重估全量（366 次 × 单元）：L0-E 约 4.1 元、L1-E 约 6.1 元，合计约 10.2 元（错峰），远低于搭建时按假设估的 38.5 元。
 
 - 产出：见上
 - 偏离与理由：
