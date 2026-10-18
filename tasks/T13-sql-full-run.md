@@ -1,6 +1,6 @@
 # T13 SQL 直答全量
 
-- 状态：未开始
+- 状态：运行完成（2026-10-18，6 单元 × 366 条齐全，24.80 元）；报告为暂定数，待 `harness-v1.1` 离线重评后定稿
 - 负责：Claude Code
 - 模式：普通（`scripts/start-card.sh T13`）
 - 依赖：G3
@@ -52,5 +52,23 @@
 ## 记录（完成后填写）
 
 - 产出：
+  - 运行 `runs/20261018-T13-sql-direct-01/`（6 个 JSONL，各 366 行，(题, 次) 无重复、全部 done）；`runs/INDEX.md` 一行；原始响应 `$SEMDEBT_DATA_DIR/runs-raw/20261018-T13-sql-direct-01/`
+  - 版本：题库 `eval-v1.1` = `938957f`（只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1.1`）；语义层 `semantic-v1.2` = `4cf56a8`（`build/contexts` 由 `render/render_all.py` 重新渲染，等价校验通过）；harness 各单元提交见 INDEX（SQL-L0 与 SQL-R 主体 `6516fcc` = harness-v1，其余 `f8da6ab`）
+  - 模型：`deepseek-flash`，全部 2,729 次调用指纹 `e72d3c7f663d3e1383b00b3884cb4501`，与 G3 一致。另起看门进程逐条核对日志指纹，不同即杀进程（未触发）
+  - 报告 `reports/results/sql_direct.md`（`uv run python scripts/sql_direct_report.py --run 20261018-T13-sql-direct-01 --eval-tag eval-v1.1`）：六项指标、四种结果合计 100%、SQL-L1.5S 按覆盖分列、judge 与低区分度单列、费用、打分超时逐条、各单元提交。**判定是运行时 harness-v1 的当场判定，暂定**
+  - SQL-L0 失败归因 `reports/results/T13-L0-failures.md`（协调会话要求；`scripts/t13_failure_dump.py`、`scripts/t13_failure_report.py`、`scripts/t13_l0_failure_verdicts.yaml`），其中「判不清」引出 `decisions/2026-10-18-harness-v1-1-scorer-fixes.md`
+  - 运行器改动 PR #100（`harness/score_guard.py`、`--backfill-from-raw`；系统提示与评分器不动，有逐字节测试）
+- 预热（交接第一条）：开跑前在 harness 执行器里把 122 题全部 137 份中文参考 SQL 各跑一遍（0 报错，合计 9.1 秒，最慢 Q76-2 1.4 秒，Q33 0.23 秒），并对 `l0`（25 张）、`dwd`（5 张）、`ads`（25 张）每张表整表扫一遍（`count()`、`sum(cityHash64(*))`）。不调用模型。全量运行 0 条执行超时
+- 换单元（交接第二条）：一个进程按单元顺序连续跑，换单元 5 次；每单元首个调用单独先跑写缓存。冷启动：SQL-L1.5W 0 次（前缀与 SQL-L1 相同的部分已在缓存），其余各 1 次
+- 费用：日志合计 24.80 元（上限 80）；另有第一次暂停时至多约 0.04 元已计费未记日志
 - 偏离与理由：
-- 工时：
+  1. **两次暂停、三次启动，同一 run-id**。第一次是用户要求 SQL-L0 跑完先看结果；第二次是冻结评分器在 Q79 上卡死（敏感性诊断在 42 家并列第 1 上指数级搜索，判定本身 0.01 秒），整轮停在 SQL-R 约 50 分钟。续跑只补缺的 (题, 次)，无重复行
+  2. **运行器改动（用户选方案 1，`decisions/2026-10-18-harness-v1-1-scorer-fixes.md` 第四节）**：打分放子进程限时（先 120 秒，后按用户决定改 10 秒），超时记 pending/score_timeout，不是判定；SQL-R 的 Q79 三条从 runs-raw 补写，不重新调用模型。因此三个单元段落的 harness 提交不同，INDEX 写明
+  3. **判定暂定**：用户决定最终数字以 `harness-v1.1`（人名双向、编码字符串、Q119 分组、Q79 搜索）离线重评为准；本卡的报告数字只作进度参考。score_timeout 5 条（全是 Q79）重评前不进任何分母
+  4. 英文锚点不跑（G3 第三节），代码保留
+- 工时：约 4.5 小时（18:25 开工至 22:50；模型调用实际约 1.5 小时，其余为预热、暂停后的 L0 归因、Q79 诊断与运行器改动）
+
+### 待办（本卡收尾）
+
+- [ ] `harness-v1.1` 合并后：6 单元离线重评（`harness.rescore`，不调用模型），重新生成 `reports/results/sql_direct.md`，同时列 harness-v1 与 v1.1 两套数和逐条判定变化；score_timeout 一条不剩
+- [ ] judge 13 题待 `judge-v1` 离线评

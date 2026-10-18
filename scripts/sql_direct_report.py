@@ -69,6 +69,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True, help="run-id under runs/")
     ap.add_argument("--eval-tag", default="eval-v1.1")
+    ap.add_argument("--verdicts", default="运行时 `harness-v1` 评分器的当场判定（暂定）。"
+                    "最终数字以 `harness-v1.1` 离线重评为准（decisions/2026-10-18-harness-v1-1-scorer-fixes.md 第二节第 6 条）",
+                    help="one line saying where the verdicts in the logs come from")
     args = ap.parse_args()
 
     commit = verify_eval_tag(args.eval_tag)
@@ -78,7 +81,11 @@ def main() -> int:
     cov = coverage()
     data = {c: records(args.run, c) for c in CELLS}
     done = {c: [r for r in v if r.get("status") == "done"] for c, v in data.items()}
-    first = [r for c in CELLS for r in done[c]]
+    # score_timeout (harness/score_guard.py) is no verdict: out of every denominator, listed one by one
+    timeout = {c: [r for r in done[c] if r["final"].get("pending") == "score_timeout"] for c in CELLS}
+    done_all = done
+    done = {c: [r for r in v if r["final"].get("pending") != "score_timeout"] for c, v in done_all.items()}
+    first = [r for c in CELLS for r in done_all[c]]
     fps: dict[str, int] = {}
     for r in first:
         for t in r["turns"]:
@@ -93,13 +100,17 @@ def main() -> int:
            f"低区分度 {len(low)} 题（主表单列）{sorted(low)}",
            f"- 主表分母：确定性评分题 {len(qs) - len(judge)} 题；不含低区分度 {len(set(qs) - judge - low)} 题",
            "- 生成：`uv run python scripts/sql_direct_report.py --run "
-           f"{args.run} --eval-tag {args.eval_tag}`", ""]
+           f"{args.run} --eval-tag {args.eval_tag}`",
+           f"- **判定来源**：{args.verdicts}",
+           f"- 打分超时（`score_timeout`，不是判定，不进任何分母，逐条见文末）：{sum(len(v) for v in timeout.values())} 条", ""]
 
     out += ["## 完整性", "", "| 单元 | 作答（done） | 应有 | 非 done 行 | 缺失的 (题, 次) |", "|---|---:|---:|---:|---|"]
     for c in CELLS:
-        have = {(r["qid"], r["rep"]) for r in done[c]}
+        have = {(r["qid"], r["rep"]) for r in done_all[c]}
         missing = sorted({(q, k) for q in qs for k in range(1, REPS + 1)} - have)
-        out.append(f"| {c} | {len(done[c])} | {len(qs) * REPS} | {len(data[c]) - len(done[c])} | {missing or '无'} |")
+        dup = len(done_all[c]) - len(have)
+        out.append(f"| {c} | {len(done_all[c])} | {len(qs) * REPS} | {len(data[c]) - len(done_all[c])} | {missing or '无'}"
+                   f"{f'；重复 {dup}' if dup else ''} |")
 
     out += ["", "## 主表（judge 题不计；准确率 = 最终正确 / 作答）", "",
             "| 单元 | 准确率（不含低区分度） | 准确率（含低区分度） | 首次即对率（不含低区分度） | 三次全对率（不含低区分度，按题） |",
@@ -173,10 +184,10 @@ def main() -> int:
             "| 单元 | 调用 | 冷启动 | 输入 token | 命中率 | 输出 token | 费用（元） |", "|---|---:|---:|---:|---:|---:|---:|"]
     total = 0.0
     for c in CELLS:
-        turns = [t for r in done[c] for t in r["turns"]]
+        turns = [t for r in done_all[c] for t in r["turns"]]
         pt = sum(t["usage"]["prompt_tokens"] for t in turns)
         hit = sum(t["usage"]["cache_hit_tokens"] for t in turns)
-        cost = sum(r.get("cost_cny") or 0 for r in done[c])
+        cost = sum(r.get("cost_cny") or 0 for r in done_all[c])
         total += cost
         out.append(f"| {c} | {len(turns)} | {sum(cold(t) for t in turns)} | {pt:,} | {share(hit, pt)} "
                    f"| {sum(t['usage']['completion_tokens'] for t in turns):,} | {cost:.2f} |")
@@ -184,6 +195,20 @@ def main() -> int:
     out += [f"| 合计 | | | | | | {total:.2f} |", "",
             f"价格：`harness/cells.py` 的 `PRICES_OFFPEAK['deepseek-flash']` = {PRICES_OFFPEAK['deepseek-flash']}；"
             f"高峰时段作答 {peak} 条。"]
+    out += ["", "## 打分超时（`score_timeout`）", "",
+            "冻结评分器在这些作答上超过运行器的打分时限（SQL-R 的 Q79 三条为补写时的 120 秒，其余 10 秒）。"
+            "行集在 runs-raw，`harness-v1.1` 合并后离线重评；最终报告里不能剩下。", "",
+            "| 单元 | 题 | 次 | 判定来源 |", "|---|---|---:|---|"]
+    rows_t = [(c, r) for c in CELLS for r in sorted(timeout[c], key=lambda r: (r["qid"], r["rep"]))]
+    out += [f"| {c} | {r['qid']} | {r['rep']} | {'补写（runs-raw）' if 'backfilled_from_raw' in r else '运行时'} |"
+            for c, r in rows_t] or ["| 无 | | | |"]
+    hc: dict = {}
+    for c in CELLS:
+        for r in done_all[c]:
+            hc.setdefault(c, {}).setdefault(r["harness_commit"], 0)
+            hc[c][r["harness_commit"]] += 1
+    out += ["", "## 各单元的 harness 提交", "", "| 单元 | 提交（条数） |", "|---|---|"]
+    out += [f"| {c} | " + "，".join(f"`{k}`（{v}）" for k, v in hc[c].items()) + " |" for c in CELLS]
     print("\n".join(out))
     return 0
 
