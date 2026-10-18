@@ -964,3 +964,20 @@ def test_semantic_tag_is_checked_against_this_repo():
         pytest.skip("tag semantic-v1.1 not fetched")
     with pytest.raises(SemanticVersionError, match="differ from semantic-v1.1"):
         verify_semantic_tag("semantic-v1.1", [], root=REPO, contexts_dir=CONTEXTS)
+
+
+def test_final_rescore_swaps_a_key_only_for_its_own_entity_name():
+    """T12 final rescore: a key stands in for the name of the same entity, never for
+    another entity's name (swapping a selection group column made the scorer search
+    without end); dropping convention columns also drops their rank rules."""
+    from scripts.t12_final_rescore import key_variants, without
+    header = ["StoreName", "ProductName", "product_sales", "pct_of_store", "ProductKey", "store_total_sales", "rank"]
+    rules = {"ordered": False, "top_n": None, "required_columns": [0, 1, 3, 5, 6], "identifier_columns": [4],
+             "value_kinds": ["other", "other", "amount", "percentage", "other", "amount", "other"],
+             "value_types": ["String", "Nullable(String)", "Float64", "Nullable(Float64)", "Int32", "Float64", "UInt64"],
+             "rank_columns": [6], "rankings": [{"column": 6}]}
+    assert [v["required_columns"] for v in key_variants(rules, header)] == [[0, 4, 3, 5, 6]]
+    relaxed = without(rules, [5, 6])
+    assert relaxed["required_columns"] == [0, 1, 3] and "rank_columns" not in relaxed and "rankings" not in relaxed
+    assert without(rules, []) is rules
+    assert key_variants({**rules, "identifier_columns": [0]}, ["t.StoreKey", "StoreName", "x", "y", "z", "w", "v"]) == []

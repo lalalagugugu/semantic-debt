@@ -60,7 +60,7 @@ JWT，SQL 开发模式接受任意非空认证响应。两个接口都绑定 loo
 | `prompt.py` | T11 | 系统提示（`harness-v1` 冻结范围；第 1–5 条是作答格式，第 6–15 条是结果的展示约定：名称标识（名称缺失或占位时给编码）、不截断、分类值照原值、长表、无合计行、日期与期间写法、金额原始单位、变化率与降幅的写法、变化量同时给绝对值和百分比（百分点除外）、多行排名给名次、比率给基数（均值不算比率），见 `decisions/2026-10-18-names-required-by-system-prompt.md`、`decisions/2026-10-18-ux-conventions-and-annotation-disputes.md` 第一、五、八节）、稳定前缀的拼装（系统提示 → 语义上下文 → 语法说明；用户消息只放题目）、响应解析 |
 | `questions.py` | T11 | 中文题集读 `$SEMDEBT_EVAL_DIR/questions/*.yaml`，参考结果读 CSV 并按 `refs/MANIFEST.json` 的列类型还原。题级 `rules` 与逐参考 `rules` 原样交给评分器（`reference_rules`），`selection` 等字段不读不改；题目文件与 MANIFEST 的有效 `rules` 不一致时拒绝加载。英文锚点（99 道）按英文原文对应到题库题号，按外部原始参考评分、另记修订后参考的对照列。judge 题 / 无参考 / 无 `rules` 的返回行集记 `pending`，行集存 runs-raw 待离线重评 |
 | `anchor_refs.py` | T11 | 英文锚点的原始参考：外部 `expected_sql` 原样在本地完整执行，存 `$SEMDEBT_DATA_DIR/anchor-refs/`（不入库）；`--check` 逐字节复核 |
-| `rescore.py` | T11 | 离线重评：从 runs-raw 的执行结果重建候选（核 sha256），按当前题库重评，写进新 run 目录；题干变过的行拒绝 |
+| `rescore.py` | T11、T12 | 离线重评：从 runs-raw 的执行结果重建候选（核 sha256），按当前题库重评，写进新 run 目录；`--eval-tag` 校验题库是该 tag 的内容；题干变过的行默认拒绝，只有显式 `--allow-changed-question` 才照评并在行内标 `question_changed`（T12 最终重评只用于 Q69） |
 | `run_direct.py` | T11 | 直答：一次调用写出查询；执行报错时发回报错、固定修一次。日志、断点续跑、`--dry-run`、并发 |
 | `run_agent.py` | T15 | 探查 agent（-E）：多一个只读工具 `run_sql`，最多 8 步 |
 | `scorer.py` | T02（Codex 写） | 确定性结果集评分器（纯函数，不执行查询） |

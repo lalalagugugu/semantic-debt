@@ -107,6 +107,17 @@ Pro 的错判里 `missing_columns`（候选少了参考的某列）占大头：S
 
 **结论**：2026-10-18 用户先裁决选 Flash；`decisions/2026-10-18-judge-stratum-and-t12-audit.md` 第二节改为 G3 时按最终重评（`required_columns`、标签规则、judge 单列、参考修正全部落地后）套卡片规则定。按现有数字，规则给出 Flash（指纹 `e72d3c7f663d3e1383b00b3884cb4501`）。
 
+## 最终重评（eval-v1.1，2026-10-18）
+
+试跑全部 288 条作答离线重评（不调用模型）：题库 `eval-v1.1` = `938957f`，评分器 main `ea90587`（含 #91）。完整表格、逐条判定变化和归因见 `reports/T12-pilot.md` 开头「最终重评」一节。SQL-L1 主表（不含低区分度、judge；每格 57 条）：
+
+| 口径 | Flash | Pro | Pro − Flash | 规则结论 |
+|---|---|---|---|---|
+| 严格（评分器原始判定） | 40/57 = 70.2% | 35/57 = 61.4% | −8.8 点 | Flash |
+| 最终（旧提示下不能要求的项不扣分） | 49/57 = 86.0% | 48/57 = 84.2% | −1.8 点 | Flash |
+
+两套数都不触发「选 Pro」：Flash 没有低于 50%，Pro 也没有高 10 个点以上。由 G3 确认。
+
 ## 用户裁决
 
 - [x] 模型：Flash（2026-10-18，`decisions/2026-10-18-reference-columns-asked-only.md` 第四节）→ 改为 G3 时按最终重评定（`decisions/2026-10-18-judge-stratum-and-t12-audit.md` 第二节）
