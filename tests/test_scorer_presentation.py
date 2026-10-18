@@ -75,3 +75,37 @@ def test_unordered_pairs_swap_attributes_together_per_row():
 def test_invalid_unordered_pairs_fail(pair):
     with pytest.raises(ValueError, match='unordered_pairs'):
         score([[1, 2]], [[[1, 2]]], rules(['Int64', 'Int64'], unordered_pairs=pair))
+
+
+
+def test_zero_count_groups_are_optional_in_both_directions():
+    metadata = rules(['String','UInt64','Nullable(Float64)'], value_kinds=['other','count','amount'])
+    ref = [['A',2,10],['B',0,None],['C',0,0]]
+    assert score([['A',2,10]], [ref], metadata) == 'correct'
+    assert score([['A',2,10],['extra',0,0]], [ref[:1]], metadata) == 'correct'
+    assert score([['A',2,10],['extra',0,None]], [ref], metadata) == 'correct'
+    assert score([], [[['B',0,None]]], metadata) == 'correct'
+    assert score([['B',0,None]], [[]], metadata) == 'correct'
+    assert score([['A',2,10],['extra',0,5]], [ref], metadata) == 'wrong'
+    assert score([['A',2,10]], [[['A',2,10],['extra',0,5]]], metadata) == 'wrong'
+    assert score([['A',2,10],['extra',0,'0']], [ref], metadata) == 'wrong'
+    assert score([['A',2,10],['extra',None,None]], [ref], metadata) == 'wrong'
+
+
+def test_zero_group_detection_follows_reference_column_mapping_and_required_projection():
+    metadata = rules(['String','UInt64','Float64'], value_kinds=['other','count','amount'],required_columns=[0,1])
+    assert score([[2,'A'],[0,'B']], [[['A',2,50]]], metadata) == 'correct'
+    assert score([], [[['B',0,100]]], metadata) == 'correct'  # Optional amount is not compared.
+    assert score([['A',0]], [[['A',1,0]]], metadata) == 'wrong'
+    assert score([['A',0],['B',1]], [[['A',0,0]]], metadata) == 'wrong'
+
+
+def test_zero_measures_without_a_required_count_are_not_optional():
+    assert score([], [[['A',0]]], rules(['String','Float64'],value_kinds=['other','amount'])) == 'wrong'
+    assert score([], [[['A',None]]], rules(['String','Nullable(UInt64)'],value_kinds=['other','count'])) == 'wrong'
+
+
+def test_zero_group_rule_does_not_relax_top_n_quota():
+    metadata = rules(['String','UInt64'],value_kinds=['other','count'],ordered=True,top_n=2,
+                     tie_columns=[1],order_by=[{'column':1,'descending':True}])
+    assert score([['A',1]], [[['A',1],['B',0]]], metadata) == 'wrong'

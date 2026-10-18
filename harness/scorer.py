@@ -375,7 +375,43 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
             return True, reason
         if first_reason is None:
             first_reason = reason
+        # Zero groups do not relax declared Top-N or hierarchical quotas.
+        if rules.top_n is None and rules.selection is None:
+            if _matches_without_zero_groups(form, reference, rules):
+                return True, "matched"
     return False, first_reason
+
+
+def _matches_without_zero_groups(candidate: Rows, reference: Rows, rules: _Rules) -> bool:
+    width = len(reference[0]) if reference else len(rules.value_kinds or rules.value_types)
+    columns = rules.required_columns if rules.required_columns is not None else tuple(range(width))
+    counts = [i for i in columns if rules.value_kinds and rules.value_kinds[i] == "count"]
+    if not counts:
+        return False
+    def zero_group(row: Row, mapping: tuple[int, ...]) -> bool:
+        values = {i:row[mapping[pos]] for pos,i in enumerate(columns)}
+        if any(not _is_numeric(values[i]) or values[i] != 0 for i in counts):
+            return False
+        for i,value in values.items():
+            numeric_type = bool(rules.value_types and re.search(r"(?:U?Int\d+|Float\d+|Decimal)", rules.value_types[i]))
+            numeric_kind = bool(rules.value_kinds and rules.value_kinds[i] != "other")
+            if numeric_type or numeric_kind or _is_numeric(value):
+                if value is not None and (not _is_numeric(value) or value != 0):
+                    return False
+        return True
+    kept_reference = tuple(row for row in reference if not zero_group(row, columns))
+    if not candidate:
+        return not kept_reference
+    if len(candidate[0]) < len(columns):
+        return False
+    for mapping in permutations(range(len(candidate[0])),len(columns)):
+        kept_candidate = tuple(row for row in candidate if not zero_group(row,mapping))
+        if len(kept_candidate) == len(candidate) and len(kept_reference) == len(reference):
+            continue
+        matched,_ = _matches_reference_core(kept_candidate,kept_reference,rules,fixed_mapping=mapping)
+        if matched:
+            return True
+    return False
 
 
 def _matches_reference_core(candidate: Rows, reference: Rows, rules: _Rules, fixed_mapping: tuple[int, ...] | None = None) -> tuple[bool, str]:
