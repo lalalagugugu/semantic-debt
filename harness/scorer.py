@@ -70,6 +70,10 @@ class _Rules:
     required_columns: tuple[int, ...] | None = None
     label_values: tuple[frozenset[object] | None, ...] = ()
     unordered_pairs: tuple[tuple[tuple[int, ...], tuple[int, ...]], ...] = ()
+    identifier_columns: tuple[int, ...] = ()
+    rank_columns: tuple[int, ...] = ()
+    rankings: tuple[Mapping[str, object], ...] = ()
+    rank_style: str = "competition"
 
 
 def score(
@@ -301,8 +305,52 @@ def _parse_rules(rules: Mapping[str, object]) -> _Rules:
                 raise ValueError("unordered_pairs requires both sides of each compared attribute")
         seen_pair_columns.update(left + right)
         parsed_pairs.append((tuple(left), tuple(right)))
+    exact_roles = {}
+    for field in ("identifier_columns", "rank_columns"):
+        positions = rules.get(field, [])
+        if (not isinstance(positions, list) or any(type(i) is not int or i < 0 for i in positions)
+                or len(set(positions)) != len(positions)):
+            raise ValueError(field + " must contain unique nonnegative column indexes")
+        for metadata in (value_kinds, value_types):
+            if metadata and any(i >= len(metadata) for i in positions):
+                raise ValueError(field + " contains an index outside reference metadata")
+        for left,right in parsed_pairs:
+            if any((a in positions) != (b in positions) for a,b in zip(left,right)):
+                raise ValueError(field + " must agree on both sides of unordered pairs")
+        exact_roles[field]=tuple(positions)
+    if set(exact_roles['identifier_columns']) & set(exact_roles['rank_columns']):
+        raise ValueError("identifier_columns and rank_columns must be disjoint")
+    rankings = rules.get("rankings", [])
+    if not isinstance(rankings, list):
+        raise ValueError("rankings must be a list")
+    seen_ranks = set()
+    for spec in rankings:
+        if not isinstance(spec, dict) or spec.get("column") not in exact_roles['rank_columns'] or spec['column'] in seen_ranks:
+            raise ValueError("rankings requires one specification per declared rank column")
+        seen_ranks.add(spec['column'])
+        for field in ('group_columns','object_columns'):
+            indexes = spec.get(field)
+            if not isinstance(indexes,list) or any(type(i) is not int or i < 0 for i in indexes) or len(set(indexes)) != len(indexes):
+                raise ValueError("invalid ranking identity columns")
+            if any(metadata and any(i >= len(metadata) for i in indexes) for metadata in (value_kinds,value_types)):
+                raise ValueError("ranking identity outside reference metadata")
+        if not spec['object_columns'] or type(spec.get('prefix')) is not bool or not isinstance(spec.get('blocks'),list):
+            raise ValueError("rankings requires objects, prefix policy and complete blocks")
+        groups = defaultdict(list)
+        for block in spec['blocks']:
+            if (not isinstance(block,dict) or not isinstance(block.get('group'),list)
+                    or len(block['group']) != len(spec['group_columns'])
+                    or any(type(block.get(k)) is not int or block[k] < 1 for k in ('rank','dense','size'))):
+                raise ValueError("invalid ranking block")
+            groups[tuple(block['group'])].append(block)
+        for blocks in groups.values():
+            offset = 1
+            for dense,block in enumerate(sorted(blocks,key=lambda b:b['rank']),1):
+                if block['rank'] != offset or block['dense'] != dense:
+                    raise ValueError("ranking blocks must describe a complete competition-ranked domain")
+                offset += block['size']
     parsed_order = tuple((item["column"], item["descending"]) for item in order_by or ())
-    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection, parsed_order, tuple(required_columns) if required_columns is not None else None, unordered_pairs=tuple(parsed_pairs))
+    return _Rules(ordered, top_n, tuple(tie_columns), tuple(value_kinds), use_absolute, exact_counts, tuple(value_types), selection, parsed_order, tuple(required_columns) if required_columns is not None else None, unordered_pairs=tuple(parsed_pairs), rankings=tuple(rankings), **exact_roles)
 
 
 def _coerce_rows(rows: Sequence[Sequence[Cell]], name: str) -> Rows:
@@ -370,9 +418,11 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
     first_reason = None
     minimum = len(_comparison_columns(reference[0], rules)) if reference else 0
     for form in _candidate_forms(candidate, minimum):
-        matched, reason = _matches_reference_core(form, reference, rules)
-        if matched:
-            return True, reason
+        for style in ("competition", "dense", "position") if rules.rankings else ("competition",):
+            styled = replace(rules,rank_style=style)
+            matched, reason = _matches_reference_core(form, reference, styled)
+            if matched:
+                return True, reason
         if first_reason is None:
             first_reason = reason
         # Zero groups do not relax declared Top-N or hierarchical quotas.
@@ -385,7 +435,7 @@ def _matches_reference(candidate: Rows, reference: Rows, rules: _Rules) -> tuple
 def _matches_without_zero_groups(candidate: Rows, reference: Rows, rules: _Rules) -> bool:
     width = len(reference[0]) if reference else len(rules.value_kinds or rules.value_types)
     columns = rules.required_columns if rules.required_columns is not None else tuple(range(width))
-    counts = [i for i in columns if rules.value_kinds and rules.value_kinds[i] == "count"]
+    counts = [i for i in columns if i not in rules.identifier_columns and rules.value_kinds and rules.value_kinds[i] == "count"]
     if not counts:
         return False
     def zero_group(row: Row, mapping: tuple[int, ...]) -> bool:
@@ -393,6 +443,8 @@ def _matches_without_zero_groups(candidate: Rows, reference: Rows, rules: _Rules
         if any(not _is_numeric(values[i]) or values[i] != 0 for i in counts):
             return False
         for i,value in values.items():
+            if i in rules.identifier_columns:
+                continue
             numeric_type = bool(rules.value_types and re.search(r"(?:U?Int\d+|Float\d+|Decimal)", rules.value_types[i]))
             numeric_kind = bool(rules.value_kinds and rules.value_kinds[i] != "other")
             if numeric_type or numeric_kind or _is_numeric(value):
@@ -425,6 +477,13 @@ def _matches_reference_core(candidate: Rows, reference: Rows, rules: _Rules, fix
         raise ValueError("required_columns contains an index outside the reference rows")
     if reference and any(i >= len(reference[0]) for pair in rules.unordered_pairs for side in pair for i in side):
         raise ValueError("unordered_pairs contains an index outside reference rows")
+    if reference and any(i >= len(reference[0]) for i in rules.identifier_columns + rules.rank_columns):
+        raise ValueError("exact column role contains an index outside reference rows")
+    for spec in rules.rankings:
+        for row in reference:
+            if any(i >= len(row) for i in spec['group_columns'] + spec['object_columns'] + [spec['column']]):
+                raise ValueError("ranking columns outside reference rows")
+            _rank_block(row,spec)
     if rules.selection is not None:
         complete, _ = complete_selection(list(reference), rules.selection, rules.value_kinds)
         if len(complete) != len(reference):
@@ -464,12 +523,12 @@ def _matches_reference_core(candidate: Rows, reference: Rows, rules: _Rules, fix
 
     for mapping in (permutations(range(candidate_width), reference_width) if fixed_mapping is None else (fixed_mapping,)):
         if rules.top_n is not None:
-            if _top_rows_match(candidate, reference, mapping, rules):
+            if _top_rows_match(candidate, reference, mapping, rules) and _position_ranks_valid(candidate,reference,mapping,rules):
                 return True, "matched"
         elif rules.ordered:
-            if _ordered_rows_match(candidate, reference, mapping, rules):
+            if _ordered_rows_match(candidate, reference, mapping, rules) and _position_ranks_valid(candidate,reference,mapping,rules):
                 return True, "matched"
-        elif _rows_match_unordered(candidate, reference, mapping, rules):
+        elif _rows_match_unordered(candidate, reference, mapping, rules) and _position_ranks_valid(candidate,reference,mapping,rules):
             return True, "matched"
     return False, "values"
 
@@ -535,7 +594,7 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
                 continue
             for matched in product(*choices):
                 valid, reason = matches_selection(matched, reference, spec, rules.value_kinds)
-                if valid:
+                if valid and _position_ranks_valid(candidate,reference,mapping,rules):
                     return True, "matched"
         return False, reason
     reason = "selection_values"
@@ -550,7 +609,7 @@ def _matches_selection_reference(candidate: Rows, reference: Rows, rules: _Rules
             matched.append(match)
         else:
             valid, reason = matches_selection(matched, reference, spec, rules.value_kinds)
-            if valid:
+            if valid and _position_ranks_valid(candidate,reference,mapping,rules):
                 return True, "matched"
     return False, reason
 
@@ -662,6 +721,15 @@ def _row_bucket(row: Row, mapping: tuple[int, ...], rules: _Rules, *, candidate:
         if i in pair_columns:
             continue
         value = row[mapping[position]] if candidate else row[i]
+        if i in rules.rank_columns and rules.rank_style != 'competition' and any(spec['column']==i for spec in rules.rankings):
+            continue
+        if i in rules.identifier_columns or i in rules.rank_columns:
+            key = ('exact_column', value.strip() if isinstance(value,str) else value)
+            if isinstance(value,bool):key=('exact_bool',value)
+            try:hash(key)
+            except TypeError:key=('unhashable_exact',repr(value))
+            bucket.append(key)
+            continue
         if _is_numeric(value):
             continue
         key = _nonnumeric_bucket(value)
@@ -731,11 +799,81 @@ def _match_bucket(candidate: list[Row], reference: list[Row], mapping: tuple[int
     return True
 
 
+def _rank_block(row: Row, spec: Mapping[str, object]) -> Mapping[str, object]:
+    group = [row[i] for i in spec['group_columns']]
+    block = next((b for b in spec['blocks'] if b['group']==group and b['rank']==row[spec['column']]),None)
+    if block is None:
+        raise ValueError("reference rank missing from complete ranking domain")
+    return block
+
+
+def _position_ranks_valid(candidate: Rows, reference: Rows, mapping: tuple[int,...], rules: _Rules) -> bool:
+    if rules.rank_style != 'position':
+        return True
+    columns = _comparison_columns(reference[0],rules)
+    for spec in rules.rankings:
+        column = spec['column']
+        if column not in columns:
+            continue
+        choices = []
+        for row in candidate:
+            value = row[mapping[columns.index(column)]]
+            matches = set()
+            for ref in reference:
+                if _rows_equal(row,ref,mapping,rules):
+                    group = tuple(ref[i] for i in spec['group_columns'])
+                    obj = tuple(ref[i] for i in spec['object_columns'])
+                    block = _rank_block(ref,spec)
+                    matches.add((group,obj,block['rank'],value))
+            if not matches:
+                return False
+            choices.append(matches)
+        # Repeated output rows for one object share its position; distinct
+        # objects never share a position. Search only ambiguous identities.
+        states = [(0,{}, {}, {})]
+        valid = False
+        while states:
+            index,objects,positions,blocks = states.pop()
+            if index == len(choices):
+                if spec['prefix'] and any(sorted(values) != list(range(start,start+len(values))) for (_,start),values in blocks.items()):
+                    continue
+                valid = True
+                break
+            for group,obj,start,value in choices[index]:
+                identity_key = (group,obj)
+                position_key = (group,value)
+                if identity_key in objects and objects[identity_key] != value:
+                    continue
+                if position_key in positions and positions[position_key] != obj:
+                    continue
+                next_blocks = {key:set(values) for key,values in blocks.items()}
+                next_blocks.setdefault((group,start),set()).add(value)
+                states.append((index+1,{**objects,identity_key:value},{**positions,position_key:obj},next_blocks))
+        if not valid:
+            return False
+    return True
+
+
 def _rows_equal(candidate: Row, reference: Row, mapping: tuple[int, ...], rules: _Rules) -> bool:
     columns = _comparison_columns(reference, rules)
     def equal(column: int, expected_column: int) -> bool:
         value = candidate[mapping[columns.index(column)]]
         expected = reference[expected_column]
+        if expected_column in rules.rank_columns:
+            if not _is_numeric(value) or not math.isfinite(value) or value != int(value):
+                return False
+            spec = next((spec for spec in rules.rankings if spec['column']==expected_column),None)
+            if spec is not None and rules.rank_style != 'competition':
+                block = _rank_block(reference,spec)
+                if rules.rank_style == 'dense':
+                    return value == block['dense']
+                return block['rank'] <= value < block['rank'] + block['size']
+        if expected_column in rules.identifier_columns or expected_column in rules.rank_columns:
+            if _is_numeric(value) and _is_numeric(expected):
+                return value == expected
+            if isinstance(value,str) and isinstance(expected,str):
+                return value.strip() == expected.strip()
+            return type(value) is type(expected) and value == expected
         return (_label_matches(value, expected, expected_column, rules)
                 or _cells_equal(value, expected, kind=rules.value_kinds[expected_column] if rules.value_kinds else "other",
                                 use_absolute=rules.use_absolute_tolerance,
