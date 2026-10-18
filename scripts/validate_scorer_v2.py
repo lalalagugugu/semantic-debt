@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from copy import deepcopy
 from contextlib import contextmanager
 import hashlib
 import json
@@ -52,6 +53,59 @@ def deadline(seconds):
         signal.signal(signal.SIGALRM, handler)
 
 
+def explain_rejection(candidate, refs, rules, reason):
+    """Counterfactual evidence for legacy flips; never used by score/score_detailed."""
+    def proves_correct(rows, reference, rule):
+        try:
+            return scorer_v2.score(rows, [reference], {}, reference_rules=[rule]) == 'correct'
+        except (ValueError, TypeError):
+            # Removing a rank can also remove a required ordering/identity column.
+            # Such a counterfactual is invalid and supplies no attribution evidence.
+            return False
+
+    for reference, rule in zip(refs, rules):
+        if reason == 'rank' and rule.get('rankings') and all(
+                block['size'] == 1 and block['rank'] == block['dense']
+                for ranking in rule['rankings'] for block in ranking['blocks']):
+            relaxed = deepcopy(rule)
+            relaxed['required_columns'] = [c for c in rule['required_columns'] if c not in rule['rank_columns']]
+            relaxed['rank_columns'], relaxed['rankings'] = [], []
+            if proves_correct(candidate, reference, relaxed):
+                return ('旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12）',
+                        {'status': 'singleton_rank_mismatch', 'without_rank_outcome': 'correct'})
+        if reason == 'values' and rule.get('selection'):
+            relaxed = deepcopy(rule)
+            relaxed.pop('selection')
+            if not proves_correct(candidate, reference, relaxed):
+                continue
+            identity = {c for stage in rule['selection']['stages']
+                        for c in stage['group_columns'] + stage['object_columns']}
+            for count, parts in enumerate(scorer_v2._mappings(candidate, reference, relaxed, relaxed['required_columns'])):
+                if count >= 1000:
+                    break
+                if scorer_v2._check_mapping(candidate, reference, parts, relaxed) is not None:
+                    continue
+                for part in parts:
+                    if len(part.reference) != 1 or len(part.candidate) != 1 or part.reference[0] not in identity:
+                        continue
+                    rc, cc = part.reference[0], part.candidate[0]
+                    expected = Counter(scorer_v2._norm(row[rc]) for row in reference)
+                    actual = Counter(scorer_v2._norm(row[cc]) for row in candidate)
+                    extra = actual - expected
+                    if expected[('null', None)] <= actual[('null', None)] or not extra:
+                        continue
+                    if not all(cell[0] == 'text' and cell[1] for cell in extra):
+                        continue
+                    fixed = [list(row) for row in candidate]
+                    for row in fixed:
+                        if scorer_v2._norm(row[cc]) in extra:
+                            row[cc] = None
+                    if proves_correct(fixed, reference, rule):
+                        return ('旧评分器把选择身份的 NULL 当作任意标签：候选缺少 NULL 身份且多出非空身份；仅恢复该身份后原规则判对（第五节第 7 条、12.15；空标签例外不适用身份）',
+                                {'status': 'identity_mismatch', 'identity_fixed_outcome': 'correct'})
+    return None
+
+
 def run(paths, output, report, old_timeout=2, eval_tag=None):
     records, fingerprints = [], {}
     for path in paths:
@@ -64,6 +118,7 @@ def run(paths, output, report, old_timeout=2, eval_tag=None):
                     raise ValueError(f'{case["case_id"]}: real reconciliation requires bank {eval_tag}')
                 rec = {k: case[k] for k in ('case_id','source','question_id','turn','bank') if k in case}
                 rec['phase'] = 't0' if case['case_id'].endswith('/t0') else 'final'
+                rec['input_sha256'] = hashlib.sha256(raw).hexdigest()
                 if case.get('judge'):
                     rec['status'] = 'judge'
                     records.append(rec)
@@ -108,7 +163,6 @@ def run(paths, output, report, old_timeout=2, eval_tag=None):
                         rule = case['rules'][ref_index]
                         for parts in scorer_v2._mappings(candidate, refs[ref_index], rule, rule['required_columns']):
                             if scorer_v2._check_mapping(candidate, refs[ref_index], parts, rule) is None:
-                                rec['mapping_witness'] = [dict(reference=list(p.reference), candidate=list(p.candidate), reverse=p.reverse) for p in parts]
                                 rec['difference_class'] = 'legacy_bug' if any(len(p.reference)>1 for p in parts) else 'needs_review'
                                 rec['explanation'] = ('旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功'
                                                       if rec['difference_class']=='legacy_bug' else '待审核匹配见证')
@@ -116,8 +170,19 @@ def run(paths, output, report, old_timeout=2, eval_tag=None):
                     else:
                         rec['difference_class'] = 'needs_review'
                         rec['explanation'] = '待审核新旧判定'
+                        evidence = explain_rejection(candidate, refs, case['rules'], rec.get('reason'))
+                        if evidence:
+                            rec['difference_class'] = 'legacy_bug'
+                            rec['explanation'], rec['verification'] = evidence
                 records.append(rec)
         fingerprints[path.name] = digest.hexdigest()
+    return write_results(records, fingerprints, output, report, old_timeout)
+
+
+def write_results(records, fingerprints, output, report, old_timeout):
+    """Render saved verdict metadata without rerunning either scorer."""
+    for record in records:
+        record['phase'] = 't0' if record['case_id'].endswith('/t0') else 'final'
     output.parent.mkdir(parents=True,exist_ok=True)
     output.write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in records))
     counts = Counter(r.get('outcome',r['status']) for r in records)

@@ -1,34 +1,39 @@
-# T02 评分器 v2 验证（历史检查点）
-
-> 历史检查点：本报告基于 eval-v1.1 和第十二节合并前的规格，不代表当前判定或验收结果。第十二节共用用例的当前结果见 `scorer_v2_shared_check.md`；正式对账等待按 eval-v1.2 重新导出的语料。
+# T02 评分器 v2 验证
 
 语料只读；不执行查询、不调用模型。judge 单列，不进入评分器。
 
-- 输入行数：3645；分类：`{'correct': 1295, 'exec_error': 524, 'wrong': 1191, 'judge': 388, 'invalid_input': 137, 'refused': 110}`。
-- unscored：0；新评分超时：0；输入不合法：137。
-- 旧评分超时上限：10.0 秒；判定差异：46；旧评分未完成：12。
+- 输入行数：3645；分类：`{'correct': 1301, 'exec_error': 560, 'wrong': 1281, 'refused': 115, 'judge': 388}`。
+- unscored：0；新评分超时：0；输入不合法：0。
+- 旧评分超时上限：10 秒；判定差异：53；旧评分未完成：12。
 - 完整逐条耗时和原因：`scorer_v2_cases.jsonl`。
 
 ## 输入指纹
 
-- pilot288.jsonl：`ddecb0355656911e2c1a3eb13277fc85946ec460a6aabbcfe25219546395b586`
-- t13.jsonl：`600946ea962d241a2c829b9d13e9412686f72ca5c8360beac818b63e000367b2`
-- ext600.jsonl：`fc248fe1bfcc92039b27f4514a1602ab4bb9b5fcb337521a376262fa99093f37`
+- t13.jsonl：`d66b2ad19e83652503a9ab6387b3d2a2feda61b47f226d908b9c30aaba2a6b8b`
+- pilot288.jsonl：`395839fa4ceca37fa7881fa8515d54e067055e87f2552502853ba5a77ea82b47`
+- ext600.jsonl：`da4626ec18ceba0d4379193442ccd3994447e9979ee3648ed0a3f2346a347fb5`
+
+## final 与 /t0 分开统计
+
+| 阶段 | 输入 | 分类 | 翻转 | invalid_input | unscored | 总秒数 | 最慢秒数 |
+|---|---:|---|---:|---:|---:|---:|---:|
+| final | 3084 | {'correct': 1301, 'wrong': 1281, 'refused': 115, 'judge': 324, 'exec_error': 63} | 53 | 0 | 0 | 18.829042 | 0.517960 |
+| t0 | 561 | {'exec_error': 497, 'judge': 64} | 0 | 0 | 0 | 0.018684 | 0.000669 |
 
 ## 最慢 10 条
 
 | case_id | 秒 | 状态 / 判定 |
 |---|---:|---|
-| t13/SQL-L1/Q34/r1 | 0.348111 | correct |
-| t13/SQL-L1.5W/Q34/r3 | 0.312819 | correct |
-| t13/SQL-L1/Q34/r2 | 0.301699 | correct |
-| t13/SQL-L1/Q34/r3 | 0.282403 | correct |
-| t13/SQL-R/Q34/r1 | 0.268689 | correct |
-| t13/SQL-L1c/Q34/r3 | 0.243511 | wrong |
-| pilot288/flash/SQL-L1/Q34/r1 | 0.241568 | correct |
-| t13/SQL-L1.5W/Q34/r2 | 0.230268 | wrong |
-| ext600:codex_gpt_5_4_raw:Q36 | 0.213082 | wrong |
-| ext600:claude_claude_sonnet_4_6_raw:Q36 | 0.199418 | wrong |
+| pilot288/pro/SQL-L1/Q74/r2 | 0.517960 | wrong |
+| ext600:claude_claude_opus_4_7_raw:Q74 | 0.453204 | wrong |
+| pilot288/pro/SQL-L1/Q74/r3 | 0.402506 | wrong |
+| pilot288/pro/SQL-L1/Q74/r1 | 0.372298 | wrong |
+| t13/SQL-L1/Q34/r2 | 0.367088 | correct |
+| t13/SQL-L1/Q34/r1 | 0.324218 | correct |
+| pilot288/flash/SQL-L1/Q34/r1 | 0.321083 | correct |
+| ext600:codex_gpt_5_4_raw:Q74 | 0.318772 | correct |
+| pilot288/flash/SQL-L1/Q74/r1 | 0.311670 | wrong |
+| t13/SQL-R/Q34/r1 | 0.308864 | correct |
 
 ## 逐条新旧判定差异
 
@@ -46,18 +51,23 @@
 | t13/SQL-L1.5W/Q08/r1 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1.5W/Q08/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1.5W/Q08/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
+| t13/SQL-L1.5W/Q119/r1 | correct | wrong | 旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12） |
 | t13/SQL-L1.5W/Q35/r1 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1.5W/Q35/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1.5W/Q35/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1.5W/Q75/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
+| t13/SQL-L1.5W/Q98/r3 | correct | wrong | 旧评分器把选择身份的 NULL 当作任意标签：候选缺少 NULL 身份且多出非空身份；仅恢复该身份后原规则判对（第五节第 7 条、12.15；空标签例外不适用身份） |
 | t13/SQL-L1/Q08/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1/Q08/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
+| t13/SQL-L1/Q119/r1 | correct | wrong | 旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12） |
+| t13/SQL-L1/Q119/r3 | correct | wrong | 旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12） |
 | t13/SQL-L1/Q35/r1 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1/Q35/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1/Q35/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1c/Q08/r1 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1c/Q08/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1c/Q08/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
+| t13/SQL-L1c/Q119/r1 | correct | wrong | 旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12） |
 | t13/SQL-L1c/Q22/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1c/Q22/r1 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-L1c/Q22/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
@@ -69,6 +79,8 @@
 | t13/SQL-L1c/Q75/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-R/Q08/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-R/Q08/r3 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
+| t13/SQL-R/Q119/r1 | correct | wrong | 旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12） |
+| t13/SQL-R/Q119/r2 | correct | wrong | 旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12） |
 | t13/SQL-R/Q22/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-R/Q35/r1 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
 | t13/SQL-R/Q35/r2 | wrong | correct | 旧评分器未覆盖参考拆列、候选合列方向；v2 依第三节第 7 条合并相邻必答字符串列，整表匹配成功 |
@@ -85,211 +97,51 @@
 
 | case_id | v2 状态 / 判定 | 秒 |
 |---|---|---:|
-| t13/SQL-L0/Q117/r2 | invalid_input | 0.000024 |
-| t13/SQL-L0/Q74/r2 | invalid_input | 0.000134 |
-| t13/SQL-L0/Q111/r1 | wrong | 0.054256 |
-| t13/SQL-L0/Q111/r2 | wrong | 0.047009 |
-| t13/SQL-L1.5W/Q79/r3 | wrong | 0.000638 |
-| t13/SQL-L1/Q79/r2 | wrong | 0.000609 |
-| t13/SQL-R/Q74/r2 | invalid_input | 0.000125 |
-| t13/SQL-R/Q74/r1 | invalid_input | 0.000119 |
-| t13/SQL-R/Q79/r1 | wrong | 0.000509 |
-| t13/SQL-R/Q79/r2 | wrong | 0.000700 |
-| t13/SQL-R/Q79/r3 | wrong | 0.000743 |
-| ext600:codex_gpt_5_4_raw:Q74 | invalid_input | 0.000128 |
+| t13/SQL-L0/Q117/r2 | wrong | 0.003321 |
+| t13/SQL-L0/Q74/r2 | wrong | 0.296498 |
+| t13/SQL-L0/Q111/r1 | wrong | 0.045765 |
+| t13/SQL-L0/Q111/r2 | wrong | 0.050800 |
+| t13/SQL-L1.5W/Q79/r3 | wrong | 0.000727 |
+| t13/SQL-L1/Q79/r2 | wrong | 0.000818 |
+| t13/SQL-R/Q74/r2 | correct | 0.202142 |
+| t13/SQL-R/Q74/r1 | correct | 0.196406 |
+| t13/SQL-R/Q79/r1 | wrong | 0.000700 |
+| t13/SQL-R/Q79/r2 | wrong | 0.000982 |
+| t13/SQL-R/Q79/r3 | wrong | 0.000891 |
+| ext600:codex_gpt_5_4_raw:Q74 | correct | 0.318772 |
 
 ## 输入不合法
 
 | case_id | 错误 |
 |---|---|
-| pilot288/flash/SQL-L1/Q117/r3 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q117/r3/t0 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q117/r2 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q117/r2/t0 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q117/r1 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q117/r1/t0 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q74/r2 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q74/r3 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-L1/Q74/r1 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q117/r2 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q117/r2/t0 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q117/r3 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q117/r3/t0 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q117/r1 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q117/r1/t0 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q74/r3 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q74/r1 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q74/r1/t0 | selection identity columns must be required_columns |
-| pilot288/flash/SQL-R/Q74/r2 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q117/r2 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q117/r3 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q117/r3/t0 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q117/r1 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q117/r1/t0 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q74/r1 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q74/r3 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-L1/Q74/r2 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-R/Q117/r3 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-R/Q117/r1 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-R/Q117/r2 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-R/Q74/r3 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-R/Q74/r1 | selection identity columns must be required_columns |
-| pilot288/pro/SQL-R/Q74/r2 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q117/r1 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q117/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q117/r3 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q119/r1 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q119/r2 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q119/r3 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q74/r1 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q74/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q74/r3 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q117/r2 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q74/r2 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q98/r2 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q98/r1 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q98/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-L0/Q98/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q119/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q119/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q119/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q117/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q117/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q74/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q74/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q74/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q98/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q98/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q98/r3/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q98/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q117/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1.5S/Q117/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q119/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q119/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q117/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q117/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q117/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q117/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q117/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q119/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q74/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q74/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q74/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q74/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q74/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q98/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q98/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q98/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q98/r3/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1.5W/Q98/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q119/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q119/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q117/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q117/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q117/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q117/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q117/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q119/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q74/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q74/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q74/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q74/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q98/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q98/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1/Q98/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q117/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q117/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q117/r3/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q119/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q119/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q119/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q117/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q74/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q74/r2 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q74/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q74/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q98/r1 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q98/r3 | selection identity columns must be required_columns |
-| t13/SQL-L1c/Q98/r2 | selection identity columns must be required_columns |
-| t13/SQL-R/Q119/r1 | selection identity columns must be required_columns |
-| t13/SQL-R/Q119/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-R/Q117/r1 | selection identity columns must be required_columns |
-| t13/SQL-R/Q117/r1/t0 | selection identity columns must be required_columns |
-| t13/SQL-R/Q117/r3 | selection identity columns must be required_columns |
-| t13/SQL-R/Q119/r2 | selection identity columns must be required_columns |
-| t13/SQL-R/Q117/r2 | selection identity columns must be required_columns |
-| t13/SQL-R/Q117/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-R/Q119/r3 | selection identity columns must be required_columns |
-| t13/SQL-R/Q74/r3 | selection identity columns must be required_columns |
-| t13/SQL-R/Q74/r2 | selection identity columns must be required_columns |
-| t13/SQL-R/Q74/r2/t0 | selection identity columns must be required_columns |
-| t13/SQL-R/Q74/r1 | selection identity columns must be required_columns |
-| t13/SQL-R/Q98/r2 | selection identity columns must be required_columns |
-| t13/SQL-R/Q98/r3 | selection identity columns must be required_columns |
-| t13/SQL-R/Q98/r1 | selection identity columns must be required_columns |
-| ext600:claude_claude_opus_4_7_raw:Q74 | selection identity columns must be required_columns |
-| ext600:claude_claude_opus_4_7_raw:Q98 | selection identity columns must be required_columns |
-| ext600:claude_claude_opus_4_7_semantic:Q74 | selection identity columns must be required_columns |
-| ext600:claude_claude_opus_4_7_semantic:Q98 | selection identity columns must be required_columns |
-| ext600:claude_claude_sonnet_4_6_raw:Q74 | selection identity columns must be required_columns |
-| ext600:claude_claude_sonnet_4_6_raw:Q98 | selection identity columns must be required_columns |
-| ext600:claude_claude_sonnet_4_6_semantic:Q74 | selection identity columns must be required_columns |
-| ext600:claude_claude_sonnet_4_6_semantic:Q98 | selection identity columns must be required_columns |
-| ext600:codex_gpt_5_4_raw:Q74 | selection identity columns must be required_columns |
-| ext600:codex_gpt_5_4_raw:Q98 | selection identity columns must be required_columns |
-| ext600:codex_gpt_5_4_semantic:Q74 | selection identity columns must be required_columns |
-| ext600:codex_gpt_5_4_semantic:Q98 | selection identity columns must be required_columns |
 
-## 验收限制与测试
+## 验证与复现
 
-- 本报告为实现检查点，**不是最终验收通过报告**。主仓库规格尚无 T05b 数据引用的第十二节，详见 `scorer_v2_blockers.md`；独立压力测试四项超过 30 秒。
-- 真实语料和独立数据对照基于实现检查点 `ab994cb`。其后的小数窗口精度补丁已通过作者测试，但尚未重复全语料；下一轮须按统一规格完整复验。
-- 最后一次作者及旧评分器回归：328 passed（24.58 秒）。命令：`.venv/bin/python -m pytest tests/test_scorer_v2.py tests/test_scorer_v2_performance.py tests/test_scorer.py tests/test_scorer_presentation.py tests/test_selection.py --durations=10`。109 个 warning 均来自保留的旧评分器兼容行为。
-- 作者二百万行测试的 pytest 整项耗时（包括构造数据）为正确 5.00 秒、错误 18.15 秒；测试内部另对 score 调用断言 ≤30 秒。万行和宽表等作者测试同样通过，但不替代独立压力测试。
-- 旧评分器与系统提示未修改；提示文件与 `harness-v1` 逐字节一致的测试通过。
-- 46 条真实判定翻转均为 wrong → correct，每条均有参考必答相邻字符串列合并的匹配见证，已归为旧评分器缺失的参考拆列 / 候选合列方向。12 条旧评分器 10 秒未完成的记录单列，不计作翻转。
-- 不含任何题目原文、SQL 或参考结果行；逐条 JSONL 只含标识、判定、计时、错误及列位置见证。
-
-## 复现
-
-在环境变量指向现有数据目录后运行：
+- 当前真实语料共 3,645 条；三份输入 SHA256 均与用户通知一致，bank 全为 `eval-v1.2@90e13b3`。不读取旧版 `*.eval-v1.1.jsonl`。
+- 53 处翻转逐条归因完成：46 处人名拆合、6 处单元素块名次错误、1 处 NULL 选择身份被当作标签；均归为旧评分器错误，无待归因条目。逐条记录带输入行 SHA256。
+- 6 处名次反事实核验：保留其他约束、仅移除名次要求，均为 correct；所有参考排名块 size=1 且 rank=dense，所以三种允许写法均须精确相等。
+- 1 处身份反事实核验：保留原规则，仅将候选多出的非空身份恢复为缺失的 NULL 身份，即为 correct。反事实不改变正式判定。
+- 12 条旧评分器超过 10 秒，未获得其判定，不能声称这些条目已完成新旧判定比较；均单列且不计翻转。v2 全部完成。
+- 测试：作者测试 173 项、旧评分器相关回归 185 项、共用用例及压力测试 201 项，合计 559 项通过。旧版回归产生 109 条兼容 warning。
+- 当前压力复跑：20 万行单值错误 16.28 秒、全值错误 12.65 秒；5 万行单值错误 3.24 秒、全值错误 2.58 秒。二百万行正确 / 错误的整项耗时（含构造）6.25 / 23.36 秒，内部判分均通过 30 秒上限断言。
+- 193 条共用用例零分歧，1 条刻意触发 mapping_cap 的合成用例单列；真实语料 unscored 为 0。
+- 本轮未改 `harness/scorer_v2.py`，评分器 SHA256：`d2e85ef14d4d5e9c3f153794c08941e32f907cd49ed194c2721297885e25a305`。旧评分器和 prompt 与 main 无差异。
+- T05b 在 eval-v1.2 真实语料上的独立实现对账仍由 T05b / 协调会话执行；本报告不替代该跨实现验收，不打 tag、不启动正式重评。
 
 ```sh
-.venv/bin/python scripts/validate_scorer_v2.py \
-  --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/pilot288.jsonl" \
+UV_CACHE_DIR="$TMPDIR/t02-uv-cache" uv run --no-sync python -m pytest \
+  tests/test_scorer_v2.py tests/test_scorer_v2_shared.py \
+  tests/test_scorer_v2_performance.py tests/test_scorer.py \
+  tests/test_scorer_presentation.py tests/test_selection.py --durations=12
+
+UV_CACHE_DIR="$TMPDIR/t02-uv-cache" uv run --no-sync python scripts/validate_scorer_v2.py \
   --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/t13.jsonl" \
-  --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/ext600.jsonl" \
-  --old-timeout 10
+  --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/pilot288.jsonl" \
+  --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/ext600.jsonl" --old-timeout 10
 ```
 
-发现 invalid_input、unscored、超时或待审核差异时脚本退出码为 1；本轮因 137 条旧身份标注不合法返回 1，不能作为通过。
-## 合成测试覆盖
+## 历史清理与隐私审计
 
-| 规格 | 正例与反例（测试函数） |
-|---|---|
-| 一：输入、确定性、五种输出 | `test_input_states`、`test_invalid_input_and_determinism`、`test_mapping_cap_and_early_success` |
-| 一：原因码、逐参考汇总 | `test_top_n_boundary_members_and_full_group`、`test_multiple_reference_outcome_precedence`、`test_no_ties_rank_exact_and_top_n_position_prefix` |
-| 一：诊断分离与限时 | `test_diagnostics_separate_and_bounded`、`test_numeric_projection_diagnosis`、`test_diagnostic_real_deadline` |
-| 二：必需元数据、整份替代、旧开关拒绝 | `test_required_metadata`、`test_invalid_metadata`、`test_per_reference_rules_replace_without_merging` |
-| 三：字符串、NULL、参考空标签 | `test_strings_and_null_labels`、`test_reference_only_empty_labels`、`test_numeric_rules` |
-| 三：容差方向、atol、百分数双向、计数整数守卫、非有限值 | `test_numeric_rules`、`test_count_nullable_noninteger_guard_and_wrapped_strings` |
-| 三：编码双向、前导零和格式反例 | `test_identifiers` |
-| 三：日期双向、零点、时区和非零点反例 | `test_dates`、`test_zero_fractional_midnight_and_timezone_rejection` |
-| 三：候选拆 / 参考拆、两个列序、邻接与必答限制 | `test_adjacent_name_join`、`test_only_one_required_name_column_does_not_join`、`test_join_requires_adjacent_columns_and_full_table_correspondence`、`test_join_cannot_erase_nonempty_column_when_other_column_is_null` |
-| 四：列重排、多列、缺列、一对一覆盖 | `test_column_permutation_extra_missing_and_nonrequired` |
-| 五：无序多重集、重复行、容差非传递 | `test_multiset_duplicates_and_augmenting_paths`、`test_flow_witness_requires_reassigning_across_two_numeric_dimensions` |
-| 五：有序块、隐藏排序键、量化与容差分离 | `test_ordered_tie_blocks_and_hidden_key`、`test_order_blocks_use_quantization_not_result_tolerance` |
-| 五：Top-N、必须覆盖前缀、完整边界、重复成员 | `test_top_n_boundary_members_and_full_group`、`test_top_n_duplicate_boundary_cannot_replace_strict_prefix` |
-| 五：零计数组双向、非零数值反例、Top-N / selection 不放宽 | `test_optional_zero_rows_both_directions`、`test_zero_rows_need_count_and_do_not_apply_to_top_n`、`test_optional_zero_rows_keep_numerical_and_label_requirements`、`test_selection_ties_missing_groups_duplicates_and_zero_not_optional` |
-| 五：成对对象原样 / 对调、整组交换限制 | `test_unordered_pairs_are_whole_groups_per_row` |
-| 五：selection 父对象、组覆盖、边界选择、独立根、重复叶子、必答身份 | `test_selection_parent_and_leaf_constraints`、`test_selection_ties_missing_groups_duplicates_and_zero_not_optional`、`test_selection_identity_must_be_required_and_exact`、`test_selection_separate_root_filters_and_invalid_contracts` |
-| 五：不放宽期间、单位、符号、格式化数值、自造标签、宽长表 | `test_dates`、`test_numeric_rules`、`test_strings_and_null_labels`、`test_column_permutation_extra_missing_and_nonrequired`、`test_input_states` |
-| 五：名次三种模式、整份统一、分组一致、Top-N 位置编号 | `test_whole_answer_ranking_modes`、`test_no_ties_rank_exact_and_top_n_position_prefix`、`test_rank_style_uniform_across_groups_and_columns` |
-| 六：无损哈希、失败转匹配、不量化 | `test_fast_path_miss_is_not_rejection_and_never_rounds`、`test_numeric_rules` |
-| 六：最大匹配与列筛选 | `test_random_small_tables_against_exhaustive_matching_oracle`（120 组固定种子的小表穷举真值）、`test_flow_witness_requires_reassigning_across_two_numeric_dimensions` |
-| 六：1,000 种上限、先成功与 unscored 汇总 | `test_mapping_cap_and_early_success`、`test_multiple_reference_outcome_precedence` |
-| 六：万行 / 二百万行耗时上限 | `test_execution_row_limits`（正确 / 错误，两个规模）、`test_tolerance_augmenting_paths_with_distinct_labels`、`test_large_tie_wrong_wide_permuted_and_multiple_refs`、`test_dense_tolerance_matching_has_linear_witness` |
-| 七：冻结提示不变、语料报告 | `test_prompt_byte_identical_to_frozen_tag`、`test_corpus_runner_reports_decoded_cases_without_private_values`、`test_corpus_runner_rejects_incomplete_rules_without_a_verdict` |
-| 九：身份隐藏的参考不得静默评分 | `test_selection_identity_must_be_required_and_exact` |
+用户授权仅重写 `T02-scorer-v2`，已用固定旧远端提交的 `--force-with-lease` 清理草稿历史；其他分支、tag 与 stash 未改。审计范围是 `origin/main..HEAD` 的全部独有提交，而非仅最新提交：逐提交检查本分支新增 / 修改的 reports 和 JSONL，保留标识、状态、原因码、耗时、计数和哈希，无查询、题目原文或模型原始作答。执行错误只保留 execution_failed 和 SHA256；输入错误只保留异常类型和 SHA256。
 
-第七节要求的跨厂商独立检查与独立压力测试由 T05b 执行，作者测试不替代独立验收。第八节的协作和第九节的题库修正不由评分器修改题库完成；主分支打 tag、T13 离线重评也不在本 PR 自动执行。
+main 继承的报告及运行日志有既存查询内容，本分支保持其字节不变；不能把本次审计表述为整个主仓库历史均无查询。分支清理移除了旧提交的可达路径，不代表托管端已清除旧对象或缓存。

@@ -1,6 +1,6 @@
 # T02 v2 第十二节共用用例验证
 
-仅运行只读的 T05b 数据文件，未导入或读取独立检查器代码。正式真实语料对账等待 eval-v1.2 重新导出。
+仅运行只读的 T05b 数据文件，未导入或读取独立检查器代码。eval-v1.2 正式复验已完成，见 `scorer_v2_check.md`。
 
 - 共 193 条；判定 / 原因差异 0 条。
 - 任一侧 unscored 单列 1 条；不计入分歧（第十二节第 7 条）。
@@ -53,7 +53,7 @@ SEMDEBT_DATA_DIR=<数据目录> .venv/bin/python -m pytest \
   --report reports/validation/scorer_v2_shared_check.md
 ```
 
-真实对账命令默认要求 eval-v1.2 的 `bank`；三份新导出到位前不将旧语料当作正式验收。独立检查器在真实语料上的最终一致性验收仍待执行。
+真实对账命令默认要求 eval-v1.2 的 `bank`；正式三份语料结果见 `scorer_v2_check.md`。独立检查器在真实语料上的最终一致性验收仍由 T05b 执行。
 
 ## 第十二节覆盖
 
@@ -83,4 +83,6 @@ SEMDEBT_DATA_DIR=<数据目录> .venv/bin/python -m pytest \
 - 历史报告标识 / 脱敏：`reports/validation/scorer_v2_check.md`、`scorer_v2_cases.jsonl`。
 - 状态：`decisions/open-questions.md`、`tasks/BOARD.md`、`tasks/T02-scorer.md`。
 
-历史执行错误诊断已从最新工作树改为状态及 SHA256，当前报告不存原文；原始错误由库外语料保留。已经发布的旧提交中的原文不会因本轮普通提交而消失，分支历史清理另行请求用户授权。
+历史执行错误诊断已从最新工作树改为状态及 SHA256，当前报告不存原文；原始错误由库外语料保留。用户已授权并完成草稿分支历史清理，审计范围及继承基线说明见 `scorer_v2_check.md`。
+
+本轮复跑：193 条共用用例及 8 项作者压力测试合计 201 passed（70.49 秒）；最新作者测试 173 passed。此前单独 CLI 逐条耗时保留于上表，评分核心未变。

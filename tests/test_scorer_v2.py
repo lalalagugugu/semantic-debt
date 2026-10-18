@@ -704,3 +704,23 @@ def test_corpus_report_groups_by_case_id_suffix(tmp_path):
     assert [record['phase'] for record in records] == ['final', 't0']
     assert '| final | 1 |' in report.read_text()
     assert '| t0 | 1 |' in report.read_text()
+
+
+def test_legacy_flip_evidence_checks_rank_and_null_identity():
+    from scripts.validate_scorer_v2 import explain_rejection
+    rank_rule = rules(['String', 'UInt64'], rank_columns=[1], rankings=[{
+        'column': 1, 'group_columns': [], 'object_columns': [0], 'prefix': False,
+        'blocks': [{'group': [], 'rank': 1, 'dense': 1, 'size': 1},
+                   {'group': [], 'rank': 2, 'dense': 2, 'size': 1}]}])
+    ref = [['a', 1], ['b', 2]]
+    proof = explain_rejection([['a', 2], ['b', 1]], [ref], [rank_rule], 'rank')
+    assert proof[1]['status'] == 'singleton_rank_mismatch'
+    assert explain_rejection([['c', 2], ['b', 1]], [ref], [rank_rule], 'rank') is None
+    selection_rule = rules(['String', 'String', 'Float64'], selection={
+        'version': 1, 'output_order': [], 'stages': [{
+            'parent': None, 'where': [], 'group_columns': [0], 'object_columns': [1],
+            'order_by': [{'column': 2, 'descending': True}], 'n': 1}]})
+    ref = [[None, 'object', 10.0]]
+    proof = explain_rejection([['invented', 'object', 10.0]], [ref], [selection_rule], 'values')
+    assert proof[1]['status'] == 'identity_mismatch'
+    assert explain_rejection([['invented', 'wrong object', 10.0]], [ref], [selection_rule], 'values') is None
