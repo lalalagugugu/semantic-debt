@@ -703,7 +703,9 @@ def test_anchor_rules_from_the_bank_and_boundary_on_the_real_bank():
 @needs_eval
 def test_ordered_anchors_declare_their_sort_key():
     """Scorer since main #52: ordered rules without order_by warn and fall back to positional
-    comparison. Every ordered anchor must carry a key, so loading and self-matching never warn."""
+    comparison. Every ordered anchor must carry a key, so loading and self-matching never raise
+    that warning. Only that warning is an error: other scorer warnings (e.g. missing
+    required_columns before eval-v1.1) are not this test's concern."""
     import warnings
     from harness.anchor_refs import anchor_dir, load_anchor_ref
     from harness.questions import load_questions
@@ -711,7 +713,7 @@ def test_ordered_anchors_declare_their_sort_key():
     if not (anchor_dir() / "MANIFEST.json").exists():
         pytest.skip("anchor references not built")
     with warnings.catch_warnings():
-        warnings.simplefilter("error", RuntimeWarning)
+        warnings.filterwarnings("error", message="ordered rules missing order_by", category=RuntimeWarning)
         en = load_questions(EVAL, lang="en")
         for q in en:
             if q.rules is None or not q.rules.get("ordered"):
