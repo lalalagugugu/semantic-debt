@@ -18,6 +18,11 @@ built context the run sends is freshly rendered from them (harness/semantic_vers
 If one requested model answers with a second ``system_fingerprint`` within
 a run, the run stops (decisions/2026-10-17-model-version-fingerprint.md).
 
+Scoring never holds a run up: a returned row set is scored in a child process with a
+time limit (harness/score_guard.py, 10 s); a slower one is logged ``pending`` with
+reason ``score_timeout`` and rescored offline (harness.rescore). ``--backfill-from-raw``
+writes the missing lines of attempts that are complete in runs-raw (no model call).
+
 Resuming: rerunning the same run-id only runs (question, rep) pairs that have no
 ``status: done`` line. Lines with ``status: api_error`` (transport failure after
 backoff) stay in the log and the pair is run again; reports take the ``done`` line.
@@ -52,6 +57,7 @@ from harness.executors import (  # noqa: E402
     DEFAULT_MAX_MEMORY_BYTES, DEFAULT_MAX_RESULT_ROWS, ChdbExecutor, ExecResult, Executor,
 )
 from harness.questions import Question  # noqa: E402
+from harness.score_guard import SCORE_TIMEOUT, SCORE_TIMEOUT_S, score_with_timeout  # noqa: E402
 from harness.scorer import REFUSAL, ExecError, score_detailed  # noqa: E402
 
 NO_QUERY = "no_query"
@@ -154,20 +160,30 @@ def _candidate(parsed: P.Parsed, result: ExecResult | None):
 PENDING = "pending"
 
 
-def score_question(candidate, q: Question) -> dict:
+def score_question(candidate, q: Question, score_timeout_s: float | None = SCORE_TIMEOUT_S) -> dict:
     """Score with T02's scorer. ``rules`` and per-reference ``reference_rules``
     go to it exactly as the question bank carries them.
 
     A returned row set for a question that cannot be scored deterministically
     here (judge question, no rules, no refs) gets ``outcome = "pending"`` with the
     reason; its rows are in runs-raw for later scoring. Exec errors and refusals
-    need no reference and are scored now."""
+    need no reference and are scored now.
+
+    A returned row set is scored in a child process with a time limit
+    (harness/score_guard.py); if the scorer does not finish, the outcome is
+    ``pending`` with reason ``score_timeout`` and the rows wait in runs-raw for
+    offline rescoring. ``score_timeout_s=None`` scores in-process without a limit."""
     if q.pending and not isinstance(candidate, (ExecError, str)):
         return {"outcome": PENDING, "pending": q.pending, "reason": None, "matched_ref": None, "sensitivity": None}
     if q.refs is None or q.rules is None:      # only exec_error / refusal reach here; rules are not consulted
         s = score_detailed(candidate, [[]], {"ordered": False, "top_n": None})
-    else:
+    elif isinstance(candidate, (ExecError, str)) or score_timeout_s is None:
         s = score_detailed(candidate, q.refs, q.rules, reference_rules=q.ref_rules)
+    else:
+        s = score_with_timeout(candidate, q.refs, q.rules, reference_rules=q.ref_rules, timeout_s=score_timeout_s)
+        if s is None:
+            return {"outcome": PENDING, "pending": SCORE_TIMEOUT, "score_timeout_s": score_timeout_s,
+                    "reason": None, "matched_ref": None, "sensitivity": None}
     return {"outcome": s.outcome, "reason": s.reason if s.outcome != "exec_error" else None,
             "matched_ref": s.matched_ref, "sensitivity": s.sensitivity}
 
@@ -201,13 +217,15 @@ def _save_exec(ctx: RunContext, q: Question, rep: int, turn: int, result: ExecRe
 
 
 def _turn_record(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply,
-                 parsed: P.Parsed, result: ExecResult | None) -> dict:
+                 parsed: P.Parsed, result: ExecResult | None, saved: tuple[str, str | None] | None = None) -> dict:
+    """One turn of the log line. ``saved`` = (raw_sha256, exec_raw_sha256) of files already in
+    runs-raw (backfill): they are hashed, not rewritten."""
     if parsed.refused:
         execution = {"status": "refused"}
     elif parsed.query is None:
         execution = {"status": "error", "error_class": NO_QUERY}
     else:
-        execution = {**result.summary(), "exec_raw_sha256": _save_exec(ctx, q, rep, turn, result)}
+        execution = {**result.summary(), "exec_raw_sha256": saved[1] if saved else _save_exec(ctx, q, rep, turn, result)}
     return {
         "turn": turn,
         "query": parsed.query,
@@ -220,7 +238,19 @@ def _turn_record(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply
         "usage": reply.usage,
         "latency_s": round(reply.latency_s, 3),
         "transport_retries": reply.transport_retries,
-        "raw_sha256": _save_raw(ctx, q, rep, turn, reply),
+        "raw_sha256": saved[0] if saved else _save_raw(ctx, q, rep, turn, reply),
+    }
+
+
+def _base(ctx: RunContext, q: Question, rep: int, started: datetime) -> dict:
+    return {
+        "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep, "question_sha256": sha256(q.text),
+        "eval_commit": ctx.eval_commit, **({"eval_tag": ctx.eval_tag} if ctx.eval_tag else {}),
+        **({"semantic_tag": ctx.semantic_tag} if ctx.semantic_tag else {}),
+        **({"anchor_rules": q.meta["rules_tag"]} if "rules_tag" in q.meta else {}),
+        "harness_commit": ctx.harness_commit,
+        "model_requested": ctx.client.model, "system_sha256": sha256(ctx.system),
+        "exec_timeout_s": ctx.timeout_s, "exec_limits": ctx.limits, "scoring": q.scoring, "started_at": started.isoformat(timespec="seconds"),
     }
 
 
@@ -231,15 +261,7 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
     messages = P.first_messages(ctx.system, q.text)
     turns: list[dict] = []
     replies: list[Reply] = []
-    base = {
-        "run_id": ctx.run_id, "cell": ctx.cell.name, "qid": q.qid, "rep": rep, "question_sha256": sha256(q.text),
-        "eval_commit": ctx.eval_commit, **({"eval_tag": ctx.eval_tag} if ctx.eval_tag else {}),
-        **({"semantic_tag": ctx.semantic_tag} if ctx.semantic_tag else {}),
-        **({"anchor_rules": q.meta["rules_tag"]} if "rules_tag" in q.meta else {}),
-        "harness_commit": ctx.harness_commit,
-        "model_requested": ctx.client.model, "system_sha256": sha256(ctx.system),
-        "exec_timeout_s": ctx.timeout_s, "exec_limits": ctx.limits, "scoring": q.scoring, "started_at": started.isoformat(timespec="seconds"),
-    }
+    base = _base(ctx, q, rep, started)
     try:
         reply = ctx.client.chat(messages)
         replies.append(reply)
@@ -263,6 +285,11 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
         return {**base, "status": "api_error", "error": str(exc)[:500], "turns": turns,
                 "transport_retries": exc.transport_retries}
 
+    return _done_line(ctx, q, base, turns, replies, first_candidate, final_candidate, fixed, peak)
+
+
+def _done_line(ctx: RunContext, q: Question, base: dict, turns: list[dict], replies: list[Reply],
+               first_candidate, final_candidate, fixed: bool, peak: bool) -> dict:
     usage = {k: sum(r.usage.get(k, 0) for r in replies) for k in replies[0].usage}
     last_exec = turns[-1]["exec"]
     final = final_score(final_candidate, q, last_exec.get("error_class"), last_exec.get("limit"))
@@ -272,7 +299,8 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
         "model_version": replies[-1].model_version,
         "n_calls": len(replies),
         "fixed": fixed,
-        "first": score_question(first_candidate, q)["outcome"],
+        # without a fix turn the first answer is the final one: score it once (the scorer is deterministic)
+        "first": final["outcome"] if not fixed else score_question(first_candidate, q)["outcome"],
         "final": final,
         "turns": turns,
         "usage": usage,
@@ -280,6 +308,53 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
         "peak": peak,
         "cost_cny": cost_cny(ctx.client.model, usage, peak),
     }
+
+
+def attempt_from_raw(ctx: RunContext, q: Question, rep: int, note: str) -> dict:
+    """Rebuild the ``done`` line of an attempt whose calls and executions are complete in
+    runs-raw but whose line was never written (the process was stopped while scoring).
+
+    No model call and no execution: replies come from ``<qid>_r<rep>_t<turn>.json``, rows from
+    the ``.exec.json`` files; both are hashed, not rewritten. Wall-clock latency and execution
+    time were not saved, so they are logged as 0 and the line carries ``backfilled_from_raw``.
+    """
+    from harness.client import _reply
+
+    turns: list[dict] = []
+    replies: list[Reply] = []
+    candidates = []
+    for turn in (0, 1):
+        raw_path = ctx.raw_dir / f"{q.qid}_r{rep}_t{turn}.json"
+        if not raw_path.exists():
+            break
+        raw = raw_path.read_bytes()
+        reply = _reply(raw, 0.0, 0)
+        parsed = P.parse_response(reply.content)
+        result, exec_sha = None, None
+        if parsed.query and not parsed.refused:
+            exec_bytes = (ctx.raw_dir / f"{q.qid}_r{rep}_t{turn}.exec.json").read_bytes()
+            e = json.loads(exec_bytes)
+            result = ExecResult(rows=e["rows"], columns=e["columns"], error=e["error"], error_class=e["error_class"],
+                                limit=e["limit"], detail=e["detail"])
+            exec_sha = sha256(exec_bytes)
+        replies.append(reply)
+        turns.append(_turn_record(ctx, q, rep, turn, reply, parsed, result, saved=(sha256(raw), exec_sha)))
+        candidates.append(_candidate(parsed, result))
+        if result is None or result.ok:
+            break
+    if not turns:
+        raise FileNotFoundError(f"{ctx.raw_dir}: no raw response for {q.qid} r{rep}")
+    if len(turns) == 1 and turns[0]["exec"].get("status") == "error" and turns[0]["exec"].get("error_class") != NO_QUERY:
+        raise ValueError(f"{q.qid} r{rep}: turn 0 failed but no fix turn in runs-raw; the attempt is incomplete")
+    stamp = json.loads(replies[0].raw).get("created")
+    source = "response.created" if stamp is not None else "raw file mtime"
+    if stamp is None:
+        stamp = (ctx.raw_dir / f"{q.qid}_r{rep}_t0.json").stat().st_mtime
+    created = datetime.fromtimestamp(stamp, BEIJING)
+    base = _base(ctx, q, rep, created)
+    line = _done_line(ctx, q, base, turns, replies, candidates[0], candidates[-1], len(turns) == 2, is_peak(created))
+    line["backfilled_from_raw"] = {"note": note, "started_at_from": source, "latency_and_exec_time_not_saved": True}
+    return line
 
 
 # ---------------------------------------------------------------------------
@@ -336,6 +411,29 @@ class FingerprintGuard:
                 if rec.get("model_requested") == model:
                     guard.observe(rec)
         return guard
+
+
+def backfill_cell(ctx: RunContext, questions: list[Question], pairs: list[tuple[str, int]], note: str,
+                  runs_root: Path | None = None, progress=print) -> Path:
+    """Append ``attempt_from_raw`` lines for (question, rep) pairs that have no ``done`` line."""
+    path = log_path(ctx.run_id, ctx.cell.name, runs_root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    done = done_pairs(path)
+    by_id = {q.qid: q for q in questions}
+    missing = [p for p in pairs if p[0] not in by_id]
+    if missing:
+        raise SystemExit(f"backfill: not in the question set: {missing}")
+    with path.open("a", encoding="utf-8") as out:
+        for qid, rep in pairs:
+            if (qid, rep) in done:
+                progress(f"  backfill {qid} r{rep}: already done, skipped")
+                continue
+            record = attempt_from_raw(ctx, by_id[qid], rep, note)
+            out.write(json.dumps(record, ensure_ascii=False) + "\n")
+            out.flush()
+            progress(f"  backfill {qid} r{rep}: {record['final']['outcome']}"
+                     f"{' (' + record['final']['pending'] + ')' if record['final'].get('pending') else ''}")
+    return path
 
 
 def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency: int,
@@ -568,7 +666,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--est-question-tokens", type=int, default=60)
     ap.add_argument("--est-from-args", action="store_true",
                     help="estimate from the --est-* values even where committed logs have measurements")
+    ap.add_argument("--backfill-from-raw", metavar="QID:REP[,QID:REP...]",
+                    help="write the missing done lines of these attempts from runs-raw (no model call, no "
+                         "execution) and exit; one cell only")
+    ap.add_argument("--backfill-note", default="", help="why the lines are backfilled (logged on each line)")
     args = ap.parse_args(argv)
+    if args.backfill_from_raw and (not args.run_id or not args.cell or len(args.cell) != 1 or "all" in args.cell):
+        ap.error("--backfill-from-raw needs --run-id and exactly one --cell")
     if not args.dry_run and not args.run_id:
         ap.error("--run-id is required unless --dry-run")
     return args
@@ -625,6 +729,20 @@ def main(argv: list[str] | None = None, load=None) -> int:
     if "en" in by_lang:
         print(f"anchor rules: {args.anchor_rules_tag} = "
               f"{next((q.meta['rules_tag']['commit'] for q in by_lang['en'] if 'rules_tag' in q.meta), '—')}")
+
+    if args.backfill_from_raw:
+        import types
+
+        cell = cells[0]
+        pairs = [(x.split(":")[0].strip(), int(x.split(":")[1])) for x in args.backfill_from_raw.split(",") if x.strip()]
+        ctx = RunContext(run_id=args.run_id, cell=cell, client=types.SimpleNamespace(model=args.model),
+                         executor=make_executor(cell, args.exec_timeout), system=system_for(cell),
+                         eval_commit=eval_commit(), harness_commit=harness_commit(), timeout_s=args.exec_timeout,
+                         raw_dir=raw_root() / args.run_id / cell.name,
+                         limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
+                         eval_tag=args.eval_tag, semantic_tag=args.semantic_tag)
+        backfill_cell(ctx, by_lang[cell.lang], pairs, args.backfill_note)
+        return 0
 
     rows, total = dry_run([c for c in cells], {k: len(v) for k, v in by_lang.items()}, args.reps, args.model,
                           fix_rate=args.est_fix_rate, output_tokens=args.est_output_tokens,
