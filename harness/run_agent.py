@@ -11,9 +11,10 @@ same static checks (single read-only SELECT, pinned settings, database scope) an
 resource caps; ``run_sql`` times out after ``--tool-timeout`` (30 s), the final query
 after ``--exec-timeout`` (120 s, as in direct answering). At most ``MAX_TOOL_CALLS`` calls; each shows at most
 ``ECHO_ROWS`` rows and says when it was cut. The tool runs only while ``tool_choice`` is
-left to the model; once the calls are used up the next request sends
-``tool_choice: "none"``, so the model must answer. Calls beyond the limit inside one
-response are answered with ``LIMIT_REACHED`` and not executed.
+left to the model; once the calls are used up, one fixed user message ``TOOLS_EXHAUSTED``
+is appended and the next request sends ``tool_choice: "none"``, so the model must answer
+(T15-1). Calls beyond the limit inside one response are answered with ``LIMIT_REACHED``
+and not executed.
 
 The final answer (a reply without tool calls) is handled exactly as in direct answering:
 parsed by ``harness.prompt``, executed, and on an execution error sent back once for a
@@ -64,7 +65,7 @@ from harness.questions import Question  # noqa: E402
 G3_FINGERPRINT = "e72d3c7f663d3e1383b00b3884cb4501"     # decisions/model.md, decisions/2026-10-18-g3-passed.md
 HARNESS_TAG = "harness-v1"
 TOOL_TIMEOUT_S = 30         # run_sql (user, 2026-10-19); the final query keeps DEFAULT_EXEC_TIMEOUT_S
-AGENT_TAG = "harness-agent-v1"
+AGENT_TAG = "harness-agent-v1.1"
 
 
 def agent_system_for(cell: Cell) -> str:
@@ -175,6 +176,7 @@ def run_attempt(ctx: R.RunContext, q: Question, rep: int) -> dict:
     replies: list[Reply] = []
     used, tool_time = 0, 0.0
     call = 0
+    limit_message_sent = False
     try:
         while True:
             choice = "none" if used >= A.MAX_TOOL_CALLS else None
@@ -185,6 +187,9 @@ def run_attempt(ctx: R.RunContext, q: Question, rep: int) -> dict:
                 tool_time += spent
                 steps.append(_step_record(ctx, q, rep, call, reply, choice, calls))
                 messages = messages + [_assistant(reply)] + tool_msgs
+                if used >= A.MAX_TOOL_CALLS:      # the forced answer comes next: say so once (T15-1)
+                    messages.append({"role": "user", "content": A.TOOLS_EXHAUSTED})
+                    limit_message_sent = True
                 call += 1
                 continue
             break
@@ -211,7 +216,8 @@ def run_attempt(ctx: R.RunContext, q: Question, rep: int) -> dict:
             fixed = True
     except APIError as exc:
         return {**base, "status": "api_error", "error": str(exc)[:500], "steps": steps, "turns": turns,
-                "n_tool_calls": used, "transport_retries": exc.transport_retries}
+                "n_tool_calls": used, "limit_message_sent": limit_message_sent,
+                "transport_retries": exc.transport_retries}
 
     line = R._done_line(ctx, q, base, turns, replies, first_candidate, final_candidate, fixed, peak)
     executed = [c for s in steps for c in s["tool_calls"] if c["status"] == "executed"]
@@ -221,6 +227,7 @@ def run_attempt(ctx: R.RunContext, q: Question, rep: int) -> dict:
         "n_tool_calls": used,                       # run_sql calls counted against the limit
         "n_tool_executed": len(executed),
         "hit_tool_limit": used >= A.MAX_TOOL_CALLS,
+        "limit_message_sent": limit_message_sent,
         "tool_time_s": round(tool_time, 3),
         "wall_s": round(time.monotonic() - wall, 3),
     })
@@ -267,6 +274,7 @@ def summarize(path: Path) -> dict:
         "mean_model_calls": sum(r["n_calls"] for r in done) / n,
         "attempts_without_tool": sum(r["n_tool_calls"] == 0 for r in done),
         "attempts_hit_limit": sum(r["hit_tool_limit"] for r in done),
+        "attempts_limit_message_sent": sum(bool(r.get("limit_message_sent")) for r in done),
         "tool_call_status": R._count(c["status"] for c in calls),
         "tool_exec_status": R._count(c["exec"]["status"] for c in calls if c["status"] == "executed"),
         "tool_exec_error_classes": R._count(c["exec"].get("error_class") for c in calls
