@@ -20,6 +20,8 @@
 | 20261019-T15-explorer-01-rescore-01 | 2026-10-19 | SQL-L0-E、SQL-L1-E | T15 | 源运行全部 732 条作答 | deepseek-flash（源运行） | eval-v1.2 = 90e13b3（只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2`，开跑前校验） | 0 | 沿用 $SEMDEBT_DATA_DIR/runs-raw/20261019-T15-explorer-01 | **离线重评，无模型调用**：`harness-v1.1`（6a23d3c，评分器 v2）。`uv run python -m harness.rescore --source 20261019-T15-explorer-01 --cell <单元> --run-id 20261019-T15-explorer-01-rescore-01 --eval-tag eval-v1.2`。题面与源运行相同（同为 eval-v1.2），无 `question_changed`。源运行的 10 条 score_timeout 全部得到判定；只剩 judge 题 pending（L0-E 38、L1-E 39）。L0-E 对 122→129，L1-E 211→217。rescore.py 补了 -E 单元的查表（只改单元查找，不改评分） |
 | 20261019-T21-pilot-01 | 2026-10-19 | SQL-L0-P、SQL-L1-P | T21 | 48（试跑 24 题 × 1 次 × 2） | deepseek-flash（指纹 e72d3c7f…，唯一） | eval-v1.2 = 90e13b3（只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2`） | 1.18 | $SEMDEBT_DATA_DIR/runs-raw/20261019-T21-pilot-01 | 首跑：`harness-plan-v1`（b10ca1a），scorer v2；错峰 12:00–12:08 |
 
+| 20261019-T16-pilot-01 | 2026-10-19 | SQL-L2（JSON-L2 未启动） | T16 | pilot 24 × 1，SQL 24/24 | deepseek-flash（35 次调用指纹唯一：e72d3c7f663d3e1383b00b3884cb4501） | eval-v1.1 = 938957f（只读副本校验）；semantic-v1.2 = 4cf56a8 | 0.54510072 | $SEMDEBT_DATA_DIR/runs-raw/20261019-T16-pilot-01 | 用户批准冒烟后执行；本地 harness cf7d3b5b6040affc014c5969267cb006d2cae516（main 基线 84f5e04，含 #100）；单并发、全部错峰；35 份响应及35份执行文件哈希核对通过。SQL 最终执行失败 7 条中接口限制 4 条（57.1%），按卡片 20% 门槛停止，待用户选择保留或移至第二期，JSON/全量未启动。judge 不进分母，低区分度单列；当场分数仅作进度参考，最终待 harness-v1.1 离线重评；报告 reports/results/metric_layer.md |
+
 <!-- 追加格式：
 | 20261101-SQL-L1-01 | 2026-11-01 | SQL-L1 | T13 | 120 | deepseek-… | eval@a1b2c3d | 12.3 | $SEMDEBT_DATA_DIR/runs-raw/20261101-SQL-L1-01 | 首跑 |
 -->

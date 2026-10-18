@@ -36,11 +36,13 @@ needs_chdb = pytest.mark.skipif(not CHDB.exists(), reason="chDB data directory n
 
 
 @pytest.mark.parametrize("path", ["harness/prompt.py", "harness/scorer.py"])
-def test_t16_frozen_files_match_main_byte_for_byte(path):
+@pytest.mark.parametrize("baseline", [
+    "84f5e045dc9d3456c11c4453515c746047a69c74",  # experiment baseline, including PR #100
+    "88fd81c9d743ef93d1e00f65c7f5f8faa95d72ec",  # main at PR preparation, including T15
+])
+def test_t16_frozen_files_match_main_byte_for_byte(path, baseline):
     import subprocess
 
-    # Main used by this experiment, including PR #100's runtime scoring timeout.
-    baseline = "84f5e045dc9d3456c11c4453515c746047a69c74"
     expected = subprocess.check_output(["git", "show", f"{baseline}:{path}"], cwd=REPO)
     actual = (REPO / path).read_bytes()
     assert actual == expected, f"{path} differs from experiment main {baseline}"
