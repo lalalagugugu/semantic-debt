@@ -34,7 +34,6 @@ agent 发现设计层面的问题（档位定义、评分规则、题目口径�
 | T12-2 | 2026-10-18 | T12（Claude Code） | **全错题归因里有 4 题「参考可疑」**（`reports/T12-all-wrong-audit.md`）：Q71 参考把缺失产品那一组当成一个品类、其「最高子品类」为 NULL，12 次作答 8 个真实品类全对、11 次没有这一行；Q69 参考按几乎单值的促销类别分组只剩 1 行，SQL-L1 6 次都按促销名分组；Q100 12 次中 11 次数值与参考逐对一致，但参考 108 行姓名全是同一个值，无法核对客户；Q34 参考漏了 4 个有库存、2009 年无销售（周转率 0）的产品 | 参考属冻结的 `eval-v1`（Codex 修，T05）；Q100 与 `2026-10-18-reference-columns-asked-only.md` 第五节第 4 条（不补键）直接相关 | 已裁决（#79）：修 Q34、Q71 参考，Q69 先核题面，Q100 占位名称不是标识 | `decisions/2026-10-18-judge-stratum-and-t12-audit.md` 第三节 |
 | T12-3 | 2026-10-18 | T12（Claude Code） | **两处语义层缺口**：① Q40 的 5 次拒答都同时以「汇率不是每天、缺日怎么取没约定」和「L1 写着汇率表本库用不上」为由，只补缺日口径不够，约定 6 的 note、FactExchangeRate 的描述与 `when_to_use` 也要改；② Q49 的参考正确，但集团级实体的 `ParentEntityKey` 指向自己，L1 没写，模型上卷时重复计算集团或撞递归上限 | L1 冻结在 `semantic-v1.1`，改文字需用户拍板（`2026-10-18-label-scoring-and-all-wrong-audit.md` 第四节） | 已裁决（#79）：只改正写错的事实（Q40「用不上汇率表」→ `semantic-v1.2`），Q49 与缺日口径记调优候选 | `decisions/2026-10-18-judge-stratum-and-t12-audit.md` 第四节；`decisions/2026-10-18-semantic-v1.2.md` |
 
-| T15-1 | 2026-10-19 | T15（Claude Code） | **`run_sql` 用满 8 次后模型不知道次数已用完**：小样本 SQL-L0-E 的 10 条执行失败全是 `no_query`，全部出在用满 8 次的作答上；第 8 次正常返回、无提示，强制交卷时模型把工具调用写成正文 | 改的是冻结的工具说明（`harness-agent-v1`） | 已裁决（2026-10-19，方案 ③：强制交卷前固定提示一次，`harness-agent-v1.1`） | `decisions/2026-10-19-t15-1-midreport-dsh.md` 第一节 |
 
 <!-- 追加格式：
 | 7 | YYYY-MM-DD | Txx（Claude Code / Codex） | 一句话问题 | 为什么不能自己定 | 待裁决 | — |
