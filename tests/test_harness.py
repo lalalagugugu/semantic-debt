@@ -317,7 +317,13 @@ def test_rules_are_passed_through_untouched(tmp_path, monkeypatch):
     def spy(candidate, refs, rules, **kw):
         seen.append((rules, kw.get("reference_rules")))
         return real(candidate, refs, rules, **kw)
+    real_guarded = R.score_with_timeout
+
+    def spy_guarded(candidate, refs, rules, **kw):   # the time-limited path pickles them into a child process
+        seen.append((rules, kw.get("reference_rules")))
+        return real_guarded(candidate, refs, rules, **kw)
     monkeypatch.setattr(R, "score_detailed", spy)
+    monkeypatch.setattr(R, "score_with_timeout", spy_guarded)
     respond, _ = _scripted("```sql\nSELECT 42\n```")
     R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])})), Q, 1)
     assert seen and all(r is Q.rules and rr is None for r, rr in seen)
@@ -336,7 +342,13 @@ def test_per_reference_rules_are_passed_through_untouched(tmp_path, monkeypatch)
     def spy(candidate, refs, rules, **kw):
         seen.append((rules, kw.get("reference_rules")))
         return real(candidate, refs, rules, **kw)
+    real_guarded = R.score_with_timeout
+
+    def spy_guarded(candidate, refs, rules, **kw):
+        seen.append((rules, kw.get("reference_rules")))
+        return real_guarded(candidate, refs, rules, **kw)
     monkeypatch.setattr(R, "score_detailed", spy)
+    monkeypatch.setattr(R, "score_with_timeout", spy_guarded)
     respond, _ = _scripted("```sql\nSELECT 'a', 7\n```")
     rec = R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 'a', 7": ExecResult(rows=[["a", 7]])})), q, 1)
     assert rec["final"]["outcome"] == "correct" and rec["final"]["matched_ref"] == 1
