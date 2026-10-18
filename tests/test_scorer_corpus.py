@@ -86,13 +86,16 @@ def test_read_back_equals_what_rescore_builds(run):
     out = run / "corpus" / "t.jsonl"
     C.write_corpus(cases, out)
     back = C.load_corpus(out)
-    assert len(back) == 6
+    assert len(back) == 8          # 6 attempts + the turn 0 of the two that have a fix turn
+    assert {c["case_id"] for c in back if c["turn"] == 0 and c["case_id"].endswith("/t0")} == \
+        {"t/SQL-L1/Q001/r2/t0", "t/SQL-R/Q001/r1/t0"}
     for log in sorted((run / "runs" / "test-run").glob("*.jsonl")):
         recs = [json.loads(l) for l in log.read_text(encoding="utf-8").splitlines()]
-        for rec in recs:
-            case = next(c for c in back if c["case_id"] == f"t/{log.stem}/{rec['qid']}/r{rec['rep']}")
+        for rec, turn in [(r, t) for r in recs for t in ([-1, 0] if len(r["turns"]) > 1 else [-1])]:
+            case = next(c for c in back if c["case_id"] == f"t/{log.stem}/{rec['qid']}/r{rec['rep']}" + ("/t0" if turn == 0 else ""))
+            assert case["turn"] == rec["turns"][turn]["turn"]
             q = qs[rec["qid"]]
-            want = candidate_of(rec["turns"][-1], run / "raw-root" / "test-run" / log.stem, rec["qid"], rec["rep"])
+            want = candidate_of(rec["turns"][turn], run / "raw-root" / "test-run" / log.stem, rec["qid"], rec["rep"])
             got = case["candidate"]
             assert type(got) is type(want)
             assert got == want if isinstance(want, (ExecError, str)) else same(got, want)
@@ -108,10 +111,11 @@ def test_read_back_equals_what_rescore_builds(run):
     assert QTEXT not in out.read_text(encoding="utf-8")
 
 
-def test_export_checks_runs_raw_hashes_and_reads_only(run):
-    raw = run / "raw-root" / "test-run" / "SQL-L1" / "Q001_r1_t0.exec.json"
+@pytest.mark.parametrize("stem", ["Q001_r1_t0", "Q001_r2_t0"])   # a final turn; a turn 0 before a fix
+def test_export_checks_runs_raw_hashes_and_reads_only(run, stem):
+    raw = run / "raw-root" / "test-run" / "SQL-L1" / f"{stem}.exec.json"
     logs = {p: p.read_bytes() for p in (run / "runs").rglob("*.jsonl")}
-    raw.write_bytes(raw.read_bytes().replace(b"7", b"8"))
+    raw.write_bytes(raw.read_bytes() + b" ")
     with pytest.raises(ValueError, match="sha256"):
         C.export_run("test-run", "t", {"Q001": QA, "Q002": QJ}, "b", runs_root=run / "runs", raw_root=run / "raw-root")
     assert {p: p.read_bytes() for p in logs} == logs

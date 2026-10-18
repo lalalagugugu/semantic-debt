@@ -16,6 +16,10 @@ One JSON line per attempt::
      "value_types": [<value_types of each ref's effective rules>, ...],
      "bank": "eval-v1.1@938957f"}
 
+The candidate is the attempt's last turn, the one its ``final`` verdict scores. An attempt
+fixed after an execution error also gives a second case for its turn 0 (``case_id`` ending
+in ``/t0``, ``turn: 0``, all else the same), so that first-try accuracy can be re-scored.
+
 A row set is a list of rows (lists). Values JSON cannot carry natively are typed objects:
 ``{"$date": ...}``, ``{"$datetime": ...}``, ``{"$decimal": ...}``, ``{"$float": "nan" | "inf" |
 "-inf"}``. Strings stay strings: a date the engine returned as text is text, as it is for
@@ -108,10 +112,14 @@ def decode_candidate(c):
 # Export
 
 
-def case_of(rec: dict, q: Question, raw_dir: Path, source: str, bank: str, label: str | None = None) -> dict:
-    last = rec["turns"][-1]
+def case_of(rec: dict, q: Question, raw_dir: Path, source: str, bank: str, label: str | None = None,
+            turn: int = -1) -> dict:
+    """The case for one turn of an attempt: the last (the ``final`` verdict's) by default;
+    ``turn=0`` of a fixed attempt is the answer before the fix (case_id ends in ``/t0``)."""
+    last = rec["turns"][turn]
     rules = effective_rules(q) if q.refs is not None else []
-    parts = [source, *([label] if label else []), rec["cell"], rec["qid"], f"r{rec['rep']}"]
+    parts = [source, *([label] if label else []), rec["cell"], rec["qid"], f"r{rec['rep']}",
+             *(["t0"] if turn == 0 else [])]
     case = {
         "case_id": "/".join(parts), "source": source, "run_id": rec["run_id"],
         "question_id": rec["qid"], "cell": rec["cell"], "round": rec["rep"], "turn": last["turn"],
@@ -131,7 +139,8 @@ def case_of(rec: dict, q: Question, raw_dir: Path, source: str, bank: str, label
 
 def export_run(run_id: str, source: str, questions: dict[str, Question], bank: str,
                label: str | None = None, runs_root: Path | None = None, raw_root: Path | None = None) -> list[dict]:
-    """Every ``done`` attempt of every cell of a run, in (cell, qid, rep) order of the log."""
+    """Every ``done`` attempt of every cell of a run, in (cell, qid, rep) order of the log;
+    a fixed attempt also gives a ``/t0`` case for its turn before the fix."""
     root = (runs_root or R.REPO / "runs") / run_id
     cases = []
     for log in sorted(root.glob("*.jsonl")):
@@ -145,6 +154,8 @@ def export_run(run_id: str, source: str, questions: dict[str, Question], bank: s
             if rec["cell"] != log.stem:
                 raise ValueError(f"{log}: line for cell {rec['cell']}")
             cases.append(case_of(rec, questions[rec["qid"]], raw_dir, source, bank, label))
+            if len(rec["turns"]) > 1:      # fixed: the answer before the fix, for first-try accuracy
+                cases.append(case_of(rec, questions[rec["qid"]], raw_dir, source, bank, label, turn=0))
     return cases
 
 
