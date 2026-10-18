@@ -264,7 +264,8 @@ def main() -> int:
           ("、".join(short(r).replace(" | ", " ") for r in keyonly) or "无") +
           "。旧提示没要求给名称，最终口径按键核对对象后算对（上表「只给键」）。SQL-L1 没有这一类："
           "Pro SQL-L1 Q34 r3 也只给了键，但同时漏了 4 个产品，归 SQL 真错。", ""]
-    o += ["暂时归不了类的：无（每一条都有类别；其中判断依据较弱、标为「参考问题 · 题面歧义」的两条是 Pro SQL-L1 Q73 r3 与 Q82 r3）。", ""]
+    o += ["暂时归不了类的：无。Pro SQL-L1 Q73 r3（差额方向）与 Q82 r3（「团队」含不含间接下属）起初归「参考问题 · 题面歧义」，"
+          "用户裁决改为语义层差距：都是 L1 没写的口径选择，记为调优候选，不补参考。", ""]
 
     # ---- model choice
     o += ["### 选模型（卡片规则）", "",
@@ -290,7 +291,7 @@ def main() -> int:
     text = path.read_text(encoding="utf-8")
     if BEGIN in text:
         head, rest = text.split(BEGIN, 1)
-        text = head + section + rest.split(END, 1)[1].lstrip("\n")
+        text = head + section + "\n" + rest.split(END, 1)[1].lstrip("\n")
     else:
         title, _, body = text.partition("\n")
         text = (title + "\n\n" + section + "\n## 附：试跑原判定（eval-v1、旧评分器；历史，选模型不用）\n\n"
