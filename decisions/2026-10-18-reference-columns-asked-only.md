@@ -54,6 +54,8 @@ T05b 的写入测试发现 `eval-ro-eval-v1` 可以写（已删掉测试文件�
 
 ## 七、补充：另一家的独立标注改由 Qwen 做（2026-10-18）
 
+> **已被取代**：先改回 Codex 写评分器、再改由 Codex 新会话做独立标注，见 `decisions/2026-10-18-label-scoring-and-all-wrong-audit.md` 第七、八节。
+
 用户不愿为等 Codex 额度重置（10-22）阻塞 4 天。第三节第 2 步拆开：
 
 1. **独立标注必答列**：改由 aion agent 接 **qwen3.8-max** 做（不用 DeepSeek，它是被测模型）。Qwen 既非 Claude、也非被测模型，满足「独立核对必须跨厂商」。只读 `eval-v1` 的只读副本，不得读 T05b 的标注；输出放 `$SEMDEBT_DATA_DIR/handoff-qwen/`。T19 披露这一项由 Qwen 完成。
