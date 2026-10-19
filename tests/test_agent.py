@@ -441,6 +441,16 @@ def test_skip_judge_leaves_judge_questions_out_of_the_dry_run(capsys):
     assert (attempts(with_judge), attempts(without)) == ("3", "2")
 
 
+def test_probe_cube_compares_served_and_rendered_members():
+    expected = {"sales": {"salesamount", "sales_amount"}, "product": {"productkey"}}
+    served = [("sales", "SalesAmount"), ("sales", "sales_amount"), ("sales", "__user"),
+              ("sales", "__cubeJoinField"), ("product", "ProductKey"), ("product", "__user")]
+    assert AG.probe_cube(expected, served) == []
+    stale = [r for r in served if r[1] != "sales_amount"] + [("store", "StoreKey")]
+    assert AG.probe_cube(expected, stale) == ["cube 'store' served but not rendered", "sales: missing ['sales_amount']"]
+    assert AG.parse_args(["--cell", "SQL-L2-E", "--probe-cube"]).probe_cube
+
+
 def test_verify_file_at_tag(tmp_path):
     root = tmp_path / "repo"
     (root / "harness").mkdir(parents=True)
