@@ -22,7 +22,8 @@ in ``/t0``, ``turn: 0``, all else the same), so that first-try accuracy can be r
 
 A row set is a list of rows (lists). Values JSON cannot carry natively are typed objects:
 ``{"$date": ...}``, ``{"$datetime": ...}``, ``{"$decimal": ...}``, ``{"$float": "nan" | "inf" |
-"-inf"}``. Strings stay strings: a date the engine returned as text is text, as it is for
+"-inf"}``, and an Array / Tuple cell is ``{"$array": [...]}`` so that it cannot be taken for a row
+(scorer spec v2 §12, corpus note; it decodes to a list). Strings stay strings: a date the engine returned as text is text, as it is for
 the scorer. ``question_changed: true`` marks an answer to an older wording of the question
 (source log's ``question_sha256`` differs from the bank's text; Q69 in the T12 pilot runs).
 Cases whose source line has ``model`` set carry it (the pilot ran two models).
@@ -52,7 +53,7 @@ if __package__ in (None, ""):
 from harness import run_direct as R  # noqa: E402
 from harness.questions import Question, effective_rules, load_questions, verify_eval_tag  # noqa: E402
 from harness.rescore import candidate_of  # noqa: E402
-from harness.scorer import REFUSAL, ExecError  # noqa: E402
+from harness.scorer_v2 import REFUSAL, ExecError  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Values
@@ -68,10 +69,15 @@ def encode_value(v):
     if isinstance(v, Decimal):
         return {"$decimal": str(v)}
     if isinstance(v, (list, tuple)):
-        return [encode_value(x) for x in v]
+        return {"$array": [encode_value(x) for x in v]}
     if v is None or isinstance(v, (bool, int, float, str)):
         return v
     raise TypeError(f"no corpus encoding for {type(v).__name__}: {v!r}")
+
+
+def encode_rows(rows) -> list:
+    """A row set: rows stay JSON lists, each cell goes through ``encode_value``."""
+    return [[encode_value(cell) for cell in row] for row in rows]
 
 
 _FLOATS = {"nan": math.nan, "inf": math.inf, "-inf": -math.inf}
@@ -81,6 +87,10 @@ _TAGS = {"$date": date.fromisoformat, "$datetime": datetime.fromisoformat,
 
 def decode_value(v):
     if isinstance(v, dict):
+        if len(v) == 1 and "$array" in v:
+            if not isinstance(v["$array"], list):
+                raise ValueError(f"$array must hold a list: {v!r}")
+            return [decode_value(x) for x in v["$array"]]
         if len(v) != 1 or next(iter(v)) not in _TAGS:
             raise ValueError(f"not a typed value: {v!r}")
         (tag, text), = v.items()
@@ -97,7 +107,7 @@ def encode_candidate(c):
         if c != REFUSAL:
             raise ValueError(f"unexpected string candidate {c!r}")
         return c
-    return encode_value(c)
+    return encode_rows(c)
 
 
 def decode_candidate(c):
@@ -125,7 +135,7 @@ def case_of(rec: dict, q: Question, raw_dir: Path, source: str, bank: str, label
         "question_id": rec["qid"], "cell": rec["cell"], "round": rec["rep"], "turn": last["turn"],
         "judge": q.scoring == "judge",
         "candidate": encode_candidate(candidate_of(last, raw_dir, rec["qid"], rec["rep"])),
-        "refs": encode_value(q.refs) if q.refs is not None else None,
+        "refs": [encode_rows(ref) for ref in q.refs] if q.refs is not None else None,
         "rules": rules,
         "value_types": [(r or {}).get("value_types") for r in rules],
         "bank": bank,
