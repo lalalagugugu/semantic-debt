@@ -185,18 +185,18 @@ L2 的 92 个可调用对象（指标 × 数据集），对照由同一数据集
 
 ## 3. DAX × Cube
 
-- 101 个可调用对象，DAX 有表达式的 101 个，Cube 有成员的 101 个；三个 L2 上下文给出的调用写法个数一致的 101 个。
+- 102 个可调用对象，DAX 有表达式的 102 个，Cube 有成员的 102 个；三个 L2 上下文给出的调用写法个数一致的 102 个。
 - 实现层面的读法差异来自 `reports/validation/metric-text-vs-impl.md`（人工逐条比对，本脚本只按指标名引用）：A = 两边选了同一种文字没写明的读法；B = 两边不一致或引擎做不到。
 
 | 类 | 可调用对象 |
 |---|---|
 | A | 15：销售额占比·FactOnlineSales（A3）、销售额占比·FactSales（A3）、坪效·FactSales（A7）、门店人均销售额·FactSales（A7）、同店销售额·FactSales（A4）、产品标价·DimProduct（A6）、产品单位成本·DimProduct（A6）、产品利润率·DimProduct（A5）、当前在手库存数量·FactInventory（A8）、当前在手库存金额·FactInventory（A8）、当前在订库存数量·FactInventory（A8）、当前安全库存数量·FactInventory（A8）、低于安全库存的门店产品数·FactInventory（A8）、平均在手库存金额·FactInventory（A1）、库存周转率·FactInventory（A2） |
 | B | 9：销售额环比增长率·FactOnlineSales（B1）、销售额环比增长率·FactSales（B1）、新客数·FactOnlineSales（B2）、新客销售额·FactOnlineSales（B2）、新客销售额占比·FactOnlineSales（B2）、目标销售额·FactSalesQuota（B3）、目标销量·FactSalesQuota（B3）、目标毛利·FactSalesQuota（B3）、计划收入·FactStrategyPlan（B3） |
-| 其余 | 77 |
+| 其余 | 78 |
 
 ### L1 写明的范围或变体（semantic-v1.4：逐个核对 69 个指标）
 
-- 69 个指标里，L1 文字写了范围或变体的 12 个；其中缺实现、本次照 L1 文字补成变体调用名的 6 个（9 个调用名），其余 L1 写了的已由主调用名覆盖或属已记的引擎限制。不改 L1 文字，不加 L1 没有的口径。
+- 69 个指标里，L1 文字写了范围或变体的 12 个；其中缺实现、本次照 L1 文字补成变体调用名的 7 个（10 个调用名），其余 L1 写了的已由主调用名覆盖或属已记的引擎限制。不改 L1 文字，不加 L1 没有的口径。
 - 变体的 Cube 实现里，父组分母（渠道内、品类内）用多阶段成员的 `reduce_by`，只能在 Cube 里运行，须经 T16 实测后再打 tag；DAX 变体须经 T17 实测。
 
 | 指标 | L1 原文 | 处理 | 变体调用名（DAX / Cube） |
@@ -242,7 +242,7 @@ L2 的 92 个可调用对象（指标 × 数据集），对照由同一数据集
 | 销售额同比增长率 | 去年同期销售额 | 两边都按查询的期取去年同期（SAMEPERIODLASTYEAR、time_shift 1 年），不需要变体 | — |
 | 销售额环比增长率 | 期的长度由问题的粒度决定（月、季） | DAX 主度量值按查询的期取月、季、年；Cube 主成员固定为月，补「按季」变体（DAX 同补一个，两边对称） | 按季·FactSales：`[Sales Amount QoQ %]` / `sales.sales_amount_qoq_pct`；按季·FactOnlineSales：`[Online Sales Amount QoQ %]` / `online_sales.sales_amount_qoq_pct` |
 | 销售额占比 | 分母的范围由问题决定（全公司、某渠道、某品类内） | 主调用名是全公司（查询筛选后的全部）；补「渠道内」「品类内」两个变体 | 渠道内·FactSales：`[Sales Amount Share In Channel]` / `sales.sales_amount_share_in_channel`；品类内·FactSales：`[Sales Amount Share In Category]` / `sales.sales_amount_share_in_category`；品类内·FactOnlineSales：`[Online Sales Amount Share In Category]` / `online_sales.sales_amount_share_in_category` |
-| 同店销售额 | 两个对比年份 | 两边都按查询年与前一年比，不需要变体 | — |
+| 同店销售额 | 两个对比年份 | 主调用名的对比年份是本年与上一年；补「作基年」（本年与下一年），让基期金额与增长率用同一门店集合（T16 读法对齐清单） | 作基年·FactSales：`[Same Store Sales As Base Year]` / `sales.same_store_sales_as_base_year` |
 | 同店销售额增长率 | 同店本年销售额 − 同店去年销售额 | 同「同店销售额」 | — |
 | 产品标价 | — | L1 没有写范围或变体 | — |
 | 产品单位成本 | — | L1 没有写范围或变体 | — |

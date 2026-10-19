@@ -196,6 +196,11 @@ def dax_measures() -> dict[tuple[str, str], tuple[str, str]]:
     }
     for name, expr in store.items():
         out[(name, "FactSales")] = ("FactSales", expr)
+    out[(variant_key("同店销售额", "作基年"), "FactSales")] = ("FactSales", (
+        "SUMX (\n    VALUES ( 'DimDate'[CalendarYear] ),\n"
+        "    VAR _y = 'DimDate'[CalendarYear]\n"
+        f"    VAR _stores = {same_store_set('_y', '_y + 1')}\n"
+        f"    RETURN CALCULATE ( {sales}, KEEPFILTERS ( _stores ) )\n)"))
 
     p = "'DimProduct'"
     out[("产品标价", "DimProduct")] = ("DimProduct", f"AVERAGE ( {p}[UnitPrice] )")
@@ -440,6 +445,9 @@ def cube_measures() -> dict[tuple[str, str], list[dict]]:
          "filters": _f("has({CUBE}.StoreYears, toYear({CUBE}.DateKey) + 1)"), "public": False},
         {"name": "same_store_base_prior_year", "type": "number", "multi_stage": True, "sql": "{same_store_base}",
          "time_shift": [{"time_dimension": "DateKey", "interval": "1 year", "type": "prior"}], "public": False})
+
+    add(variant_key("同店销售额", "作基年"), s, {"type": "sum", "sql": "{CUBE}.SalesAmount",
+                                            "filters": _f("has({CUBE}.StoreYears, toYear({CUBE}.DateKey) + 1)")})
 
     p = "DimProduct"
     add("产品标价", p, {"type": "avg", "sql": "{CUBE}.UnitPrice"})

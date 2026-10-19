@@ -75,6 +75,11 @@ CROSS_CHECKS = [
     ("sales.same_store_sales_amount",
      "SELECT sum(SalesAmount) FROM retail.FactSales AS f WHERE (StoreKey, toYear(DateKey) - 1) IN "
      "(SELECT DISTINCT StoreKey, toYear(DateKey) FROM retail.FactSales)"),
+    ("sales.same_store_sales_as_base_year",          # semantic-v1.4 variant: this year and the next
+     "SELECT sum(SalesAmount) FROM retail.FactSales AS f WHERE (StoreKey, toYear(DateKey) + 1) IN "
+     "(SELECT DISTINCT StoreKey, toYear(DateKey) FROM retail.FactSales)"),
+    ("sales_quota.sales_amount_quota_by_scenario",     # semantic-v1.4 variant: every scenario, the query filters
+     "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota"),
     ("online_sales.new_customer_count",
      "SELECT uniqExactIf(CustomerKey, first >= toDate('2009-12-31') - 89) FROM "
      "(SELECT CustomerKey, min(DateKey) AS first FROM retail.FactOnlineSales GROUP BY CustomerKey)"),

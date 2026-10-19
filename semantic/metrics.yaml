@@ -503,6 +503,12 @@ metrics:
     unit: "USD"
     numerator: "销售额，筛 门店在两个对比年份都有销售"
     dataset: FactSales
+    variants:   # L1：「只统计两个对比年份都有销售的门店」；主调用名的对比年份是本年与上一年
+      - id: "作基年"
+        scope: "本年作为基期、与下一年比较：只统计本年和下一年都有销售的门店（与「同店销售额增长率」的基期是同一门店集合）"
+        dataset: FactSales
+        dax_measure: "[Same Store Sales As Base Year]"
+        cube_member: "sales.same_store_sales_as_base_year"
 
   - name: "同店销售额增长率"
     definition: "（同店本年销售额 − 同店去年销售额）÷ 同店去年销售额（约定 15）。"
