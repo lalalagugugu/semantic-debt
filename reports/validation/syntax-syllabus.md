@@ -64,7 +64,7 @@
 - **Cube JSON 的多个 `timeDimensions`、相对日期区间（如 `"last year"`）、默认行数上限**：没有探针，说明里不写。
 - **ClickHouse 只到 1 级**：没写「中文别名要加反引号」（T13 首轮执行报错 77% 来自中文别名），按裁决第一期不改，报告写明缺口与代价。
 - **DAX 多数项只到 1 级**：裁决要求开跑前补到 2 级，不在本卡范围。
-- **四份说明长度不再相等**：`tests/test_render.py::test_four_syntax_notes_within_ten_percent` 在本卡开工前就已失败（`ef06279` 后 2,533 / 922 字符），补到 2 级后更长（`cube_sql.md` 3,126，`cube_json.md` 1,427，ClickHouse 953，DAX 922，按去空白字符计）。已记在 `decisions/open-questions.md` 的 T12-4，等用户裁决；本卡没有改这个测试。
+- **四份说明长度不再相等**：`tests/test_render.py::test_four_syntax_notes_within_ten_percent` 在本卡开工前就已失败（`ef06279` 后 2,533 / 922 字符），补到 2 级后更长（`cube_sql.md` 3,126，`cube_json.md` 1,427，ClickHouse 953，DAX 922，按去空白字符计）。记在 `decisions/open-questions.md` 的 T12-4，用户已裁决（`decisions/2026-10-19-self-built-p-and-cube-notes.md` 第五节：栈之间篇幅可以不同）。测试改为 `test_syntax_note_lengths`：两份 Cube 说明不受等长约束，ClickHouse 与 DAX 之间仍按 10% 核对（DAX 开跑前补到 2 级时去掉），四份长度都记进测试属性。
 
 ## 重渲染与系统消息比对
 
@@ -89,6 +89,10 @@ uv run python render/render_all.py          # 通过，等价校验通过
 | SQL-L1.5S | `clickhouse_sql.md` | c08313c23b9b | c08313c23b9b | 同 |
 | SQL-L2 | `cube_sql.md` | 400fd926ce07 | 5722ed6d03f4 | **变** |
 | SQL-L2-E | `cube_sql.md` | ec9d4c047cf4 | d802db367737 | **变**（嵌入 SQL-L2 的系统消息，随之变） |
-| SQL-L1c、SQL-R-EN、SQL-L1c-EN | `clickhouse_sql.md` | — | — | 同（说明部分逐字相同；上下文要读题库，本卡用占位文本代替，交本地复跑确认） |
+| SQL-L1c | `clickhouse_sql.md` | a61668486bf0 | a61668486bf0 | 同 |
+| SQL-R-EN | `clickhouse_sql.md` | 69c11407e717 | 69c11407e717 | 同 |
+| SQL-L1c-EN | `clickhouse_sql.md` | a61668486bf0 | a61668486bf0 | 同 |
 
 渲染产物本身（`build/contexts/*.yaml`、Cube 模型、PBIP）不读 `render/syntax/`，改说明不影响它们；`git status` 里唯一的渲染副产物变化是 `reports/validation/context_sizes.md` 中两行 L2 的说明 token 数。
+
+SQL-L1c、SQL-R-EN、SQL-L1c-EN 三行由 T12 在本地用真题库（`eval-v1.2` 只读副本，90e13b3）复跑：这三个单元的上下文从题库读取，本分支 `system_for` 生成的系统消息与 `origin/main` 的说明拼出的逐字节相同；其余各行哈希与上表一致，重渲后 `build/contexts/` 与 `context_sizes.md` 均无变化。
