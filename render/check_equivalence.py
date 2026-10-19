@@ -25,7 +25,7 @@ import yaml
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from render.common import BUILD, CUBE_NAMES, metrics_file  # noqa: E402
+from render.common import BUILD, CUBE_NAMES, metrics_file, variant_callables  # noqa: E402
 
 CTX = BUILD / "contexts"
 
@@ -130,7 +130,7 @@ def strip_callables(obj):
     return obj
 
 
-def expected_calls(stack: str) -> dict[tuple[str, str], str]:
+def expected_calls(stack: str) -> dict[tuple, str]:
     """(metric, `<Table>`) → the call as this stack must write it, built from metrics.yaml."""
     out = {}
     for m in metrics_file()["metrics"]:
@@ -140,6 +140,9 @@ def expected_calls(stack: str) -> dict[tuple[str, str], str]:
         for ds, dax, cube in pairs:
             call = {"dax": dax, "cube_sql": f"MEASURE({cube})", "cube_json": cube}[stack]
             out[(m["name"], f"<{ds}>")] = call
+        for _, ds, dax, cube, scope in variant_callables(m):       # variants: keyed by their scope too
+            call = {"dax": dax, "cube_sql": f"MEASURE({cube})", "cube_json": cube}[stack]
+            out[(m["name"], f"<{ds}>", scope)] = call
     return out
 
 
@@ -149,7 +152,7 @@ def check_calls(cell: str, ctx: dict) -> list[str]:
     problems, seen = [], set()
     for m in ctx.get("metrics", []):
         for c in m.get("callables", []):
-            key = (m["name"], neutral_name(stack, c["dataset"]))
+            key = (m["name"], neutral_name(stack, c["dataset"]), *([c["scope"]] if c.get("scope") else []))
             seen.add(key)
             if want.get(key) != c["call"]:
                 problems.append(f"{cell} 的「{m['name']}」@{c['dataset']} 写成 {c['call']!r}，应为 {want.get(key)!r}")

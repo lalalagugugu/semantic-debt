@@ -199,6 +199,30 @@ def metric_callables(m: dict) -> list[tuple[str, str, str]]:
     return out
 
 
+def primary_key(ds: dict) -> str:
+    keys = [c["name"] for c in ds["columns"] if c.get("role") == "key"]
+    return keys[0] if keys else ds["columns"][0]["name"]
+
+
+def cube_dimension_names(ds: dict) -> list[str]:
+    """Columns that become dimensions of a dataset's cube: every non-technical column, plus the primary
+    key. render/cube.py builds the model from this; anything referring to cube dimensions (reduce_by)
+    must use the same list."""
+    pk = primary_key(ds)
+    return [c["name"] for c in ds["columns"] if not c.get("technical") or c["name"] == pk]
+
+
+def variant_key(metric: str, variant_id: str) -> str:
+    """Key of a variant callable in the (metric, dataset) maps: ``<指标>｜<变体>``."""
+    return f"{metric}｜{variant_id}"
+
+
+def variant_callables(m: dict) -> list[tuple[str, str, str, str, str]]:
+    """(variant id, dataset, dax_measure, cube_member, scope) for each variant the L1 text states
+    (metrics.yaml ``variants``: share scopes, period lengths, scenario; semantic-v1.4)."""
+    return [(v["id"], v["dataset"], v["dax_measure"], v["cube_member"], v["scope"]) for v in m.get("variants") or []]
+
+
 class _Dumper(yaml.SafeDumper):
     pass
 

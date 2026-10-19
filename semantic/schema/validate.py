@@ -267,6 +267,19 @@ def check_metrics_yaml(c: Checker, src: dict) -> None:
             member = m.get(key) or ""
             c.check(member.split(".")[0] == cube_of.get(ds),
                     f"「{name}」的 {key} 落在 {ds} 对应的 cube 上", f"写的是 {member}")
+    # L1 写明的变体（semantic-v1.4：范围或变体检查）：落在指标已有的数据集上，名字全局唯一
+    cube_of.update({"FactSalesQuota": "sales_quota", "FactStrategyPlan": "strategy_plan"})
+    for m in mfile.get("metrics", []):
+        for v in m.get("variants") or []:
+            label = f"「{m['name']}」的变体「{v.get('id')}」"
+            c.check(all(has_text(v.get(k), 1) for k in ("id", "scope", "dataset", "dax_measure", "cube_member")),
+                    f"{label} 写全了 id、scope、dataset、dax_measure、cube_member")
+            c.check(v.get("dataset") in {m.get("dataset"), m.get("alternate_dataset")},
+                    f"{label} 落在指标已有的数据集上", f"写的是 {v.get('dataset')}")
+            c.check((v.get("cube_member") or "").split(".")[0] == cube_of.get(v.get("dataset")),
+                    f"{label} 的 Cube 成员落在 {v.get('dataset')} 对应的 cube 上", f"写的是 {v.get('cube_member')}")
+            dax_seen.append(v.get("dax_measure"))
+            cube_seen.append(v.get("cube_member"))
     dup_dax = sorted({x for x in dax_seen if dax_seen.count(x) > 1})
     dup_cube = sorted({x for x in cube_seen if cube_seen.count(x) > 1})
     c.check(not dup_dax, "DAX 度量值名全模型唯一", f"重复：{dup_dax}")
