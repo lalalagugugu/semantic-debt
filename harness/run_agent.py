@@ -453,6 +453,25 @@ def run_cube_probe(timeout_s: int) -> int:
     return 0 if not diffs else 3
 
 
+def parse_attempts(text: str) -> set[tuple[str, int]]:
+    """``Q79:2,Q80:3`` → {("Q79", 2), ("Q80", 3)}."""
+    pairs = set()
+    for item in filter(None, (s.strip() for s in text.split(","))):
+        qid, sep, rep = item.partition(":")
+        if not sep or not qid or not rep.isdigit() or int(rep) < 1:
+            raise argparse.ArgumentTypeError(f"{item!r} is not QID:REP")
+        pairs.add((qid, int(rep)))
+    if not pairs:
+        raise argparse.ArgumentTypeError("no attempts given")
+    return pairs
+
+
+def unknown_attempts(pairs: set[tuple[str, int]], questions: list[Question], reps: int) -> list[str]:
+    """Pairs that are not a (question, rep) of this run's plan."""
+    qids = {q.qid for q in questions}
+    return [f"{q}:{r}" for q, r in sorted(pairs) if q not in qids or r > reps]
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cell", action="append", required=True, choices=sorted(AGENT_CELLS), help="repeatable")
@@ -466,6 +485,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--limit", type=int, help="first N questions only")
+    ap.add_argument("--attempts", type=parse_attempts,
+                    help="only these (question, rep) pairs, as Q79:2,Q80:3; rep numbers are kept (a continuation run)")
     ap.add_argument("--skip-judge", action="store_true",
                     help="leave out judge questions (phase 1 replan §二; as run_direct --skip-judge)")
     ap.add_argument("--eval-tag", default="eval-v1.2")
@@ -542,7 +563,15 @@ def main(argv: list[str] | None = None, load=None) -> int:
             print(f"  {b}")
         return 2
 
-    rows, total = dry_run(args.cell, len(questions), args.reps, args.model, calls=args.est_calls,
+    if args.attempts:
+        unknown = unknown_attempts(args.attempts, questions, args.reps)
+        if unknown:
+            print(f"refusing to start: not in this run's plan: {', '.join(unknown)}")
+            return 2
+        questions = [q for q in questions if q.qid in {qid for qid, _ in args.attempts}]
+    # with --attempts, each listed pair is one attempt (n_questions = pairs, reps = 1)
+    n_planned, reps_planned = (len(args.attempts), 1) if args.attempts else (len(questions), args.reps)
+    rows, total = dry_run(args.cell, n_planned, reps_planned, args.model, calls=args.est_calls,
                           growth=args.est_growth_tokens, output=args.est_output_tokens,
                           question_tokens=args.est_question_tokens, use_measured=not args.est_from_args)
     print_dry_run(rows, total, args.model, args.reps)
@@ -570,7 +599,8 @@ def main(argv: list[str] | None = None, load=None) -> int:
                            limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS,
                                    "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
                            eval_tag=args.eval_tag, semantic_tag=args.semantic_tag)
-        path = R.run_cell(ctx, questions, args.reps, args.concurrency, guard=guard, attempt=run_attempt)
+        path = R.run_cell(ctx, questions, args.reps, args.concurrency, guard=guard, attempt=run_attempt,
+                          only=args.attempts)
         print(json.dumps(summarize(path), ensure_ascii=False, indent=2))
         if guard.conflict:
             print(f"STOP: system_fingerprint {guard.seen} is not only {args.expect_fingerprint or 'one value'}. "
