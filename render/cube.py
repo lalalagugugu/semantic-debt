@@ -23,15 +23,13 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from render.common import BUILD, CUBE_NAMES, CUBE_TYPES, dump_yaml, logical_type, metrics_file, physical_schema, source  # noqa: E402
+from render.common import (  # noqa: E402
+    BUILD, CUBE_NAMES, CUBE_TYPES, cube_dimension_names, dump_yaml, logical_type, metrics_file, physical_schema,
+    primary_key, source, variant_callables, variant_key,
+)
 from render.measures import CUBE_SQL, cube_measures  # noqa: E402
 
 OUT_DIR = BUILD / "cube" / "model" / "cubes"
-
-
-def primary_key(ds: dict) -> str:
-    keys = [c["name"] for c in ds["columns"] if c.get("role") == "key"]
-    return keys[0] if keys else ds["columns"][0]["name"]
 
 
 def build_model() -> dict[str, dict]:
@@ -44,13 +42,16 @@ def build_model() -> dict[str, dict]:
         pairs = [(m["dataset"], m["cube_member"])]
         if m.get("alternate_dataset"):
             pairs.append((m["alternate_dataset"], m["alternate_cube_member"]))
-        for dataset, member in pairs:
+        items = [(m["name"], dataset, member, m["name"], m["definition"]) for dataset, member in pairs]
+        items += [(variant_key(m["name"], vid), dataset, member, f"{m['name']}（{vid}）", f"{m['definition']} 本成员：{scope}。")
+                  for vid, dataset, _, member, scope in variant_callables(m)]
+        for key, dataset, member, title, description in items:
             cube, name = member.split(".", 1)
-            specs = measures[(m["name"], dataset)]
+            specs = measures[(key, dataset)]
             public = dict(specs[0])
             if public.pop("name") != name:
                 raise ValueError(f"{member} 的实现名字对不上")
-            public = {"name": name, "title": m["name"], "description": m["definition"], **public}
+            public = {"name": name, "title": title, "description": description, **public}
             for spec in [public, *specs[1:]]:
                 existing = {x["name"]: x for x in by_cube.setdefault(cube, [])}
                 if spec["name"] in existing:
@@ -78,8 +79,9 @@ def build_model() -> dict[str, dict]:
         coltypes = dict(types[ds["name"]])
         pk = primary_key(ds)
         dims = []
+        keep = set(cube_dimension_names(ds))
         for c in ds["columns"]:
-            if c.get("technical") and c["name"] != pk:
+            if c["name"] not in keep:
                 continue
             d = {"name": c["name"], "sql": f"{{CUBE}}.{c['name']}",
                  "type": CUBE_TYPES[logical_type(coltypes[c["name"]])]}
@@ -122,6 +124,10 @@ def check_model(model: dict[str, dict]) -> None:
                 for ref in _REF.findall(f["sql"]):
                     if ref != "CUBE":
                         problems.append(f"{cube}.{m['name']} 的筛选引用了 {ref}")
+            for ref in m.get("reduce_by", []) + m.get("group_by", []):   # cube.member, as Cube resolves it
+                target, _, member = ref.partition(".")
+                if target not in model or member not in {d["name"] for d in model[target]["dimensions"]}:
+                    problems.append(f"{cube}.{m['name']} 的 reduce_by / group_by 引用了不存在的维度 {ref}")
             if m.get("time_shift") and not any(d["name"] == m["time_shift"][0]["time_dimension"] and d["type"] == "time"
                                               for d in body["dimensions"]):
                 problems.append(f"{cube}.{m['name']} 的 time_shift 指向的不是本 cube 的时间维度")
