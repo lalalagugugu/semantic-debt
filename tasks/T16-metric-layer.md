@@ -1,6 +1,6 @@
 # T16 指标层（Cube Core：SQL-L2 与 JSON-L2）
 
-- 状态：semantic-v1.3 两单元冒烟各23题完成（跳过judge），用户批准高峰执行，总费1.41452904元；v2离线重评主表SQL10/19、JSON5/19。SQL执行失败归因1条待定，不判通过；全量待归因裁决、估算与批准，限错峰。PR #114待Claude Code审。
+- 状态：v1.3冒烟及无模型L2交付审查完成；SQL四条执行失败均为说明缺口（Q80已定位，诊断均过v2参考），JSON十条拒答为当前冻结交付接口限制。只增补建议待审定，不改冻结材料；全量不估算、不启动，等待用户裁决。PR #114待Claude Code审。
 - 负责：Codex
 - 模式：主仓库 clone（`scripts/start-card.sh T16`）
 - 依赖：搭建在 G1 之后（需要 `build/cube/`，T10）；跑单元在 G3 之后、T13 跑完之后（避免抢 API 并发）
@@ -81,3 +81,9 @@ T10-1 的裁决（23 个双表指标各有两个调用名，`online_sales.<成�
 - 采用rescore-02的v2离线结果；rescore-01因Cube number注解数值未恢复而误降4条，保留但不用。c709ca5仅修harness/rescore.py反序列化，并加现有测试；6项rescore测试及harness/Cube测试通过。prompt.py、scorer.py、scorer_v2.py、score_guard.py与main逐字节一致；不改semantic/render。
 - SQL最终失败：1条明确列名规则违反并伴随别名缺口，2条有通用正反例的说明条件缺失，1条未定位；已证实硬能力限制0/4、1/4待定，不能作确定0%，敏感范围0–25%可能跨20%门槛。JSON最终失败是不必要的sales时间筛选，已证实硬能力限制0/1。16条通用控制不调用模型，逐轮原文、置信度见reports/validation/t16_pilot_v13_results.md。
 - 尚不判冒烟通过。三组全量（SQL v1.3/v1.2、JSON各109×3）未估算、未启动；按用户顺序等冒烟归因/裁决后再估，并等待批准、只在错峰执行。报告和全部日志已交PR #114，由Claude Code审后用户合并。
+
+## 2026-10-19 L2交付审查追加
+
+- 用户明确先审交付、不估全量、不调用模型。JSON十条拒答逐题核对338个既定义成员（含隐藏成员）；在一条JSON直接答对的口径下均不可表达，列当前交付接口限制。缺失能力及既有相关成员见reports/validation/t16_l2_delivery_audit.md。
+- SQL四条均复现报错，单改英文输出别名即可执行；前三条通过v2，另一条用两侧分别聚合的CTE后通过v2。均归说明缺口，Q80待定消除，硬能力限制0/4；不改源模型作答或分数。
+- 25条通用探针、6项独立数值基线断言验证；原查询及仅改别名对照做字节检查。只增补建议在reports/validation/t16_l2_delivery_additions.md，未直接修改render/、模型或tag。模型调用0、费用0；全量仍待用户审定后再估算与批准。

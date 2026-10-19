@@ -30,7 +30,7 @@
 | T13 | SQL 直答全量（6 个中文单元；英文锚点第一期不跑，G3 第三节） | Claude Code | 普通 | G3 | 80 / 250 元 | 完成（2026-10-18 运行，6 × 366 条齐全，24.80 元，指纹唯一；2026-10-19 `harness-v1.1` + `eval-v1.2` 离线重评定稿，0 打分超时）；judge 13 题待 `judge-v1` |
 | T14 | 调优（SQL-L1 调优；DAX-L2 调优同法） | Claude Code（A 普通，B 调优包） | 普通 / 调优包 | T13 | 15 / 50 元 | 未开始 |
 | T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | **L0-E、L1-E 全量已跑完并按 harness-v1.1 离线重评**（`20261019-T15-explorer-01-rescore-01`，最终：L0-E 39.8%、L1-E 68.4%，judge 不计、不含低区分度）；对 T13 重评后的直答各 **+0.7 点**（`reports/results/explorer.md`）；L2-E 等 T16 |
-| T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | v1.3冒烟各23题完成（用户批准高峰执行、跳过judge），总1.41452904元；v2主表SQL10/19、JSON5/19，低区分度3/4、1/4。SQL失败归因1条待定，未判通过；全量待估算/批准、限错峰。PR #114待Claude Code审；详见reports/validation/t16_pilot_v13_results.md |
+| T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | v1.3冒烟完成（高峰获批、1.41452904元）；无模型L2交付审查完成：SQL四条失败均为说明缺口，Q80已定位；JSON十条拒答为当前交付接口限制。两条只增补建议待审；全量不估算/不启动，等待用户裁决。PR #114待Claude Code审；详见reports/validation/t16_l2_delivery_audit.md |
 | T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | 未开始（用家里那台 Windows，装 Claude Code 后按卡片首选做法执行） |
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
