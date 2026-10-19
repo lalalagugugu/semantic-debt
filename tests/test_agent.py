@@ -474,3 +474,19 @@ def test_tool_on_real_chdb_cuts_a_large_result(tmp_path):
     c = rec["steps"][0]["tool_calls"][0]
     assert c["exec"]["row_count"] == 1000 and c["echoed_rows"] == 50 and c["truncated"]
     assert calls[1][-1]["content"].splitlines()[0] == "结果已截断，共 1000 行，以下只显示前 50 行。"
+
+
+def test_rescore_accepts_agent_cells(tmp_path):
+    """harness.rescore runs on a -E log: the final answer is in ``turns``, steps ride along unchanged."""
+    respond, _ = scripted(tool("SELECT 1"), ANSWER)
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 1": OK42, "SELECT 42": OK42}))
+    path = R.run_cell(ctx, [Q], reps=1, concurrency=1, runs_root=tmp_path / "runs", progress=lambda *_: None,
+                      attempt=AG.run_attempt)
+    src = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    raw_root = tmp_path / "rr"
+    (raw_root / "test-run").mkdir(parents=True)
+    (raw_root / "test-run" / "SQL-L1-E").symlink_to(tmp_path / "raw")
+    dst = RS.rescore("test-run", "SQL-L1-E", "rs-01", runs_root=tmp_path / "runs", raw_root=raw_root,
+                     questions={"Q001": Q}, commit="evalabc")
+    rec = json.loads(dst.read_text(encoding="utf-8").splitlines()[0])
+    assert rec["final"]["outcome"] == "correct" and rec["steps"] == src["steps"] and rec["rescored_from"]["run_id"] == "test-run"

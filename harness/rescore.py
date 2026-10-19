@@ -39,6 +39,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from harness import run_direct as R  # noqa: E402
+from harness.cells import AGENT_CELLS  # noqa: E402
 from harness.questions import EvalVersionError, Question, eval_commit, load_questions, verify_eval_tag  # noqa: E402
 from harness.scorer_v2 import REFUSAL, ExecError  # noqa: E402
 
@@ -94,7 +95,7 @@ def rescore(source: str, cell: str, run_id: str, runs_root: Path | None = None, 
     dst = R.log_path(run_id, cell, runs_root)
     if dst.exists():
         raise SystemExit(f"{dst} exists; logs are append-only, choose a new run id")
-    lang = R.CELLS[cell].lang
+    lang = (R.CELLS.get(cell) or AGENT_CELLS[cell]).lang      # -E cells (T15) score like their direct cell
     questions = questions or {q.qid: q for q in load_questions(lang=lang)}
     commit = commit or eval_commit()
     raw_dir = (raw_root or R.raw_root()) / source / cell
