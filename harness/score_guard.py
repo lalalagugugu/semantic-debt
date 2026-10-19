@@ -1,8 +1,10 @@
 """Scoring with a time limit (T13, decisions/2026-10-18-harness-v1-1-scorer-fixes.md §4).
 
-The frozen scorer (``harness/scorer.py``, ``harness-v1``) can run for hours on some
-Top-N tie boundaries (Q79 on SQL-R: a 10-row answer against a 42-member boundary block).
-A run must not wait on it: every attempt is scored in a child process, and if the
+The scorer is ``harness/scorer_v2.py`` (decisions/2026-10-18-scorer-spec-v2.md, harness-v1.1);
+the frozen ``harness/scorer.py`` (harness-v1) stays in the tree for comparison only. The old
+scorer could run for hours on some Top-N tie boundaries (Q79 on SQL-R: a 10-row answer against
+a 42-member boundary block); v2 has hard time limits (spec §6.7), but a run still must not wait
+on scoring: every attempt is scored in a child process, and if the
 scorer has not finished within ``SCORE_TIMEOUT_S`` the child is killed and the attempt
 is logged as ``pending`` with reason ``score_timeout``; its rows are in runs-raw and it
 is scored offline (``harness.rescore``) once the scorer is fixed. A timeout is never a
@@ -35,7 +37,7 @@ class Scored:
 
 def _work(conn, candidate, refs, rules, reference_rules) -> None:
     try:
-        from harness.scorer import score_detailed
+        from harness.scorer_v2 import score_detailed
 
         s = score_detailed(candidate, refs, rules, reference_rules=reference_rules)
         conn.send(("ok", (s.outcome, s.reason, s.matched_ref, s.sensitivity)))

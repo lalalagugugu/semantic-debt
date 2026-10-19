@@ -25,6 +25,7 @@ from harness.executors import (
     ENGINE_ERROR, SCOPE_VIOLATION, TIMEOUT, ExecResult, ast_references, mask_sql, scope_violations,
 )
 from harness.questions import Question  # noqa: E402
+from harness.scorer_v2 import ExecError  # noqa: E402
 
 CHDB = Path(os.environ.get("SEMDEBT_DATA_DIR", "/nonexistent")).expanduser() / "chdb"
 needs_chdb = pytest.mark.skipif(not CHDB.exists(), reason="chDB data directory not available")
@@ -205,7 +206,8 @@ class FakeExecutor:
 
 QTEXT = "这是一个绝不能进入日志的问题原文样本"
 Q = Question("Q001", QTEXT, refs=[[[42]]], rules={"ordered": False, "top_n": None, "tie_columns": [],
-                                                    "value_kinds": ["count"], "value_types": ["UInt64"]})
+                                                    "value_kinds": ["count"], "value_types": ["UInt64"],
+                                                    "required_columns": [0]})
 
 
 def _ctx(tmp_path, client, executor, cell="SQL-L1"):
@@ -332,9 +334,10 @@ def test_rules_are_passed_through_untouched(tmp_path, monkeypatch):
 def test_per_reference_rules_are_passed_through_untouched(tmp_path, monkeypatch):
     """decisions/2026-10-16-per-reference-rules.md: a ref's own rules replace the
     question's wholesale; the harness hands both to the scorer as they are."""
-    one = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["count"], "value_types": ["UInt64"]}
+    one = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["count"], "value_types": ["UInt64"],
+           "required_columns": [0]}
     two = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other", "count"],
-           "value_types": ["String", "UInt64"]}
+           "value_types": ["String", "UInt64"], "required_columns": [0, 1]}
     q = Question("Q005", QTEXT, refs=[[[8]], [["a", 7]]], rules=one, ref_rules=[None, two])
     seen = []
     real = R.score_detailed
@@ -356,7 +359,8 @@ def test_per_reference_rules_are_passed_through_untouched(tmp_path, monkeypatch)
 
 
 def test_anchor_carries_the_revised_column(tmp_path):
-    rules = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["count"], "value_types": ["UInt64"]}
+    rules = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["count"], "value_types": ["UInt64"],
+             "required_columns": [0]}
     revised = Question("Q006", "", refs=[[[8]]], rules=rules, lang="en")
     q = Question("EN06", QTEXT, refs=[[[7]]], rules=rules, lang="en", revised=revised)
     respond, _ = _scripted("```sql\nSELECT 7\n```")
@@ -379,7 +383,7 @@ def test_api_error_is_recorded(tmp_path):
 
 
 def test_run_cell_log_resume_and_no_question_text(tmp_path):
-    questions = [Question(f"Q{i:03d}", f"{QTEXT}{i}", [[[i]]], {"ordered": False, "top_n": None}) for i in range(1, 4)]
+    questions = [Question(f"Q{i:03d}", f"{QTEXT}{i}", [[[i]]], Q.rules) for i in range(1, 4)]
     by_text = {q.text: q for q in questions}
 
     def respond(messages):
@@ -508,7 +512,7 @@ def test_rows_for_unscorable_questions_are_pending_but_errors_are_scored(tmp_pat
     rec = R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 41": ExecResult(rows=[[41]])})), q, 1)
     assert rec["final"]["outcome"] == "pending" and rec["final"]["pending"] == "no_rules"
     assert (tmp_path / "raw" / "Q002_r1_t0.exec.json").exists()
-    judge = Question("Q003", QTEXT, refs=[[[1]]], rules={"ordered": False, "top_n": None}, scoring="judge")
+    judge = Question("Q003", QTEXT, refs=[[[1]]], rules=Q.rules, scoring="judge")
     respond, _ = _scripted("CANNOT_ANSWER")
     rec = R.run_attempt(_ctx(tmp_path, MockClient(respond), FakeExecutor({})), judge, 1)
     assert rec["final"]["outcome"] == "refused" and rec["scoring"] == "judge"
@@ -628,22 +632,24 @@ def test_anchor_rules_follow_column_structure():
     r2 = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other", "amount"],
           "value_types": ["String", "Float64"]}
     current = Question("Q007", "", refs=[[[1]], [["a", 1.0]]], rules=r1, ref_rules=[None, r2])
-    assert anchor_rules([{"name": "c", "type": "UInt64"}], [[5]], current) == (r1, None)
-    assert anchor_rules([{"name": "a", "type": "String"}, {"name": "b", "type": "Float64"}], [["x", 2.0]], current)[0] is r2
+    # rules from before required_columns meant every column required; v2 needs it written out
+    r1x, r2x = {**r1, "required_columns": [0]}, {**r2, "required_columns": [0, 1]}
+    assert anchor_rules([{"name": "c", "type": "UInt64"}], [[5]], current) == (r1x, None)
+    assert anchor_rules([{"name": "a", "type": "String"}, {"name": "b", "type": "Float64"}], [["x", 2.0]], current)[0] == r2x
     assert anchor_rules([{"name": "c", "type": "Int64"}], [[5]], current) == (None, "structure_differs")
     # §3.1: Nullable(...) is stripped before comparing
-    assert anchor_rules([{"name": "c", "type": "Nullable(UInt64)"}], [[5]], current) == (r1, None)
+    assert anchor_rules([{"name": "c", "type": "Nullable(UInt64)"}], [[5]], current) == (r1x, None)
     assert anchor_rules([{"name": "a", "type": "String"}, {"name": "b", "type": "Nullable(Float64)"}],
-                        [["x", None]], current)[0] is r2
+                        [["x", None]], current)[0] == r2x
     # §3.2: an empty original reference is scored as empty only if the published artifact is empty too
     wide = [{"name": "a", "type": "String"}, {"name": "b", "type": "Float64"}, {"name": "c", "type": "Float64"}]
-    assert anchor_rules(wide, [], current, published_rows=0) == (r1, None)
+    assert anchor_rules(wide, [], current, published_rows=0) == (r1x, None)
     assert anchor_rules(wide, [], current, published_rows=3)[0] is None
     assert anchor_rules(wide, [], current, published_rows=None)[0] is None
     # rules the question bank wrote for this original reference take precedence, still self-matched
     own = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other"] * 3,
            "value_types": ["String", "Float64", "Float64"]}
-    assert anchor_rules(wide, [["x", 1.0, 2.0]], current, original_rules=own) == (own, None)
+    assert anchor_rules(wide, [["x", 1.0, 2.0]], current, original_rules=own) == ({**own, "required_columns": [0, 1, 2]}, None)
     assert anchor_rules(wide, [["x", 1.0]], current, original_rules=own)[0] is None
 
 
@@ -661,8 +667,9 @@ def test_anchor_top_n_reference_is_boundary_complete():
     meta = [{"name": "n", "type": "String"}, {"name": "v", "type": "Float64"}]
     # the whole tie group is not a valid answer (scorer contract), so self-match uses N rows of it
     assert anchor_rules(meta, tied, current)[0] is None
-    assert anchor_rules(meta, tied, current, pick=tied[:2]) == (top, None)
-    from harness.scorer import score_detailed
+    assert anchor_rules(meta, tied, current, pick=tied[:2]) == ({**top, "required_columns": [0, 1]}, None)
+    from harness.scorer_v2 import score_detailed
+    top = {**top, "required_columns": [0, 1]}
     assert score_detailed([["a", 9.0], ["d", 5.0]], [tied], top).outcome == "correct"
 
 
@@ -696,12 +703,25 @@ def test_rewritten_bank_questions_drop_the_revised_column():
     assert all(q.meta["revised_excluded"] == "bank question rewritten" for q in dropped.values())
 
 
+def _all_required(rules):
+    """Pre-required_columns rules as the loader hands them to scorer v2: every column required."""
+    return rules if "required_columns" in rules else {**rules, "required_columns": list(range(len(rules["value_types"])))}
+
+
+# Anchors whose original reference scorer v2 cannot match to itself, so they lose their rules
+# (pending either way): EN44 is a judge question and its original reference holds inf (growth
+# from a zero base); v2 never treats a non-finite value as equal, even to itself.
+V2_SELF_MATCH_EXCEPTIONS = {"EN44"}
+
+
 @needs_eval
 def test_anchors_score_exactly_as_at_eval_v1_whatever_the_current_bank():
     """Anchors inherit the Chinese rules from the fixed tag (default eval-v1), never from the
-    current checkout: the 87 scorable anchors, their effective rules (no required_columns,
-    i.e. every column required), boundary completion and pending set are the same as with
-    the eval-v1 bank (snapshot from the loader before the change), on eval-v1 or eval-v1.1."""
+    current checkout: the 87 scorable anchors, their effective rules, boundary completion and
+    pending set are the same as with the eval-v1 bank (snapshot from the loader before the
+    change), on eval-v1 or eval-v1.1. Those rules have no required_columns, i.e. every column
+    is required; since harness-v1.1 (scorer v2 needs the field) the loader writes that out as
+    every column, and nothing else changes."""
     import hashlib
     from harness.anchor_refs import anchor_dir
     from harness.questions import bank_anchor_rules, load_questions
@@ -715,13 +735,19 @@ def test_anchors_score_exactly_as_at_eval_v1_whatever_the_current_bank():
     written = bank_anchor_rules(EVAL)
     for qid, q in en.items():
         want = snap["anchors"][qid]
-        digest = hashlib.sha256(json.dumps(q.rules, sort_keys=True, ensure_ascii=False).encode()).hexdigest() if q.rules else None
+        before = None
+        if qid in V2_SELF_MATCH_EXCEPTIONS:
+            assert q.pending == want["pending"] == "judge" and q.rules is None, qid
+            continue
+        if q.rules:
+            assert q.rules["required_columns"] == list(range(len(q.rules["value_types"]))), qid
+            before = {k: v for k, v in q.rules.items() if k != "required_columns"}
+        digest = hashlib.sha256(json.dumps(before, sort_keys=True, ensure_ascii=False).encode()).hexdigest() if before else None
         assert (q.pending, digest, bool(q.meta.get("boundary_completed"))) == \
             (want["pending"], want["rules_sha256"], want["boundary_completed"]), qid
-        assert not (q.rules and "required_columns" in q.rules), qid
         assert q.meta["rules_tag"] == {"tag": "eval-v1", "commit": tag}
         if q.meta.get("rules_source"):         # the bank's own rules for original references: current checkout
-            assert q.rules == written[q.meta["vendor_id"]]["rules"]
+            assert before == written[q.meta["vendor_id"]]["rules"]
 
 
 def _git_rev(root, tag):
@@ -766,11 +792,11 @@ def test_anchor_details_on_the_real_bank():
     zh, _ = zh_rules_at(EVAL, "eval-v1")
     en = {q.qid: q for q in load_questions(EVAL, lang="en")}
     for qid in ("EN84", "EN100"):           # differ from the eval-v1 refs only by Nullable(...)
-        assert en[qid].pending is None and en[qid].rules == zh[en[qid].meta["bank_qid"]].rules
+        assert en[qid].pending is None and en[qid].rules == _all_required(zh[en[qid].meta["bank_qid"]].rules)
     for qid in ("EN39", "EN49"):            # empty locally and in the published artifact
         assert en[qid].refs == [[]] and en[qid].meta["empty_original_ref"]
         assert published_row_count(EVAL, en[qid].meta["vendor_id"]) == 0
-        assert en[qid].rules == zh[en[qid].meta["bank_qid"]].rules
+        assert en[qid].rules == _all_required(zh[en[qid].meta["bank_qid"]].rules)
     assert en["EN49"].pending is None and en["EN39"].pending == "judge"
 
 
@@ -780,7 +806,7 @@ def test_anchor_rules_from_the_bank_and_boundary_on_the_real_bank():
     import random
     from harness.anchor_refs import anchor_dir, anchor_manifest
     from harness.questions import bank_anchor_rules, load_questions
-    from harness.scorer import score_detailed
+    from harness.scorer_v2 import score_detailed
     if not (anchor_dir() / "MANIFEST.json").exists():
         pytest.skip("anchor references not built")
     written = bank_anchor_rules(EVAL)
@@ -791,7 +817,7 @@ def test_anchor_rules_from_the_bank_and_boundary_on_the_real_bank():
     for vid, entry in written.items():          # picked by id, checked against both hashes, used whole
         q = en[f"EN{vid:02d}"]
         assert (entry["sql_sha256"], entry["sha256"]) == (built[vid]["sql_sha256"], built[vid]["sha256"])
-        assert q.pending is None and q.rules == entry["rules"]
+        assert q.pending is None and q.rules == _all_required(entry["rules"])
     assert all(q.pending in (None, "judge") for q in en.values())
     q79 = en["EN79"]                            # 306 stores tie at the boundary; any 10 of them score
     assert q79.meta["boundary_completed"]["original_rows"] == 10 and len(q79.refs[0]) > 10
@@ -1070,3 +1096,75 @@ def test_final_rescore_swaps_a_key_only_for_its_own_entity_name():
     assert relaxed["required_columns"] == [0, 1, 3] and "rank_columns" not in relaxed and "rankings" not in relaxed
     assert without(rules, []) is rules
     assert key_variants({**rules, "identifier_columns": [0]}, ["t.StoreKey", "StoreName", "x", "y", "z", "w", "v"]) == []
+
+
+# ---------------------------------------------------------------------------
+# harness-v1.1: scorer v2 on every scoring path (decisions/2026-10-18-scorer-spec-v2.md)
+
+# A year in an integer column: the old scorer let 2009 pass for 2008 (0.05 % tolerance);
+# v2 compares every integer-typed reference column exactly (spec §12 item 2).
+YEAR = Question("Q009", QTEXT, refs=[[[2008, 5]]],
+                rules={"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other", "count"],
+                       "value_types": ["UInt16", "UInt64"], "required_columns": [0, 1]})
+
+
+def test_run_scoring_uses_scorer_v2_in_process_and_in_the_child():
+    from harness import scorer as old
+    assert old.score_detailed([[2009, 5]], YEAR.refs, YEAR.rules).outcome == "correct"
+    for timeout in (None, 60):
+        assert R.score_question([[2009, 5]], YEAR, score_timeout_s=timeout)["outcome"] == "wrong"
+        assert R.score_question([[2008, 5]], YEAR, score_timeout_s=timeout)["outcome"] == "correct"
+
+
+def test_rescore_uses_scorer_v2(tmp_path):
+    from harness import rescore as RS
+    respond, _ = _scripted("```sql\nSELECT 2009, 5\n```")
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 2009, 5": ExecResult(rows=[[2009, 5]])}))
+    ctx.raw_dir = tmp_path / "raw" / "src" / "SQL-L1"
+    ctx.run_id = "src"
+    R.run_cell(ctx, [YEAR], reps=1, concurrency=1, runs_root=tmp_path / "runs", progress=lambda *_: None)
+    path = RS.rescore("src", "SQL-L1", "src-v2", runs_root=tmp_path / "runs", raw_root=tmp_path / "raw",
+                      questions={"Q009": YEAR}, commit="evalnew")
+    assert json.loads(path.read_text(encoding="utf-8"))["final"]["outcome"] == "wrong"
+
+
+def test_errors_and_refusals_need_no_reference():
+    bare = Question("Q010", QTEXT, refs=None, rules=None)
+    assert R.score_question(ExecError("boom"), bare)["outcome"] == "exec_error"
+    assert R.score_question(ExecError("boom"), bare)["reason"] is None       # never in the log
+    assert R.score_question("CANNOT_ANSWER", bare)["outcome"] == "refused"
+    assert R.score_question([[1]], bare)["outcome"] == "pending"
+
+
+def test_unscored_is_not_a_verdict_in_the_summary(tmp_path):
+    respond, _ = _scripted("```sql\nSELECT 42\n```")
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])}))
+    path = R.run_cell(ctx, [Q], reps=1, concurrency=1, runs_root=tmp_path / "runs", progress=lambda *_: None)
+    rec = json.loads(path.read_text(encoding="utf-8"))
+    assert R.summarize(path)["accuracy"] == 1.0
+    rec["final"] = {**rec["final"], "outcome": R.UNSCORED, "reason": "mapping_cap"}
+    path.write_text(json.dumps(rec) + "\n", encoding="utf-8")
+    s = R.summarize(path)
+    assert s["accuracy"] is None and s["accuracy_scored"] is None and s["outcomes"] == {"unscored": 1}
+
+
+def test_a_bank_scorer_v2_rejects_stops_the_run_before_any_call(capsys):
+    old_style = Question("Q011", QTEXT, refs=[[[1]]], rules={"ordered": False, "top_n": None})   # pre-v2 rules
+    assert R.invalid_rules([Q, YEAR, Question("Q012", QTEXT, refs=None, rules=None)]) == []
+    (bad,) = R.invalid_rules([Q, old_style])
+    assert bad.startswith("Q011: ")
+    called = []
+    rc = R.main(["--cell", "SQL-L1", "--dry-run"], load=lambda lang, **_: called.append(lang) or [old_style])
+    assert rc == 2 and "scorer v2 rejects the rules of 1 question" in capsys.readouterr().out
+
+
+@needs_eval
+def test_the_bank_of_the_run_passes_scorer_v2_validation():
+    """eval-v1.2 is the first bank written for scorer v2 (spec §9: identity columns required)."""
+    import subprocess
+    from harness.questions import load_questions
+    tag = subprocess.run(["git", "-C", str(EVAL), "describe", "--tags", "--exact-match"],
+                         capture_output=True, text=True).stdout.strip()
+    if tag != "eval-v1.2":
+        pytest.skip(f"bank checkout is {tag or 'untagged'}, not eval-v1.2")
+    assert R.invalid_rules(load_questions(EVAL)) == []

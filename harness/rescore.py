@@ -40,7 +40,7 @@ if __package__ in (None, ""):
 
 from harness import run_direct as R  # noqa: E402
 from harness.questions import EvalVersionError, Question, eval_commit, load_questions, verify_eval_tag  # noqa: E402
-from harness.scorer import REFUSAL, ExecError  # noqa: E402
+from harness.scorer_v2 import REFUSAL, ExecError  # noqa: E402
 
 
 def candidate_of(turn: dict, raw_dir: Path, qid: str, rep: int):
