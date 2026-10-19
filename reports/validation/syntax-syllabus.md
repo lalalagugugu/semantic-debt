@@ -16,13 +16,13 @@
 | 时间分桶 | 1 | 1 | 2 → 2 | 2 → 2 | S100–S104, S11, F22, F23, J10_* |
 | 排名与窗口 | 2（`lagInFrame` 的窗口框条件） | 1 | 2 → 2（补「内层算、外层选出也要转 `BIGINT`」、带 `PARTITION BY` 同样适用） | 1 → 2（写明不能排名、不能每组取前 N） | S35_*, S36_*, B10_*, B11, B12, T05, J32 |
 | 比率 | 1 | 1 | 1 → 2（分子分母放同一 CTE 两列、外层相除） | 1 → 2（只能调用已定义指标，否则表达不了） | F01, S38, F20_pct, J30, J33 |
-| 同比 / 环比 | 1（只有日期函数） | 2（时间智能函数要求已标记的日期表） | 0 → 2（两种成立形态：外层条件聚合拆两列；或两个 CTE 各筛一期、按键 `JOIN`，列名不同） | 0 → 2（同「比率」） | B27, F23, F22, F02_distinct_alias, S34_*, J30–J32 |
+| 同比 / 环比 | 1（只有日期函数） | 2（时间智能函数要求已标记的日期表） | 0 → 2（两种成立形态：外层条件聚合拆两列；或两个 CTE 各筛一期、按键 `JOIN`，列名不同） | 0 → 2（同「比率」） | B27, F23, F22, F02_distinct_alias, J30–J32 |
 | 前 N | 1（`LIMIT`、`LIMIT N BY`） | 1（`TOPN`） | 1 → 2（补每组前 N：`PARTITION BY` 名次 + 外层筛选） | 1 → 2（`order` + `limit`；`limit` 不分组） | S21, F10_*, F11_*, B10_*, J01, J23 |
 | 空值 | 2（`join_use_nulls`） | 1（`DIVIDE` 返回空） | 2 → 2 | 0 → 2（`set` / `notSet`；补零只能靠已定义指标） | S20_null, S38, B23, F20_coalesce*, B22, J20_set, J20_notSet |
 | 除法 | 2（`/` 恒为浮点、`intDiv`、`nullIf`） | 2（`DIVIDE` 分母为零返回空） | 2 → 2 | 0 → 2（不能做算术） | S38, S40, J30 |
 | 标识符与别名引号 | 1（**没写中文别名要加反引号**，见裁决第五节第 3 条） | 1 | 2 → 2（补「中文别名用双引号可以，窗口结果在输出里时例外」） | 1 → 2（成员名只能英文字母、数字、下划线；没有列别名） | S04, F24, T03–T07, J30, J31 |
 | 去重计数 | 1 | 1 | 0 → 0 | 0 → 0 | 未实测（见「缺口」） |
-| 在结果上再算一步 | 1（子查询与 CTE 可多层） | 1（`VAR`、`ADDCOLUMNS`） | 2 → 2 | 2 → 2（不能） | S30–S33, B24–B27, F05, F06, J30–J32 |
+| 在结果上再算一步 | 1（子查询与 CTE 可多层） | 1（`VAR`、`ADDCOLUMNS`） | 2 → 2 | 2 → 2（不能） | S30–S33, B24–B27, F06, J30–J32 |
 | 多个事实表 | 0 | 0 | 2 → 2（补「同一事实 cube 的多个指标可同层」） | 2 → 2 | F01, S53, S52_*, B01, B02, B03, J04 |
 | 查询对象的格式骨架 | — | — | — | 1 → 1（保留原有的一行占位骨架 `例：{"measures": …, "limit": 10}`；格式定义，不是样例） | J01, J20_equals, J23 |
 
@@ -36,7 +36,7 @@
 4. 每组前 N：`PARTITION BY` 名次在外层算、再到更外一层筛选（B10 四种组合都成立；名次只筛选不输出可不转）。
 5. 比率：分子分母放同一 CTE 的两列，外层相除（F01 + S38、F20_pct）。
 6. 排名转 `BIGINT` 的范围写全：内层算、外层选出或改名同样要转（B11 报错、B12 成立）；带 `PARTITION BY` 输出同样要转（S36 报错）。
-7. 两个时期对比：外层条件聚合（B27 的形态，分组键用 F23 的年份成员或 F22 的外层 `EXTRACT`），或两个 CTE 各筛一期、按键 `JOIN`、列名彼此不同（F02_distinct_alias；同名会静默算错，S34_inner/left）。
+7. 两个时期对比：外层条件聚合（B27 的形态，分组键用 F23 的年份成员或 F22 的外层 `EXTRACT`），或两个 CTE 各筛一期、按键 `JOIN`、列名彼此不同（F02_distinct_alias）。
 
 `cube_json.md`（新增 6 处）：
 
@@ -47,6 +47,20 @@
 5. 空值筛选用 `set` / `notSet`（J20_set、J20_notSet）。
 6. 比率、同比、除法、补零、组内排名：只能调用已定义指标，否则一条查询表达不了（J30–J33）。
 7. 原来那行占位骨架（`例：{"measures": …, "limit": 10}`）**保留**，与 `main` 逐字相同。本卡起初把它当 3 级样例删掉，按裁决第五节第 5 条恢复：占位名称、不对应任何题、只示范一种非标准语法的对象结构，是格式定义（1 级）。
+
+## T16 复核后的删除（76f1aa2）
+
+T16 逐句复核 76f1aa2 的两份说明（PR #114，`reports/validation/t16-cube-notes-review-76f1aa2-01/review.md`）：88 项中成立 78、不成立 6、条件不符 4。按 T16 的只删补丁（`deletions-only.patch`）原样删除，不改写、不补更窄的规则：
+
+| 位置 | 删掉的内容 | T16 的理由（摘要） |
+|---|---|---|
+| `cube_sql.md` 三个维度 | 「平铺的写法都找不到路径」 | 链式图平铺可成功，断言超出星形探针的条件 |
+| `cube_sql.md` 不要这样写 | 「能执行但算出错误的数」一组：两个 CTE 同名输出列再 `JOIN`；聚合 CTE 与派生 CTE 连接后再聚合（含小标题） | 外层另起别名、派生键改名时数值正确，原句无条件归纳不成立；删前句后整条删去，不留空标题 |
+| `cube_sql.md` 不要这样写 | 「三个维度 cube 平铺……事实 cube 放在一端」 | 链式图三维平铺、二维事实在一端都可成功 |
+| `cube_sql.md` 不要这样写 | 「窗口函数的结果不转 `BIGINT` 就作为输出列」（留下后半句中文别名禁忌） | `SUM … OVER` 累计不转也正确；排名需转 `BIGINT` 仍在正面写法里 |
+| `cube_json.md` 键 | 「其他键（例如 `"join"`、`"expression"`）会被拒绝」 | `offset`、`timezone` 未列出却被接受 |
+
+对照表的深度不变：删掉的都是禁忌或过宽的概括，每个写法项仍有成立条件（连表的嵌套与事实位置、排名转 `BIGINT`、两个 CTE 列名不同、`IN (SELECT …)` 筛选等），只去掉了引用被删句子的证据（S34_*、F05）。重渲后 `build/contexts/` 不变，系统消息只有 SQL-L2、SQL-L2-E、JSON-L2 变（哈希见下表）。
 
 ## 由多条探针拼出、需要 T16 单独复核的条目
 
@@ -80,7 +94,7 @@ uv run python render/render_all.py          # 通过，等价校验通过
 | DAX-L0 | `dax.md` | 222556c0285d | 222556c0285d | 同 |
 | DAX-L1 | `dax.md` | 413e3a178101 | 413e3a178101 | 同 |
 | DAX-L2 | `dax.md` | 403b4544c438 | 403b4544c438 | 同 |
-| JSON-L2 | `cube_json.md` | 0cfbedfff9d0 | 4ef222a65e1a | **变**（恢复一行骨架后重算） |
+| JSON-L2 | `cube_json.md` | 0cfbedfff9d0 | 3b26b8397228 | **变**（恢复骨架、按 T16 复核删除后重算） |
 | SQL-L0 | `clickhouse_sql.md` | c7d4d21fb562 | c7d4d21fb562 | 同 |
 | SQL-L0-E | `clickhouse_sql.md` | fbb4111c70d6 | fbb4111c70d6 | 同 |
 | SQL-R | `clickhouse_sql.md` | b7cee8d0f32a | b7cee8d0f32a | 同 |
@@ -88,8 +102,8 @@ uv run python render/render_all.py          # 通过，等价校验通过
 | SQL-L1-E | `clickhouse_sql.md` | b2f84db36481 | b2f84db36481 | 同 |
 | SQL-L1.5W | `clickhouse_sql.md` | 23ed4a78009c | 23ed4a78009c | 同 |
 | SQL-L1.5S | `clickhouse_sql.md` | c08313c23b9b | c08313c23b9b | 同 |
-| SQL-L2 | `cube_sql.md` | 400fd926ce07 | 5722ed6d03f4 | **变** |
-| SQL-L2-E | `cube_sql.md` | ec9d4c047cf4 | d802db367737 | **变**（嵌入 SQL-L2 的系统消息，随之变） |
+| SQL-L2 | `cube_sql.md` | 400fd926ce07 | fcced29198e4 | **变**（按 T16 复核删除后重算） |
+| SQL-L2-E | `cube_sql.md` | ec9d4c047cf4 | 5e6760bff4a4 | **变**（嵌入 SQL-L2 的系统消息，随之变） |
 | SQL-L1c | `clickhouse_sql.md` | a61668486bf0 | a61668486bf0 | 同 |
 | SQL-R-EN | `clickhouse_sql.md` | 69c11407e717 | 69c11407e717 | 同 |
 | SQL-L1c-EN | `clickhouse_sql.md` | a61668486bf0 | a61668486bf0 | 同 |

@@ -17,7 +17,7 @@
 - 连接的写法和顺序会影响引擎能不能找到路径：
   - 一个事实 cube 加一个维度 cube：`事实 CROSS JOIN 维度`。
   - 一个事实 cube 加两个维度 cube：把事实 cube 放在两个维度中间，`维度甲 CROSS JOIN 事实 CROSS JOIN 维度乙`。
-  - 一个事实 cube 加三个维度 cube：用括号向右嵌套，事实 cube 放在最里层，`维度甲 CROSS JOIN (维度乙 CROSS JOIN (事实 CROSS JOIN 维度丙))`。平铺的写法都找不到路径。
+  - 一个事实 cube 加三个维度 cube：用括号向右嵌套，事实 cube 放在最里层，`维度甲 CROSS JOIN (维度乙 CROSS JOIN (事实 CROSS JOIN 维度丙))`。
 - 同一个事实 cube 的多个指标可以放在同一层，例如同时选出 `MEASURE(甲.指标一)` 和 `MEASURE(甲.指标二)`。
 - 两个事实 cube 的指标不能放在同一层查询里。先各写一个 CTE、分别按同一个键聚合，再在外层用普通 `JOIN … ON` 或 `FULL OUTER JOIN … ON` 把两个 CTE 按键连起来。
 - 需要维度的属性（名称等）时，在含 `MEASURE()` 的那一层用 `CROSS JOIN` 把维度 cube 带进来，直接选出属性。
@@ -57,16 +57,12 @@
 
 **不要这样写**
 
-- 能执行但算出错误的数（不报错，要特别避开）：
-  - 两个含 `MEASURE()` 的 CTE 用同一个输出列名（例如都叫 `v`），外层再用 `JOIN … ON` 或 `LEFT JOIN … ON` 连起来同时选出这两列：第二列会变成第一列的值。
-  - 一个聚合 CTE，和由它派生出来的 CTE（例如从它取出的键集合）`JOIN` 之后再 `SUM` / `GROUP BY`：每组得到的是全部的合计，不是本组的值。要这样筛选时改用上面的 `IN (SELECT …)`。
 - 会报错：
   - 对指标再套聚合，例如 `SUM(MEASURE(…))`。
   - cube 之间写 `JOIN … ON` 条件；或者把一个已聚合的 CTE 和原始 cube 用 `JOIN … ON` 连起来。
-  - 三个维度 cube 平铺 `CROSS JOIN`（任何顺序都不行）；两个维度 cube 时把它们写在相邻位置、事实 cube 放在一端。
   - 两个事实 cube 的指标放在同一层查询里（任何连接顺序都不行）。
   - `EXTRACT(…)` 和 `MEASURE()` 在同一层一起分组。
-  - 窗口函数的结果不转 `BIGINT` 就作为输出列；输出里有窗口函数结果时用中文别名。
+  - 输出里有窗口函数结果时用中文别名。
   - `COALESCE(NULL, 值)`、`COALESCE(CAST(NULL AS …), 值)` 这种第一个参数是空值常量的写法。
   - `PERCENTILE_CONT(…) WITHIN GROUP (…)`：引擎没有实现。
   - 对两个时间戳之差求 `AVG`，或把它转成 `DOUBLE PRECISION`：引擎不支持这种类型。
