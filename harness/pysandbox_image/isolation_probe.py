@@ -29,12 +29,19 @@ def probe(label, fn):
         print(f"blocked  {label}: {type(e).__name__}: {str(e)[:120]}")
 for label, path in PATHS:
     probe("read " + label, lambda p=path: (os.listdir(p) if os.path.isdir(p) else open(p, "rb").read(64)))
-probe("stat " + "root listing", lambda: sorted(os.listdir("/")))
-probe("mounts (host binds)", lambda: [l for l in open("/proc/mounts") if "/Users" in l or "/host" in l] or (_ for _ in ()).throw(LookupError("no host bind mounts")))
+DOCKER_FILES = {"/etc/hostname", "/etc/hosts", "/etc/resolv.conf"}   # read-only files docker injects itself
+VIRTUAL = {"overlay", "proc", "tmpfs", "devpts", "sysfs", "mqueue", "cgroup", "cgroup2", "shm"}
+def host_mounts():
+    rows = [l.split() for l in open("/proc/mounts")]
+    extra = [r[1] for r in rows if r[2] not in VIRTUAL and r[1] not in DOCKER_FILES]
+    if not extra:
+        raise LookupError("no host mounts; only " + ", ".join(sorted({r[1] for r in rows if r[1] in DOCKER_FILES})))
+    return extra
+probe("host mounts (other than docker's own /etc files)", host_mounts)
 probe("dns api.deepseek.com", lambda: socket.getaddrinfo("api.deepseek.com", 443))
 probe("tcp 1.1.1.1:443", lambda: socket.create_connection(("1.1.1.1", 443), timeout=3))
 probe("tcp 116.205.40.120:443", lambda: socket.create_connection(("116.205.40.120", 443), timeout=3))
-probe("write /work", lambda: open("/probe.txt", "w").write("x"))
+probe("write / (read-only root)", lambda: open("/probe.txt", "w").write("x"))
 '''
 
 

@@ -9,7 +9,7 @@ Built on ``harness/run_agent.py`` (T15) and reusing everything it has: ``run_sql
 same executor, scope and read-only checks (30 s; final queries 120 s), the 50-row echo,
 the log fields, the fingerprint guard, ``--dry-run`` / ``--budget``, the "calls used up"
 message before the forced answer (T15-1), one fix of an execution error, scoring in a
-child process with a time limit.
+child process with a time limit (scorer v2, ``harness-v1.1``).
 
 What is new (``harness/plan_prompt.py``, frozen as ``harness-plan-v1``):
 
@@ -60,7 +60,7 @@ from harness.cells import (  # noqa: E402
 from harness.client import APIError, Reply  # noqa: E402
 from harness.executors import DEFAULT_MAX_MEMORY_BYTES, DEFAULT_MAX_RESULT_ROWS, ExecResult  # noqa: E402
 from harness.questions import Question  # noqa: E402
-from harness.scorer import ExecError  # noqa: E402
+from harness.scorer_v2 import ExecError  # noqa: E402
 
 PLAN_TAG = "harness-plan-v1"
 PLAN_FILES = ("harness/plan_prompt.py", "harness/pysandbox.py", "harness/pysandbox_image/runner.py",
@@ -322,30 +322,50 @@ def run_attempt(ctx: PlanContext, q: Question, rep: int) -> dict:
 
 
 def summarize(path: Path) -> dict:
-    """-E summary plus plans, lookup / python use and the answer form."""
-    out = AG.summarize(path)
+    """Direct summary plus the agent tax (as -E, with run_sql stats over run_sql calls only),
+    plans, lookup / python use and the answer form."""
+    out = R.summarize(path)
     recs = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     done = [r for r in recs if r.get("status") == "done"]
     calls = [c for r in done for s in r.get("steps", []) for c in s["tool_calls"]]
+    sql = [c for c in calls if c["name"] == PP.RUN_SQL and c["status"] == "executed"]
+    py = [c for c in calls if c["name"] == PP.PYTHON and c["status"] == "executed"]
     n = len(done) or 1
-    finals = {}
-    for r in done:
-        kind = r.get("answer_kind")
-        finals.setdefault(kind, R._count([]))
+    out["system_fingerprints"] = R._count(t["system_fingerprint"] for r in done
+                                          for t in r.get("steps", []) + r["turns"] if t.get("system_fingerprint"))
+    out["agent"] = {
+        "tool_calls_per_attempt": R._count(r["n_tool_calls"] for r in done),
+        "mean_tool_calls": sum(r["n_tool_calls"] for r in done) / n,
+        "mean_model_calls": sum(r["n_calls"] for r in done) / n,
+        "attempts_hit_limit": sum(r["hit_tool_limit"] for r in done),
+        "attempts_hit_model_call_limit": sum(bool(r.get("hit_model_call_limit")) for r in done),
+        "attempts_limit_message_sent": sum(bool(r.get("limit_message_sent")) for r in done),
+        "tool_call_status": R._count(f"{c['name']}:{c['status']}" for c in calls),
+        "run_sql_exec_status": R._count(c["exec"]["status"] for c in sql),
+        "run_sql_error_classes": R._count(c["exec"].get("error_class") for c in sql if c["exec"]["status"] == "error"),
+        # read-only check (acceptance): an executed run_sql either ran as a single SELECT or was refused
+        "run_sql_forbidden_statements": sum(c["exec"].get("error_class") == "forbidden_statement" for c in sql),
+        "run_sql_results_truncated": sum(bool(c.get("truncated")) for c in sql),
+        "run_sql_results_py_rows_cut": sum(bool(c.get("py_rows_cut")) for c in sql),
+        "mean_prompt_tokens": sum(r["usage"]["prompt_tokens"] for r in done) / n,
+        "mean_completion_tokens": sum(r["usage"]["completion_tokens"] for r in done) / n,
+        "mean_wall_s": sum(r["wall_s"] for r in done) / n,
+        "mean_tool_time_s": sum(r["tool_time_s"] for r in done) / n,
+        "mean_python_time_s": sum(r.get("python_time_s", 0) for r in done) / n,
+        "mean_cost_cny": sum(r.get("cost_cny") or 0 for r in done) / n,
+    }
+    kinds = sorted({r.get("answer_kind") for r in done}, key=str)
     out["plan"] = {
         "answer_kind": R._count(r.get("answer_kind") for r in done),
-        "accuracy_by_answer_kind": {k: R._count(r["final"]["outcome"] for r in done if r.get("answer_kind") == k)
-                                    for k in finals},
+        "outcome_by_answer_kind": {k: R._count(r["final"]["outcome"] for r in done if r.get("answer_kind") == k)
+                                   for k in kinds},
         "attempts_without_plan": sum(r.get("n_plans", 0) == 0 for r in done),
         "mean_plans": sum(r.get("n_plans", 0) for r in done) / n,
         "plan_first_rejections": sum(r.get("plan_first_rejections", 0) for r in done),
         "tool_executed": {t: sum(r.get("tool_executed", {}).get(t, 0) for r in done) for t in PP.COUNTED_TOOLS},
         "attempts_using": {t: sum(r.get("tool_executed", {}).get(t, 0) > 0 for r in done) for t in PP.COUNTED_TOOLS},
         "lookup_missing_names": sum(len(c.get("missing") or []) for c in calls if c["name"] == PP.LOOKUP),
-        "python_status": R._count((c.get("py") or {}).get("error_class") or "ok" for c in calls
-                                  if c["name"] == PP.PYTHON and c["status"] == "executed"),
-        "attempts_hit_model_call_limit": sum(bool(r.get("hit_model_call_limit")) for r in done),
-        "mean_python_time_s": sum(r.get("python_time_s", 0) for r in done) / n,
+        "python_status": R._count(c["py"].get("error_class") or "ok" for c in py),
     }
     return out
 
@@ -414,7 +434,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--limit", type=int, help="first N questions only")
-    ap.add_argument("--eval-tag", default="eval-v1.1")
+    ap.add_argument("--eval-tag", default="eval-v1.2")
     ap.add_argument("--semantic-tag", default="semantic-v1.2")
     ap.add_argument("--agent-tag", default=AG.AGENT_TAG, help="harness/agent_prompt.py must be this tag's")
     ap.add_argument("--plan-tag", default=PLAN_TAG, help="plan_prompt.py and the sandbox files must be this tag's")
@@ -477,6 +497,12 @@ def main(argv: list[str] | None = None, load=None, sandbox=None) -> int:
         questions = R.select_questions(load(lang="zh"), args, pilot)
     except EvalVersionError as exc:
         print(f"refusing to start: {exc}")
+        return 2
+    bad = R.invalid_rules(questions)
+    if bad:
+        print(f"refusing to start: scorer v2 rejects the rules of {len(bad)} question(s) in {args.eval_tag}:")
+        for b in bad:
+            print(f"  {b}")
         return 2
 
     rows, total = dry_run(args.cell, len(questions), args.reps, args.model, calls=args.est_calls,

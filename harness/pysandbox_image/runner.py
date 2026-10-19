@@ -46,7 +46,9 @@ def _frame(table: dict) -> pd.DataFrame:
         t = _base_type(c.get("type", ""))
         s = df.iloc[:, i]
         if re.match(r"^U?Int\d+$", t):
-            df.isetitem(i, pd.to_numeric(s, errors="coerce").astype("Int64" if s.isna().any() else "int64"))
+            na = s.isna().any()
+            kind = ("UInt64" if na else "uint64") if t == "UInt64" else ("Int64" if na else "int64")
+            df.isetitem(i, pd.to_numeric(s, errors="coerce").astype(kind))
         elif t.startswith(("Float", "Decimal")):
             df.isetitem(i, pd.to_numeric(s, errors="coerce").astype("float64"))
         elif t.startswith(("Date", "DateTime")):
