@@ -21,6 +21,7 @@
 | 20261019-T21-pilot-01 | 2026-10-19 | SQL-L0-P、SQL-L1-P | T21 | 48（试跑 24 题 × 1 次 × 2） | deepseek-flash（指纹 e72d3c7f…，唯一） | eval-v1.2 = 90e13b3（只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2`） | 1.18 | $SEMDEBT_DATA_DIR/runs-raw/20261019-T21-pilot-01 | 首跑：`harness-plan-v1`（b10ca1a），scorer v2；错峰 12:00–12:08 |
 
 | 20261019-T16-pilot-01 | 2026-10-19 | SQL-L2（JSON-L2 未启动） | T16 | pilot 24 × 1，SQL 24/24 | deepseek-flash（35 次调用指纹唯一：e72d3c7f663d3e1383b00b3884cb4501） | eval-v1.1 = 938957f（只读副本校验）；semantic-v1.2 = 4cf56a8 | 0.54510072 | $SEMDEBT_DATA_DIR/runs-raw/20261019-T16-pilot-01 | 用户批准冒烟后执行；本地 harness cf7d3b5b6040affc014c5969267cb006d2cae516（main 基线 84f5e04，含 #100）；单并发、全部错峰；35 份响应及35份执行文件哈希核对通过。SQL 最终执行失败 7 条中接口限制 4 条（57.1%），按卡片 20% 门槛停止，待用户选择保留或移至第二期，JSON/全量未启动。judge 不进分母，低区分度单列；当场分数仅作进度参考，最终待 harness-v1.1 离线重评；报告 reports/results/metric_layer.md |
+**注（2026-10-19，`eval_tag` 沿用源运行）**：`20261018-T13-sql-direct-01-rescore-01` 的日志行里，`eval_tag` 是源运行的标签（`eval-v1.1`），但实际按 `eval-v1.2` = 90e13b3 评分，以各行的 `eval_commit` 为准。原因是当时的 `harness.rescore` 只替换 `eval_commit`、不替换 `eval_tag`。日志只追加，这个 run 不改写。`20261019-T15-explorer-01-rescore-01` 不受影响：它的源运行本来就是 `eval-v1.2`，732 行的 `eval_tag` 都是 `eval-v1.2`，`eval_commit` 都是 90e13b3。之后的重评由修过的 `harness/rescore.py` 写入实际校验过的标签，源运行的标签另记在 `rescored_from.eval_tag`。
 
 <!-- 追加格式：
 | 20261101-SQL-L1-01 | 2026-11-01 | SQL-L1 | T13 | 120 | deepseek-… | eval@a1b2c3d | 12.3 | $SEMDEBT_DATA_DIR/runs-raw/20261101-SQL-L1-01 | 首跑 |

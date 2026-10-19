@@ -287,3 +287,17 @@ def test_snapshot_covers_every_rendered_object() -> None:
     assert {ds["name"] for ds in source()["datasets"]} == set(snap["retail"])
     assert {v["name"] for v in source()["widetables"]["views"]} == set(snap["dwd"])
     assert len(snap["l0"]) == 25
+
+
+def test_ladder_notes_t2_t3_say_nothing_about_this_dataset() -> None:
+    """C13 (decisions/2026-10-19-phase1-replan.md §三): levels 2 and 3 carry no hint about this
+    dataset or any question; level 4's few-shot examples come from tuning-split questions and are
+    checked in tests/test_harness.py."""
+    names = business_names() | set(CUBE_NAMES.values()) | {m["name"] for m in metrics_file()["metrics"]}
+    names -= {"retail", "dwd", "ads"}
+    for f in ("clickhouse_sql_t2.md", "clickhouse_sql_t3.md"):
+        text = (REPO / "harness" / "syntax_ladder" / f).read_text(encoding="utf-8")
+        tokens = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", text)) | set(re.findall(r"[^\x00-\x7f]+", text))
+        assert not tokens & names, (f, tokens & names)
+        assert "2009" not in text and "2007" not in text and "2008" not in text, f
+        assert "CANNOT_ANSWER" not in text, f
