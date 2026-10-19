@@ -6,6 +6,7 @@ real executor on ``$SEMDEBT_DATA_DIR/chdb`` and are skipped when it is not avail
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
@@ -375,6 +376,36 @@ def test_run_cell_log_has_steps_and_no_question_text_and_rescores(tmp_path):
     for rec in recs:
         out = RS.rescore_line(rec, questions[int(rec["qid"][1:]) - 1], tmp_path / "raw", "rs", "evalabc")
         assert out["final"]["outcome"] == "correct"
+
+
+def test_run_cell_only_runs_the_listed_pairs_with_their_rep_numbers(tmp_path):
+    questions = [Question(f"Q{i:03d}", f"q{i}", [[[42]]], Q.rules) for i in range(1, 4)]
+    ctx = _ctx(tmp_path, MockClient(lambda m: ANSWER), FakeExecutor({"SELECT 42": OK42}))
+    only = {("Q002", 3), ("Q003", 1)}
+    path = R.run_cell(ctx, questions, reps=3, concurrency=2, runs_root=tmp_path / "runs",
+                      progress=lambda *_: None, attempt=AG.run_attempt, only=only)
+    recs = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines()]
+    assert {(r["qid"], r["rep"]) for r in recs} == only and len(recs) == 2
+    # a second call has nothing left to run: no pair is logged twice
+    R.run_cell(ctx, questions, reps=3, concurrency=2, runs_root=tmp_path / "runs",
+               progress=lambda *_: None, attempt=AG.run_attempt, only=only)
+    assert len(path.read_text(encoding="utf-8").splitlines()) == 2
+
+
+def test_attempts_argument_and_plan_check(capsys):
+    assert AG.parse_attempts("Q79:2, Q80:3,") == {("Q79", 2), ("Q80", 3)}
+    for bad in ("Q79", "Q79:x", "Q79:0", ":2", ","):
+        with pytest.raises(argparse.ArgumentTypeError):
+            AG.parse_attempts(bad)
+    assert AG.unknown_attempts({("Q001", 3), ("Q001", 4), ("Q999", 1)}, [Q], 3) == ["Q001:4", "Q999:1"]
+    from dataclasses import replace
+
+    questions = [Q, replace(Q, qid="Q002")]
+    argv = ["--cell", "SQL-L1-E", "--dry-run", "--reps", "3", "--est-from-args"]
+    assert AG.main([*argv, "--attempts", "Q001:2,Q002:3"], load=lambda lang: questions) == 0
+    assert next(l.split()[1] for l in capsys.readouterr().out.splitlines() if l.startswith("SQL-L1-E")) == "2"
+    assert AG.main([*argv, "--attempts", "Q001:4"], load=lambda lang: questions) == 2
+    assert "not in this run's plan: Q001:4" in capsys.readouterr().out
 
 
 def test_unexpected_fingerprint_stops_the_run(tmp_path):

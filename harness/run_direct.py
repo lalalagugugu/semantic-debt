@@ -454,18 +454,20 @@ def backfill_cell(ctx: RunContext, questions: list[Question], pairs: list[tuple[
 
 def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency: int,
              runs_root: Path | None = None, progress=print, guard: FingerprintGuard | None = None,
-             attempt=None) -> Path:
+             attempt=None, only: set[tuple[str, int]] | None = None) -> Path:
     """Run every missing (question, rep) of one cell.
 
     The first attempt runs alone so that it writes the prefix cache before the
     concurrent ones start (otherwise every worker's first call is a cache miss).
     ``attempt(ctx, q, rep) -> line`` defaults to ``run_attempt`` (the explorer agent passes its own).
+    ``only``: run just these (qid, rep) pairs, keeping their rep numbers (a continuation run).
     """
     run_attempt_ = attempt or run_attempt
     path = log_path(ctx.run_id, ctx.cell.name, runs_root)
     path.parent.mkdir(parents=True, exist_ok=True)
     done = done_pairs(path)
-    todo = [(q, rep) for q in questions for rep in range(1, reps + 1) if (q.qid, rep) not in done]
+    todo = [(q, rep) for q in questions for rep in range(1, reps + 1)
+            if (q.qid, rep) not in done and (only is None or (q.qid, rep) in only)]
     progress(f"{ctx.cell.name}: {len(done)} done, {len(todo)} to run")
     if guard is not None and guard.conflict:
         progress(f"  stop: more than one system_fingerprint already in this run: {guard.seen}")
