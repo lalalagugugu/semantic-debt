@@ -29,7 +29,7 @@ import uuid
 from dataclasses import dataclass, field
 
 # Image ID of `docker build -t semdebt-pysandbox:1 harness/pysandbox_image` (recorded in the T21 card).
-IMAGE_ID = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+IMAGE_ID = "sha256:9eb1919845fa7e9088970f28f2aea6e685b2bdcbf42c4e1e79007bc89f617579"
 TIMEOUT_S = 30              # baked into the image's ENTRYPOINT; here only to classify and to wait
 HOST_GRACE_S = 15           # container start-up and the transfer of the input rows
 TMPFS = "/tmp:rw,noexec,nosuid,size=256m"
