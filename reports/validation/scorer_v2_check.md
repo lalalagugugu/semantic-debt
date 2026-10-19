@@ -160,3 +160,9 @@ UV_CACHE_DIR="$TMPDIR/t02-uv-cache" uv run --no-sync python scripts/validate_sco
 实际和共用预期中的 exec_error 原因只写 execution_failed 与 SHA256；输入错误只保留异常类别与 SHA256。数据库报错原文留在库外语料，未写入本分支报告。旧 scorer 与 prompt 未改。
 
 此前已按授权仅清理 T02-scorer-v2 独有历史并用固定 lease 推送。本轮普通追加提交，审计本分支各独有提交的 reports / JSONL，不只最新工作树；不更改 main 继承的报告和只追加运行日志，也不声称托管端旧对象已物理删除。
+
+## PR #120 裁决已确认
+
+主仓库第十三节补充已明确：合法选择后的参考应判 correct；完整边界域的 N+k 应判 selection，对完整域仅核验名次按对象计数。当前实现与已完成的全语料复验符合该裁决，无需修改评分逻辑。
+
+共用旧预期冲突以第十三节为准，不再是待裁决问题；只读用例由 T05b 更新，等待新的条数和 SHA256 后复验。当前文件仍为 194 条、SHA256 `5954bcac3a4dee62d4f50d89a0d57f16c59723fa914a0d7a1cb9392c91fb285d`，未修改或覆盖预期，也未计作全部通过。
