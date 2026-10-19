@@ -46,5 +46,6 @@ cards:
   - {id: T17,  owner: claude, mode: windows,       repo: main, card: tasks/T17-powerbi-dax.md, after: G1}
   - {id: T18,  owner: claude, mode: windows,       repo: main, card: tasks/T18-dax-full-and-tuning.md, after: G3}
   - {id: T19,  owner: claude, mode: open,          repo: main, card: tasks/T19-report.md}
+  - {id: T19a, owner: claude, mode: open,          repo: main, card: tasks/T19-report.md, after: G3, note: "SQL 线中期报告（decisions/2026-10-19-t15-1-midreport-dsh.md 第二节）"}
   - {id: T20,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T20-independent-recheck.md}
-  - {id: T21,  owner: claude, mode: open,          repo: main, card: tasks/T21-dsh-planning-agent.md, after: T15, note: "可行性验证在 harness-agent-v1.1 后即可；开跑等 T15 全量"}
+  - {id: T21,  owner: claude, mode: open,          repo: main, card: tasks/T21-dsh-planning-agent.md, after: G3, note: "另需 T15：可行性验证在 harness-agent-v1.1 后即可，开跑等 T15 全量"}
