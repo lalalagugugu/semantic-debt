@@ -332,3 +332,46 @@ def test_every_rendered_context_names_only_visible_or_documented_objects() -> No
         pytest.skip("contexts not rendered")
     gaps = {p.stem: CR.check(yaml.safe_load(p.read_text(encoding="utf-8")))["gaps"] for p in contexts}
     assert not {k: v for k, v in gaps.items() if v}, gaps
+
+
+# ---------------------------------------------------------------------------
+# Generic delivery check (b): coverage tables
+# ---------------------------------------------------------------------------
+def test_convention_citations_parse_lists_and_ranges_of_words() -> None:
+    from render import check_conventions as CC
+    assert CC.cites("按约定 1 和 2 选表；约定 5、约定 7 另说；约定12") == {1, 2, 5, 7, 12}
+    assert CC.cites({"a": ["约定 2 + 约定 5"]}) == {2, 5}
+    assert CC.logical("retail.FactSales") == "FactSales" and CC.logical("online_sales") == "FactOnlineSales"
+
+
+def test_convention_row_verdicts_and_table_choice() -> None:
+    from render import check_conventions as CC
+    lin = {"ads_a": {"FactOnlineSales"}, "ads_b": {"FactSales"}}
+    conv = {"id": 1, "applies_to_datasets": ["FactOnlineSales"]}
+    ctx = {"conventions": [{"id": 1}],
+           "datasets": [{"name": "ads.ads_a", "description": "电商。", "columns": []},
+                        {"name": "ads.ads_b", "description": "全渠道（约定 2）。", "columns": []}],
+           "metrics": [{"name": "m", "default_filters": ["约定 1"]}]}
+    row = CC.convention_row(conv, "SQL-L1.5S", ctx, lin, {})
+    assert row["verdict"] == "仅指标" and row["anchors"] == "1/1"
+    assert [t["ok"] for t in CC.table_choice(ctx, lin)] == [False, True]
+    ctx["datasets"][0]["columns"] = [{"name": "c", "description": "线上销售（约定 1）"}]
+    assert CC.convention_row(conv, "SQL-L1.5S", ctx, lin, {})["verdict"] == "对象"
+    assert all(t["ok"] for t in CC.table_choice(ctx, lin))
+    ctx["metrics"] = []
+    ctx["datasets"][0]["columns"] = []
+    assert CC.convention_row(conv, "SQL-L1.5S", ctx, lin, {})["verdict"] == "仅条文"
+    # outside L1.5S a visible anchor is enough
+    l1 = {"conventions": [{"id": 1}], "datasets": [{"name": "retail.FactOnlineSales", "columns": []}], "metrics": []}
+    assert CC.convention_row(conv, "SQL-L1", l1, lin, {})["verdict"] == "对象"
+
+
+def test_every_sales_summary_table_says_which_sales_it_comes_from() -> None:
+    from render import check_conventions as CC
+    if not (REPO / "build" / "contexts" / "SQL-L1.5S.yaml").exists():
+        pytest.skip("contexts not rendered")
+    r = CC.run()
+    assert len(r["table_choice"]) == 12 and all(t["ok"] for t in r["table_choice"]), r["table_choice"]
+    for n in (1, 2):
+        assert all(x["verdict"] == "对象" for x in r["conventions"] if x["convention"] == n)
+    assert all(x["dax"] and x["cube"] and x["contexts_agree"] for x in r["dax_vs_cube"])
