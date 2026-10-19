@@ -35,7 +35,7 @@
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
-| T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 第一步完成（2026-10-19，0 元）：`harness/run_plan.py`、工具说明 `harness/plan_prompt.py`（待冻结 `harness-plan-v1`）、Docker Python 沙箱（隔离实测全部失败，证据在卡里）；测试 45 条通过；小样本估算 3.62 元超上限，待用户定 |
+| T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 小样本完成（2026-10-19，`20261019-T21-pilot-01`，1.18 元）：同 24 题 L0-P 50.0%（L0-E 38.9%）、L1-P 58.3%（L1-E 75.0%）；Python 0/48。分析发现 -P 同时改了规划、Python、按需检索与次数上限（12 对 8），L1 回退主要来自检索。**全量暂停，等用户裁决 `decisions/open-questions.md` T21-1（单元定义）、T21-2（L1 指标文字比 L2 实现模糊）**；假设全表 `reports/hypotheses.md` |
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | 未开始；排在 DAX 线之前 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
