@@ -84,6 +84,8 @@ def test_mock_end_to_end_real_questions(tmp_path):
     pick = _pick(recs, manifest)
     questions = {q.qid: q for q in load_questions(EVAL)}
     chosen = [questions[qid] for qid in pick.values()]
+    if R.invalid_rules(chosen):                # a bank written for the old scorer (before eval-v1.2)
+        pytest.skip(f"bank rules predate scorer v2: {R.invalid_rules(chosen)[0]}")
     role = {questions[qid].text: r for r, qid in pick.items()}
 
     def ref_values(qid: str, index: int, drop_last: bool = False) -> str:
@@ -127,7 +129,7 @@ def test_mock_end_to_end_real_questions(tmp_path):
                    "grouped_missing_row": ("wrong", "wrong"), "judge": ("pending", "pending")}
     # the second reference matched under its own rules (question-level rules have a different width)
     assert out[pick["multi_ref2"]]["final"]["matched_ref"] == 1
-    assert out[pick["grouped_missing_row"]]["final"]["reason"].startswith("selection_")
+    assert out[pick["grouped_missing_row"]]["final"]["reason"] == "selection"   # scorer v2 reason code (spec §1.4)
     assert out[pick["judge"]]["final"]["pending"] == "judge"
     assert out[pick["fixed"]]["n_calls"] == 2
     for q in chosen:                       # no question text in the committed log

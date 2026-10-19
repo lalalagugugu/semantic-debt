@@ -261,7 +261,7 @@
 |---|---|---|---|---|---|
 | Q17（低区分度） | v4-pro | r3 | wrong | 语义层差距 | 照约定 4 用日均销售算占比（50.01/49.99），参考按合计（28.47/71.53）；约定 4 没说占比类问题不适用，调优候选 |
 | Q34 | flash | r2 | wrong | SQL 真错 | 只列 2009 年有销售的产品（2,504 行），漏了 4 个有库存、无销售、周转率为 0 的产品（eval-v1.1 已收）；其余数值一致 |
-| Q34 | flash | r3 | exec_error | 执行错误/超时/拒答 | 修一次后仍引用 CTE 里不存在的 ProductKey（UNKNOWN_IDENTIFIER） |
+| Q34 | flash | r3 | exec_error | 执行错误/超时/拒答 | 修一次后仍引用了不存在的列（engine_error · sha256:e5e70d16700dc29c） |
 | Q34 | v4-pro | r3 | wrong | SQL 真错 | 同 Flash r2 漏 4 个周转率为 0 的产品；另外只给键、没给名称（展示差异，不单独计） |
 | Q40（judge） | flash | r1 | refused | 执行错误/超时/拒答 | judge 题，拒答：L1 写着汇率表用不上，且缺日汇率没有约定（semantic-v1.2 已改） |
 | Q40（judge） | flash | r2 | refused | 执行错误/超时/拒答 | 同上 |
@@ -269,11 +269,11 @@
 | Q40（judge） | v4-pro | r2 | refused | 执行错误/超时/拒答 | 同上 |
 | Q40（judge） | v4-pro | r3 | refused | 执行错误/超时/拒答 | 同上 |
 | Q49 | flash | r1 | wrong | 语义层差距 | 集团实体父键指向自身，L1 没写；按层级汇总时集团算两次（17,884,462,022.63 对 12,413,657,608.89）；另输出成按层级的 4 行合计 |
-| Q49 | flash | r2 | exec_error | 执行错误/超时/拒答 | 递归 CTE 撞 1000 层上限（TOO_DEEP_RECURSION），根因同上：集团自环（语义层差距） |
+| Q49 | flash | r2 | exec_error | 执行错误/超时/拒答 | 递归查询撞上引擎的递归层数上限，根因同上：集团自环（语义层差距）（engine_error · sha256:a531bbe69c441ad8） |
 | Q49 | flash | r3 | wrong | 语义层差距 | 420 行中 417 行一致，3 个集团因自环重复计算 |
 | Q49 | v4-pro | r1 | wrong | 语义层差距 | 集团金额对，但没有州的门店归进一个 N/A「州」，多 1 行；根因同上（层级结构 L1 没写全） |
 | Q49 | v4-pro | r2 | wrong | 语义层差距 | 3 个集团因自环重复计算 |
-| Q49 | v4-pro | r3 | exec_error | 执行错误/超时/拒答 | 修一次后仍引用子查询外不可见的 EntityKey（UNKNOWN_IDENTIFIER） |
+| Q49 | v4-pro | r3 | exec_error | 执行错误/超时/拒答 | 修一次后仍引用了子查询外不可见的列（engine_error · sha256:6726726953d5b5e9） |
 | Q69（低区分度） | flash | r1 | wrong | 参考问题 | 题目退化（低区分度，已标）：按 PromotionCategory 排除无折扣后只剩 1 行，作答改按促销名分组（9 行）；作答针对旧题面 |
 | Q69（低区分度） | flash | r2 | wrong | 参考问题 | 同上 |
 | Q69（低区分度） | flash | r3 | wrong | 参考问题 | 同上 |
@@ -289,8 +289,8 @@
 | Q76（低区分度） | v4-pro | r2 | wrong | 语义层差距 | 同上 |
 | Q82 | flash | r2 | wrong | SQL 真错 | dateDiff('year') 取整年，平均任期 10.01 对参考 10.83 |
 | Q82 | v4-pro | r3 | wrong | 语义层差距 | 把「团队」理解为全部下级（含间接下属）算平均任期，参考只算直属下属；直属人数全对。「团队」算直属还是全部下级是组织口径，L1 没写；调优候选，不补参考（用户裁决） |
-| Q117 | flash | r1 | exec_error | 执行错误/超时/拒答 | 修一次后仍引用不存在的 StoreKey（UNKNOWN_IDENTIFIER） |
-| Q117 | v4-pro | r1 | exec_error | 执行错误/超时/拒答 | 同上 |
+| Q117 | flash | r1 | exec_error | 执行错误/超时/拒答 | 修一次后仍引用了不存在的列（engine_error · sha256:3ff8a407800785d7） |
+| Q117 | v4-pro | r1 | exec_error | 执行错误/超时/拒答 | 同上（engine_error · sha256:1f2183c586acf87a） |
 
 ### 归因：SQL-R（语义层差距即「缺约定（档位差距）」：约定写在 L1，R 没有）
 

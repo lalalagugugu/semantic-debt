@@ -25,8 +25,8 @@ from harness.scorer import REFUSAL, ExecError  # noqa: E402
 from tests.test_harness import QTEXT, FakeExecutor, _ctx, _scripted  # noqa: E402
 
 RULES = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other", "count"],
-         "value_types": ["String", "UInt64"]}
-OWN = {**RULES, "ordered": True}
+         "value_types": ["String", "UInt64"], "required_columns": [0, 1]}
+OWN = {**RULES, "ordered": True, "order_by": [{"column": 1, "descending": True}]}
 QA = Question("Q001", QTEXT, refs=[[["a", 7], ["b", 1.5]], [["a", 7]]], rules=RULES, ref_rules=[None, OWN])
 QJ = Question("Q002", "另一道题", refs=[[["x", 1]]], rules=RULES, scoring="judge")
 
@@ -46,8 +46,27 @@ def same(a, b) -> bool:
                                math.nan, math.inf, -math.inf, date(2024, 1, 2),
                                datetime(2024, 1, 2, 3, 4, 5), Decimal("1.230")])
 def test_values_round_trip_with_their_types(v):
-    back = C.decode_value(json.loads(json.dumps(C.encode_value([[v]]), allow_nan=False)))
+    back = C.decode_value(json.loads(json.dumps(C.encode_rows([[v]]), allow_nan=False)))
     assert same(back, [[v]])
+
+
+def test_array_cells_are_tagged_and_decode_to_lists():
+    """Scorer spec v2 §12 (corpus) / §13 连带: an Array or Tuple cell is {"$array": [...]}, never a
+    bare nested list that could be read as a row."""
+    rows = [[1, [2, "x"], (3, (4,))]]
+    encoded = C.encode_rows(rows)
+    assert encoded == [[1, {"$array": [2, "x"]}, {"$array": [3, {"$array": [4]}]}]]
+    assert C.decode_value(json.loads(json.dumps(encoded))) == [[1, [2, "x"], [3, [4]]]]
+    with pytest.raises(ValueError):
+        C.decode_value({"$array": "not a list"})
+
+
+def test_load_corpus_decodes_array_cells(tmp_path):
+    case = {"case_id": "x/1", "candidate": [[{"$array": [1, 2]}]], "refs": [[[{"$array": [1, 2]}]]]}
+    path = tmp_path / "c.jsonl"
+    path.write_text(json.dumps(case) + "\n", encoding="utf-8")
+    (c,) = C.load_corpus(path)
+    assert c["candidate"] == [[[1, 2]]] and c["refs"] == [[[[1, 2]]]]
 
 
 def test_candidate_kinds_round_trip():

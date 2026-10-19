@@ -63,7 +63,9 @@ JWT，SQL 开发模式接受任意非空认证响应。两个接口都绑定 loo
 | `rescore.py` | T11、T12 | 离线重评：从 runs-raw 的执行结果重建候选（核 sha256），按当前题库重评，写进新 run 目录；`--eval-tag` 校验题库是该 tag 的内容；题干变过的行默认拒绝，只有显式 `--allow-changed-question` 才照评并在行内标 `question_changed`（T12 最终重评只用于 Q69） |
 | `run_direct.py` | T11 | 直答：一次调用写出查询；执行报错时发回报错、固定修一次。日志、断点续跑、`--dry-run`、并发 |
 | `run_agent.py`、`agent_prompt.py` | T15 | 探查 agent（-E）：直答系统消息逐字节 + 一段工具说明（`agent_prompt.py`，`harness-agent-v1` 冻结）；只读工具 `run_sql` 过与最终查询相同的检查，每次回显至多 50 行（截断时写明总行数），最多 8 次；用完时发一条固定用户消息「run_sql 次数已用完…」（T15-1，`harness-agent-v1.1`），之后 `tool_choice: "none"` 强制交卷；最终答案照直答规则执行、修一次、限时打分。日志另记 `steps`。见 `tasks/T15-explorer-agent.md` |
-| `scorer.py` | T02（Codex 写） | 确定性结果集评分器（纯函数，不执行查询） |
+| `scorer_v2.py` | T02（Codex 写） | **harness-v1.1 起的评分器**：按 `decisions/2026-10-18-scorer-spec-v2.md` 重写的确定性结果集评分器（纯函数，不执行查询，有耗时上限）。`run_direct`（直答与探查 agent 共用的 `score_question` / `final_score`）、`score_guard.py` 的子进程打分、`rescore.py`、`scorer_corpus.py` 都用它。除四种判定外可能给 `unscored`（规格第六节第 5 条，`mapping_cap`）：不是判定，和 `pending` 一样不进准确率、单列。开跑前用 v2 校验所选题目的全部 `rules`（`run_direct.invalid_rules`），有不接受的就拒绝启动；`--eval-tag` 默认改为 `eval-v1.2`（第一个按 v2 写 `rules` 的题库，规格第九节）。锚点规则若写于 `required_columns` 出现之前（继承的 eval-v1 规则、题库为原始参考写的规则），原意是全部列必答，加载时写成显式的全部列，评分口径不变；EN44（judge）的原始参考含 `inf`，v2 不认非有限值相等，自比失败、规则置空，仍按 judge 待评 |
+| `scorer.py` | T02（Codex 写） | harness-v1 的评分器，**只留作对照**（与 `harness-v1` 逐字节相同），运行与重评不再调用 |
+| `redact.py` | T12 | 写进 `reports/` 的执行错误只留错误类别和报错原文的哈希（规格 v2 第十三节连带）；`test_reports_hold_no_raw_engine_message` 扫 `reports/` 确认没有引擎报错原文 |
 | `exec_dax.py` | T17 | Windows 上经 ADOMD.NET 执行 DAX |
 
 ### 英文锚点的规则来源

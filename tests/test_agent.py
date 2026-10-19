@@ -32,7 +32,8 @@ needs_chdb = pytest.mark.skipif(not CHDB.exists(), reason="chDB data directory n
 
 QTEXT = "这是一个绝不能进入日志的探查问题原文"
 Q = Question("Q001", QTEXT, refs=[[[42]]], rules={"ordered": False, "top_n": None, "tie_columns": [],
-                                                    "value_kinds": ["count"], "value_types": ["UInt64"]})
+                                                    "value_kinds": ["count"], "value_types": ["UInt64"],
+                                                    "required_columns": [0]})
 ANSWER = "```sql\nSELECT 42\n```\n假设：无"
 
 

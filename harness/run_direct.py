@@ -10,16 +10,19 @@ Raw responses  $SEMDEBT_DATA_DIR/runs-raw/<run-id>/<cell>/   full API responses 
                                                      the log keeps their sha256
 
 The question bank is read only from a fixed tag (``--eval-tag``, default
-``eval-v1``): ``$SEMDEBT_EVAL_DIR`` must be a clean checkout of exactly that tag,
-otherwise nothing starts (dry run included). ``--pilot`` restricts to T06's pilot
+``eval-v1.2``, the first bank whose rules scorer v2 accepts): ``$SEMDEBT_EVAL_DIR`` must be
+a clean checkout of exactly that tag, otherwise nothing starts (dry run included); nor does
+a run whose questions carry rules scorer v2 rejects (``invalid_rules``). ``--pilot`` restricts to T06's pilot
 sample. The semantic layer must be the content of a fixed tag too (``--semantic-tag``,
 default ``semantic-v1.2``): ``semantic/`` and ``render/`` equal the tag's tree and every
 built context the run sends is freshly rendered from them (harness/semantic_version.py).
 If one requested model answers with a second ``system_fingerprint`` within
 a run, the run stops (decisions/2026-10-17-model-version-fingerprint.md).
 
-Scoring never holds a run up: a returned row set is scored in a child process with a
-time limit (harness/score_guard.py, 10 s); a slower one is logged ``pending`` with
+Scoring is scorer v2 (``harness/scorer_v2.py``, decisions/2026-10-18-scorer-spec-v2.md;
+harness-v1.1). It may also answer ``unscored`` (spec §6.5, ``mapping_cap``): not a verdict,
+counted apart like ``pending``. Scoring never holds a run up: a returned row set is scored in a
+child process with a time limit (harness/score_guard.py, 10 s); a slower one is logged ``pending`` with
 reason ``score_timeout`` and rescored offline (harness.rescore). ``--backfill-from-raw``
 writes the missing lines of attempts that are complete in runs-raw (no model call).
 
@@ -58,7 +61,7 @@ from harness.executors import (  # noqa: E402
 )
 from harness.questions import Question  # noqa: E402
 from harness.score_guard import SCORE_TIMEOUT, SCORE_TIMEOUT_S, score_with_timeout  # noqa: E402
-from harness.scorer import REFUSAL, ExecError, score_detailed  # noqa: E402
+from harness.scorer_v2 import REFUSAL, ExecError, ScoreResult, score_detailed  # noqa: E402
 
 NO_QUERY = "no_query"
 BEIJING = ZoneInfo("Asia/Shanghai")
@@ -159,11 +162,12 @@ def _candidate(parsed: P.Parsed, result: ExecResult | None):
 
 
 PENDING = "pending"
+UNSCORED = "unscored"    # scorer v2, spec §6.5: mapping cap reached; not a verdict, reported apart
 
 
 def score_question(candidate, q: Question, score_timeout_s: float | None = SCORE_TIMEOUT_S) -> dict:
-    """Score with T02's scorer. ``rules`` and per-reference ``reference_rules``
-    go to it exactly as the question bank carries them.
+    """Score with scorer v2 (T02, harness/scorer_v2.py). ``rules`` and per-reference
+    ``reference_rules`` go to it exactly as the question bank carries them.
 
     A returned row set for a question that cannot be scored deterministically
     here (judge question, no rules, no refs) gets ``outcome = "pending"`` with the
@@ -176,8 +180,8 @@ def score_question(candidate, q: Question, score_timeout_s: float | None = SCORE
     offline rescoring. ``score_timeout_s=None`` scores in-process without a limit."""
     if q.pending and not isinstance(candidate, (ExecError, str)):
         return {"outcome": PENDING, "pending": q.pending, "reason": None, "matched_ref": None, "sensitivity": None}
-    if q.refs is None or q.rules is None:      # only exec_error / refusal reach here; rules are not consulted
-        s = score_detailed(candidate, [[]], {"ordered": False, "top_n": None})
+    if q.refs is None or q.rules is None:      # only exec_error / refusal reach here; nothing to compare
+        s = _without_reference(candidate)
     elif isinstance(candidate, (ExecError, str)) or score_timeout_s is None:
         s = score_detailed(candidate, q.refs, q.rules, reference_rules=q.ref_rules)
     else:
@@ -187,6 +191,16 @@ def score_question(candidate, q: Question, score_timeout_s: float | None = SCORE
                     "reason": None, "matched_ref": None, "sensitivity": None}
     return {"outcome": s.outcome, "reason": s.reason if s.outcome != "exec_error" else None,
             "matched_ref": s.matched_ref, "sensitivity": s.sensitivity}
+
+
+def _without_reference(candidate) -> ScoreResult:
+    """An execution error or a refusal needs no reference (v2 validates the rules of every
+    reference before looking at the candidate, so it is not called with a placeholder)."""
+    if isinstance(candidate, ExecError):
+        return ScoreResult("exec_error", candidate.message)
+    if isinstance(candidate, str) and candidate.strip() == REFUSAL:
+        return ScoreResult("refused")
+    raise TypeError("only an execution error or a refusal can be scored without a reference")
 
 
 def final_score(candidate, q: Question, error_class: str | None, limit: str | None) -> dict:
@@ -516,7 +530,7 @@ def summarize(path: Path) -> dict:
     recs = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     done = [r for r in recs if r.get("status") == "done"]
     counts = _count(r["final"]["outcome"] for r in done)
-    pending = counts.get(PENDING, 0)
+    pending = counts.get(PENDING, 0) + counts.get(UNSCORED, 0)     # neither is a verdict
     scored = len(done) - pending
     turns = [t for r in done for t in r["turns"]]
     tokens = {k: sum(r["usage"].get(k, 0) for r in done) for k in
@@ -654,7 +668,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--exec-timeout", type=int, default=DEFAULT_EXEC_TIMEOUT_S, help="seconds per query execution")
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
-    ap.add_argument("--eval-tag", default="eval-v1",
+    ap.add_argument("--eval-tag", default="eval-v1.2",
                     help="the question bank must be a clean checkout of this tag (BOARD item 13)")
     ap.add_argument("--anchor-rules-tag", default="eval-v1",
                     help="English anchors inherit the Chinese questions' rules from this bank tag, never from the "
@@ -681,6 +695,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if not args.dry_run and not args.run_id:
         ap.error("--run-id is required unless --dry-run")
     return args
+
+
+def invalid_rules(questions: list[Question]) -> list[str]:
+    """Questions whose rules scorer v2 rejects (spec §2: missing or unknown fields, identity
+    columns not required, ...), as ``"<qid>: <error>"``. Checked before a run starts, so that
+    a bank written for the old scorer stops the run instead of failing every attempt.
+    Questions without references or rules are pending anyway and not checked."""
+    bad = []
+    for q in questions:
+        if q.refs is None or q.rules is None:
+            continue
+        try:                                   # v2 validates every reference's rules before the candidate
+            score_detailed(REFUSAL, q.refs, q.rules, reference_rules=q.ref_rules)
+        except (ValueError, TypeError) as exc:
+            bad.append(f"{q.qid}: {exc}")
+    return bad
 
 
 def select_questions(questions: list[Question], args: argparse.Namespace, pilot: list[str] | None = None) -> list[Question]:
@@ -734,6 +764,12 @@ def main(argv: list[str] | None = None, load=None) -> int:
     if "en" in by_lang:
         print(f"anchor rules: {args.anchor_rules_tag} = "
               f"{next((q.meta['rules_tag']['commit'] for q in by_lang['en'] if 'rules_tag' in q.meta), '—')}")
+    bad = [b for qs in by_lang.values() for b in invalid_rules(qs)]
+    if bad:
+        print(f"refusing to start: scorer v2 rejects the rules of {len(bad)} question(s) in {args.eval_tag}:")
+        for b in bad:
+            print(f"  {b}")
+        return 2
 
     if args.backfill_from_raw:
         import types
