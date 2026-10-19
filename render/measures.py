@@ -21,7 +21,7 @@ These differences are engine capability limits, recorded in render/README.md.
 
 from __future__ import annotations
 
-from render.common import metrics_file
+from render.common import metrics_file, source, variant_callables, variant_key
 
 AS_OF = "2009-12-31"
 
@@ -33,6 +33,8 @@ def _names() -> dict[tuple[str, str], tuple[str, str]]:
         out[(m["name"], m["dataset"])] = (m["dax_measure"][1:-1], m["cube_member"])
         if m.get("alternate_dataset"):
             out[(m["name"], m["alternate_dataset"])] = (m["alternate_dax_measure"][1:-1], m["alternate_cube_member"])
+        for vid, ds, dax, cube, _ in variant_callables(m):
+            out[(variant_key(m["name"], vid), ds)] = (dax[1:-1], cube)
     return out
 
 
@@ -241,6 +243,26 @@ def dax_measures() -> dict[tuple[str, str], tuple[str, str]]:
     out[("IT 成本", "FactITMachine")] = ("FactITMachine", "SUM ( 'FactITMachine'[CostAmount] )")
     out[("停机时长", "FactITSLA")] = ("FactITSLA", "SUM ( 'FactITSLA'[DownTime] )")
     out[("故障次数", "FactITSLA")] = ("FactITSLA", "COUNTROWS ( 'FactITSLA' )")
+
+    # Variants the L1 text states (metrics.yaml ``variants``; semantic-v1.4 range/variant check).
+    for t in ("FactOnlineSales", "FactSales"):
+        sales = D("销售额", t)
+        cats = (f"VAR _cats = CALCULATETABLE ( VALUES ( 'DimProductSubcategory'[ProductCategoryKey] ),\n"
+                f"    TREATAS ( VALUES ( 'DimProduct'[ProductSubcategoryKey] ), 'DimProductSubcategory'[ProductSubcategoryKey] ) )\n")
+        out[(variant_key("销售额占比", "品类内"), t)] = (t, cats + (
+            f"RETURN\n    DIVIDE ( {sales}, CALCULATE ( {sales}, REMOVEFILTERS ( 'DimProduct' ), "
+            f"REMOVEFILTERS ( 'DimProductSubcategory' ), _cats ) )"))
+        out[(variant_key("销售额环比增长率", "按季"), t)] = (t, (
+            f"VAR _cur = {sales}\n"
+            f"VAR _prev = CALCULATE ( {sales}, DATEADD ( 'DimDate'[DateKey], -1, QUARTER ) )\n"
+            "RETURN\n    DIVIDE ( _cur - _prev, _prev )"))
+    out[(variant_key("销售额占比", "渠道内"), "FactSales")] = ("FactSales", (
+        f"DIVIDE ( {D('销售额', 'FactSales')}, CALCULATE ( {D('销售额', 'FactSales')}, REMOVEFILTERS ( 'DimStore' ), "
+        "VALUES ( 'FactSales'[channelKey] ) ) )"))
+    for name, col in (("目标销售额", "SalesAmountQuota"), ("目标销量", "SalesQuantityQuota"), ("目标毛利", "GrossMarginQuota")):
+        out[(variant_key(name, "按查询场景"), "FactSalesQuota")] = ("FactSalesQuota", f"SUM ( {qt}[{col}] )")
+    out[(variant_key("计划收入", "按查询场景"), "FactStrategyPlan")] = (
+        "FactStrategyPlan", f"CALCULATE ( SUM ( {sp}[Amount] ), 'DimAccount'[AccountName] = \"Sale Revenue\" )")
     return out
 
 
@@ -465,6 +487,37 @@ def cube_measures() -> dict[tuple[str, str], list[dict]]:
     add("IT 成本", "FactITMachine", {"type": "sum", "sql": "{CUBE}.CostAmount"})
     add("停机时长", "FactITSLA", {"type": "sum", "sql": "{CUBE}.DownTime"})
     add("故障次数", "FactITSLA", {"type": "count"})
+
+    # Variants the L1 text states (metrics.yaml ``variants``). Parent-group shares drop the child
+    # levels from the denominator's grouping (reduce_by) and keep every other dimension and filter.
+    def dims(dataset: str, cube: str) -> list[str]:
+        ds = next(d for d in source()["datasets"] if d["name"] == dataset)
+        return [f"{cube}.{col['name']}" for col in ds["columns"]]
+
+    for t, own in (("FactOnlineSales", "online_sales"), ("FactSales", "sales")):
+        c = lambda name: C(name, t)  # noqa: E731
+        product_levels = [f"{own}.ProductKey", *dims("DimProduct", "product"),
+                          *dims("DimProductSubcategory", "product_subcategory")]
+        add(variant_key("销售额占比", "品类内"), t,
+            {"type": "number", "multi_stage": True, "sql": f"{c('销售额')} / nullIf({{sales_amount_in_category}}, 0)"},
+            {"name": "sales_amount_in_category", "type": "sum", "multi_stage": True, "sql": c("销售额"),
+             "reduce_by": product_levels, "public": False})
+        add(variant_key("销售额环比增长率", "按季"), t,
+            {"type": "number", "multi_stage": True,
+             "sql": f"({c('销售额')} - {{sales_amount_prior_quarter}}) / nullIf({{sales_amount_prior_quarter}}, 0)"},
+            {"name": "sales_amount_prior_quarter", "type": "number", "multi_stage": True, "sql": c("销售额"),
+             "time_shift": [{"time_dimension": "DateKey", "interval": "1 quarter", "type": "prior"}], "public": False})
+    c = lambda name: C(name, "FactSales")  # noqa: E731
+    add(variant_key("销售额占比", "渠道内"), "FactSales",
+        {"type": "number", "multi_stage": True, "sql": f"{c('销售额')} / nullIf({{sales_amount_in_channel}}, 0)"},
+        {"name": "sales_amount_in_channel", "type": "sum", "multi_stage": True, "sql": c("销售额"),
+         "reduce_by": ["sales.StoreKey", *dims("DimStore", "store")], "public": False})
+    quota_rows = [{"sql": "{CUBE}.IsQuotaRow = 1"}]
+    add(variant_key("目标销售额", "按查询场景"), q, {"type": "sum", "sql": "{CUBE}.SalesAmountQuota", "filters": quota_rows})
+    add(variant_key("目标销量", "按查询场景"), q, {"type": "sum", "sql": "{CUBE}.SalesQuantityQuota", "filters": quota_rows})
+    add(variant_key("目标毛利", "按查询场景"), q, {"type": "sum", "sql": "{CUBE}.GrossMarginQuota", "filters": quota_rows})
+    add(variant_key("计划收入", "按查询场景"), sp, {"type": "sum", "sql": "{CUBE}.Amount",
+                                              "filters": [{"sql": "{CUBE}.AccountName = 'Sale Revenue'"}]})
     return out
 
 

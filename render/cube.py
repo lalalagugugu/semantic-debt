@@ -23,7 +23,10 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from render.common import BUILD, CUBE_NAMES, CUBE_TYPES, dump_yaml, logical_type, metrics_file, physical_schema, source  # noqa: E402
+from render.common import (  # noqa: E402
+    BUILD, CUBE_NAMES, CUBE_TYPES, dump_yaml, logical_type, metrics_file, physical_schema, source, variant_callables,
+    variant_key,
+)
 from render.measures import CUBE_SQL, cube_measures  # noqa: E402
 
 OUT_DIR = BUILD / "cube" / "model" / "cubes"
@@ -44,13 +47,16 @@ def build_model() -> dict[str, dict]:
         pairs = [(m["dataset"], m["cube_member"])]
         if m.get("alternate_dataset"):
             pairs.append((m["alternate_dataset"], m["alternate_cube_member"]))
-        for dataset, member in pairs:
+        items = [(m["name"], dataset, member, m["name"], m["definition"]) for dataset, member in pairs]
+        items += [(variant_key(m["name"], vid), dataset, member, f"{m['name']}（{vid}）", f"{m['definition']} 本成员：{scope}。")
+                  for vid, dataset, _, member, scope in variant_callables(m)]
+        for key, dataset, member, title, description in items:
             cube, name = member.split(".", 1)
-            specs = measures[(m["name"], dataset)]
+            specs = measures[(key, dataset)]
             public = dict(specs[0])
             if public.pop("name") != name:
                 raise ValueError(f"{member} 的实现名字对不上")
-            public = {"name": name, "title": m["name"], "description": m["definition"], **public}
+            public = {"name": name, "title": title, "description": description, **public}
             for spec in [public, *specs[1:]]:
                 existing = {x["name"]: x for x in by_cube.setdefault(cube, [])}
                 if spec["name"] in existing:

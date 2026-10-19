@@ -199,6 +199,17 @@ def metric_callables(m: dict) -> list[tuple[str, str, str]]:
     return out
 
 
+def variant_key(metric: str, variant_id: str) -> str:
+    """Key of a variant callable in the (metric, dataset) maps: ``<指标>｜<变体>``."""
+    return f"{metric}｜{variant_id}"
+
+
+def variant_callables(m: dict) -> list[tuple[str, str, str, str, str]]:
+    """(variant id, dataset, dax_measure, cube_member, scope) for each variant the L1 text states
+    (metrics.yaml ``variants``: share scopes, period lengths, scenario; semantic-v1.4)."""
+    return [(v["id"], v["dataset"], v["dax_measure"], v["cube_member"], v["scope"]) for v in m.get("variants") or []]
+
+
 class _Dumper(yaml.SafeDumper):
     pass
 
