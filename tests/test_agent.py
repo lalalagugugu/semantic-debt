@@ -427,6 +427,20 @@ def test_cli_gates_l2_e_and_requires_a_run_id():
         AG.parse_args(["--cell", "SQL-L1", "--dry-run"])
 
 
+def test_skip_judge_leaves_judge_questions_out_of_the_dry_run(capsys):
+    from dataclasses import replace
+
+    questions = [Q, replace(Q, qid="Q002", scoring="judge"), replace(Q, qid="Q003")]
+    load = lambda lang: questions  # noqa: E731
+    argv = ["--cell", "SQL-L1-E", "--dry-run", "--reps", "1", "--est-from-args"]
+    assert AG.main(argv, load=load) == 0
+    with_judge = capsys.readouterr().out
+    assert AG.main([*argv, "--skip-judge"], load=load) == 0
+    without = capsys.readouterr().out
+    attempts = lambda out: next(l.split()[1] for l in out.splitlines() if l.startswith("SQL-L1-E"))  # noqa: E731
+    assert (attempts(with_judge), attempts(without)) == ("3", "2")
+
+
 def test_verify_file_at_tag(tmp_path):
     root = tmp_path / "repo"
     (root / "harness").mkdir(parents=True)
