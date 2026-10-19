@@ -202,11 +202,22 @@ def _syntax_files() -> dict[str, str]:
     return {p.name: p.read_text(encoding="utf-8") for p in sorted(SYNTAX.glob("*.md"))}
 
 
-def test_four_syntax_notes_within_ten_percent() -> None:
+def test_syntax_note_lengths(record_property) -> None:
+    """Lengths of the four syntax notes (characters, whitespace removed).
+
+    Stacks may differ in length (decisions/2026-10-19-self-built-p-and-cube-notes.md §五,
+    open question T12-4): the target is teaching depth 2, rules plus conditions and pitfalls.
+    The two Cube notes are at depth 2 and are exempt from the old equal-length rule (T10:
+    within 10 %). ClickHouse (depth 1 in phase 1) and DAX are still held to it until DAX is
+    raised to depth 2 before it runs; then this check goes too. All four lengths are recorded
+    as test properties (``--junitxml``) and in the failure message."""
     files = _syntax_files()
     assert set(files) == {"clickhouse_sql.md", "cube_sql.md", "dax.md", "cube_json.md"}
-    sizes = [len(re.sub(r"\s", "", t)) for t in files.values()]
-    assert max(sizes) / min(sizes) <= 1.10
+    sizes = {name: len(re.sub(r"\s", "", text)) for name, text in files.items()}
+    for name, n in sizes.items():
+        record_property(f"syntax_chars_{name}", n)
+    a, b = sizes["clickhouse_sql.md"], sizes["dax.md"]
+    assert max(a, b) / min(a, b) <= 1.10, sizes
 
 
 def test_syntax_notes_say_nothing_about_this_dataset() -> None:
