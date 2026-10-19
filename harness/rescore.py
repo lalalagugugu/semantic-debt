@@ -33,6 +33,7 @@ import argparse
 import json
 import sys
 from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 
 if __package__ in (None, ""):
@@ -58,7 +59,13 @@ def candidate_of(turn: dict, raw_dir: Path, qid: str, rep: int):
     payload = json.loads(data)
     if payload["error"] is not None:
         return ExecError(payload["error"] or "execution error")
-    return payload["rows"]
+    # Cube JSON converts annotated numbers to int/Decimal at execution time.
+    # Decimal is serialized as text in runs-raw; restore only annotated numeric
+    # columns, leaving string dimensions (including numeric-looking IDs) intact.
+    columns = payload.get("columns", [])
+    return [[Decimal(value) if isinstance(value, str) and i < len(columns)
+             and columns[i].get("type") == "number" else value
+             for i, value in enumerate(row)] for row in payload["rows"]]
 
 
 def rescore_line(rec: dict, q: Question, raw_dir: Path, run_id: str, commit: str,

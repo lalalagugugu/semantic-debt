@@ -1208,6 +1208,28 @@ def test_run_scoring_uses_scorer_v2_in_process_and_in_the_child():
         assert R.score_question([[2008, 5]], YEAR, score_timeout_s=timeout)["outcome"] == "correct"
 
 
+def test_rescore_restores_cube_numbers_without_coercing_string_dimensions(tmp_path):
+    from decimal import Decimal
+    from harness import rescore as RS
+
+    payload = {"columns": [{"name": "cube.code", "type": "string"},
+                           {"name": "cube.value", "type": "number"}],
+               "rows": [["001", "12345678901234567890.125"], ["002", None], ["003", 7]],
+               "error": None}
+    data = json.dumps(payload).encode()
+    path = tmp_path / "Q001_r1_t0.exec.json"
+    path.write_bytes(data)
+    turn = {"turn": 0, "exec": {"status": "ok", "exec_raw_sha256": R.sha256(data)}}
+    candidate = RS.candidate_of(turn, tmp_path, "Q001", 1)
+    assert candidate == [["001", Decimal("12345678901234567890.125")], ["002", None], ["003", 7]]
+    assert path.read_bytes() == data
+    payload["columns"][1]["type"] = "string"
+    data = json.dumps(payload).encode()
+    path.write_bytes(data)
+    turn["exec"]["exec_raw_sha256"] = R.sha256(data)
+    assert RS.candidate_of(turn, tmp_path, "Q001", 1)[0][1] == "12345678901234567890.125"
+
+
 def test_rescore_uses_scorer_v2(tmp_path):
     from harness import rescore as RS
     respond, _ = _scripted("```sql\nSELECT 2009, 5\n```")
