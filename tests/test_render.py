@@ -427,3 +427,20 @@ def test_cube_variant_members_are_multi_stage_where_they_need_the_engine() -> No
                 assert helper["multi_stage"] and helper["reduce_by"] and helper["public"] is False
     shifted = [s for (key, _), specs in cube.items() if key == variant_key("销售额环比增长率", "按季") for s in specs[1:]]
     assert shifted and all(s["time_shift"][0]["interval"] == "1 quarter" for s in shifted)
+
+
+def test_reduce_by_refers_only_to_dimensions_the_cube_model_defines() -> None:
+    """T16 v1.4 round 1: reduce_by listed technical columns the model omits, so Cube could not load the
+    model. reduce_by is now built from the model's dimensions, and check_model rejects any other name."""
+    from render.cube import check_model
+    model = build_model()
+    for cube, body in model.items():
+        for m in body.get("measures", []):
+            for ref in m.get("reduce_by", []):
+                target, _, member = ref.partition(".")
+                assert member in {d["name"] for d in model[target]["dimensions"]}, (cube, m["name"], ref)
+    broken = copy.deepcopy(model)
+    helper = next(m for m in broken["sales"]["measures"] if m.get("reduce_by"))
+    helper["reduce_by"].append("product.ClassID")                 # a technical column: not a dimension
+    with pytest.raises(ValueError, match="reduce_by"):
+        check_model(broken)

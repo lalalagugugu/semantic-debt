@@ -14,15 +14,16 @@ Shared choices, written once here instead of per measure:
     or year). Cube's time_shift needs a fixed interval, so the Cube member shifts by
     one month (it is called *_mom_pct).
   - 新客 (convention 14): the cut-off is the last date of the query window, capped at
-    2009-12-31 in DAX. Both count every customer whose first purchase falls in the 90 days
-    (Cube: a trailing 90-day rolling window over first-purchase rows, semantic-v1.4); new
-    customers' sales are their sales inside the window.
+    2009-12-31. DAX counts every customer whose first purchase falls in the 90 days;
+    Cube only sees customers with rows in the window. Counting the full set in Cube (a
+    trailing 90-day rolling window) fails on Cube 1.8.6 with ClickHouse (T16, v1.4 round 1),
+    so it stays an interface limitation (l15s-reporting ruling §四.3).
 These differences are engine capability limits, recorded in render/README.md.
 """
 
 from __future__ import annotations
 
-from render.common import metrics_file, source, variant_callables, variant_key
+from render.common import cube_dimension_names, metrics_file, source, variant_callables, variant_key
 
 AS_OF = "2009-12-31"
 
@@ -423,12 +424,7 @@ def cube_measures() -> dict[tuple[str, str], list[dict]]:
     add("有流失风险客户数", o, {"type": "count_distinct", "sql": "{CUBE}.CustomerKey",
                          "filters": _f(f"{recency} >= 7 AND {recency} <= 12")})
     add("已流失客户数", o, {"type": "count_distinct", "sql": "{CUBE}.CustomerKey", "filters": _f(f"{recency} > 12")})
-    # Convention 14 counts every customer whose first purchase falls in the 90 days up to the cut-off,
-    # whether or not they bought again inside the query window (the reference reading; T16 alignment
-    # list). A trailing 90-day rolling window over first-purchase rows ends at each period's last day.
-    add("新客数", o, {"type": "count_distinct", "sql": "{CUBE}.CustomerKey",
-                    "filters": _f("{CUBE}.DateKey = {CUBE}.FirstPurchaseDate"),
-                    "rolling_window": {"trailing": "90 day", "offset": "end"}})
+    add("新客数", o, {"type": "number", "sql": f"length(arrayDistinct(arrayMap(t -> t.1, {new_rows})))"})
     add("新客销售额", o, {"type": "number", "sql": f"arraySum(arrayMap(t -> t.3, {new_rows}))"})
     add("新客销售额占比", o, {"type": "number", "sql": f"{c('新客销售额')} / nullIf({c('销售额')}, 0)"})
 
@@ -505,8 +501,9 @@ def cube_measures() -> dict[tuple[str, str], list[dict]]:
     # Variants the L1 text states (metrics.yaml ``variants``). Parent-group shares drop the child
     # levels from the denominator's grouping (reduce_by) and keep every other dimension and filter.
     def dims(dataset: str, cube: str) -> list[str]:
+        """Every dimension the cube model defines for this dataset (technical columns are not dimensions)."""
         ds = next(d for d in source()["datasets"] if d["name"] == dataset)
-        return [f"{cube}.{col['name']}" for col in ds["columns"]]
+        return [f"{cube}.{name}" for name in cube_dimension_names(ds)]
 
     for t, own in (("FactOnlineSales", "online_sales"), ("FactSales", "sales")):
         c = lambda name: C(name, t)  # noqa: E731

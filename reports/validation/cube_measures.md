@@ -23,14 +23,14 @@ ClickHouse SQL：每个 cube 的 `sql` 与每个指标的聚合表达式（含 f
 | `sales.store_count` | 全量 | 306 | 306 | 0.00e+00 | 门店数.note | 通过 |
 | `sales.average_daily_sales_amount` | 2009 平日 | 1.02609e+07 | 1.02609e+07 | 2.58e-10 | 日均销售额.note（2009 平日） | 通过 |
 | `inventory.current_on_hand_quantity` | 全量 | 1.18977e+07 | 1.18977e+07 | 0.00e+00 | 当前在手库存数量.note | 通过 |
-| `inventory.current_on_hand_value` | 全量 | 1.2913e+09 | 1.2913e+09 | 0.00e+00 | 当前在手库存金额.note | 通过 |
+| `inventory.current_on_hand_value` | 全量 | 1.2913e+09 | 1.2913e+09 | 3.69e-16 | 当前在手库存金额.note | 通过 |
 | `inventory.current_on_order_quantity` | 全量 | 494,285 | 494,285 | 0.00e+00 | 当前在订库存数量.note | 通过 |
 | `inventory.below_safety_stock_count` | 全量 | 89,591 | 89,591 | 0.00e+00 | 低于安全库存的门店产品数.note | 通过 |
 | `inventory.store_product_pair_count` | 全量 | 600,241 | 600,241 | 0.00e+00 | 门店产品组合数.note | 通过 |
 | `sales_quota.sales_amount_quota` | 全量 | 1.06675e+10 | 1.06675e+10 | 7.47e-14 | 目标销售额.note | 通过 |
 | `sales_quota.sales_quantity_quota` | 全量 | 4.43001e+07 | 4.43001e+07 | 0.00e+00 | 目标销量.note | 通过 |
 | `sales_quota.quota_attainment_pct` | 2009 | 1.21256 | 1.21256 | 2.11e-12 | 目标达成率.note（2009） | 通过 |
-| `strategy_plan.plan_revenue` | 全量 | 1.15487e+10 | 1.15487e+10 | 6.94e-14 | 计划收入.note | 通过 |
+| `strategy_plan.plan_revenue` | 全量 | 1.15487e+10 | 1.15487e+10 | 6.92e-14 | 计划收入.note | 通过 |
 | `it_machine.it_cost` | 全量 | 2.40766e+08 | 2.40766e+08 | 0.00e+00 | IT 成本.note | 通过 |
 | `it_sla.down_time` | 全量 | 396,699 | 396,699 | 0.00e+00 | 停机时长.note | 通过 |
 | `it_sla.outage_count` | 全量 | 4,925 | 4,925 | 0.00e+00 | 故障次数.note | 通过 |

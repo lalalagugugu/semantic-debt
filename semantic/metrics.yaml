@@ -661,7 +661,7 @@ metrics:
     dataset: FactSalesQuota
     variants:   # L1：「默认取预算场景」；主调用名固定为预算场景
       - id: "按查询场景"
-        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）"
+        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组"
         dataset: FactSalesQuota
         dax_measure: "[Sales Amount Quota By Scenario]"
         cube_member: "sales_quota.sales_amount_quota_by_scenario"
@@ -677,7 +677,7 @@ metrics:
     dataset: FactSalesQuota
     variants:   # L1：「默认取预算场景」；主调用名固定为预算场景
       - id: "按查询场景"
-        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）"
+        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组"
         dataset: FactSalesQuota
         dax_measure: "[Sales Quantity Quota By Scenario]"
         cube_member: "sales_quota.sales_quantity_quota_by_scenario"
@@ -693,7 +693,7 @@ metrics:
     dataset: FactSalesQuota
     variants:   # L1：「默认取预算场景」；主调用名固定为预算场景
       - id: "按查询场景"
-        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）"
+        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组"
         dataset: FactSalesQuota
         dax_measure: "[Gross Margin Quota By Scenario]"
         cube_member: "sales_quota.gross_margin_quota_by_scenario"
