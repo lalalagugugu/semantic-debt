@@ -606,7 +606,7 @@ def _selection_filter(candidate, reference, parts, rule):
     return sorted(allowed)
 
 
-def _rank_variants(candidate, reference, parts, rule):
+def _rank_variants(candidate, reference, parts, rule, raw_reference=None):
     """Three whole-answer modes; position ranks checked by interval counts, never searched."""
     rankings = rule.get("rankings", [])
     if not rankings:
@@ -623,8 +623,13 @@ def _rank_variants(candidate, reference, parts, rule):
                 continue
             d = positions[col]
             groups = ranking["group_columns"]
-            if any(g not in positions for g in groups):
-                raise ValueError("rank group columns must be required to count candidate ranks")
+            def identity(row, columns):
+                dims = []
+                for column in columns:
+                    for index, part in enumerate(parts):
+                        if column in part.reference and index not in dims:
+                            dims.append(index)
+                return tuple(_canonical(row[index]) for index in dims)
             blocks = {(tuple(_norm(v) for v in b["group"]), b["rank"]): b for b in ranking["blocks"]}
             by_group = defaultdict(list)
             for (group, _), block in blocks.items():
@@ -632,9 +637,20 @@ def _rank_variants(candidate, reference, parts, rule):
             for group in by_group:
                 by_group[group].sort(key=lambda b: b["rank"])
             starts = {g: [b["rank"] for b in bs] for g, bs in by_group.items()}
-            used = defaultdict(Counter)
+            object_columns = ranking["object_columns"]
+            visible = {column for part in parts for column in part.reference}
+            row_objects = False
+            if not set(object_columns) <= visible and raw_reference is not None:
+                # When the reference has one row per ranking object, a row
+                # matching witness also proves distinct objects, even if their
+                # identifiers are not required output columns (e.g. pairs).
+                keys = [tuple(_norm(row[column]) for column in groups + object_columns)
+                        for row in raw_reference]
+                row_objects = len(keys) == len(set(keys))
+            used = defaultdict(lambda: defaultdict(set))
+            object_ranks = {}
             for i, row in enumerate(crows):
-                group = tuple(_canonical(row[positions[g]]) for g in groups)
+                group = identity(row, groups)
                 value = row[d]
                 if value[0] != _NUM or value[1] != int(value[1]):
                     valid = False
@@ -649,18 +665,23 @@ def _rank_variants(candidate, reference, parts, rule):
                     if rank >= b["rank"] + b["size"]:
                         valid = False
                         break
-                    used[(group, b["rank"])][rank] += 1
+                    obj = ("row", i) if row_objects else identity(row, object_columns)
+                    if (group, obj) in object_ranks and object_ranks[group, obj] != rank:
+                        valid = False
+                        break
+                    object_ranks[group, obj] = rank
+                    used[(group, b["rank"])][rank].add(obj)
                     crows[i] = row[:d] + ((_NUM, Decimal(b["rank"])),) + row[d + 1:]
             if style == "position":
                 for (group, rank), counts in used.items():
-                    size = sum(counts.values())
-                    if set(counts.values()) != {1} or (ranking["prefix"] and set(counts) != set(range(rank, rank + size))):
+                    size = sum(len(objects) for objects in counts.values())
+                    if any(len(objects) != 1 for objects in counts.values()) or (ranking["prefix"] and set(counts) != set(range(rank, rank + size))):
                         valid = False
             if not valid:
                 break
             if style == "dense":
                 for i, row in enumerate(rrows):
-                    group = tuple(_canonical(row[positions[g]]) for g in groups)
+                    group = identity(row, groups)
                     b = blocks.get((group, int(row[d][1])))
                     if b is None:
                         raise ValueError("rankings missing reference block")
@@ -704,12 +725,10 @@ def _check_mapping(candidate, reference, parts, rule):
         else:
             boundary = _key(reference[n - 1], rule["tie_columns"], rule)
             strict_count = next(i for i, row in enumerate(reference) if _key(row, rule["tie_columns"], rule) == boundary)
-    reason = "values"
-    for cv, rv, styles in _rank_variants(c, r, parts, rule):
-        # Metadata for rank columns remains exact after transforming a whole-answer mode.
+    def match_rows(cv, rv, metadata, pair_swaps):
         mandatory = None if top is None else rv[:strict_count]
-        if not _match(cv, rv, meta, mandatory, swaps):
-            continue
+        if not _match(cv, rv, metadata, mandatory, pair_swaps):
+            return "values"
         if not rule["ordered"]:
             return None
         blocks = _blocks(raw, rule)
@@ -722,18 +741,29 @@ def _check_mapping(candidate, reference, parts, rule):
             remaining -= count
         cm = [row + (("block", block),) for row, block in zip(cv, expected)]
         rm = [row + (("block", block),) for row, block in zip(rv, blocks)]
-        mm = meta + [("other", True, None)]
+        mm = metadata + [("other", True, None)]
         required = None if top is None else rm[:strict_count]
-        if _match(cm, rm, mm, required, swaps):
+        return None if _match(cm, rm, mm, required, pair_swaps) else "order"
+
+    reason = "values"
+    for cv, rv, styles in _rank_variants(c, r, parts, rule, raw):
+        failure = match_rows(cv, rv, meta, swaps)
+        if failure is None:
             return None
-        reason = "order"
+        if failure == "order":
+            reason = failure
     if rule.get("rankings") and reason == "values":
-        rank_dims = {i for i, p in enumerate(parts) if p.reference[0] in rule.get("rank_columns", [])}
-        if _match([tuple(x for d, x in enumerate(row) if d not in rank_dims) for row in c],
-                  [tuple(x for d, x in enumerate(row) if d not in rank_dims) for row in r],
-                  [m for d, m in enumerate(meta) if d not in rank_dims],
-                  None if top is None else [tuple(x for d, x in enumerate(row) if d not in rank_dims) for row in r[:strict_count]]):
+        keep = [i for i, p in enumerate(parts) if p.reference[0] not in rule.get("rank_columns", [])]
+        remap = {old: new for new, old in enumerate(keep)}
+        nonrank_swaps = [(tuple(remap[d] for d in left), tuple(remap[d] for d in right))
+                         for left, right in swaps]
+        failure = match_rows([tuple(row[d] for d in keep) for row in c],
+                             [tuple(row[d] for d in keep) for row in r],
+                             [meta[d] for d in keep], nonrank_swaps)
+        if failure is None:
             return "rank"
+        if failure == "order":
+            return failure
     return reason
 
 
@@ -747,15 +777,25 @@ def _rank_marginal(candidate, reference, metadata, rule, column):
         if cell[0] != _NUM or cell[1] != int(cell[1]):
             return False
         counts[int(cell[1])] += 1
-    competition, dense = Counter(), Counter()
+    # The same ranking object can occur on multiple output rows. These are
+    # row-multiplicity upper bounds; distinct-object constraints are checked once
+    # group/object columns have a full correspondence witness.
+    competition = Counter(int(row[0][1]) for row in reference if row[0][0] == _NUM)
+    dense, events = Counter(), Counter()
     for block in blocks:
-        competition[block["rank"]] += block["size"]
-        dense[block["dense"]] += block["size"]
-    starts = sorted(b["rank"] for b in blocks)
-    ends = sorted(b["rank"] + b["size"] for b in blocks)
-    # A necessary marginal only; whole-answer mode consistency is checked later.
-    return all(max(competition[value], dense[value],
-                   bisect_right(starts, value) - bisect_right(ends, value)) >= count
+        weight = competition[block["rank"]]
+        dense[block["dense"]] += weight
+        events[block["rank"]] += weight
+        events[block["rank"] + block["size"]] -= weight
+    points, weights, total = [], [], 0
+    for point, delta in sorted(events.items()):
+        total += delta
+        points.append(point)
+        weights.append(total)
+    def position_bound(value):
+        index = bisect_right(points, value) - 1
+        return weights[index] if index >= 0 else 0
+    return all(max(competition[value], dense[value], position_bound(value)) >= count
                for value, count in counts.items())
 
 
@@ -871,7 +911,7 @@ def _mappings(candidate, reference, rule, required):
 def _one(candidate, reference, rule, required):
     top = rule.get("top_n")
     if not reference:
-        return ScoreResult("correct") if not candidate else ScoreResult("wrong", "row_count")
+        return ScoreResult("correct") if not candidate else ScoreResult("wrong", "selection" if rule.get("selection") else "row_count")
     if top is not None and len(candidate) != min(top, len(reference)):
         return ScoreResult("wrong", "top_n_full_group" if len(candidate) == len(reference) > top else "row_count")
     zeros = top is None and not rule.get("selection") and any(rule["value_kinds"][i] == "count" for i in required)
@@ -897,7 +937,7 @@ def _one(candidate, reference, rule, required):
     if not candidate:
         dummy = tuple(Part((col,), (col,)) for col in required)
         projected = _project(reference, dummy, False, rule)
-        return ScoreResult("correct") if zeros and all(_zero(row, dummy, rule) for row in projected) else ScoreResult("wrong", "row_count")
+        return ScoreResult("correct") if zeros and all(_zero(row, dummy, rule) for row in projected) else ScoreResult("wrong", "selection" if rule.get("selection") else "row_count")
     # A direct correspondence can be proved by lossless full-row hashes without
     # constructing per-column indexes. A miss is not a rejection.
     if (not rule["ordered"] and top is None and not rule.get("selection") and not rule.get("rankings")
@@ -908,7 +948,9 @@ def _one(candidate, reference, rule, required):
         if lossless(candidate) == lossless(reference):
             return ScoreResult("correct")
     reason = "values"
+    mapped = False
     for count, parts in enumerate(_mappings(candidate, reference, rule, required)):
+        mapped = True
         if count == CAP:
             return ScoreResult("unscored", "mapping_cap")
         failure = _check_mapping(candidate, reference, parts, rule)
@@ -917,12 +959,32 @@ def _one(candidate, reference, rule, required):
         priority = {"values": 0, "order": 1, "selection": 2, "rank": 3}
         if priority.get(failure, 0) > priority[reason]:
             reason = failure
+    if not mapped and rule.get("selection"):
+        # Full-value pruning must not hide a failed identity/selection stage.
+        identity = sorted({col for stage in rule["selection"]["stages"]
+                           for col in stage["group_columns"] + stage["object_columns"]
+                           + [condition["column"] for condition in stage["where"]]})
+        identity_valid = False
+        for count, parts in enumerate(_mappings(candidate, reference, rule, identity)):
+            if count == CAP:
+                return ScoreResult("unscored", "mapping_cap")
+            projected = _project(candidate, parts, True, rule)
+            if _selection_filter(projected, reference, parts, rule) is not None:
+                identity_valid = True
+                break
+        if not identity_valid:
+            return ScoreResult("wrong", "selection")
     if reason == "values" and rule.get("rankings"):
         nonrank = tuple(i for i in required if i not in rule.get("rank_columns", []))
         if nonrank:
             projected_rule = {**rule, "required_columns": list(nonrank), "rankings": []}
-            if _one(candidate, reference, projected_rule, nonrank).outcome == "correct":
+            nonrank_result = _one(candidate, reference, projected_rule, nonrank)
+            if nonrank_result.outcome == "correct":
                 reason = "rank"
+            elif nonrank_result.outcome == "unscored":
+                return nonrank_result
+            elif nonrank_result.reason in ("order", "selection"):
+                reason = nonrank_result.reason
         else:
             reason = "rank"
     return ScoreResult("wrong", reason)

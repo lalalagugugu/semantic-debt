@@ -679,7 +679,7 @@ def test_v12_report_does_not_commit_execution_error_sql(tmp_path):
     message='synthetic failure containing SELECT private_value FROM private_table'
     case={'case_id':'synthetic/error','source':'synthetic','question_id':'S1',
           'candidate':{'exec_error':message},'refs':[[[1]]],'rules':[rules()],
-          'expected':{'outcome':'exec_error','reason':None}}
+          'expected':{'outcome':'exec_error','reason':message}}
     corpus=tmp_path/'cases.jsonl';corpus.write_text(json.dumps(case)+'\n')
     for runner in [run,run_shared]:
         out=tmp_path/'out.jsonl';report=tmp_path/'report.md'
@@ -706,7 +706,7 @@ def test_corpus_report_groups_by_case_id_suffix(tmp_path):
     assert '| t0 | 1 |' in report.read_text()
 
 
-def test_legacy_flip_evidence_checks_rank_and_null_identity():
+def test_legacy_flip_evidence_checks_null_identity_and_does_not_attribute_rank():
     from scripts.validate_scorer_v2 import explain_rejection
     rank_rule = rules(['String', 'UInt64'], rank_columns=[1], rankings=[{
         'column': 1, 'group_columns': [], 'object_columns': [0], 'prefix': False,
@@ -714,7 +714,7 @@ def test_legacy_flip_evidence_checks_rank_and_null_identity():
                    {'group': [], 'rank': 2, 'dense': 2, 'size': 1}]}])
     ref = [['a', 1], ['b', 2]]
     proof = explain_rejection([['a', 2], ['b', 1]], [ref], [rank_rule], 'rank')
-    assert proof[1]['status'] == 'singleton_rank_mismatch'
+    assert proof is None
     assert explain_rejection([['c', 2], ['b', 1]], [ref], [rank_rule], 'rank') is None
     selection_rule = rules(['String', 'String', 'Float64'], selection={
         'version': 1, 'output_order': [], 'stages': [{
@@ -724,3 +724,95 @@ def test_legacy_flip_evidence_checks_rank_and_null_identity():
     proof = explain_rejection([['invented', 'object', 10.0]], [ref], [selection_rule], 'values')
     assert proof[1]['status'] == 'identity_mismatch'
     assert explain_rejection([['invented', 'wrong object', 10.0]], [ref], [selection_rule], 'values') is None
+
+
+@pytest.mark.parametrize('style', ['competition', 'dense', 'position'])
+def test_v13_rank_counts_objects_across_repeated_output_rows_and_groups(style):
+    r = rules(['String', 'String', 'String', 'Float64', 'UInt64'],
+              rank_columns=[4], rankings=[{
+                  'column': 4, 'group_columns': [0], 'object_columns': [1], 'prefix': True,
+                  'blocks': [{'group': [group], 'rank': rank, 'dense': dense, 'size': size}
+                             for group in ('g', 'h')
+                             for rank, dense, size in ((1, 1, 2), (3, 2, 1))]}])
+    ref = [[group, obj, bucket, score, rank]
+           for group in ('g', 'h')
+           for obj, score, rank in (('a', 10, 1), ('b', 10, 1), ('c', 9, 3))
+           for bucket in ('x', 'y')]
+    check(ref, ref, r)
+    candidate = [row[:] for row in ref]
+    for row in candidate:
+        if style == 'dense' and row[1] == 'c':
+            row[4] = 2
+        if style == 'position':
+            row[4] = {'a': 1, 'b': 2, 'c': 3}[row[1]]
+            if row[0] == 'h' and row[1] in ('a', 'b'):
+                row[4] = 3 - row[4]
+    check(candidate, ref, r)
+    bad = [row[:] for row in candidate]
+    bad[-1][4] = 99
+    check(bad, ref, r, 'wrong', 'rank')
+    if style == 'position':
+        bad = [row[:] for row in candidate]
+        bad[2][4] = bad[3][4] = 1
+        check(bad, ref, r, 'wrong', 'rank')
+        bad = [row[:] for row in candidate]
+        bad[1][4] = 2  # one object must have one position even across output rows
+        check(bad, ref, r, 'wrong', 'rank')
+
+
+def test_v13_selection_reason_for_identity_failures_and_values_only():
+    r = rules(['String', 'String', 'Float64'], selection={
+        'version': 1, 'output_order': [], 'stages': [{
+            'parent': None, 'where': [], 'group_columns': [0], 'object_columns': [1],
+            'order_by': [{'column': 2, 'descending': True}], 'n': 1}]})
+    ref = [['g', 'a', 10], ['g', 'b', 9], ['h', 'c', 8], ['h', 'd', 7]]
+    answer = [ref[0], ref[2]]
+    check(answer, ref, r)
+    for bad in (answer[:1], [], answer + [['extra', 'a', 10]],
+                answer + [ref[1]], [ref[1], ref[2]],
+                [['g', 'missing', 1000], ref[2]]):
+        check(bad, ref, r, 'wrong', 'selection')
+    check([['g', 'a', 1234], ref[2]], ref, r, 'wrong', 'values')
+    check([['g', 'a', 10.001], ref[2]], ref, r)
+
+
+def test_v13_order_stage_precedes_rank_when_nonrank_values_match():
+    r = rules(['String', 'Float64', 'UInt64'], ordered=True,
+              order_by=[{'column': 1, 'descending': True}], rank_columns=[2], rankings=[{
+                  'column': 2, 'group_columns': [], 'object_columns': [0], 'prefix': True,
+                  'blocks': [{'group': [], 'rank': rank, 'dense': rank, 'size': 1}
+                             for rank in (1, 2)]}])
+    ref = [['a', 100, 1], ['b', 90, 2]]
+    check(ref, ref, r)
+    check([['b', 90, 1], ['a', 100, 2]], ref, r, 'wrong', 'order')
+    check([['a', 100, 2], ['b', 90, 1]], ref, r, 'wrong', 'rank')
+    check(list(reversed(ref)), ref, r, 'wrong', 'order')
+
+
+def test_v13_nonprefix_global_object_repeated_in_selection_groups():
+    r = rules(['String', 'String', 'Float64', 'UInt64'], rank_columns=[3], rankings=[{
+        'column': 3, 'group_columns': [], 'object_columns': [1], 'prefix': False,
+        'blocks': [{'group': [], 'rank': 1, 'dense': 1, 'size': 1},
+                   {'group': [], 'rank': 2, 'dense': 2, 'size': 1}]}])
+    ref = [['g', 'a', 10, 1], ['h', 'a', 10, 1], ['i', 'b', 9, 2]]
+    check(ref, ref, r)
+    with_selection = {**r, 'selection': {
+        'version': 1, 'output_order': [], 'stages': [{
+            'parent': None, 'where': [], 'group_columns': [0], 'object_columns': [1],
+            'order_by': [{'column': 2, 'descending': True}], 'n': 1}]}}
+    check(ref, ref, with_selection)
+    bad = [ref[0], ['h', 'a', 10, 2], ref[2]]
+    check(bad, ref, r, 'wrong', 'rank')
+    check(bad, ref, with_selection, 'wrong', 'rank')
+
+
+def test_v13_hidden_object_identifiers_with_one_reference_row_per_object():
+    r = rules(['UInt64', 'String', 'Float64', 'UInt64'], required_columns=[1, 2, 3],
+              rank_columns=[3], rankings=[{
+                  'column': 3, 'group_columns': [], 'object_columns': [0], 'prefix': True,
+                  'blocks': [{'group': [], 'rank': 1, 'dense': 1, 'size': 2}]}])
+    ref = [[100, 'a', 10, 1], [200, 'b', 10, 1]]
+    check([['a', 10, 1], ['b', 10, 2]], ref, r)
+    check([['a', 10, 2], ['b', 10, 1]], ref, r)
+    check([['a', 10, 2], ['b', 10, 2]], ref, r, 'wrong', 'rank')
+    check([['a', 10, 1], ['missing', 10, 2]], ref, r, 'wrong', 'values')

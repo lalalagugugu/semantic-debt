@@ -64,16 +64,7 @@ def explain_rejection(candidate, refs, rules, reason):
             return False
 
     for reference, rule in zip(refs, rules):
-        if reason == 'rank' and rule.get('rankings') and all(
-                block['size'] == 1 and block['rank'] == block['dense']
-                for ranking in rule['rankings'] for block in ranking['blocks']):
-            relaxed = deepcopy(rule)
-            relaxed['required_columns'] = [c for c in rule['required_columns'] if c not in rule['rank_columns']]
-            relaxed['rank_columns'], relaxed['rankings'] = [], []
-            if proves_correct(candidate, reference, relaxed):
-                return ('旧评分器错误接受名次：参考全部为单元素排名块，三种允许写法均应精确相等；仅移除名次要求即匹配成功（第五节第 9 条、12.12）',
-                        {'status': 'singleton_rank_mismatch', 'without_rank_outcome': 'correct'})
-        if reason == 'values' and rule.get('selection'):
+        if reason in ('values', 'selection') and rule.get('selection'):
             relaxed = deepcopy(rule)
             relaxed.pop('selection')
             if not proves_correct(candidate, reference, relaxed):
@@ -229,7 +220,11 @@ def run_shared(path, output, report):
             refs = decode_value(case['refs'])
             size = max([len(candidate) if isinstance(candidate, list) else 0] + [len(r) for r in refs])
             limit = 2 if size <= 10000 else 30
-            rec = {'case_id': case['case_id'], 'expected': case['expected'], 'limit_seconds': limit}
+            expected = dict(case['expected'])
+            if expected['outcome'] == 'exec_error' and expected.get('reason') is not None:
+                expected['execution_error_sha256'] = hashlib.sha256(expected['reason'].encode()).hexdigest()
+                expected['reason'] = 'execution_failed'
+            rec = {'case_id': case['case_id'], 'expected': expected, 'limit_seconds': limit}
             start = perf_counter()
             try:
                 with deadline(limit):
@@ -248,7 +243,9 @@ def run_shared(path, output, report):
             rec['cap_separate'] = 'unscored' in (expected['outcome'], rec['outcome'])
             rec['differs'] = not rec['cap_separate'] and (
                 rec['outcome'] != expected['outcome'] or
-                (expected.get('reason') is not None and expected['reason'] != rec.get('reason')))
+                (expected.get('reason') is not None and expected['reason'] != rec.get('reason')) or
+                (expected.get('execution_error_sha256') is not None and
+                 expected['execution_error_sha256'] != rec.get('execution_error_sha256')))
             records.append(rec)
     input_sha = digest.hexdigest()
     if hashlib.sha256(path.read_bytes()).hexdigest() != input_sha:
@@ -259,7 +256,7 @@ def run_shared(path, output, report):
     separate = [r for r in records if r['cap_separate']]
     slowest = sorted(records, key=lambda r: r['seconds'], reverse=True)[:10]
     lines = ['# T02 v2 第十二节共用用例验证', '',
-             '仅运行只读的 T05b 数据文件，未导入或读取独立检查器代码。正式真实语料对账等待 eval-v1.2 重新导出。', '',
+             '仅运行只读的 T05b 数据文件，未导入或读取独立检查器代码。真实语料复验见 `scorer_v2_check.md`；当前按主规格第十三节判定。', '',
              f'- 共 {len(records)} 条；判定 / 原因差异 {len(differences)} 条。',
              f'- 任一侧 unscored 单列 {len(separate)} 条；不计入分歧（第十二节第 7 条）。',
              f'- 输入 SHA256：`{input_sha}`；验证前后文件哈希一致。',
