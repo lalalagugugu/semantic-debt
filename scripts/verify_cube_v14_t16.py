@@ -173,6 +173,34 @@ def filtered_scope_cases():
         yield case
 
 
+def round2_cases():
+    for case in cases():
+        if case["member"] == "online_sales.new_customer_count":
+            continue  # Restored main implementation; not a claimed v1.4 fix.
+        if case["id"] in ("sales_amount_quota_None", "sales_quantity_quota_None", "gross_margin_quota_None"):
+            case["id"] += "_explicit_budget"
+            case["json"]["filters"] = [{"member": "scenario.ScenarioName", "operator": "equals", "values": ["Budget"]}]
+            case["sql"] = case["sql"].replace(" GROUP BY", ' AND scenario."ScenarioName"=\'Budget\' GROUP BY')
+            case["physical"] = case["physical"].replace(" GROUP BY", " AND s.ScenarioName='Budget' GROUP BY")
+        yield case
+    yield from note_cases()
+    yield from filtered_scope_cases()
+    yield from negative_cases()
+    for cube, table in (("sales", "FactSales"), ("online_sales", "FactOnlineSales")):
+        reference = f"""WITH p AS (SELECT StoreKey,toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a
+FROM retail.{table} GROUP BY StoreKey,d)
+SELECT s.StoreName,toString(c.d),(c.a-p.a)/nullIf(p.a,0) AS rate FROM p c
+LEFT JOIN p ON p.StoreKey=c.StoreKey AND p.d=addQuarters(c.d,-1)
+LEFT JOIN retail.DimStore s ON c.StoreKey=s.StoreKey
+WHERE c.d='2008-04-01' AND rate<0 ORDER BY 1,2"""
+        member = cube + ".sales_amount_qoq_pct"
+        case = make(cube + "_quarter_store_negative", cube, member, ["store.StoreName"], cube + " CROSS JOIN store",
+                    reference, start="2008-04-01", end="2008-06-30", grain="quarter",
+                    filters=[{"member": member, "operator": "lt", "values": ["0"]}])
+        case["sql"] = case["sql"].replace(" ORDER BY", f" HAVING MEASURE({member})<0 ORDER BY")
+        yield case
+
+
 def compare(rows, expected):
     observed = {tuple(normalize(v) for v in row[:-1]): row[-1] for row in rows}
     wanted = {tuple(normalize(v) for v in row[:-1]): row[-1] for row in expected}
@@ -185,7 +213,7 @@ def main():
     assert not os.environ.get("DEEPSEEK_API_KEY"), "unset model API key"
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", required=True, choices=["full", "deletion-diagnostic"])
-    parser.add_argument("--suite", choices=["variants", "time-notes", "negative", "scopes"], default="variants")
+    parser.add_argument("--suite", choices=["variants", "time-notes", "negative", "scopes", "round2"], default="variants")
     parser.add_argument("--audit-dir", type=Path, help="New evidence directory with the same exported candidate and model layout")
     args = parser.parse_args()
     root = args.audit_dir or Path(os.environ["SEMDEBT_DATA_DIR"]) / "interface-probes/t16-v14-86d8826"
@@ -199,7 +227,7 @@ def main():
     mounted = next(m["Source"] for m in mounts if m["Destination"] == "/cube/conf/model")
     if Path(mounted).resolve() != expected_model.resolve():
         raise RuntimeError("Cube model mount differs from the recorded audit mode")
-    for case in {"variants": cases, "time-notes": note_cases, "negative": negative_cases, "scopes": filtered_scope_cases}[args.suite]():
+    for case in {"variants": cases, "time-notes": note_cases, "negative": negative_cases, "scopes": filtered_scope_cases, "round2": round2_cases}[args.suite]():
         expected = [] if case.get("expected_error") else json.loads(physical(case["physical"] + " SETTINGS join_use_nulls=1 FORMAT JSONCompact"))["data"]
         for interface in ("json", "sql"):
             executor = CubeJsonExecutor(timeout_s=120) if interface == "json" else CubeSqlExecutor(timeout_s=120)
