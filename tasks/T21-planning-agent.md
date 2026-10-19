@@ -1,6 +1,6 @@
 # T21 规划 agent（-P）：在探查 agent 上加规划、Python 退路与按需检索
 
-- 状态：小样本完成（2026-10-19）；全量暂停，等用户裁决 T21-1、T21-2（见文末「第二步之后的分析」）；此前：第一步完成（`harness-plan-v1` 已打在 `b10ca1a`）；原：未开始（2026-10-19 改写：dsh 不用，改为自写，见 `decisions/2026-10-19-self-built-p-and-cube-notes.md` 第一节）
+- 状态：**第一期暂停，第二期再做**（2026-10-19 用户裁决：-P 的 C11、C12 与 judge-v1 一起移到第二期）；小样本结果保留（`20261019-T21-pilot-01`，1.18 元）；`harness-plan-v1` 已打在 `b10ca1a`；T21-1 的「整份上下文 -P + 检索版 -PR」改动未提交，已丢弃，第二期按「用户裁决与交接」一节的规格重做
 - 负责：Claude Code
 - 模式：普通（`scripts/start-card.sh T21`）
 - 依赖：G3；`harness-agent-v1.1`（复用探查 agent 的运行器）；对照基准是 T15 的 L0-E、L1-E 全量（已完成，`runs/20261019-T15-explorer-01/`）
@@ -188,3 +188,10 @@
 **常设追踪板**：`reports/hypotheses.md`（C1–C13，每条的状态、证据和缺口；「现在能写的结论」一节供阶段报告用）。
 
 **T21-2 的决策顺序**（用户，2026-10-19）：先完成上面的第 B 步（用到 A、B 类指标的题和各单元的对错），再定是否出 `semantic-v1.4`；必须在 SQL-L2 全量之前定。`semantic-v1.3` 不并入指标文字。第 B 步做完后，把结果交给用户，不要自行改 `semantic/`。
+
+### 第一期收尾（2026-10-19）
+
+- 用户裁决：-P（C11 整份上下文 + 规划 + Python；C12 按需检索对照）移到第二期，与 judge-v1 一起做。第一期不再跑 -P。
+- 保留：`harness-plan-v1`（`b10ca1a`）的代码与 Python 沙箱、小样本日志与本卡的分析；T21-1 的次数上限方案（`run_sql` + `python` 合计 8 次，检索版另给 `lookup` 4 次）留给第二期。
+- T21-2（指标文字歧义）不受影响：用到 A、B 类指标的题已列在 `reports/validation/metric-text-vs-impl.md` 末节（`T21-pilot` 分支 `ce68f42`），是否出 `semantic-v1.4` 由用户定。
+- **提醒用户现在就删掉** `.claude/settings.local.json` 里 `sandbox.network.allowUnixSockets` 的 Docker socket 一行（第一步为 Python 沙箱加的）：第一期不再需要 Docker，第二期重开时再加。
