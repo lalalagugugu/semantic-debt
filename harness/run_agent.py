@@ -407,6 +407,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--limit", type=int, help="first N questions only")
+    ap.add_argument("--skip-judge", action="store_true",
+                    help="leave out judge questions (phase 1 replan §二; as run_direct --skip-judge)")
     ap.add_argument("--eval-tag", default="eval-v1.2")
     ap.add_argument("--semantic-tag", default="semantic-v1.2")
     ap.add_argument("--agent-tag", default=AGENT_TAG, help="harness/agent_prompt.py must be this tag's")
@@ -458,6 +460,8 @@ def main(argv: list[str] | None = None, load=None) -> int:
     pilot = pilot_ids() if args.pilot else None
     try:
         questions = R.select_questions(load(lang="zh"), args, pilot)
+        if args.skip_judge:
+            questions = [q for q in questions if q.scoring != "judge"]
     except EvalVersionError as exc:
         print(f"refusing to start: {exc}")
         return 2
