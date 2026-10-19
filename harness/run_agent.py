@@ -394,6 +394,65 @@ def make_executor(cell: Cell, timeout_s: int) -> Executor:
     return R.make_executor(cell, timeout_s)
 
 
+# Columns the Cube SQL API adds to every cube table on its own.
+CUBE_SYSTEM_COLUMNS = frozenset({"__user", "__cubejoinfield"})
+
+
+def expected_cube_columns() -> dict[str, set[str]]:
+    """cube → dimension and measure names, from render/cube.py on the working tree (which
+    ``verify_semantic_tag`` has checked against ``--semantic-tag``)."""
+    from render.cube import build_model
+
+    return {name: {m["name"].lower() for m in [*cube.get("dimensions", []), *cube.get("measures", [])]}
+            for name, cube in build_model().items()}
+
+
+def probe_cube(expected: dict[str, set[str]], rows: list[tuple[str, str]]) -> list[str]:
+    """Differences between the model Cube serves (``(table, column)`` rows of
+    information_schema.columns) and the rendered one; empty when they match."""
+    served: dict[str, set[str]] = {}
+    for table, column in rows:
+        served.setdefault(table, set()).add(column.lower())
+    diffs = [f"cube {t!r} not served" for t in sorted(set(expected) - set(served))]
+    diffs += [f"cube {t!r} served but not rendered" for t in sorted(set(served) - set(expected))]
+    for t in sorted(set(expected) & set(served)):
+        got = served[t] - CUBE_SYSTEM_COLUMNS
+        diffs += [f"{t}: missing {sorted(expected[t] - got)}"] if expected[t] - got else []
+        diffs += [f"{t}: extra {sorted(got - expected[t])}"] if got - expected[t] else []
+    return diffs
+
+
+def run_cube_probe(timeout_s: int) -> int:
+    """One connection to the Cube SQL API, no model call: SELECT 1, then the served model
+    against the rendered one."""
+    import os
+    import secrets
+
+    import psycopg
+
+    try:
+        with psycopg.connect(host=os.environ.get("CUBE_SQL_HOST", "127.0.0.1"),
+                             port=int(os.environ.get("CUBE_SQL_PORT", "15432")),
+                             user=os.environ.get("CUBE_SQL_USER", "cube"),
+                             password=os.environ.get("CUBE_SQL_PASSWORD") or secrets.token_urlsafe(),
+                             dbname=os.environ.get("CUBE_SQL_DATABASE", "cube"),
+                             connect_timeout=timeout_s, autocommit=True) as conn:
+            print(f"cube sql: SELECT 1 -> {conn.execute('SELECT 1').fetchall()}")
+            rows = conn.execute("SELECT table_name, column_name FROM information_schema.columns "
+                                "WHERE table_schema = 'public'").fetchall()
+    except psycopg.Error as exc:
+        print(f"cube sql: connection failed: {exc}")
+        return 2
+    expected = expected_cube_columns()
+    diffs = probe_cube(expected, rows)
+    print(f"cube model: {len(expected)} cubes, {sum(map(len, expected.values()))} members rendered; "
+          f"{len({t for t, _ in rows})} tables served")
+    for d in diffs:
+        print(f"  {d}")
+    print("cube model: matches the rendered model" if not diffs else "cube model: DIFFERS from the rendered model")
+    return 0 if not diffs else 3
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cell", action="append", required=True, choices=sorted(AGENT_CELLS), help="repeatable")
@@ -407,7 +466,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--limit", type=int, help="first N questions only")
+    ap.add_argument("--skip-judge", action="store_true",
+                    help="leave out judge questions (phase 1 replan §二; as run_direct --skip-judge)")
     ap.add_argument("--eval-tag", default="eval-v1.2")
+    ap.add_argument("--eval-dir", help="question bank directory (sets $SEMDEBT_EVAL_DIR for this process and its "
+                                       "children), e.g. a read-only worktree at --eval-tag")
     ap.add_argument("--semantic-tag", default="semantic-v1.2")
     ap.add_argument("--agent-tag", default=AGENT_TAG, help="harness/agent_prompt.py must be this tag's")
     ap.add_argument("--expect-fingerprint", default=G3_FINGERPRINT,
@@ -415,6 +478,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--allow-cube", action="store_true",
                     help="SQL-L2-E runs only after T16 has confirmed the Cube metrics")
     ap.add_argument("--dry-run", action="store_true", help="count attempts and estimate cost; no API call")
+    ap.add_argument("--probe-cube", action="store_true",
+                    help="after the version checks, connect to the Cube SQL API once and compare the served "
+                         "model with the rendered one; no model call")
     ap.add_argument("--budget", type=float, help="CNY; refuse to start if the estimate exceeds it")
     ap.add_argument("--allow-peak", action="store_true", help="allow starting in DeepSeek peak hours")
     ap.add_argument("--est-calls", type=float, default=5.0, help="model calls per attempt (no measurement yet)")
@@ -424,9 +490,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--est-question-tokens", type=int, default=60)
     ap.add_argument("--est-from-args", action="store_true", help="ignore committed measurements")
     args = ap.parse_args(argv)
-    if not args.dry_run and not args.run_id:
-        ap.error("--run-id is required unless --dry-run")
-    if "SQL-L2-E" in args.cell and not args.dry_run and not args.allow_cube:
+    if not args.dry_run and not args.probe_cube and not args.run_id:
+        ap.error("--run-id is required unless --dry-run or --probe-cube")
+    if "SQL-L2-E" in args.cell and not (args.dry_run or args.probe_cube) and not args.allow_cube:
         ap.error("SQL-L2-E waits for T16 to confirm the Cube metrics (pass --allow-cube once it has)")
     return args
 
@@ -436,6 +502,10 @@ def main(argv: list[str] | None = None, load=None) -> int:
     from harness.semantic_version import SemanticVersionError, verify_semantic_tag
 
     args = parse_args(argv)
+    if args.eval_dir:
+        import os
+
+        os.environ["SEMDEBT_EVAL_DIR"] = str(Path(os.path.expandvars(args.eval_dir)).expanduser())
     cells = [AGENT_CELLS[n] for n in args.cell]
     if load is None:
         try:
@@ -454,10 +524,14 @@ def main(argv: list[str] | None = None, load=None) -> int:
                 print(f"refusing to start: {exc}")
                 return 2
             print(f"warning (dry run only): {exc}")
+    if args.probe_cube:
+        return run_cube_probe(args.tool_timeout)
     load = load or load_questions
     pilot = pilot_ids() if args.pilot else None
     try:
         questions = R.select_questions(load(lang="zh"), args, pilot)
+        if args.skip_judge:
+            questions = [q for q in questions if q.scoring != "judge"]
     except EvalVersionError as exc:
         print(f"refusing to start: {exc}")
         return 2
