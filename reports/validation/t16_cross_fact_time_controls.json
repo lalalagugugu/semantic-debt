@@ -1,0 +1,695 @@
+{
+  "model_calls": 0,
+  "cases": [
+    {
+      "id": "inventory_owner_json",
+      "query": {
+        "measures": [
+          "inventory.inventory_turnover",
+          "inventory.average_on_hand_value"
+        ],
+        "dimensions": [
+          "inventory.StoreKey"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "inventory.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "order": {
+          "inventory.StoreKey": "asc"
+        },
+        "limit": 4
+      },
+      "rows": [
+        [
+          1,
+          "1.018870508814165",
+          "202128.75750000004"
+        ],
+        [
+          2,
+          "1.0233086070012147",
+          "196837.0525"
+        ],
+        [
+          3,
+          "0.9775867336039704",
+          "195333.5325"
+        ],
+        [
+          4,
+          "1.081622518491172",
+          "166856.65"
+        ]
+      ],
+      "columns": [
+        {
+          "name": "inventory.StoreKey",
+          "type": "number"
+        },
+        {
+          "name": "inventory.inventory_turnover",
+          "type": "number"
+        },
+        {
+          "name": "inventory.average_on_hand_value",
+          "type": "number"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "inventory_owner_sql",
+      "query": "SELECT inventory.StoreKey, MEASURE(inventory.inventory_turnover), MEASURE(inventory.average_on_hand_value) FROM inventory WHERE inventory.DateKey >= '2007-02-01' AND inventory.DateKey < '2007-03-01' GROUP BY inventory.StoreKey ORDER BY inventory.StoreKey LIMIT 4",
+      "rows": [
+        [
+          1.0,
+          1.018870508814165,
+          202128.75750000004
+        ],
+        [
+          2.0,
+          1.0233086070012147,
+          196837.0525
+        ],
+        [
+          3.0,
+          0.9775867336039704,
+          195333.5325
+        ],
+        [
+          4.0,
+          1.081622518491172,
+          166856.65
+        ]
+      ],
+      "columns": [
+        {
+          "name": "StoreKey",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(inventory.inventory_turnover)",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(inventory.average_on_hand_value)",
+          "type": "pg:701"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "inventory_calendar_json",
+      "query": {
+        "measures": [
+          "inventory.inventory_turnover",
+          "inventory.average_on_hand_value"
+        ],
+        "dimensions": [
+          "inventory.StoreKey"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "calendar.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "order": {
+          "inventory.StoreKey": "asc"
+        },
+        "limit": 4
+      },
+      "rows": [
+        [
+          1,
+          "1.018870508814165",
+          "202128.75750000004"
+        ],
+        [
+          2,
+          "1.0233086070012147",
+          "196837.0525"
+        ],
+        [
+          3,
+          "0.9775867336039704",
+          "195333.5325"
+        ],
+        [
+          4,
+          "1.081622518491172",
+          "166856.65"
+        ]
+      ],
+      "columns": [
+        {
+          "name": "inventory.StoreKey",
+          "type": "number"
+        },
+        {
+          "name": "inventory.inventory_turnover",
+          "type": "number"
+        },
+        {
+          "name": "inventory.average_on_hand_value",
+          "type": "number"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "inventory_calendar_sql",
+      "query": "SELECT inventory.StoreKey, MEASURE(inventory.inventory_turnover), MEASURE(inventory.average_on_hand_value) FROM inventory CROSS JOIN calendar WHERE calendar.DateKey >= '2007-02-01' AND calendar.DateKey < '2007-03-01' GROUP BY inventory.StoreKey ORDER BY inventory.StoreKey LIMIT 4",
+      "rows": [
+        [
+          1.0,
+          1.018870508814165,
+          202128.75750000004
+        ],
+        [
+          2.0,
+          1.0233086070012147,
+          196837.0525
+        ],
+        [
+          3.0,
+          0.9775867336039704,
+          195333.5325
+        ],
+        [
+          4.0,
+          1.081622518491172,
+          166856.65
+        ]
+      ],
+      "columns": [
+        {
+          "name": "StoreKey",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(inventory.inventory_turnover)",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(inventory.average_on_hand_value)",
+          "type": "pg:701"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "inventory_extra_fact_json",
+      "query": {
+        "measures": [
+          "inventory.inventory_turnover",
+          "inventory.average_on_hand_value"
+        ],
+        "dimensions": [
+          "inventory.StoreKey"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "inventory.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          },
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "order": {
+          "inventory.StoreKey": "asc"
+        },
+        "limit": 4
+      },
+      "rows": null,
+      "columns": [],
+      "error": "Can't find join path to join 'inventory', 'sales', 'inventory'",
+      "detail": "Can't find join path to join 'inventory', 'sales', 'inventory'",
+      "classification": "条件不符：加入无连接路径的事实 Cube"
+    },
+    {
+      "id": "inventory_extra_fact_sql",
+      "query": "SELECT inventory.StoreKey, MEASURE(inventory.inventory_turnover), MEASURE(inventory.average_on_hand_value) FROM inventory CROSS JOIN sales WHERE inventory.DateKey >= '2007-02-01' AND inventory.DateKey < '2007-03-01' AND sales.DateKey >= '2007-02-01' AND sales.DateKey < '2007-03-01' GROUP BY inventory.StoreKey ORDER BY inventory.StoreKey LIMIT 4",
+      "rows": null,
+      "columns": [],
+      "error": "Database Execution Error: Can't find join path to join 'inventory,sales', 'inventory', 'sales', 'inventory'",
+      "detail": "Database Execution Error: Can't find join path to join 'inventory,sales', 'inventory', 'sales', 'inventory'",
+      "classification": "条件不符：加入无连接路径的事实 Cube"
+    },
+    {
+      "id": "sales_quota_owner_json",
+      "query": {
+        "measures": [
+          "sales_quota.quota_attainment_pct",
+          "sales_quota.sales_amount_quota"
+        ],
+        "dimensions": [
+          "sales_quota.StoreKey"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "order": {
+          "sales_quota.StoreKey": "asc"
+        },
+        "limit": 4
+      },
+      "rows": [
+        [
+          1,
+          "404942.28160000005",
+          "1.14762693503824"
+        ],
+        [
+          2,
+          "421184.44339999976",
+          "1.1476269365460618"
+        ],
+        [
+          3,
+          "381287.20329999994",
+          "1.1476269363693066"
+        ],
+        [
+          4,
+          "356938.0453",
+          "1.1476269366458591"
+        ]
+      ],
+      "columns": [
+        {
+          "name": "sales_quota.StoreKey",
+          "type": "number"
+        },
+        {
+          "name": "sales_quota.sales_amount_quota",
+          "type": "number"
+        },
+        {
+          "name": "sales_quota.quota_attainment_pct",
+          "type": "number"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "sales_quota_owner_sql",
+      "query": "SELECT sales_quota.StoreKey, MEASURE(sales_quota.quota_attainment_pct), MEASURE(sales_quota.sales_amount_quota) FROM sales_quota WHERE sales_quota.DateKey >= '2007-02-01' AND sales_quota.DateKey < '2007-03-01' GROUP BY sales_quota.StoreKey ORDER BY sales_quota.StoreKey LIMIT 4",
+      "rows": [
+        [
+          1.0,
+          1.14762693503824,
+          404942.28160000005
+        ],
+        [
+          2.0,
+          1.1476269365460618,
+          421184.44339999976
+        ],
+        [
+          3.0,
+          1.1476269363693066,
+          381287.20329999994
+        ],
+        [
+          4.0,
+          1.1476269366458591,
+          356938.0453
+        ]
+      ],
+      "columns": [
+        {
+          "name": "StoreKey",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(sales_quota.quota_attainment_pct)",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(sales_quota.sales_amount_quota)",
+          "type": "pg:701"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "sales_quota_calendar_json",
+      "query": {
+        "measures": [
+          "sales_quota.quota_attainment_pct",
+          "sales_quota.sales_amount_quota"
+        ],
+        "dimensions": [
+          "sales_quota.StoreKey"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "calendar.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "order": {
+          "sales_quota.StoreKey": "asc"
+        },
+        "limit": 4
+      },
+      "rows": [
+        [
+          1,
+          "1.14762693503824",
+          "404942.28160000005"
+        ],
+        [
+          2,
+          "1.1476269365460618",
+          "421184.44339999976"
+        ],
+        [
+          3,
+          "1.1476269363693066",
+          "381287.20329999994"
+        ],
+        [
+          4,
+          "1.1476269366458591",
+          "356938.0453"
+        ]
+      ],
+      "columns": [
+        {
+          "name": "sales_quota.StoreKey",
+          "type": "number"
+        },
+        {
+          "name": "sales_quota.quota_attainment_pct",
+          "type": "number"
+        },
+        {
+          "name": "sales_quota.sales_amount_quota",
+          "type": "number"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "sales_quota_calendar_sql",
+      "query": "SELECT sales_quota.StoreKey, MEASURE(sales_quota.quota_attainment_pct), MEASURE(sales_quota.sales_amount_quota) FROM sales_quota CROSS JOIN calendar WHERE calendar.DateKey >= '2007-02-01' AND calendar.DateKey < '2007-03-01' GROUP BY sales_quota.StoreKey ORDER BY sales_quota.StoreKey LIMIT 4",
+      "rows": [
+        [
+          1.0,
+          1.14762693503824,
+          404942.28160000005
+        ],
+        [
+          2.0,
+          1.1476269365460618,
+          421184.44339999976
+        ],
+        [
+          3.0,
+          1.1476269363693066,
+          381287.20329999994
+        ],
+        [
+          4.0,
+          1.1476269366458591,
+          356938.0453
+        ]
+      ],
+      "columns": [
+        {
+          "name": "StoreKey",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(sales_quota.quota_attainment_pct)",
+          "type": "pg:701"
+        },
+        {
+          "name": "measure(sales_quota.sales_amount_quota)",
+          "type": "pg:701"
+        }
+      ],
+      "error": null,
+      "detail": null,
+      "classification": "成立（本模型连接、同一整月范围）",
+      "physical_baseline_match": true
+    },
+    {
+      "id": "sales_quota_extra_fact_json",
+      "query": {
+        "measures": [
+          "sales_quota.quota_attainment_pct",
+          "sales_quota.sales_amount_quota"
+        ],
+        "dimensions": [
+          "sales_quota.StoreKey"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          },
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "order": {
+          "sales_quota.StoreKey": "asc"
+        },
+        "limit": 4
+      },
+      "rows": null,
+      "columns": [],
+      "error": "Can't find join path to join 'sales_quota', 'sales', 'sales_quota'",
+      "detail": "Can't find join path to join 'sales_quota', 'sales', 'sales_quota'",
+      "classification": "条件不符：加入无连接路径的事实 Cube"
+    },
+    {
+      "id": "sales_quota_extra_fact_sql",
+      "query": "SELECT sales_quota.StoreKey, MEASURE(sales_quota.quota_attainment_pct), MEASURE(sales_quota.sales_amount_quota) FROM sales_quota CROSS JOIN sales WHERE sales_quota.DateKey >= '2007-02-01' AND sales_quota.DateKey < '2007-03-01' AND sales.DateKey >= '2007-02-01' AND sales.DateKey < '2007-03-01' GROUP BY sales_quota.StoreKey ORDER BY sales_quota.StoreKey LIMIT 4",
+      "rows": null,
+      "columns": [],
+      "error": "Database Execution Error: Can't find join path to join 'sales_quota,sales', 'sales_quota', 'sales', 'sales_quota'",
+      "detail": "Database Execution Error: Can't find join path to join 'sales_quota,sales', 'sales_quota', 'sales', 'sales_quota'",
+      "classification": "条件不符：加入无连接路径的事实 Cube"
+    }
+  ],
+  "physical_baselines": {
+    "inventory": {
+      "query": "WITH inv AS (\nSELECT StoreKey,DateKey,sum(OnHandQuantity*UnitCost) AS v\nFROM retail.FactInventory WHERE DateKey>='2007-02-01' AND DateKey<'2007-03-01' GROUP BY StoreKey,DateKey),\ni AS (SELECT StoreKey,avg(v) AS avg_v FROM inv GROUP BY StoreKey),\ns AS (SELECT StoreKey,sum(TotalCost) AS c FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-03-01' GROUP BY StoreKey)\nSELECT i.StoreKey,coalesce(s.c,0)/nullIf(i.avg_v,0),i.avg_v\nFROM i LEFT JOIN s ON i.StoreKey=s.StoreKey ORDER BY i.StoreKey LIMIT 4 FORMAT JSONCompact",
+      "rows": [
+        [
+          1,
+          1.0188705088141652,
+          202128.75749999998
+        ],
+        [
+          2,
+          1.0233086070012143,
+          196837.05250000008
+        ],
+        [
+          3,
+          0.9775867336039702,
+          195333.53250000006
+        ],
+        [
+          4,
+          1.0816225184911723,
+          166856.64999999997
+        ]
+      ]
+    },
+    "sales_quota": {
+      "query": "WITH q AS (SELECT StoreKey,sum(SalesAmountQuota) AS quota\nFROM retail.FactSalesQuota WHERE DateKey>='2007-02-01' AND DateKey<'2007-03-01' AND ScenarioKey=2 GROUP BY StoreKey),\ns AS (SELECT StoreKey,sum(SalesAmount) AS actual FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-03-01' GROUP BY StoreKey)\nSELECT q.StoreKey,s.actual/nullIf(q.quota,0),q.quota\nFROM q LEFT JOIN s ON q.StoreKey=s.StoreKey ORDER BY q.StoreKey LIMIT 4 FORMAT JSONCompact",
+      "rows": [
+        [
+          1,
+          1.14762693503824,
+          404942.28160000005
+        ],
+        [
+          2,
+          1.1476269365460618,
+          421184.44339999976
+        ],
+        [
+          3,
+          1.1476269363693066,
+          381287.20329999994
+        ],
+        [
+          4,
+          1.1476269366458591,
+          356938.0453
+        ]
+      ]
+    }
+  },
+  "calendar_day_check": {
+    "query": "SELECT toYear(DateKey),toQuarter(DateKey),count(),countIf(sales<>0)\nFROM (SELECT d.DateKey,coalesce(sum(f.SalesAmount),0) AS sales\nFROM retail.DimDate d LEFT JOIN retail.FactOnlineSales f ON d.DateKey=f.DateKey\nWHERE d.DateKey >= (SELECT min(DateKey) FROM retail.FactOnlineSales)\nAND d.DateKey <= (SELECT max(DateKey) FROM retail.FactOnlineSales)\nGROUP BY d.DateKey) GROUP BY toYear(DateKey),toQuarter(DateKey)\nORDER BY 1,2 FORMAT JSONCompact",
+    "rows": [
+      [
+        2007,
+        1,
+        90,
+        90
+      ],
+      [
+        2007,
+        2,
+        91,
+        91
+      ],
+      [
+        2007,
+        3,
+        92,
+        92
+      ],
+      [
+        2007,
+        4,
+        92,
+        92
+      ],
+      [
+        2008,
+        1,
+        91,
+        91
+      ],
+      [
+        2008,
+        2,
+        91,
+        91
+      ],
+      [
+        2008,
+        3,
+        92,
+        92
+      ],
+      [
+        2008,
+        4,
+        92,
+        92
+      ],
+      [
+        2009,
+        1,
+        90,
+        90
+      ],
+      [
+        2009,
+        2,
+        91,
+        91
+      ],
+      [
+        2009,
+        3,
+        92,
+        92
+      ],
+      [
+        2009,
+        4,
+        92,
+        92
+      ]
+    ],
+    "all_calendar_days_have_nonzero_sales": true
+  },
+  "dimension_extrema_controls": [
+    {
+      "query": {
+        "dimensions": [
+          "product.UnitCost"
+        ],
+        "order": {
+          "product.UnitCost": "desc"
+        },
+        "limit": 1
+      },
+      "physical_query": "SELECT max(UnitCost) FROM retail.DimProduct FORMAT JSONCompact",
+      "value": "1060.22",
+      "baseline": 1060.22,
+      "matches": true
+    },
+    {
+      "query": {
+        "dimensions": [
+          "sales.ReturnAmount"
+        ],
+        "order": {
+          "sales.ReturnAmount": "desc"
+        },
+        "limit": 1
+      },
+      "physical_query": "SELECT max(ReturnAmount) FROM retail.FactSales FORMAT JSONCompact",
+      "value": 9996,
+      "baseline": 9996,
+      "matches": true
+    }
+  ]
+}
