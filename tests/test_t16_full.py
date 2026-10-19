@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from harness.client import Reply
 from harness import run_direct as R
 from scripts.run_t16_v14_full import BudgetBoundary, FP
+from scripts.run_t16_v14_full import JsonBoundary, JsonExecutionGate
 
 
 def reply(tokens, fingerprint=FP):
@@ -109,3 +110,32 @@ def test_offline_denominator_keeps_refusals_and_errors_but_excludes_pending():
     result = counts(rows)
     assert result["attempts"] == 6 and result["scored_denominator"] == 4
     assert result["accuracy_on_scored"] == 0.25
+
+
+def test_json_gate_counts_only_covered_completed_attempts(tmp_path, monkeypatch):
+    outcomes = iter(["exec_error"] * 20 + ["correct"] * 4 + ["exec_error", "exec_error"])
+    monkeypatch.setattr(BudgetBoundary, "attempt", lambda *args: {"status": "done", "final": {"outcome": next(outcomes)}})
+    guard = JsonBoundary(tmp_path / "budget.jsonl", {"Q02"})
+    for i in range(20):
+        guard.attempt(None, SimpleNamespace(qid="Q01"), i)
+    assert guard.covered_done == 0 and not guard.stopped.is_set()
+    for i in range(5):
+        guard.attempt(None, SimpleNamespace(qid="Q02"), i)
+    assert guard.covered_errors == 1 and guard.covered_done == 5 and not guard.stopped.is_set()
+    guard.attempt(None, SimpleNamespace(qid="Q02"), 6)
+    assert guard.stopped.is_set() and "2/6" in guard.reason
+
+
+@pytest.mark.parametrize("kind", ["timeout", "transport_error"])
+def test_json_infrastructure_stop_preserves_error_and_charges_late_reply(tmp_path, kind):
+    from harness.executors import ExecResult
+    guard = JsonBoundary(tmp_path / "budget.jsonl", {"Q02"})
+    result = ExecResult(error="mock infrastructure failure", error_class=kind)
+    executor = JsonExecutionGate(SimpleNamespace(execute=lambda _: result), guard)
+    assert executor.execute("{}") is result
+    assert guard.stopped.is_set()
+    with pytest.raises(R.RunStopped):
+        guard.before_request()
+    with pytest.raises(R.RunStopped):
+        guard.check_reply(reply(10))
+    assert guard.calls == 1 and guard.spent > 0

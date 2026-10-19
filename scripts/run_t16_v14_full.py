@@ -113,6 +113,57 @@ class BudgetBoundary(R.CallBoundary):
         return result
 
 
+class JsonBoundary(BudgetBoundary):
+    """User-approved JSON gate: covered execution errors and infrastructure only."""
+    def __init__(self, ledger, covered):
+        super().__init__(ledger)
+        self.covered = frozenset(covered)
+        self.covered_done = 0
+        self.covered_errors = 0
+
+    def check_reply(self, reply):
+        super().check_reply(reply)
+        if self.stopped.is_set():
+            raise R.RunStopped(self.reason)
+
+    def check_execution(self, result):
+        if result.error_class in ("timeout", "transport_error"):
+            with self.account_lock:
+                self.reason = f"Cube infrastructure error: {result.error_class}; stop immediately"
+                self.stopped.set()
+                append_json(self.ledger.parent / "events.jsonl", {"event": "json_infrastructure_stop",
+                            "at": datetime.now(R.BEIJING).isoformat(), "reason": self.reason})
+
+    def attempt(self, ctx, question, rep):
+        result = super().attempt(ctx, question, rep)
+        if result["status"] == "done" and question.qid in self.covered:
+            with self.account_lock:
+                self.covered_done += 1
+                self.covered_errors += result["final"]["outcome"] == "exec_error"
+                if self.covered_errors * 5 > self.covered_done:
+                    self.reason = f"JSON covered execution error rate exceeds 20%: {self.covered_errors}/{self.covered_done}"
+                    self.stopped.set()
+                    append_json(self.ledger.parent / "events.jsonl", {"event": "json_covered_stop",
+                                "at": datetime.now(R.BEIJING).isoformat(), "reason": self.reason,
+                                "covered_done": self.covered_done, "covered_errors": self.covered_errors})
+        return result
+
+
+class JsonExecutionGate:
+    def __init__(self, executor, boundary):
+        self.executor = executor
+        self.boundary = boundary
+
+    def execute(self, query):
+        if self.boundary.stopped.is_set():
+            raise R.RunStopped(self.boundary.reason)
+        result = self.executor.execute(query)
+        # Return the outcome so run_direct saves its complete raw error before
+        # the stopped call boundary blocks a correction request.
+        self.boundary.check_execution(result)
+        return result
+
+
 def configured_cells():
     path = Path(os.environ["SEMDEBT_DATA_DIR"]) / "dry-runs/T16-semantic-v1.4-234ad68/cube_sql.semantic-v1.2.md"
     expected = subprocess.check_output(["git", "show", "semantic-v1.2:render/syntax/cube_sql.md"], cwd=ROOT)
@@ -185,9 +236,22 @@ def main():
                     "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"}
         with (directory / "manifest.json").open("x") as out:
             json.dump(manifest, out, ensure_ascii=False, indent=2)
-        boundary = BudgetBoundary(directory / "budget.jsonl")
+        executor = R.make_executor(cell, 120)
+        if cell.name == "JSON-L2":
+            registry_path = "reports/validation/t16-v14-8836110/coverage.json"
+            registry_bytes = (ROOT / registry_path).read_bytes()
+            assert registry_bytes == subprocess.check_output(["git", "show", "381ed1d:" + registry_path], cwd=ROOT)
+            covered = {r["qid"] for r in json.loads(registry_bytes)["rows"] if r["category"] == "covered"}
+            assert len(covered) == 39
+            boundary = JsonBoundary(directory / "budget.jsonl", covered)
+            executor = JsonExecutionGate(executor, boundary)
+            append_json(directory / "events.jsonl", {"event": "json_gate_authorized", "at": started,
+                        "covered_questions": 39, "covered_attempts_planned": 117,
+                        "rule": "已完成能答题作答的执行失败率>20%停；任何Cube超时/连接错误即停；其余拒答与失败不触发SQL检查点"})
+        else:
+            boundary = BudgetBoundary(directory / "budget.jsonl")
         client = DeepSeekClient(MODEL, before_request=boundary.before_request)
-        context = R.RunContext(run_id=run_id, cell=cell, client=client, executor=R.make_executor(cell, 120),
+        context = R.RunContext(run_id=run_id, cell=cell, client=client, executor=executor,
                                system=R.system_for(cell), eval_commit="90e13b385a639a9164ac78430c50c11a7859f976",
                                harness_commit=run_commit, timeout_s=120, raw_dir=R.raw_root() / run_id / cell.name,
                                limits={"max_result_rows": R.DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": R.DEFAULT_MAX_MEMORY_BYTES},
