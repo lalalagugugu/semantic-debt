@@ -14,8 +14,9 @@ Shared choices, written once here instead of per measure:
     or year). Cube's time_shift needs a fixed interval, so the Cube member shifts by
     one month (it is called *_mom_pct).
   - 新客 (convention 14): the cut-off is the last date of the query window, capped at
-    2009-12-31. DAX counts every customer whose first purchase falls in the 90 days;
-    Cube only sees customers with rows in the window.
+    2009-12-31 in DAX. Both count every customer whose first purchase falls in the 90 days
+    (Cube: a trailing 90-day rolling window over first-purchase rows, semantic-v1.4); new
+    customers' sales are their sales inside the window.
 These differences are engine capability limits, recorded in render/README.md.
 """
 
@@ -422,7 +423,12 @@ def cube_measures() -> dict[tuple[str, str], list[dict]]:
     add("有流失风险客户数", o, {"type": "count_distinct", "sql": "{CUBE}.CustomerKey",
                          "filters": _f(f"{recency} >= 7 AND {recency} <= 12")})
     add("已流失客户数", o, {"type": "count_distinct", "sql": "{CUBE}.CustomerKey", "filters": _f(f"{recency} > 12")})
-    add("新客数", o, {"type": "number", "sql": f"length(arrayDistinct(arrayMap(t -> t.1, {new_rows})))"})
+    # Convention 14 counts every customer whose first purchase falls in the 90 days up to the cut-off,
+    # whether or not they bought again inside the query window (the reference reading; T16 alignment
+    # list). A trailing 90-day rolling window over first-purchase rows ends at each period's last day.
+    add("新客数", o, {"type": "count_distinct", "sql": "{CUBE}.CustomerKey",
+                    "filters": _f("{CUBE}.DateKey = {CUBE}.FirstPurchaseDate"),
+                    "rolling_window": {"trailing": "90 day", "offset": "end"}})
     add("新客销售额", o, {"type": "number", "sql": f"arraySum(arrayMap(t -> t.3, {new_rows}))"})
     add("新客销售额占比", o, {"type": "number", "sql": f"{c('新客销售额')} / nullIf({c('销售额')}, 0)"})
 

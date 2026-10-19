@@ -23,6 +23,7 @@ if __package__ in (None, ""):
 
 from render.common import REPO  # noqa: E402
 from render.cube import build_model  # noqa: E402
+from render.measures import AS_OF  # noqa: E402
 
 REPORT = REPO / "reports" / "validation" / "cube_measures.md"
 _REF = re.compile(r"\{(\w+)\}")
@@ -103,7 +104,15 @@ def compile_measure(cube: dict, name: str) -> str:
     def agg(m: dict) -> str:
         if m.get("multi_stage"):
             raise NotImplementedError("multi_stage")
-        cond = " AND ".join(f"({expr(f['sql'])})" for f in m.get("filters", []))
+        conds = [f"({expr(f['sql'])})" for f in m.get("filters", [])]
+        if m.get("rolling_window"):
+            # Cube plans rolling windows per period; here the one period is the whole data, which ends on
+            # the as-of date, so the trailing window is (as-of − N days, as-of].
+            n, unit = m["rolling_window"]["trailing"].split()
+            if unit != "day" or m["rolling_window"].get("offset", "end") != "end":
+                raise NotImplementedError("rolling_window other than trailing N day / end")
+            conds.append(f"(c.DateKey > toDate('{AS_OF}') - {int(n)})")
+        cond = " AND ".join(conds)
         t = m["type"]
         if t == "number":
             return expr(m["sql"])
