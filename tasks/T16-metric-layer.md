@@ -1,6 +1,6 @@
 # T16 指标层（Cube Core：SQL-L2 与 JSON-L2）
 
-- 状态：v1.4新说明SQL全量327次完成，v2离线主表192/294=65.3%，费用5.28765880元；按用户新增集中失败停止条件（Q89三次CTE/CASE派生列错误）暂停，旧说明SQL与JSON零调用，待协调确认。详见reports/validation/t16-v14-full-results/README.md。PR #114待Claude Code审，整卡未完成。
+- 状态：v1.4新/旧说明SQL均327次完成，v2主表65.3%/51.4%，累计usage费用10.74321388元；用户解除Q89单题暂停后，旧说明并发4运行，其98/327执行失败及跨题同类错误触发新检查点1/3，JSON零调用待协调确认，Cube空闲。详见reports/validation/t16-v14-full-results/README.md。PR #114待Claude Code审，整卡未完成。
 - 负责：Codex
 - 模式：主仓库 clone（`scripts/start-card.sh T16`）
 - 依赖：搭建在 G1 之后（需要 `build/cube/`，T10）；跑单元在 G3 之后、T13 跑完之后（避免抢 API 并发）

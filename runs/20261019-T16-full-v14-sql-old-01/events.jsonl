@@ -1,0 +1,3 @@
+{"event": "complete", "at": "2026-10-20T02:10:06.447729+08:00", "cost_cny": "5.45555508", "response_calls": 483, "reason": ""}
+{"event": "review_pause", "at": "2026-10-20T02:11:06.349316+08:00", "triggered_gates": [1, 2, 3], "reason": "98/327执行失败；新连接路径/UInt64类别跨5%；相同错误涉及3道以上不同题；JSON未启动，待协调确认"}
+{"event": "gate_audit_baseline_correction", "at": "2026-10-20T02:11:56.408181+08:00", "reason": "扩大冒烟对照至全部既有SQL/JSON冒烟，路径/UInt64类别此前已见，检查点2未触发；仅触发1和3，暂停决定不变", "triggered_gates": [1, 3], "model_calls": 0}

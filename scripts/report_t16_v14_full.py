@@ -77,6 +77,12 @@ def error_family(execution):
         return "cube_planning"
     if "Aggregate function with name" in message and "does not exist" in message:
         return "backend_function_not_supported"
+    if "Max query size exceeded" in message:
+        return "cube_generated_query_size"
+    if "not under aggregate function and not in GROUP BY keys" in message:
+        return "cube_generated_group_by"
+    if "Invalid member expression format" in message:
+        return "cube_member_expression"
     return kind or "unclassified"
 
 
@@ -229,8 +235,9 @@ def main():
     output.mkdir(exist_ok=True)
     payload = {"eval_tag": "eval-v1.2", "semantic_tag": "semantic-v1.4", "harness_protocol": "harness-v1.1",
                "coverage_commit": "381ed1d", "model_calls_by_this_report": 0,
-               "completed_units": [cell for _, cell in units],
-               "not_run_units": [cell for _, cell in UNITS if cell not in offline],
+               "audited_units": [cell for _, cell in units],
+               "units_not_in_this_report": [cell for _, cell in UNITS if cell not in offline],
+               "not_run_units": [cell for run, cell in UNITS if not read_lines(ROOT / "runs" / run / (cell + ".jsonl"))],
                "integrity": integrity, "results": results, "json_failure_refusal_by_coverage": categories if json_rows else None,
                "json_failure_refusal_cases": cases, "paired": paired if json_rows else None,
                "json_mechanical_error_counts": dict(Counter(r["mechanical_cause"] for r in mechanical)),
