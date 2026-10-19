@@ -15,9 +15,8 @@ Each line is the source line with ``run_id``, ``eval_tag``, ``eval_commit``, ``f
 holding the source run id, its eval tag and commit, and its ``first`` / ``final``.
 ``eval_tag`` is the tag the bank was verified against (``--eval-tag``), or null when the
 bank was not checked against a tag: it never carries the source run's tag over. (Lines of
-``20261018-T13-sql-direct-01-rescore-01`` and ``20261019-T15-explorer-01-rescore-01``, written
-before this, do carry the source's ``eval_tag``; their ``eval_commit`` is the bank they were
-scored on. runs/INDEX.md.)
+``20261018-T13-sql-direct-01-rescore-01``, written before this, carry the source's ``eval-v1.1``;
+their ``eval_commit`` is the bank they were scored on, eval-v1.2. runs/INDEX.md.)
 Lines of the source that are not ``status: done`` are not carried over. A line
 whose ``question_sha256`` (logged since 2026-10-16) differs from the current
 question text is refused: the answer belongs to a different question. Only an
