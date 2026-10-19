@@ -32,3 +32,5 @@
 - 模型版本：接口返回的版本字符串，不是请求里写的名字。
 - 题库提交号：运行时 `$SEMDEBT_EVAL_DIR` 的 `git rev-parse --short HEAD`。
 - 原始响应目录：只记路径；里面的内容不入库，日志里记哈希。
+
+| 20261019-T16-pilot-v13-02 | 2026-10-19 | SQL-L2、JSON-L2 | T16 | 各23 × 1（pilot跳过judge Q40） | deepseek-flash，固定指纹e72d3c7f… | eval-v1.2 = 90e13b3；semantic-v1.3 = d2801b1 | 预算高峰合计≤3元，结果待追加 | $SEMDEBT_DATA_DIR/runs-raw/20261019-T16-pilot-v13-02 | **用户批准高峰执行**，仅此次冒烟，不含全量；--allow-peak、单并发、按单元依次跑；授权见本目录authorization.json；完整行集存外部runs-raw；指纹不符即停 |
