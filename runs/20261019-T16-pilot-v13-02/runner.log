@@ -127,3 +127,5 @@ JSON-L2: 0 done, 23 to run
   "cache_hit_ratio": 0.9861938860445327,
   "cost_cny": 0.4328
 }
+
+授权摘要：用户批准高峰执行；仅本轮 SQL-L2、JSON-L2 各23×1，合计预算3元；实际1.41452904元，使用--allow-peak。实际运行提交22b6100，固定指纹55/55通过；全量未启动。见authorization.json。
