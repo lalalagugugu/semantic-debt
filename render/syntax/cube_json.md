@@ -4,6 +4,7 @@
 
 - 输出一个 JSON 对象，发给 Cube 的 `/load` 接口。只能引用数据模型里已定义的成员，写成「cube名.成员名」，照数据模型里的写法原样抄写；不存在的成员会报错。成员名只能由英文字母、数字和下划线组成，不能写表达式、函数或空格（会被拒绝）。
 - 键：`"measures"`（指标数组）、`"dimensions"`（分组维度数组）、`"timeDimensions"`（时间维度数组）、`"filters"`（筛选数组）、`"order"`（排序）、`"limit"`（行数上限，整数）。其他键（例如 `"join"`、`"expression"`）会被拒绝。
+- 例：`{"measures": ["甲.指标"], "dimensions": ["乙.维度"], "filters": [{"member": "乙.维度", "operator": "equals", "values": ["某值"]}], "order": {"甲.指标": "desc"}, "limit": 10}`。
 - `"measures"`、`"dimensions"` 的元素是成员名字符串；`"filters"` 的每个元素写成 `{"member": 成员名, "operator": 运算符, "values": [字符串, …]}`。
 - 没有列别名：结果的每一列就以成员名命名，不能改名。
 - 结果按 `dimensions` 和时间粒度分组，每组返回一行，指标由引擎按定义计算。
