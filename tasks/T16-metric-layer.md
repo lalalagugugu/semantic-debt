@@ -1,6 +1,6 @@
 # T16 指标层（Cube Core：SQL-L2 与 JSON-L2）
 
-- 状态：v1.4新/旧说明SQL均327次完成，v2主表65.3%/51.4%，累计usage费用10.74321388元；用户解除Q89单题暂停后，旧说明并发4运行，其98/327执行失败及跨题同类错误触发新检查点1/3，JSON零调用待协调确认，Cube空闲。详见reports/validation/t16-v14-full-results/README.md。PR #114待Claude Code审，整卡未完成。
+- 状态：实验运行完成（2026-10-20）：新/旧说明SQL与JSON各327次齐，v2主表65.3%/51.4%/31.0%，usage费用13.327147元；JSON按用户新检查点运行，覆盖内117次0执行失败、无Cube超时/连接错误。日志、INDEX、逐题覆盖错因及旧说明条目对照已齐，Cube已释放。详见reports/validation/t16-v14-full-results/README.md；PR #114待Claude Code复审与用户合并。
 - 负责：Codex
 - 模式：主仓库 clone（`scripts/start-card.sh T16`）
 - 依赖：搭建在 G1 之后（需要 `build/cube/`，T10）；跑单元在 G3 之后、T13 跑完之后（避免抢 API 并发）
@@ -87,3 +87,12 @@ T10-1 的裁决（23 个双表指标各有两个调用名，`online_sales.<成�
 - 用户明确先审交付、不估全量、不调用模型。JSON十条拒答逐题核对338个既定义成员（含隐藏成员）；在一条JSON直接答对的口径下均不可表达，列当前交付接口限制。缺失能力及既有相关成员见reports/validation/t16_l2_delivery_audit.md。
 - SQL四条均复现报错，单改英文输出别名即可执行；前三条通过v2，另一条用两侧分别聚合的CTE后通过v2。均归说明缺口，Q80待定消除，硬能力限制0/4；不改源模型作答或分数。
 - 25条通用探针、6项独立数值基线断言验证；原查询及仅改别名对照做字节检查。只增补建议在reports/validation/t16_l2_delivery_additions.md，未直接修改render/、模型或tag。模型调用0、费用0；全量仍待用户审定后再估算与批准。
+
+## 2026-10-20 全量实验交付
+
+- 状态：三个单元各109非judge题×3次完整结束，低区分度单列，全部按冻结v2离线重评，无pending/unscored；实验运行完成，待Claude Code复审PR #114及用户合并。
+- 产出：`runs/20261019-T16-full-v14-{sql-new,sql-old,json}-01/`及各自`-rescore-01/`，INDEX分别记录原因、并发和费用；`reports/validation/t16-v14-full-results/`内最终结果、覆盖分类、能答却答错清单、旧说明条目映射、原始行集完整性及冻结字节证明；结果入口与BOARD已更新。
+- 数字：主表新SQL65.3%、旧SQL51.4%、JSON31.0%；JSON覆盖内117次85对32错0失败0拒答。1204份模型响应指纹一致，1072份执行文件与734份成功完整行集核验通过，usage费用13.327147元，低于用户批准的各10元/总30元。
+- 偏离与理由：用户授权后两单元从并发1调至4；旧说明高失败率按用户确认是预期对照，JSON的停止条件改为仅覆盖内执行失败率>20%或任一Cube超时/连接错误，均未触发。Q89按#143列为引擎限制，通用写法说明留下一轮修订；本轮不改冻结材料、不重跑SQL。两次API传输重试单列，不冒充Cube连接失败；无返回usage的重试不虚构费用。
+- 工时：根据三个manifest及complete事件，运行墙钟累计约149分钟，不含等用户确认及离线审查；人工审查未独立计时。全部模型请求错峰，Cube已释放，T15由协调排期。
+- 复核：23项定向测试、diff检查及四个冻结文件与harness-v1.1/已记录main逐字节核验通过。只读状态复核命令：`env -u DEEPSEEK_API_KEY uv run python -m scripts.report_t16_v14_full --progress`；已有日志、重评与机器汇总不覆盖。复审仍须Claude Code，本轮未调用其模型。

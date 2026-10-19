@@ -1,0 +1,21 @@
+{
+  "run_id": "20261019-T16-full-v14-json-01",
+  "cell": "JSON-L2",
+  "runner_commit": "080e725",
+  "eval_tag": "eval-v1.2",
+  "semantic_tag": "semantic-v1.4",
+  "harness_protocol": "harness-v1.1",
+  "syntax_tag": "semantic-v1.4",
+  "syntax_sha256": "47ebdf71cb37574a3e4bb3ad1199ae656ce9f8bff2bfeb517d1bedf273094654",
+  "system_sha256": "4f2519a1d3db0a2cc2d39076d006fa6e5519a5d4c2bf073bd30cb45dfb907f2e",
+  "context_sha256": "1eaf4135842718f5c2af6c1ee9b89de117c735f53da91007d09ff1c34908d8a8",
+  "coverage_commit": "381ed1d",
+  "started_at": "2026-10-20T02:24:05+08:00",
+  "questions": 109,
+  "reps": 3,
+  "concurrency": 4,
+  "authorized_unit_limit_cny": 10,
+  "authorized_batch_limit_cny": 30,
+  "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；单元串行；后续单元可并发4",
+  "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"
+}

@@ -242,6 +242,7 @@ def main():
                "json_failure_refusal_cases": cases, "paired": paired if json_rows else None,
                "json_mechanical_error_counts": dict(Counter(r["mechanical_cause"] for r in mechanical)),
                "json_mechanical_error_cases": mechanical,
+               "json_covered_wrong_cases": [r for r in mechanical if r["category"] == "covered" and r["outcome"] == "wrong"],
                "total_cost_cny": str(sum(Decimal(r["cost_cny"]) for r in integrity.values()))}
     filename = f"results-{args.unit}.json" if args.unit else "results.json"
     with (output / filename).open("x") as out:
