@@ -15,6 +15,7 @@ from functools import cache
 from pathlib import Path
 
 import pytest
+import yaml
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
@@ -301,3 +302,33 @@ def test_ladder_notes_t2_t3_say_nothing_about_this_dataset() -> None:
         assert not tokens & names, (f, tokens & names)
         assert "2009" not in text and "2007" not in text and "2008" not in text, f
         assert "CANNOT_ANSWER" not in text, f
+
+
+# ---------------------------------------------------------------------------
+# Generic delivery check (a): names in conventions / metrics / synonyms are visible or mapped
+# ---------------------------------------------------------------------------
+def test_reference_check_flags_invisible_names_and_accepts_documented_ones() -> None:
+    from render import check_references as CR
+    ctx = {"datasets": [{"name": "ads.dim_store", "columns": [
+               {"name": "面积", "description": "来自 DimStore.SellingAreaSize。"}]},
+                        {"name": "ads.t", "columns": [{"name": "c"}]}],
+           "metrics": [{"name": "m1", "definition": "看 DimStore.SellingAreaSize 与 ads.t.c", "only_dataset": True},
+                       {"name": "m2", "definition": "看 DimStore.EmployeeCount", "dataset": "FactSales"}],
+           "synonyms": [{"terms": ["x"], "maps_to_column": "t.c"}, {"terms": ["y"], "maps_to_column": "t.nope"}]}
+    res = CR.check(ctx)
+    assert {g["name"] for g in res["gaps"]} == {"DimStore.EmployeeCount", "FactSales", "t.nope"}
+    assert {d["name"] for d in res["documented"]} == {"DimStore.SellingAreaSize"}
+    dax = {"datasets": [{"name": "DimProduct", "columns": [{"name": "UnitPrice"}]}],
+           "metrics": [{"name": "m", "callables": [{"call": "[Sales Amount]"}]}],
+           "synonyms": [{"terms": ["p"], "maps_to_column": "DimProduct[UnitPrice]"},
+                        {"terms": ["q"], "maps_to_column": "DimProduct[Nope]"}]}
+    assert [g["name"] for g in CR.check(dax)["gaps"]] == ["DimProduct[Nope]"]
+
+
+def test_every_rendered_context_names_only_visible_or_documented_objects() -> None:
+    from render import check_references as CR
+    contexts = sorted((REPO / "build" / "contexts").glob("*.yaml"))
+    if not contexts:
+        pytest.skip("contexts not rendered")
+    gaps = {p.stem: CR.check(yaml.safe_load(p.read_text(encoding="utf-8")))["gaps"] for p in contexts}
+    assert not {k: v for k, v in gaps.items() if v}, gaps

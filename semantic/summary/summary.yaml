@@ -874,10 +874,10 @@ tables:
         description: "门店所在大洲：North America / Europe / Asia。"
         additivity: 维度
       - name: "门店营业面积"
-        description: "门店营业面积（单位数据里没写），反范式化进来做**坪效的分母**（坪效 = 销售额 ÷ 营业面积）。2 家门店是 93,800，比其余（450 ~ 1,125）高约两个数量级，是离群值。"
+        description: "门店营业面积，来自 DimStore.SellingAreaSize（单位数据里没写），反范式化进来做**坪效的分母**（坪效 = 销售额 ÷ 营业面积）。2 家门店是 93,800，比其余（450 ~ 1,125）高约两个数量级，是离群值。"
         additivity: 维度
       - name: "门店员工数"
-        description: "门店员工数，反范式化进来做**门店人均销售额的分母**。1 家是 325，是离群值。"
+        description: "门店员工数，来自 DimStore.EmployeeCount，反范式化进来做**门店人均销售额的分母**。1 家是 325，是离群值。"
         additivity: 维度
       - name: "销售额"
         description: "销售金额合计，已扣折扣、未扣退货（约定 7）。存成 Decimal(38,6)：事实表的金额列是 Float64，直接 sum 的结果随分组顺序有末位差异，定点数求和才能和事实表逐位对上。"
