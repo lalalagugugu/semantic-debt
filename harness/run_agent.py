@@ -407,7 +407,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--questions", help="comma-separated question ids (default: all)")
     ap.add_argument("--pilot", action="store_true", help="T06's pilot sample only (questions/pilot.yaml)")
     ap.add_argument("--limit", type=int, help="first N questions only")
-    ap.add_argument("--eval-tag", default="eval-v1.1")
+    ap.add_argument("--eval-tag", default="eval-v1.2")
     ap.add_argument("--semantic-tag", default="semantic-v1.2")
     ap.add_argument("--agent-tag", default=AGENT_TAG, help="harness/agent_prompt.py must be this tag's")
     ap.add_argument("--expect-fingerprint", default=G3_FINGERPRINT,
@@ -460,6 +460,12 @@ def main(argv: list[str] | None = None, load=None) -> int:
         questions = R.select_questions(load(lang="zh"), args, pilot)
     except EvalVersionError as exc:
         print(f"refusing to start: {exc}")
+        return 2
+    bad = R.invalid_rules(questions)
+    if bad:
+        print(f"refusing to start: scorer v2 rejects the rules of {len(bad)} question(s) in {args.eval_tag}:")
+        for b in bad:
+            print(f"  {b}")
         return 2
 
     rows, total = dry_run(args.cell, len(questions), args.reps, args.model, calls=args.est_calls,

@@ -13,6 +13,8 @@
 #   On SQL-R, 语义层差距 is reported as 「缺约定（档位差距）」: the convention is in L1,
 #   not in R. Pro SQL-L1 Q73 r3 and Q82 r3 were first filed as 参考问题 (wording reads two
 #   ways); the user ruled them 语义层差距 (a definitional choice L1 does not state).
+# exec_error notes never quote the engine message (scorer spec v2 §13 连带): the report adds
+# the error class and a hash of the message from runs-raw (harness/redact.py).
 
 presentation:
   # Q66: eval-v1.1 writes quarters as Q1–Q4; these answers return 1–4 with every amount right.
@@ -42,14 +44,14 @@ presentation:
 attribution:
   # ---------------- SQL-L1 ----------------
   deepseek-flash SQL-L1 Q34 2: {category: SQL 真错, note: "只列 2009 年有销售的产品（2,504 行），漏了 4 个有库存、无销售、周转率为 0 的产品（eval-v1.1 已收）；其余数值一致"}
-  deepseek-flash SQL-L1 Q34 3: {category: 执行错误/超时/拒答, note: "修一次后仍引用 CTE 里不存在的 ProductKey（UNKNOWN_IDENTIFIER）"}
+  deepseek-flash SQL-L1 Q34 3: {category: 执行错误/超时/拒答, note: "修一次后仍引用了不存在的列"}
   deepseek-v4-pro SQL-L1 Q34 3: {category: SQL 真错, note: "同 Flash r2 漏 4 个周转率为 0 的产品；另外只给键、没给名称（展示差异，不单独计）"}
   deepseek-flash SQL-L1 Q49 1: {category: 语义层差距, note: "集团实体父键指向自身，L1 没写；按层级汇总时集团算两次（17,884,462,022.63 对 12,413,657,608.89）；另输出成按层级的 4 行合计"}
-  deepseek-flash SQL-L1 Q49 2: {category: 执行错误/超时/拒答, note: "递归 CTE 撞 1000 层上限（TOO_DEEP_RECURSION），根因同上：集团自环（语义层差距）"}
+  deepseek-flash SQL-L1 Q49 2: {category: 执行错误/超时/拒答, note: "递归查询撞上引擎的递归层数上限，根因同上：集团自环（语义层差距）"}
   deepseek-flash SQL-L1 Q49 3: {category: 语义层差距, note: "420 行中 417 行一致，3 个集团因自环重复计算"}
   deepseek-v4-pro SQL-L1 Q49 1: {category: 语义层差距, note: "集团金额对，但没有州的门店归进一个 N/A「州」，多 1 行；根因同上（层级结构 L1 没写全）"}
   deepseek-v4-pro SQL-L1 Q49 2: {category: 语义层差距, note: "3 个集团因自环重复计算"}
-  deepseek-v4-pro SQL-L1 Q49 3: {category: 执行错误/超时/拒答, note: "修一次后仍引用子查询外不可见的 EntityKey（UNKNOWN_IDENTIFIER）"}
+  deepseek-v4-pro SQL-L1 Q49 3: {category: 执行错误/超时/拒答, note: "修一次后仍引用了子查询外不可见的列"}
   deepseek-flash SQL-L1 Q74 3: {category: 语义层差距, note: "按 L1 对 7 家渠道虚拟门店的描述只保留实体店（897 行，参考 925 行含虚拟门店）；L1 没说「按门店」是否含虚拟门店，调优候选"}
   deepseek-v4-pro SQL-L1 Q74 2: {category: 语义层差距, note: "同上，StoreType = 'Store'，897 行"}
   deepseek-v4-pro SQL-L1 Q71 3: {category: 语义层差距, note: "照 L1「保住总额用左连接」把缺失产品归为「未知品类」一组（9 行），eval-v1.1 参考已去掉这一组；左连接说明的适用范围不清，调优候选"}
@@ -60,7 +62,7 @@ attribution:
   deepseek-flash SQL-L1 Q82 2: {category: SQL 真错, note: "dateDiff('year') 取整年，平均任期 10.01 对参考 10.83"}
   deepseek-v4-pro SQL-L1 Q82 3: {category: 语义层差距, note: "把「团队」理解为全部下级（含间接下属）算平均任期，参考只算直属下属；直属人数全对。「团队」算直属还是全部下级是组织口径，L1 没写；调优候选，不补参考（用户裁决）"}
   deepseek-v4-pro SQL-L1 Q73 3: {category: 语义层差距, note: "「差额」取 安全库存 − 当前库存（缺口最大），参考取 当前库存 − 安全库存；当前库存口径照约定 11，正确。差额方向是口径选择（names-required-by-system-prompt 第三节），L1 没写；调优候选，不补参考（用户裁决）"}
-  deepseek-flash SQL-L1 Q117 1: {category: 执行错误/超时/拒答, note: "修一次后仍引用不存在的 StoreKey（UNKNOWN_IDENTIFIER）"}
+  deepseek-flash SQL-L1 Q117 1: {category: 执行错误/超时/拒答, note: "修一次后仍引用了不存在的列"}
   deepseek-v4-pro SQL-L1 Q117 1: {category: 执行错误/超时/拒答, note: "同上"}
   deepseek-flash SQL-L1 Q69 1: {category: 参考问题, note: "题目退化（低区分度，已标）：按 PromotionCategory 排除无折扣后只剩 1 行，作答改按促销名分组（9 行）；作答针对旧题面"}
   deepseek-flash SQL-L1 Q69 2: {category: 参考问题, note: "同上"}

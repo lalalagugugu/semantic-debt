@@ -265,12 +265,23 @@ def _is_top_n(rules: dict) -> bool:
     return rules.get("top_n") is not None or bool(rules.get("selection"))
 
 
+def _all_columns_required(rules: dict) -> dict:
+    """Rules written before ``required_columns`` existed (the eval-v1 rules anchors inherit,
+    and the bank's original-anchor rules) meant every reference column is required: the old
+    scorer defaulted to that. Scorer v2 requires the field (spec §2), so the default is
+    written out; the meaning, and so how an anchor is scored, does not change."""
+    if "required_columns" in rules or not rules.get("value_types"):
+        return rules
+    return {**rules, "required_columns": list(range(len(rules["value_types"])))}
+
+
 def _self_match(rules: dict, rows: list[list], pick: list[list] | None = None) -> tuple[dict | None, str | None]:
     """The scorer must accept a valid answer against the reference under ``rules``:
     the rows themselves, or for a boundary-complete Top-N reference ``pick`` (a
     valid choice of N rows; returning the whole tie group is wrong by contract)."""
-    from harness.scorer import score_detailed
+    from harness.scorer_v2 import score_detailed
 
+    rules = _all_columns_required(rules)
     try:
         ok = score_detailed(rows if pick is None else pick, [rows], rules).outcome == "correct"
     except (ValueError, TypeError) as exc:

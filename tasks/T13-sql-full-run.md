@@ -1,6 +1,6 @@
 # T13 SQL 直答全量
 
-- 状态：运行完成（2026-10-18，6 单元 × 366 条齐全，24.80 元）；报告为暂定数，待 `harness-v1.1` 离线重评后定稿
+- 状态：完成（2026-10-18 运行，6 单元 × 366 条齐全，24.80 元；2026-10-19 以 `harness-v1.1` + `eval-v1.2` 离线重评定稿，`runs/20261018-T13-sql-direct-01-rescore-01/`）。judge 13 题待 `judge-v1`
 - 负责：Claude Code
 - 模式：普通（`scripts/start-card.sh T13`）
 - 依赖：G3
@@ -70,5 +70,5 @@
 
 ### 待办（本卡收尾）
 
-- [ ] `harness-v1.1` 合并后：6 单元离线重评（`harness.rescore`，不调用模型），重新生成 `reports/results/sql_direct.md`，同时列 harness-v1 与 v1.1 两套数和逐条判定变化；score_timeout 一条不剩
+- [x] `harness-v1.1` 合并后：6 单元离线重评（`harness.rescore`，不调用模型），重新生成 `reports/results/sql_direct.md`，同时列 harness-v1 与 v1.1 两套数和逐条判定变化；score_timeout 一条不剩——2026-10-19 完成：协调会话要求按 `eval-v1.2` 重评（tag `harness-v1.1` = 6a23d3c，`eval-v1.2` = 90e13b3），新 run `20261018-T13-sql-direct-01-rescore-01`，原运行不动。score_timeout 0、unscored 0；翻转 49 条（错→对 43、pending→错 5、对→错 1）。报告主表只用重评数，暂定数只作「暂定 → 重评」一列；执行失败按报错码分类，含「中文别名语法错误」（首轮报错 + 最终失败合计 382 条，占执行报错的 77%）。报告生成器加 `--before`（`scripts/sql_direct_report.py`）
 - [ ] judge 13 题待 `judge-v1` 离线评

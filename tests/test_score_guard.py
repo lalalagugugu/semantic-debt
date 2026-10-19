@@ -1,7 +1,8 @@
 """T13 scoring time limit (harness/score_guard.py) and backfill from runs-raw.
 
-decisions/2026-10-18-harness-v1-1-scorer-fixes.md §4: only the runner changes; the system prompt and
-the scorer stay byte-for-byte the ``harness-v1`` versions.
+decisions/2026-10-18-harness-v1-1-scorer-fixes.md §4. Since harness-v1.1 the child process runs
+scorer v2 (harness/scorer_v2.py); the system prompt stays byte-for-byte the ``harness-v1`` version
+(scorer spec v2 §7.5), and so does the old scorer, kept in the tree for comparison only.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ from harness import run_direct as R  # noqa: E402
 from harness.client import MockClient  # noqa: E402
 from harness.executors import ExecResult  # noqa: E402
 from harness.score_guard import SCORE_TIMEOUT, Scored, score_with_timeout  # noqa: E402
-from harness.scorer import ExecError, score_detailed  # noqa: E402
+from harness.scorer_v2 import ExecError, score_detailed  # noqa: E402
 from tests.test_harness import QTEXT, FakeExecutor, Q, _ctx, _scripted  # noqa: E402
 
 FROZEN = ("harness/prompt.py", "harness/scorer.py")
@@ -41,7 +42,7 @@ def test_prompt_and_scorer_are_byte_identical_to_harness_v1(path):
 
 def test_guarded_score_equals_in_process_score():
     rules = {"ordered": False, "top_n": None, "tie_columns": [], "value_kinds": ["other", "count"],
-             "value_types": ["String", "UInt64"]}
+             "value_types": ["String", "UInt64"], "required_columns": [0, 1]}
     for cand in ([["a", 7]], [["a", 8]], [["a", 7], ["b", 1]]):
         s = score_detailed(cand, [[["a", 7]]], rules)
         assert score_with_timeout(cand, [[["a", 7]]], rules, timeout_s=60) == Scored(s.outcome, s.reason, s.matched_ref, s.sensitivity)
