@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import yaml  # noqa: E402
 
+from harness.run_direct import cost_cny  # noqa: E402
 from harness.questions import eval_dir, load_questions, question_files, verify_eval_tag  # noqa: E402
 from scripts.sql_direct_report import FOUR, REPS, all_three, correct, pct, records, share  # noqa: E402
 
@@ -46,6 +47,12 @@ def reason(r: dict) -> str:
 
 def mean(xs: list[float]) -> float:
     return sum(xs) / len(xs) if xs else 0.0
+
+
+def cost(r: dict) -> float:
+    """The attempt's model cost, from its token usage: a rescored line logs ``cost_cny = 0`` (the rescore
+    spent nothing) but keeps the source attempt's ``usage`` and ``peak``."""
+    return cost_cny(r["model_requested"], r["usage"], bool(r.get("peak"))) or 0.0
 
 
 def dependency() -> dict[str, str]:
@@ -83,7 +90,9 @@ def main() -> int:
     scored = {c: [r for r in v if r["qid"] not in judge] for c, v in done.items()}
     main_ = {c: [r for r in v if r["qid"] not in low] for c, v in scored.items()}
     dep = dependency()
-    tags = {c: sorted({r.get("eval_tag") or "?" for r in done_all[c]}) for c in cells}
+    # the bank commit each verdict was made against: a rescored line updates eval_commit but keeps the
+    # source run's eval_tag, so the tag alone would misreport the bank a rescore used
+    tags = {c: sorted({r["eval_commit"][:7] for r in done_all[c]}) for c in cells}
 
     fps = Counter(t.get("system_fingerprint") for c in cells for r in done_all[c]
                   for t in r.get("steps", []) + r["turns"])
@@ -97,9 +106,11 @@ def main() -> int:
            f"- 版本（日志）：" + "；".join(f"{c} {versions[c]}" for c in cells),
            f"- 题集标注取自 `{args.eval_tag}` = `{commit[:7]}`：judge {len(judge)} 题（不进任何准确率分母）、"
            f"低区分度 {len(low)} 题（主表单列）",
-           *([f"- **题库版本不同**：{ {c: tags[c] for c in cells} }。`eval-v1.1` 与 `eval-v1.2` 的 122 题题面与参考结果逐题相同，"
-              "只有 Q74、Q98、Q117、Q119 的 rules 不同"] if len({tuple(t) for t in tags.values()}) > 1 else
-             [f"- 四个单元的判定都按同一题库 {tags[cells[0]]}"]),
+           *([f"- **判定所用的题库提交不同**：{ {c: tags[c] for c in cells} }。`eval-v1.1`（938957f）与 `eval-v1.2`（90e13b3）"
+              "的 122 题题面与参考结果逐题相同，只有 Q74、Q98、Q117、Q119 的 rules 不同"]
+             if len({tuple(t) for t in tags.values()}) > 1 else
+             [f"- 四个单元的判定都按同一题库提交 `{tags[cells[0]][0]}`（{args.eval_tag}）；重评行的 `eval_tag` 字段沿用源运行，"
+              "以 `eval_commit` 为准"]),
            f"- 指纹（四个单元的全部调用）：{dict(fps)}",
            "- 生成：`SEMDEBT_EVAL_DIR=$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2 uv run python scripts/explorer_report.py "
            f"--run {args.run} --direct-run {args.direct_run} --eval-tag {args.eval_tag}{' --final' if args.final else ''}"
@@ -209,14 +220,14 @@ def main() -> int:
             out.append(f"| {c} | {mean([r['n_calls'] for r in rs]):.2f} | {mean([r['usage']['prompt_tokens'] for r in rs]):,.0f} "
                        f"| {mean([r['usage']['cache_miss_tokens'] for r in rs]):,.0f} "
                        f"| {mean([r['usage']['completion_tokens'] for r in rs]):,.0f} | {mean([r['latency_s'] for r in rs]):.1f} "
-                       f"| {mean([r.get('wall_s', r['latency_s']) for r in rs]):.1f} | {mean([r.get('cost_cny') or 0 for r in rs]):.4f} "
-                       f"| {sum(r.get('cost_cny') or 0 for r in rs):.2f} |")
+                       f"| {mean([r.get('wall_s', r['latency_s']) for r in rs]):.1f} | {mean([cost(r) for r in rs]):.4f} "
+                       f"| {sum(cost(r) for r in rs):.2f} |")
         re_, rd = done_all[e], done_all[d]
         out.append(f"| **{e} ÷ {d}** | {mean([r['n_calls'] for r in re_]) / mean([r['n_calls'] for r in rd]):.1f}× "
                    f"| {mean([r['usage']['prompt_tokens'] for r in re_]) / mean([r['usage']['prompt_tokens'] for r in rd]):.1f}× | "
                    f"| {mean([r['usage']['completion_tokens'] for r in re_]) / mean([r['usage']['completion_tokens'] for r in rd]):.1f}× "
                    f"| {mean([r['latency_s'] for r in re_]) / mean([r['latency_s'] for r in rd]):.1f}× | "
-                   f"| {mean([r.get('cost_cny') or 0 for r in re_]) / mean([r.get('cost_cny') or 0 for r in rd]):.1f}× | |")
+                   f"| {mean([cost(r) for r in re_]) / mean([cost(r) for r in rd]):.1f}× | |")
 
     out += ["", "## 打分超时（`score_timeout`）", "", "行集在 runs-raw，`harness-v1.1` 合并后离线重评；最终报告里不能剩下。", "",
             "| 单元 | 题 | 次 |", "|---|---|---:|"]
