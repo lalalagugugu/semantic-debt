@@ -1,0 +1,20 @@
+## 查询语言：Cube JSON 查询
+
+下面的写法都经过实测。
+
+- 输出一个 JSON 对象，发给 Cube 的 `/load` 接口。只能引用数据模型里已定义的成员，写成「cube名.成员名」，照数据模型里的写法原样抄写；不存在的成员会报错。成员名只能由英文字母、数字和下划线组成，不能写表达式、函数或空格（会被拒绝）。
+- 键：`"measures"`（指标数组）、`"dimensions"`（分组维度数组）、`"timeDimensions"`（时间维度数组）、`"filters"`（筛选数组）、`"order"`（排序）、`"limit"`（行数上限，整数）。
+- 例：`{"measures": ["甲.指标"], "dimensions": ["乙.维度"], "filters": [{"member": "乙.维度", "operator": "equals", "values": ["某值"]}], "order": {"甲.指标": "desc"}, "limit": 10}`。
+- `"measures"`、`"dimensions"` 的元素是成员名字符串；`"filters"` 的每个元素写成 `{"member": 成员名, "operator": 运算符, "values": [字符串, …]}`。
+- 没有列别名：结果的每一列就以成员名命名，不能改名。
+- 结果按 `dimensions` 和时间粒度分组，每组返回一行，指标由引擎按定义计算。
+- 多个 cube 的成员可以放在同一个查询里，前提是数据模型里有连接路径：一个事实 cube 的指标配多个维度 cube 的维度可以；两个事实 cube 的指标也可以放在一起，按它们共同连接的维度分组。连接条件不需要也不能写。
+- 时间维度：`{"dimension": "甲.时间", "granularity": "month", "dateRange": ["2020-01-01", "2020-06-30"]}`；粒度可选 day、week、month、quarter、year；不写粒度就只按区间筛选、不分组。区间两端落在半个周、季、年里时，那一组仍按所在周、季、年的起点标注，但只计入 `dateRange` 以内的数据。
+- 筛选运算符：`equals`、`notEquals`、`contains`、`notContains`、`gt`、`gte`、`lt`、`lte`、`set`、`notSet`、`inDateRange`、`beforeDate`、`afterDate`。`values` 一律写成字符串数组（`set`、`notSet` 写空数组）。`contains`、`notContains` 不区分大小写。`inDateRange` 两端都包含；`beforeDate`、`afterDate` 不包含所给的那一天。
+- 多个条件默认同时成立；需要「或」时写 `{"or": [条件1, 条件2]}`，「且」写 `{"and": […]}`。
+- 按指标筛选（相当于分组后的 HAVING）也写在 `filters` 里，`member` 填指标名。
+- 排序 `order` 可以是对象 `{"成员": "asc"}`，也可以是数组 `[["成员", "desc"], …]`，按顺序生效。
+- 取前 N 行：按指标写 `order`，再写 `"limit": N`。`limit` 作用于整个结果，不能「每组各取前 N」。
+- 空值：要筛出某个维度有值或为空的行，用 `set`、`notSet`。
+- 不能写任意表达式：不能在指标结果上再做加减乘除、排名、累计，也不能对维度临时做计算（这样写会被拒绝）。这些计算只能由模型里已定义的指标完成。
+- 因此比率、占比、同比、环比、除法、空值补零、组内排名：数据模型里有对应的指标时直接调用它；没有时，这个接口在一条查询里表达不了。
