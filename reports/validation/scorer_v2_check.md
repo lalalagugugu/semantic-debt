@@ -17,23 +17,23 @@
 
 | 阶段 | 输入 | 分类 | 翻转 | invalid_input | unscored | 总秒数 | 最慢秒数 |
 |---|---:|---|---:|---:|---:|---:|---:|
-| final | 3084 | {'correct': 1307, 'wrong': 1275, 'refused': 115, 'judge': 324, 'exec_error': 63} | 47 | 0 | 0 | 16.275017 | 0.378900 |
-| t0 | 561 | {'exec_error': 497, 'judge': 64} | 0 | 0 | 0 | 0.014262 | 0.000535 |
+| final | 3084 | {'correct': 1307, 'wrong': 1275, 'refused': 115, 'judge': 324, 'exec_error': 63} | 47 | 0 | 0 | 19.288286 | 0.485621 |
+| t0 | 561 | {'exec_error': 497, 'judge': 64} | 0 | 0 | 0 | 0.018997 | 0.001507 |
 
 ## 最慢 10 条
 
 | case_id | 秒 | 状态 / 判定 |
 |---|---:|---|
-| pilot288/pro/SQL-L1/Q74/r1 | 0.378900 | wrong |
-| pilot288/flash/SQL-L1/Q74/r1 | 0.343563 | wrong |
-| t13/SQL-L0/Q74/r2 | 0.340560 | wrong |
-| pilot288/pro/SQL-L1/Q74/r3 | 0.336880 | wrong |
-| t13/SQL-L1/Q34/r1 | 0.295671 | correct |
-| pilot288/flash/SQL-L1/Q34/r1 | 0.280605 | correct |
-| pilot288/pro/SQL-R/Q74/r2 | 0.275465 | wrong |
-| t13/SQL-L1/Q34/r2 | 0.274864 | correct |
-| t13/SQL-R/Q74/r3 | 0.267843 | wrong |
-| t13/SQL-R/Q34/r1 | 0.267500 | correct |
+| pilot288/flash/SQL-L1/Q34/r1 | 0.485621 | correct |
+| pilot288/pro/SQL-L1/Q74/r1 | 0.450722 | wrong |
+| pilot288/flash/SQL-L1/Q74/r1 | 0.446997 | wrong |
+| pilot288/flash/SQL-L1/Q74/r2 | 0.423595 | wrong |
+| pilot288/pro/SQL-L1/Q74/r3 | 0.406795 | wrong |
+| t13/SQL-L0/Q74/r2 | 0.357539 | wrong |
+| t13/SQL-L1/Q34/r2 | 0.329286 | correct |
+| t13/SQL-R/Q34/r1 | 0.314081 | correct |
+| pilot288/flash/SQL-R/Q74/r1 | 0.307601 | wrong |
+| pilot288/pro/SQL-R/Q74/r2 | 0.307580 | wrong |
 
 ## 逐条新旧判定差异
 
@@ -91,78 +91,132 @@
 
 | case_id | v2 状态 / 判定 | 秒 |
 |---|---|---:|
-| t13/SQL-L0/Q117/r2 | wrong | 0.003416 |
-| t13/SQL-L0/Q74/r2 | wrong | 0.340560 |
-| t13/SQL-L0/Q111/r1 | wrong | 0.044659 |
-| t13/SQL-L0/Q111/r2 | wrong | 0.040295 |
-| t13/SQL-L1.5W/Q79/r3 | wrong | 0.000778 |
-| t13/SQL-L1/Q79/r2 | wrong | 0.000781 |
-| t13/SQL-R/Q74/r2 | correct | 0.158207 |
-| t13/SQL-R/Q74/r1 | correct | 0.161123 |
-| t13/SQL-R/Q79/r1 | wrong | 0.000708 |
-| t13/SQL-R/Q79/r2 | wrong | 0.000739 |
-| t13/SQL-R/Q79/r3 | wrong | 0.000772 |
-| ext600:codex_gpt_5_4_raw:Q74 | correct | 0.237359 |
+| t13/SQL-L0/Q117/r2 | wrong | 0.003864 |
+| t13/SQL-L0/Q74/r2 | wrong | 0.357539 |
+| t13/SQL-L0/Q111/r1 | wrong | 0.048526 |
+| t13/SQL-L0/Q111/r2 | wrong | 0.044768 |
+| t13/SQL-L1.5W/Q79/r3 | wrong | 0.000794 |
+| t13/SQL-L1/Q79/r2 | wrong | 0.000951 |
+| t13/SQL-R/Q74/r2 | correct | 0.175340 |
+| t13/SQL-R/Q74/r1 | correct | 0.175879 |
+| t13/SQL-R/Q79/r1 | wrong | 0.000727 |
+| t13/SQL-R/Q79/r2 | wrong | 0.000830 |
+| t13/SQL-R/Q79/r3 | wrong | 0.000797 |
+| ext600:codex_gpt_5_4_raw:Q74 | correct | 0.265635 |
 
 ## 输入不合法
 
 | case_id | 错误 |
 |---|---|
 
-## 第十三节修复与归因更正
+## 分语料判定统计（本轮全部重跑 v2）
 
-此前 c6ed93c 把 Q119 的 6 处名次翻转归为旧版错误，归因错误，现撤回。实际缺陷在 v2：列必要条件筛选按行数限制名次，而同一排名对象可出现在多个输出组的多行中；位置编号的唯一性也应按组内对象核对。
+| 语料 / 阶段 | 输入 | correct | wrong | exec_error | refused | judge | invalid_input | unscored |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| t13 / final | 2196 | 959 | 860 | 28 | 115 | 234 | 0 | 0 |
+| t13 / t0 | 533 | 0 | 0 | 469 | 0 | 64 | 0 | 0 |
+| pilot288 / final | 288 | 133 | 138 | 5 | 0 | 12 | 0 | 0 |
+| pilot288 / t0 | 28 | 0 | 0 | 28 | 0 | 0 | 0 | 0 |
+| ext600 / final | 600 | 215 | 277 | 30 | 0 | 78 | 0 | 0 |
+| ext600 / t0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-修复后：竞赛 / 稠密排名允许同对象重复输出；位置编号按排名组和对象去重计数，同对象在同组内保持一致，不同对象不能占用同一位置。参考每对象只有一行时，行匹配见证可证明对象互异，覆盖 Q122 对象编码列非必答的情况。新增合成正反例保护这些条件。
+## wrong 原因码统计
 
-Q119 先去掉 selection、保留名次约束，19 次参考域自比探针全部 correct。完整参考域含 4 组额外边界对象，完整域本身不得用 N+k 冒充 N；合法选择后的 306 行在原规则下 correct。此处与 T05b 正式报告的探针上下文相同。
+| 语料 | row_count | missing_columns | values | order | selection | rank | top_n_full_group |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| t13 | 325 | 33 | 419 | 18 | 48 | 17 | 0 |
+| pilot288 | 56 | 19 | 51 | 0 | 4 | 8 | 0 |
+| ext600 | 121 | 12 | 113 | 2 | 8 | 21 | 0 |
+| 全部 | 502 | 64 | 583 | 20 | 60 | 46 | 0 |
 
-选择约束发现漏组、多组、N+k、错对象时给 selection；身份都正确而数值错误给 values。有序值匹配失败先核验去掉名次后的行序，Q92 两条改为 order。
+所有 wrong 都在 final；/t0 只有 exec_error / judge。数据库执行错误的原文不参与原因码统计，仅保留 execution_failed 与 SHA256。
 
-### 被撤销的 6 条名次翻转
+## 比较基线与第十三节变化
 
-| case_id | 旧版 | 修复后 v2 |
+- 相对上一提交 af9e2d3 / 5617caa 的已提交逐条结果，本轮 3,645 条判定和原因码均无变化。评分实现未改。
+- 相对旧评分器仍为 47 处翻转：46 人名拆合 wrong→correct、1 NULL 选择身份 correct→wrong；没有 Q119 名次翻转。旧评分器本轮未重复运行，沿用同一输入、同一旧代码的已完成结果；12 条旧版超时照旧单列。
+- 相对 c6ed93c（第十三节修复前），6 条 Q119 wrong/rank→correct 已修正，Q92 的 1 条 rank→order 和 1 条 values→order 已修正。
+- values→selection 实测 **52 条**，与用户给出的预期 48 条相差 4 条：t13 41、pilot288 3、ext600 8。多出的 4 条均为 Q71，候选有参考全部 8 个组再多 1 组；第十三节明确多组报 selection，未为凑数改回 values。交 T05b 复核统计基线 / 这 4 条，尚不声称真实语料独立对账全部完成。
+
+### 与 48 条预期相差的 Q71 四条（标识和计数，不含原文）
+
+| case_id | 参考组数 | 候选组数 | 共同组数 | 多出组数 | 本轮原因 |
+|---|---:|---:|---:|---:|---|
+| t13/SQL-L1.5S/Q71/r1 | 8 | 9 | 8 | 1 | selection |
+| t13/SQL-L1.5S/Q71/r2 | 8 | 9 | 8 | 1 | selection |
+| t13/SQL-L1.5S/Q71/r3 | 8 | 9 | 8 | 1 | selection |
+| pilot288/pro/SQL-L1/Q71/r3 | 8 | 9 | 8 | 1 | selection |
+
+### values→selection 全部逐条变化（相对 c6ed93c）
+
+| case_id | 修复前 | 当前 |
 |---|---|---|
-| t13/SQL-L1.5W/Q119/r1 | correct | correct |
-| t13/SQL-L1/Q119/r1 | correct | correct |
-| t13/SQL-L1/Q119/r3 | correct | correct |
-| t13/SQL-L1c/Q119/r1 | correct | correct |
-| t13/SQL-R/Q119/r1 | correct | correct |
-| t13/SQL-R/Q119/r2 | correct | correct |
+| t13/SQL-L0/Q119/r1 | values | selection |
+| t13/SQL-L0/Q119/r2 | values | selection |
+| t13/SQL-L0/Q119/r3 | values | selection |
+| t13/SQL-L0/Q74/r1 | values | selection |
+| t13/SQL-L0/Q85/r2 | values | selection |
+| t13/SQL-L0/Q85/r1 | values | selection |
+| t13/SQL-L0/Q85/r3 | values | selection |
+| t13/SQL-L0/Q98/r2 | values | selection |
+| t13/SQL-L0/Q98/r1 | values | selection |
+| t13/SQL-L0/Q98/r3 | values | selection |
+| t13/SQL-L1.5S/Q119/r1 | values | selection |
+| t13/SQL-L1.5S/Q71/r1 | values | selection |
+| t13/SQL-L1.5S/Q71/r3 | values | selection |
+| t13/SQL-L1.5S/Q71/r2 | values | selection |
+| t13/SQL-L1.5S/Q85/r2 | values | selection |
+| t13/SQL-L1.5S/Q98/r1 | values | selection |
+| t13/SQL-L1.5S/Q98/r3 | values | selection |
+| t13/SQL-L1.5S/Q98/r2 | values | selection |
+| t13/SQL-L1.5W/Q119/r2 | values | selection |
+| t13/SQL-L1.5W/Q119/r3 | values | selection |
+| t13/SQL-L1.5W/Q74/r3 | values | selection |
+| t13/SQL-L1.5W/Q74/r1 | values | selection |
+| t13/SQL-L1.5W/Q98/r2 | values | selection |
+| t13/SQL-L1.5W/Q98/r3 | values | selection |
+| t13/SQL-L1/Q74/r1 | values | selection |
+| t13/SQL-L1/Q85/r1 | values | selection |
+| t13/SQL-L1/Q85/r3 | values | selection |
+| t13/SQL-L1/Q98/r3 | values | selection |
+| t13/SQL-L1c/Q74/r1 | values | selection |
+| t13/SQL-L1c/Q74/r2 | values | selection |
+| t13/SQL-L1c/Q74/r3 | values | selection |
+| t13/SQL-L1c/Q85/r2 | values | selection |
+| t13/SQL-L1c/Q98/r3 | values | selection |
+| t13/SQL-L1c/Q98/r2 | values | selection |
+| t13/SQL-R/Q119/r3 | values | selection |
+| t13/SQL-R/Q22/r3 | values | selection |
+| t13/SQL-R/Q85/r1 | values | selection |
+| t13/SQL-R/Q85/r2 | values | selection |
+| t13/SQL-R/Q98/r2 | values | selection |
+| t13/SQL-R/Q98/r3 | values | selection |
+| t13/SQL-R/Q98/r1 | values | selection |
+| pilot288/pro/SQL-L1/Q71/r3 | values | selection |
+| pilot288/pro/SQL-L1/Q74/r2 | values | selection |
+| pilot288/pro/SQL-R/Q74/r3 | values | selection |
+| ext600:claude_claude_opus_4_7_raw:Q74 | values | selection |
+| ext600:claude_claude_opus_4_7_raw:Q98 | values | selection |
+| ext600:claude_claude_opus_4_7_semantic:Q74 | values | selection |
+| ext600:claude_claude_opus_4_7_semantic:Q98 | values | selection |
+| ext600:claude_claude_sonnet_4_6_raw:Q74 | values | selection |
+| ext600:claude_claude_sonnet_4_6_raw:Q98 | values | selection |
+| ext600:codex_gpt_5_4_raw:Q98 | values | selection |
+| ext600:codex_gpt_5_4_semantic:Q98 | values | selection |
 
-## 验证状态与限制
+## 共用验收、版本与隐私
 
-- 47 处新旧翻转全部逐条归因：46 处人名拆合 wrong→correct、1 处 NULL 选择身份 correct→wrong；不再有名次翻转。当前正式语料 invalid_input、unscored、v2 timeout 均为 0。
-- 本轮旧 / 新评分器先全量运行；发现 Q122 回归后修复，再对全部 3,645 条重跑最终 v2。旧评分器代码与输入未变，保留本轮旧评分结果；两条额外超时重试已完成，最终仍为原来的 12 条旧版超时，未编造其判定，不算翻转。
-- 作者合成 180 passed；旧版相关回归 185 passed、109 条兼容 warning；作者压力 8 passed。二百万行正确 / 错误整项耗时 7.24 / 25.53 秒，内部判分断言 ≤30 秒。
-- 当前 194 条只读共用用例的判定差异为 0、原因码差异为 1，不能声称全部通过。`t05b/name/selection-identity-wrong` 仍预期 values，按第十三节第 2 条应为 selection，已交用户 / T05b 更新；未覆盖、未修改输入预期。刻意触发 mapping_cap 的 1 条合成用例单列，不影响真实 unscored=0。
-- 仓库结构测试另有 2 条 main 基线失败（T21 前置检查点、T19a 卡片登记）；用 origin/main 原文件复现，未做卡外改动。
-- 当前结果交 T05b 按第十三节再做独立复验；不把本报告当作跨实现全部验收完成，不打 tag、不启动正式重评。
+更新后的 207 条共用用例判定 / 原因码零分歧；1 条有意 mapping_cap 单列。输入 SHA256 为 `bb5fe9fa6881d4340f5c4e92ebcd17c481a2c7733bd5b9fed8b1405bb0ad2673`，运行前后未变。详情见 `scorer_v2_shared_check.md`。
 
-- 最终评分器 SHA256：`a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4`。
+评分器 SHA256 `a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4`，与前次真实语料复验相同。三份语料 SHA256 与原验收通知相同，每行输入哈希均核验通过，未读取旧 eval-v1.1 数据。
 
-## 复现
+当前共用用例阻塞已解除；交用户通知 T05b 进行第十三节最终独立对账，不代替独立检查器宣布零分歧、不打 tag、不启动正式重评。
+
+实际和预期中的 exec_error 原因均脱敏，仅保留错误类别与哈希。所有新增 / 修改 reports 和 JSONL 均只含标识、状态、计数、耗时、原因码和哈希；main 继承的只追加日志未改，旧 scorer 与 prompt 未改。
 
 ```sh
-UV_CACHE_DIR="$TMPDIR/t02-uv-cache" uv run --no-sync python -m pytest \
-  tests/test_scorer_v2.py tests/test_scorer_v2_performance.py \
-  tests/test_scorer_v2_shared.py tests/test_scorer.py \
-  tests/test_scorer_presentation.py tests/test_selection.py --durations=12
-
 UV_CACHE_DIR="$TMPDIR/t02-uv-cache" uv run --no-sync python scripts/validate_scorer_v2.py \
   --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/t13.jsonl" \
   --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/pilot288.jsonl" \
   --corpus "$SEMDEBT_DATA_DIR/scorer-corpus/ext600.jsonl" --old-timeout 10
 ```
-
-## 报告脱敏与历史范围
-
-实际和共用预期中的 exec_error 原因只写 execution_failed 与 SHA256；输入错误只保留异常类别与 SHA256。数据库报错原文留在库外语料，未写入本分支报告。旧 scorer 与 prompt 未改。
-
-此前已按授权仅清理 T02-scorer-v2 独有历史并用固定 lease 推送。本轮普通追加提交，审计本分支各独有提交的 reports / JSONL，不只最新工作树；不更改 main 继承的报告和只追加运行日志，也不声称托管端旧对象已物理删除。
-
-## PR #120 裁决已确认
-
-主仓库第十三节补充已明确：合法选择后的参考应判 correct；完整边界域的 N+k 应判 selection，对完整域仅核验名次按对象计数。当前实现与已完成的全语料复验符合该裁决，无需修改评分逻辑。
-
-共用旧预期冲突以第十三节为准，不再是待裁决问题；只读用例由 T05b 更新，等待新的条数和 SHA256 后复验。当前文件仍为 194 条、SHA256 `5954bcac3a4dee62d4f50d89a0d57f16c59723fa914a0d7a1cb9392c91fb285d`，未修改或覆盖预期，也未计作全部通过。
