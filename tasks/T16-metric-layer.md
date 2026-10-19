@@ -1,6 +1,6 @@
 # T16 指标层（Cube Core：SQL-L2 与 JSON-L2）
 
-- 状态：v1.3冒烟及无模型L2交付审查完成；SQL四条执行失败均为说明缺口（Q80已定位，诊断均过v2参考），JSON十条拒答为当前冻结交付接口限制。只增补建议待审定，不改冻结材料；全量不估算、不启动，等待用户裁决。PR #114待Claude Code审。
+- 状态：v1.4新说明SQL全量327次完成，v2离线主表192/294=65.3%，费用5.28765880元；按用户新增集中失败停止条件（Q89三次CTE/CASE派生列错误）暂停，旧说明SQL与JSON零调用，待协调确认。详见reports/validation/t16-v14-full-results/README.md。PR #114待Claude Code审，整卡未完成。
 - 负责：Codex
 - 模式：主仓库 clone（`scripts/start-card.sh T16`）
 - 依赖：搭建在 G1 之后（需要 `build/cube/`，T10）；跑单元在 G3 之后、T13 跑完之后（避免抢 API 并发）

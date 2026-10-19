@@ -90,3 +90,22 @@ def test_concurrent_accounting_keeps_attempt_identity_and_every_charge(tmp_path)
     assert [r["call"] for r in ledger] == list(range(1, 41))
     assert {(r["qid"], r["rep"], r["turn"]) for r in ledger} == {(f"Q{i}", 2, t) for i in range(20) for t in (0, 1)}
     assert sum(Decimal(r["cost_cny"]) for r in ledger) == guard.spent == Decimal(ledger[-1]["cumulative_cost_cny"])
+
+
+def test_offline_member_set_ignores_filter_values_but_keeps_nested_members():
+    from scripts.report_t16_v14_full import query_members
+
+    query = {"measures": ["fact.amount"], "dimensions": ["store.name"],
+             "filters": [{"or": [{"member": "store.key", "operator": "equals", "values": ["fact.fake"]}]}],
+             "timeDimensions": [{"dimension": "fact.date", "dateRange": ["2020-01-01", "2020-02-01"]}],
+             "order": [["fact.amount", "desc"]]}
+    assert query_members(json.dumps(query)) == ["fact.amount", "fact.date", "store.key", "store.name"]
+
+
+def test_offline_denominator_keeps_refusals_and_errors_but_excludes_pending():
+    from scripts.report_t16_v14_full import counts
+
+    rows = [{"final": {"outcome": x}} for x in ("correct", "wrong", "exec_error", "refused", "pending", "unscored")]
+    result = counts(rows)
+    assert result["attempts"] == 6 and result["scored_denominator"] == 4
+    assert result["accuracy_on_scored"] == 0.25

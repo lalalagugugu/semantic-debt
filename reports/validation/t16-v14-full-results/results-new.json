@@ -1,0 +1,198 @@
+{
+  "eval_tag": "eval-v1.2",
+  "semantic_tag": "semantic-v1.4",
+  "harness_protocol": "harness-v1.1",
+  "coverage_commit": "381ed1d",
+  "model_calls_by_this_report": 0,
+  "completed_units": [
+    "SQL-L2"
+  ],
+  "not_run_units": [
+    "SQL-L2-notes-v12",
+    "JSON-L2"
+  ],
+  "integrity": {
+    "SQL-L2": {
+      "run_id": "20261019-T16-full-v14-sql-new-01",
+      "response_calls": 386,
+      "cost_cny": "5.28765880",
+      "transport_retries": 0,
+      "raw_responses_verified": 386,
+      "exec_files_verified": 386,
+      "successful_full_rowsets_verified": 313,
+      "source_log_sha256": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+      "manifest": {
+        "run_id": "20261019-T16-full-v14-sql-new-01",
+        "cell": "SQL-L2",
+        "runner_commit": "a8e3777",
+        "eval_tag": "eval-v1.2",
+        "semantic_tag": "semantic-v1.4",
+        "harness_protocol": "harness-v1.1",
+        "syntax_tag": "semantic-v1.4",
+        "syntax_sha256": "5afe370dd45dfaf37aa457b75c9d20ffc1e3809e2fd5494bd7ee6761aa8a4e8e",
+        "system_sha256": "c27b04b8047c175a7dcccabc35b0defbfc34d0b44dbf40e2545de299cb32ba02",
+        "context_sha256": "a84929df3f91a0317e592b8a7a50162d0df1fa87008a13d1c43cbd3647187790",
+        "coverage_commit": "381ed1d",
+        "started_at": "2026-10-19T23:40:54+08:00",
+        "questions": 109,
+        "reps": 3,
+        "concurrency": 1,
+        "authorized_unit_limit_cny": 10,
+        "authorized_batch_limit_cny": 30,
+        "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；不得并行",
+        "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"
+      }
+    }
+  },
+  "results": {
+    "SQL-L2": {
+      "source": "20261019-T16-full-v14-sql-new-01",
+      "offline_run": "20261019-T16-full-v14-sql-new-01-rescore-01",
+      "all": {
+        "attempts": 327,
+        "outcomes": {
+          "correct": 213,
+          "wrong": 100,
+          "exec_error": 14
+        },
+        "scored_denominator": 327,
+        "accuracy_on_scored": 0.6513761467889908
+      },
+      "primary": {
+        "attempts": 294,
+        "outcomes": {
+          "correct": 192,
+          "wrong": 88,
+          "exec_error": 14
+        },
+        "scored_denominator": 294,
+        "accuracy_on_scored": 0.6530612244897959
+      },
+      "low_discrimination": {
+        "attempts": 33,
+        "outcomes": {
+          "correct": 21,
+          "wrong": 12
+        },
+        "scored_denominator": 33,
+        "accuracy_on_scored": 0.6363636363636364
+      },
+      "runtime_snapshot": {
+        "done": 327,
+        "outcomes": {
+          "correct": 213,
+          "wrong": 100,
+          "exec_error": 14
+        },
+        "mean_model_seconds_per_answer": 19.454990825688075,
+        "mean_cube_seconds_per_answer": 0.321868501529052,
+        "final_error_families": {
+          "cube_rewrite": 5,
+          "cube_join_path": 1,
+          "cube_postprocessing_type": 2,
+          "cube_sql_generation": 1,
+          "cube_response_type": 2,
+          "cube_generated_clickhouse_syntax": 1,
+          "cube_planning": 1,
+          "backend_function_not_supported": 1
+        },
+        "all_turn_error_families": {
+          "cube_generated_clickhouse_syntax": 23,
+          "cube_join_path": 3,
+          "cube_rewrite": 20,
+          "engine_error": 3,
+          "cube_response_type": 4,
+          "cube_planning": 10,
+          "cube_postprocessing_type": 2,
+          "cube_sql_generation": 1,
+          "backend_function_not_supported": 7
+        },
+        "final_error_cases": [
+          {
+            "qid": "Q113",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q113",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q116",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q116",
+            "rep": 3,
+            "family": "cube_sql_generation"
+          },
+          {
+            "qid": "Q119",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q36",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q49",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q49",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q74",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q77",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q89",
+            "rep": 1,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q89",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q89",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q90",
+            "rep": 3,
+            "family": "backend_function_not_supported"
+          }
+        ]
+      },
+      "first_try_correct": 187,
+      "attempts_repaired_once": 59,
+      "pending_reasons": {},
+      "exec_error_classes": {
+        "engine_error": 10,
+        "interface_limitation": 4
+      }
+    }
+  },
+  "json_failure_refusal_by_coverage": null,
+  "json_failure_refusal_cases": [],
+  "paired": null,
+  "json_mechanical_error_counts": {},
+  "json_mechanical_error_cases": [],
+  "total_cost_cny": "5.28765880"
+}
