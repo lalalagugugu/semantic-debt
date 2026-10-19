@@ -10,9 +10,14 @@ The result goes to a *new* run directory (logs are append-only, hard rule 7):
 
     runs/<run-id>/<cell>.jsonl
 
-Each line is the source line with ``run_id``, ``eval_commit``, ``first`` and
+Each line is the source line with ``run_id``, ``eval_tag``, ``eval_commit``, ``first`` and
 ``final`` replaced, ``cost_cny = 0`` (nothing was spent), and ``rescored_from``
-holding the source run id, its eval commit, and its ``first`` / ``final``.
+holding the source run id, its eval tag and commit, and its ``first`` / ``final``.
+``eval_tag`` is the tag the bank was verified against (``--eval-tag``), or null when the
+bank was not checked against a tag: it never carries the source run's tag over. (Lines of
+``20261018-T13-sql-direct-01-rescore-01`` and ``20261019-T15-explorer-01-rescore-01``, written
+before this, do carry the source's ``eval_tag``; their ``eval_commit`` is the bank they were
+scored on. runs/INDEX.md.)
 Lines of the source that are not ``status: done`` are not carried over. A line
 whose ``question_sha256`` (logged since 2026-10-16) differs from the current
 question text is refused: the answer belongs to a different question. Only an
@@ -61,7 +66,7 @@ def candidate_of(turn: dict, raw_dir: Path, qid: str, rep: int):
 
 
 def rescore_line(rec: dict, q: Question, raw_dir: Path, run_id: str, commit: str,
-                 allow_changed: bool = False) -> dict:
+                 allow_changed: bool = False, eval_tag: str | None = None) -> dict:
     changed = "question_sha256" in rec and rec["question_sha256"] != R.sha256(q.text)
     if changed and not allow_changed:
         raise ValueError(f"{rec['qid']}: the question text changed since run {rec['run_id']}; "
@@ -73,11 +78,12 @@ def rescore_line(rec: dict, q: Question, raw_dir: Path, run_id: str, commit: str
     out = {
         **rec,
         "run_id": run_id,
+        "eval_tag": eval_tag,
         "eval_commit": commit,
         "first": R.score_question(first, q)["outcome"],
         "final": R.final_score(last, q, last_exec.get("error_class"), last_exec.get("limit")),
         "cost_cny": 0.0,
-        "rescored_from": {"run_id": rec["run_id"], "eval_commit": rec["eval_commit"],
+        "rescored_from": {"run_id": rec["run_id"], "eval_tag": rec.get("eval_tag"), "eval_commit": rec["eval_commit"],
                           "first": rec["first"], "final": rec["final"],
                           "rescored_at": datetime.now(R.BEIJING).isoformat(timespec="seconds"),
                           "harness_commit": R.harness_commit()},
@@ -89,7 +95,8 @@ def rescore_line(rec: dict, q: Question, raw_dir: Path, run_id: str, commit: str
 
 def rescore(source: str, cell: str, run_id: str, runs_root: Path | None = None, raw_root: Path | None = None,
             questions: dict[str, Question] | None = None, commit: str | None = None,
-            allow_changed: bool = False) -> Path:
+            allow_changed: bool = False, eval_tag: str | None = None) -> Path:
+    """``eval_tag``: the tag the bank was verified against (recorded in every line), or None."""
     src = R.log_path(source, cell, runs_root)
     dst = R.log_path(run_id, cell, runs_root)
     if dst.exists():
@@ -99,7 +106,7 @@ def rescore(source: str, cell: str, run_id: str, runs_root: Path | None = None, 
     commit = commit or eval_commit()
     raw_dir = (raw_root or R.raw_root()) / source / cell
     lines = [json.loads(l) for l in src.read_text(encoding="utf-8").splitlines() if l.strip()]
-    out = [rescore_line(rec, questions[rec["qid"]], raw_dir, run_id, commit, allow_changed)
+    out = [rescore_line(rec, questions[rec["qid"]], raw_dir, run_id, commit, allow_changed, eval_tag)
            for rec in lines if rec.get("status") == "done"]
     dst.parent.mkdir(parents=True, exist_ok=True)
     with dst.open("x", encoding="utf-8") as fh:
@@ -124,7 +131,8 @@ def main(argv: list[str] | None = None) -> int:
         except EvalVersionError as exc:
             print(f"refusing to start: {exc}", file=sys.stderr)
             return 2
-    path = rescore(args.source, args.cell, args.run_id, allow_changed=args.allow_changed_question)
+    path = rescore(args.source, args.cell, args.run_id, allow_changed=args.allow_changed_question,
+                   eval_tag=args.eval_tag)
     for rec in map(json.loads, path.read_text(encoding="utf-8").splitlines()):
         mark = "  (question changed)" if rec.get("question_changed") else ""
         print(f"{rec['qid']} r{rec['rep']}: {rec['rescored_from']['final']['outcome']} -> {rec['final']['outcome']}{mark}")
