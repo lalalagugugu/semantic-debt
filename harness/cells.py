@@ -51,6 +51,10 @@ CELLS: dict[str, Cell] = {c.name: c for c in [
 # ``run_direct --cell all`` never picks them up.
 AGENT_CELLS: dict[str, Cell] = {f"{base}-E": CELLS[base] for base in ("SQL-L0", "SQL-L1", "SQL-L2")}
 
+# Planning agent cells (-P, T21): the direct cell's execution scope, syntax notes and rendered
+# context (as a catalog plus ``lookup``), with plan / run_sql / python tools. L0 and L1 only.
+PLAN_CELLS: dict[str, Cell] = {f"{base}-P": CELLS[base] for base in ("SQL-L0", "SQL-L1")}
+
 # DeepSeek official prices, CNY per 1M tokens, off-peak (peak = 2x).
 # Source: https://api-docs.deepseek.com/zh-cn/quick_start/pricing, read 2026-10-16.
 PRICES_OFFPEAK: dict[str, dict[str, float]] = {
