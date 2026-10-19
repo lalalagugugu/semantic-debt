@@ -1,0 +1,60 @@
+{
+  "denominator": 327,
+  "pilot_source": "20261019-T16-pilot-v13-02/SQL-L2.jsonl",
+  "pilot_all_turn_error_families": {
+    "cube_rewrite": 3,
+    "cube_generated_clickhouse_syntax": 7,
+    "cube_planning": 1
+  },
+  "first_turn_error_families": {
+    "cube_generated_clickhouse_syntax": 22,
+    "cube_join_path": 2,
+    "cube_rewrite": 15,
+    "engine_error": 3,
+    "cube_response_type": 2,
+    "cube_planning": 9,
+    "backend_function_not_supported": 6
+  },
+  "attempts_with_error_family_any_turn": {
+    "cube_generated_clickhouse_syntax": 23,
+    "cube_join_path": 2,
+    "cube_rewrite": 19,
+    "engine_error": 3,
+    "cube_response_type": 3,
+    "cube_planning": 10,
+    "cube_postprocessing_type": 2,
+    "cube_sql_generation": 1,
+    "backend_function_not_supported": 7
+  },
+  "new_error_families_relative_to_pilot": {
+    "cube_join_path": {
+      "attempts_any_turn": 2,
+      "rate_per_completed_answer": 0.0061162079510703364
+    },
+    "engine_error": {
+      "attempts_any_turn": 3,
+      "rate_per_completed_answer": 0.009174311926605505
+    },
+    "cube_response_type": {
+      "attempts_any_turn": 3,
+      "rate_per_completed_answer": 0.009174311926605505
+    },
+    "cube_postprocessing_type": {
+      "attempts_any_turn": 2,
+      "rate_per_completed_answer": 0.0061162079510703364
+    },
+    "cube_sql_generation": {
+      "attempts_any_turn": 1,
+      "rate_per_completed_answer": 0.0030581039755351682
+    },
+    "backend_function_not_supported": {
+      "attempts_any_turn": 7,
+      "rate_per_completed_answer": 0.021406727828746176
+    }
+  },
+  "new_family_over_5pct": false,
+  "stop_condition_1": false,
+  "stop_condition_2": false,
+  "stop_condition_3": true,
+  "decision": "hold next units pending coordinator confirmation"
+}

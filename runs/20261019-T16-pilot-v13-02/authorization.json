@@ -1,0 +1,45 @@
+{
+  "authorization": "用户批准高峰执行",
+  "scope": "仅本轮 SQL-L2、JSON-L2 冒烟，不含全量",
+  "budget_cny_peak_total": 3,
+  "cells": [
+    "SQL-L2",
+    "JSON-L2"
+  ],
+  "reps": 1,
+  "questions": [
+    "Q08",
+    "Q100",
+    "Q102",
+    "Q117",
+    "Q15",
+    "Q17",
+    "Q28",
+    "Q34",
+    "Q49",
+    "Q50",
+    "Q51",
+    "Q66",
+    "Q68",
+    "Q69",
+    "Q70",
+    "Q71",
+    "Q73",
+    "Q74",
+    "Q75",
+    "Q76",
+    "Q80",
+    "Q81",
+    "Q82"
+  ],
+  "skipped_judge": [
+    "Q40"
+  ],
+  "eval_tag": "eval-v1.2",
+  "semantic_tag": "semantic-v1.3",
+  "expected_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501",
+  "allow_peak": true,
+  "concurrency": 1,
+  "runtime_budget_note": "--budget 检查开跑估算；外部持续监看累计实际费用，不引入额外重试",
+  "harness_base": "56fcac29bfb4a2326190f1969e457e93b4314707"
+}

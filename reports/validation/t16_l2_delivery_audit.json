@@ -1,0 +1,1014 @@
+{
+  "source": "20261019-T16-pilot-v13-02",
+  "eval_tag": "eval-v1.2",
+  "semantic_tag": "semantic-v1.3",
+  "model_calls": 0,
+  "script_sha256": "20ef1cf4c46bab4b58fe22d8db72cb6fcf3cc91c5322f243649ed5370572bb8d",
+  "defined_member_names": [
+    "account.AccountDescription",
+    "account.AccountKey",
+    "account.AccountName",
+    "account.AccountType",
+    "account.ParentAccountKey",
+    "account.ValueType",
+    "calendar.AsiaSeason",
+    "calendar.CalendarDayOfWeekLabel",
+    "calendar.CalendarDayOfWeekNumber",
+    "calendar.CalendarHalfYearLabel",
+    "calendar.CalendarMonthLabel",
+    "calendar.CalendarQuarterLabel",
+    "calendar.CalendarWeekLabel",
+    "calendar.CalendarYear",
+    "calendar.CalendarYearLabel",
+    "calendar.DateKey",
+    "calendar.EuropeSeason",
+    "calendar.FiscalHalfYearLabel",
+    "calendar.FiscalMonthLabel",
+    "calendar.FiscalQuarterLabel",
+    "calendar.FiscalYear",
+    "calendar.FiscalYearLabel",
+    "calendar.IsHoliday",
+    "calendar.IsWorkDay",
+    "calendar.MonthNumber",
+    "calendar.NorthAmericaSeason",
+    "channel.ChannelDescription",
+    "channel.ChannelKey",
+    "channel.ChannelName",
+    "currency.CurrencyDescription",
+    "currency.CurrencyKey",
+    "currency.CurrencyName",
+    "customer.BirthDate",
+    "customer.CustomerKey",
+    "customer.Education",
+    "customer.FirstName",
+    "customer.Gender",
+    "customer.GeographyKey",
+    "customer.HouseOwnerFlag",
+    "customer.LastName",
+    "customer.MaritalStatus",
+    "customer.NumberCarsOwned",
+    "customer.NumberChildrenAtHome",
+    "customer.Occupation",
+    "customer.TotalChildren",
+    "customer.YearlyIncome",
+    "employee.BaseRate",
+    "employee.BirthDate",
+    "employee.DepartmentName",
+    "employee.EmailAddress",
+    "employee.EmergencyContactName",
+    "employee.EmergencyContactPhone",
+    "employee.EmployeeKey",
+    "employee.FirstName",
+    "employee.Gender",
+    "employee.HireDate",
+    "employee.IsMarried",
+    "employee.IsSalesPerson",
+    "employee.LastName",
+    "employee.ParentEmployeeKey",
+    "employee.PayFrequency",
+    "employee.Phone",
+    "employee.SalaryStatus",
+    "employee.StartDate",
+    "employee.Status",
+    "employee.Title",
+    "employee.VacationHours",
+    "entity.EntityDescription",
+    "entity.EntityKey",
+    "entity.EntityName",
+    "entity.EntityType",
+    "entity.ParentEntityKey",
+    "entity.ParentEntityLabel",
+    "entity.StartDate",
+    "entity.Status",
+    "exchange_rate.AverageRate",
+    "exchange_rate.CurrencyKey",
+    "exchange_rate.DateKey",
+    "exchange_rate.EndOfDayRate",
+    "exchange_rate.ExchangeRateKey",
+    "geography.CityName",
+    "geography.ContinentName",
+    "geography.GeographyKey",
+    "geography.GeographyType",
+    "geography.RegionCountryName",
+    "geography.StateProvinceName",
+    "inventory.Aging",
+    "inventory.CurrencyKey",
+    "inventory.DateKey",
+    "inventory.DaysInStock",
+    "inventory.InventoryKey",
+    "inventory.MaxDayInStock",
+    "inventory.MinDayInStock",
+    "inventory.OnHandQuantity",
+    "inventory.OnOrderQuantity",
+    "inventory.ProductKey",
+    "inventory.SafetyStockQuantity",
+    "inventory.StoreKey",
+    "inventory.UnitCost",
+    "inventory.average_on_hand_value",
+    "inventory.below_safety_stock_count",
+    "inventory.current_on_hand_quantity",
+    "inventory.current_on_hand_value",
+    "inventory.current_on_order_quantity",
+    "inventory.current_safety_stock_quantity",
+    "inventory.inventory_turnover",
+    "inventory.snapshot_below_safety_stock_count",
+    "inventory.snapshot_on_hand_quantity",
+    "inventory.snapshot_on_hand_value",
+    "inventory.snapshot_on_order_quantity",
+    "inventory.snapshot_safety_stock_quantity",
+    "inventory.store_product_pair_count",
+    "it_machine.CostAmount",
+    "it_machine.CostType",
+    "it_machine.DateKey",
+    "it_machine.ITMachinekey",
+    "it_machine.MachineKey",
+    "it_machine.it_cost",
+    "it_sla.DateKey",
+    "it_sla.DownTime",
+    "it_sla.ITSLAkey",
+    "it_sla.MachineKey",
+    "it_sla.OutageEndTime",
+    "it_sla.OutageKey",
+    "it_sla.OutageStartTime",
+    "it_sla.StoreKey",
+    "it_sla.down_time",
+    "it_sla.outage_count",
+    "machine.DecommissionDate",
+    "machine.MachineDescription",
+    "machine.MachineHardware",
+    "machine.MachineKey",
+    "machine.MachineName",
+    "machine.MachineOS",
+    "machine.MachineSoftware",
+    "machine.MachineSource",
+    "machine.MachineType",
+    "machine.ServiceStartDate",
+    "machine.Status",
+    "machine.StoreKey",
+    "machine.VendorName",
+    "online_sales.CurrencyKey",
+    "online_sales.CustomerKey",
+    "online_sales.DateKey",
+    "online_sales.DiscountAmount",
+    "online_sales.DiscountQuantity",
+    "online_sales.OnlineSalesKey",
+    "online_sales.ProductKey",
+    "online_sales.PromotionKey",
+    "online_sales.ReturnAmount",
+    "online_sales.ReturnQuantity",
+    "online_sales.SalesAmount",
+    "online_sales.SalesOrderLineNumber",
+    "online_sales.SalesOrderNumber",
+    "online_sales.SalesQuantity",
+    "online_sales.StoreKey",
+    "online_sales.TotalCost",
+    "online_sales.UnitCost",
+    "online_sales.UnitPrice",
+    "online_sales.active_customer_count",
+    "online_sales.at_risk_customer_count",
+    "online_sales.average_daily_sales_amount",
+    "online_sales.average_daily_sales_quantity",
+    "online_sales.average_order_value",
+    "online_sales.average_unit_price",
+    "online_sales.churned_customer_count",
+    "online_sales.customer_count",
+    "online_sales.customer_recency_months",
+    "online_sales.discount_amount",
+    "online_sales.discount_quantity",
+    "online_sales.discount_rate",
+    "online_sales.discounted_list_amount",
+    "online_sales.discounted_sales_amount",
+    "online_sales.discounted_sales_share",
+    "online_sales.gross_margin",
+    "online_sales.gross_margin_pct",
+    "online_sales.lines_per_order",
+    "online_sales.list_amount_before_discount",
+    "online_sales.net_sales_amount",
+    "online_sales.new_customer_count",
+    "online_sales.new_customer_sales_amount",
+    "online_sales.new_customer_sales_share",
+    "online_sales.order_count",
+    "online_sales.order_line_count",
+    "online_sales.orders_per_customer",
+    "online_sales.product_count",
+    "online_sales.return_amount",
+    "online_sales.return_quantity",
+    "online_sales.return_rate",
+    "online_sales.sales_amount",
+    "online_sales.sales_amount_in_scope",
+    "online_sales.sales_amount_mom_pct",
+    "online_sales.sales_amount_prior_month",
+    "online_sales.sales_amount_prior_year",
+    "online_sales.sales_amount_share",
+    "online_sales.sales_amount_yoy_pct",
+    "online_sales.sales_per_customer",
+    "online_sales.sales_quantity",
+    "online_sales.selling_day_count",
+    "online_sales.total_cost",
+    "outage.OutageKey",
+    "outage.OutageName",
+    "outage.OutageSubType",
+    "outage.OutageType",
+    "outage.OutageTypeDescription",
+    "product.AvailableForSaleDate",
+    "product.BrandName",
+    "product.ClassName",
+    "product.ColorName",
+    "product.Manufacturer",
+    "product.ProductDescription",
+    "product.ProductKey",
+    "product.ProductName",
+    "product.ProductSubcategoryKey",
+    "product.Status",
+    "product.StockTypeName",
+    "product.StyleName",
+    "product.UnitCost",
+    "product.UnitOfMeasureName",
+    "product.UnitPrice",
+    "product.Weight",
+    "product.WeightUnitMeasureID",
+    "product.list_price",
+    "product.margin_pct",
+    "product.unit_cost",
+    "product_category.ProductCategoryKey",
+    "product_category.ProductCategoryName",
+    "product_subcategory.ProductCategoryKey",
+    "product_subcategory.ProductSubcategoryKey",
+    "product_subcategory.ProductSubcategoryName",
+    "promotion.DiscountPercent",
+    "promotion.PromotionCategory",
+    "promotion.PromotionKey",
+    "promotion.PromotionName",
+    "promotion.PromotionType",
+    "sales.CurrencyKey",
+    "sales.DateKey",
+    "sales.DiscountAmount",
+    "sales.DiscountQuantity",
+    "sales.ProductKey",
+    "sales.PromotionKey",
+    "sales.ReturnAmount",
+    "sales.ReturnQuantity",
+    "sales.SalesAmount",
+    "sales.SalesKey",
+    "sales.SalesQuantity",
+    "sales.StoreKey",
+    "sales.TotalCost",
+    "sales.UnitCost",
+    "sales.UnitPrice",
+    "sales.average_daily_sales_amount",
+    "sales.average_daily_sales_quantity",
+    "sales.average_unit_price",
+    "sales.channelKey",
+    "sales.discount_amount",
+    "sales.discount_quantity",
+    "sales.discount_rate",
+    "sales.discounted_list_amount",
+    "sales.discounted_sales_amount",
+    "sales.discounted_sales_share",
+    "sales.gross_margin",
+    "sales.gross_margin_pct",
+    "sales.list_amount_before_discount",
+    "sales.net_sales_amount",
+    "sales.product_count",
+    "sales.return_amount",
+    "sales.return_quantity",
+    "sales.return_rate",
+    "sales.sales_amount",
+    "sales.sales_amount_in_scope",
+    "sales.sales_amount_mom_pct",
+    "sales.sales_amount_prior_month",
+    "sales.sales_amount_prior_year",
+    "sales.sales_amount_share",
+    "sales.sales_amount_yoy_pct",
+    "sales.sales_per_selling_area",
+    "sales.sales_per_store",
+    "sales.sales_per_store_employee",
+    "sales.sales_quantity",
+    "sales.same_store_base",
+    "sales.same_store_base_prior_year",
+    "sales.same_store_sales_amount",
+    "sales.same_store_sales_growth_pct",
+    "sales.selling_day_count",
+    "sales.store_count",
+    "sales.total_cost",
+    "sales_quota.ChannelKey",
+    "sales_quota.CurrencyKey",
+    "sales_quota.DateKey",
+    "sales_quota.GrossMarginQuota",
+    "sales_quota.ProductKey",
+    "sales_quota.SalesAmountQuota",
+    "sales_quota.SalesQuantityQuota",
+    "sales_quota.SalesQuotaKey",
+    "sales_quota.ScenarioKey",
+    "sales_quota.StoreKey",
+    "sales_quota.gross_margin_quota",
+    "sales_quota.quota_attainment_pct",
+    "sales_quota.quota_variance",
+    "sales_quota.sales_amount_quota",
+    "sales_quota.sales_quantity_quota",
+    "sales_territory.EmployeeKey",
+    "sales_territory.GeographyKey",
+    "sales_territory.SalesTerritoryCountry",
+    "sales_territory.SalesTerritoryGroup",
+    "sales_territory.SalesTerritoryKey",
+    "sales_territory.SalesTerritoryLevel",
+    "sales_territory.SalesTerritoryManager",
+    "sales_territory.SalesTerritoryName",
+    "sales_territory.SalesTerritoryRegion",
+    "sales_territory.Status",
+    "scenario.ScenarioKey",
+    "scenario.ScenarioName",
+    "store.CloseDate",
+    "store.CloseReason",
+    "store.EmployeeCount",
+    "store.EmployeeKey",
+    "store.EntityKey",
+    "store.GeographyKey",
+    "store.OpenDate",
+    "store.SellingAreaSize",
+    "store.Status",
+    "store.StoreFax",
+    "store.StoreKey",
+    "store.StoreManager",
+    "store.StoreName",
+    "store.StorePhone",
+    "store.StoreType",
+    "strategy_plan.AccountKey",
+    "strategy_plan.Amount",
+    "strategy_plan.CurrencyKey",
+    "strategy_plan.DateKey",
+    "strategy_plan.EntityKey",
+    "strategy_plan.ProductCategoryKey",
+    "strategy_plan.ScenarioKey",
+    "strategy_plan.StrategyPlanKey",
+    "strategy_plan.plan_amount",
+    "strategy_plan.plan_revenue"
+  ],
+  "capabilities": {
+    "I-RANK": "无已定义排名/分位成员；不能动态产生名次、百分位筛选阈值。",
+    "I-INTERSECT": "不能求两个由聚合结果动态排名产生的集合的交集。",
+    "I-NEST": "limit作用于整个结果；没有分组内Top-N或父子两阶段选择。",
+    "I-SCOPE": "没有所需分母作用域/差额占比成员；现有share的group_by为空，不能临时改成按父组归约。",
+    "I-AGG": "缺少所需预定义聚合度量；维度存在不代表可以临时对它写AVG/COUNT。",
+    "I-EXPR": "缺少所需预定义计算成员；JSON不能临时写算术或日期差表达式。",
+    "I-COHORT": "缺少所需聚合后群组判定再重聚合的计算成员；对当前分组的指标做filter不是先按另一粒度选集合。",
+    "I-REAGG": "缺少所需两级聚合成员；JSON不能先按实体聚合、再对实体结果重新分组/平均。",
+    "I-DERIVED": "所需派生分组键没有定义为维度；不能把MIN等聚合表达式临时用作维度。",
+    "I-SELF": "缺少所需预定义自关联关系和度量；不能临时声明第二个cube别名及ON条件。"
+  },
+  "json_refusals": [
+    {
+      "qid": "Q100",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-RANK",
+        "I-INTERSECT"
+      ],
+      "existing_related_members": [
+        "online_sales.order_count",
+        "online_sales.average_order_value"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q117",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-NEST",
+        "I-RANK",
+        "I-SCOPE"
+      ],
+      "existing_related_members": [
+        "sales.same_store_sales_growth_pct",
+        "sales.same_store_sales_amount"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q70",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-AGG"
+      ],
+      "existing_related_members": [
+        "sales.sales_amount",
+        "store.SellingAreaSize"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q71",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-NEST"
+      ],
+      "existing_related_members": [
+        "online_sales.sales_amount"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q73",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-EXPR",
+        "I-RANK"
+      ],
+      "existing_related_members": [
+        "inventory.current_on_hand_quantity",
+        "inventory.current_safety_stock_quantity"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q74",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-NEST",
+        "I-RANK",
+        "I-SCOPE"
+      ],
+      "existing_related_members": [
+        "sales.sales_amount",
+        "sales.sales_amount_share"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q76",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-COHORT",
+        "I-EXPR"
+      ],
+      "existing_related_members": [
+        "online_sales.order_count",
+        "online_sales.sales_amount"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q80",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-REAGG"
+      ],
+      "existing_related_members": [
+        "online_sales.customer_recency_months",
+        "online_sales.DateKey"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q81",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-REAGG",
+        "I-DERIVED"
+      ],
+      "existing_related_members": [
+        "online_sales.sales_per_customer",
+        "online_sales.customer_count"
+      ],
+      "material_defect_if_expressible": null
+    },
+    {
+      "qid": "Q82",
+      "correct_single_json_with_existing_members": false,
+      "category": "接口限制（当前冻结交付）",
+      "capability_codes": [
+        "I-SELF",
+        "I-AGG",
+        "I-EXPR"
+      ],
+      "existing_related_members": [
+        "employee.EmployeeKey",
+        "employee.ParentEmployeeKey",
+        "employee.HireDate"
+      ],
+      "material_defect_if_expressible": null
+    }
+  ],
+  "sql_failures": [
+    {
+      "qid": "Q50",
+      "category": "写法说明缺口",
+      "original_error_reproduced": true,
+      "ascii_only_executable": true,
+      "verified_correct_case": "Q50_ascii_only",
+      "verification": {
+        "outcome": "correct",
+        "reason": null,
+        "matched_ref": 0,
+        "sensitivity": null
+      },
+      "rows": 1
+    },
+    {
+      "qid": "Q76",
+      "category": "写法说明缺口",
+      "original_error_reproduced": true,
+      "ascii_only_executable": true,
+      "verified_correct_case": "Q76_ascii_only",
+      "verification": {
+        "outcome": "correct",
+        "reason": null,
+        "matched_ref": 0,
+        "sensitivity": null
+      },
+      "rows": 9
+    },
+    {
+      "qid": "Q80",
+      "category": "写法说明缺口",
+      "original_error_reproduced": true,
+      "ascii_only_executable": true,
+      "verified_correct_case": "Q80_ascii_only",
+      "verification": {
+        "outcome": "correct",
+        "reason": null,
+        "matched_ref": 0,
+        "sensitivity": null
+      },
+      "rows": 29
+    },
+    {
+      "qid": "Q82",
+      "category": "写法说明缺口",
+      "original_error_reproduced": true,
+      "ascii_only_executable": true,
+      "verified_correct_case": "Q82_two_aggregated_ctes",
+      "verification": {
+        "outcome": "correct",
+        "reason": null,
+        "matched_ref": 0,
+        "sensitivity": null
+      },
+      "rows": 11
+    }
+  ],
+  "generic_probes": [
+    {
+      "id": "G_date_chain_ascii",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 4,
+      "error": null,
+      "raw_sha256": "5c1223f698563d309949342aaca282e785824c7c9fc4c730b558ce5d63b07afd",
+      "query": "WITH raw_days AS (SELECT sales.\"StoreKey\" AS StoreKey,channel.\"ChannelName\" AS ChannelName,sales.\"DateKey\" AS TransactionDate FROM store CROSS JOIN sales CROSS JOIN channel WHERE channel.\"ChannelName\" <> '' GROUP BY 1,2,3), spans AS (SELECT StoreKey,ChannelName,MIN(TransactionDate) AS first_day,MAX(TransactionDate) AS last_day FROM raw_days GROUP BY StoreKey,ChannelName), day_counts AS (SELECT ChannelName,StoreKey,CAST(last_day AS DATE)-CAST(first_day AS DATE) AS day_count FROM spans) SELECT ChannelName AS group_name,ROUND(AVG(day_count),2) AS mean_days FROM day_counts GROUP BY ChannelName ORDER BY ChannelName",
+      "numeric_baseline_match": true
+    },
+    {
+      "id": "G_date_chain_unicode",
+      "interface": "sql",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 35 (``) (line 1, col 35): ``, ROUND(`day_counts`.`avg_day_counts_d`, 2) `mean_days` \nFROM (\n  SELECT `day_counts`.`channelname` `channelname`, AVG(`day_counts`.`day_count`) `avg_day_counts... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: a1507d1f-4729-46e4-a81d-a2f7fbc5177d-207f8095-bc08-45eb-b91f-7da7735fcc08",
+      "raw_sha256": "0851d1952f5e88c5fa9a87b679264daa14095a13acf40243484380f2fa5782d5",
+      "query": "WITH raw_days AS (SELECT sales.\"StoreKey\" AS StoreKey,channel.\"ChannelName\" AS ChannelName,sales.\"DateKey\" AS TransactionDate FROM store CROSS JOIN sales CROSS JOIN channel WHERE channel.\"ChannelName\" <> '' GROUP BY 1,2,3), spans AS (SELECT StoreKey,ChannelName,MIN(TransactionDate) AS first_day,MAX(TransactionDate) AS last_day FROM raw_days GROUP BY StoreKey,ChannelName), day_counts AS (SELECT ChannelName,StoreKey,CAST(last_day AS DATE)-CAST(first_day AS DATE) AS day_count FROM spans) SELECT ChannelName AS \"分组\",ROUND(AVG(day_count),2) AS mean_days FROM day_counts GROUP BY ChannelName ORDER BY ChannelName",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_join_aggregate_ascii",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 4,
+      "error": null,
+      "raw_sha256": "7a9c731cf36a723e81f6a2d2dcd07339575c166f9353a9fa85f713b34ffea8cd",
+      "query": "WITH a AS (SELECT sales.\"channelKey\" AS left_key,MEASURE(sales.sales_amount) AS left_value FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS right_key,MEASURE(sales.sales_quantity) AS right_value FROM sales GROUP BY 1) SELECT a.left_key AS group_key,SUM(a.left_value) AS total_value,SUM(b.right_value) AS total_quantity FROM a JOIN b ON a.left_key=b.right_key GROUP BY a.left_key ORDER BY a.left_key",
+      "numeric_baseline_match": true
+    },
+    {
+      "id": "G_join_aggregate_unicode",
+      "interface": "sql",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 23 (``) (line 1, col 23): ``, `a`.`sum_a_left_value` `total_value`, `a`.`sum_a_right_valu` `total_quantity` \nFROM (\n  SELECT `a`.`left_key` `left_key`, SUM(`a`.`left_value`) `sum_a_left_va... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: cdb38094-7762-492e-84f6-1c96890e9d16-79196491-2718-453e-9573-01542b1f4c75",
+      "raw_sha256": "5b9073e63a765dfa35d4d6a7a6ae56402a954637391439d788c3afe8d4a29519",
+      "query": "WITH a AS (SELECT sales.\"channelKey\" AS left_key,MEASURE(sales.sales_amount) AS left_value FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS right_key,MEASURE(sales.sales_quantity) AS right_value FROM sales GROUP BY 1) SELECT a.left_key AS \"分组\",SUM(a.left_value) AS total_value,SUM(b.right_value) AS total_quantity FROM a JOIN b ON a.left_key=b.right_key GROUP BY a.left_key ORDER BY a.left_key",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_self_alias_ascii",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 0,
+      "error": null,
+      "raw_sha256": "6705f509c6a7d146668d5ade64c43609fff6d2ad8489d92635dc5cd9ae961840",
+      "query": "SELECT p.\"EmployeeKey\" AS group_key,COUNT(c.\"EmployeeKey\") AS subordinate_count FROM employee p CROSS JOIN employee c WHERE c.\"ParentEmployeeKey\"=p.\"EmployeeKey\" GROUP BY p.\"EmployeeKey\" ORDER BY p.\"EmployeeKey\"",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_self_alias_unicode",
+      "interface": "sql",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 26 (``) (line 1, col 26): ``, `p`.`count_c_employee` `subordinate_coun` \nFROM (\n  SELECT `employee`.EmployeeKey `employeekey`, COUNT(`employee`.EmployeeKey) `count_c_employee` \n  FROM  reta... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 02606ae9-a121-4e4a-9c83-dfbc260dd269-3acb7aee-6dc3-4ecb-aac9-a221de6f917f",
+      "raw_sha256": "6b789a8c28376ba7e243623e74d1d6d367c397ab860b18342ba8dc65a60f098f",
+      "query": "SELECT p.\"EmployeeKey\" AS \"分组\",COUNT(c.\"EmployeeKey\") AS subordinate_count FROM employee p CROSS JOIN employee c WHERE c.\"ParentEmployeeKey\"=p.\"EmployeeKey\" GROUP BY p.\"EmployeeKey\" ORDER BY p.\"EmployeeKey\"",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_single_cte_ascii",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 4,
+      "error": null,
+      "raw_sha256": "49eff92af866954454bcdc289c5c21645e0458c0e60d1b12901efbd5d366868c",
+      "query": "WITH a AS (SELECT sales.\"channelKey\" AS group_key,MEASURE(sales.sales_amount) AS value FROM sales GROUP BY 1) SELECT group_key AS group_key_out,SUM(value) AS total_value FROM a GROUP BY group_key ORDER BY group_key",
+      "numeric_baseline_match": true
+    },
+    {
+      "id": "G_single_cte_unicode",
+      "interface": "sql",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 24 (``) (line 1, col 24): ``, `a`.`sum_a_value_` `total_value` \nFROM (\n  SELECT `a`.`group_key` `group_key`, SUM(`a`.`value`) `sum_a_value_` \n  FROM (\n    SELECT `sales`.channelKey `group_ke... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 9f9925d7-4c3c-4473-8da6-62b35575475d-d7b6cf46-60f5-4bcf-b1cf-010f52ab639a",
+      "raw_sha256": "3a14a7b45d7d4f952e51ee83456291bfad649c55cb9d3711fabd0e0677a36d2f",
+      "query": "WITH a AS (SELECT sales.\"channelKey\" AS group_key,MEASURE(sales.sales_amount) AS value FROM sales GROUP BY 1) SELECT group_key AS \"分组\",SUM(value) AS total_value FROM a GROUP BY group_key ORDER BY group_key",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_defined_baseline",
+      "interface": "json",
+      "generic": true,
+      "ok": true,
+      "row_count": 3,
+      "error": null,
+      "raw_sha256": "9fcb4b8c34f938d581ff849664bcdc2ed088154b548dbcd7a108f98888acbe57",
+      "query": {
+        "measures": [
+          "online_sales.order_count",
+          "online_sales.average_order_value"
+        ],
+        "dimensions": [
+          "online_sales.CustomerKey"
+        ],
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_ad_hoc_aggregate",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Invalid query format: \"measures[0]\" does not match any of the allowed types",
+      "raw_sha256": "39407c2e917cedf23e13fba68218bbaaae386a4bfff0555db009feb39ae26d0a",
+      "query": {
+        "measures": [
+          {
+            "expression": "AVG(${store.SellingAreaSize})",
+            "cubeName": "store",
+            "name": "dynamic_mean"
+          }
+        ],
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_arithmetic_member",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Invalid query format: \"measures[0]\" with value \"inventory.current_on_hand_quantity - inventory.current_safety_stock_quantity\" fails to match the required pattern: /^[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+$/",
+      "raw_sha256": "92c78b079b180b05f0ffe5f0723be7df44da0e1a9046f2410d7582d21f37fe00",
+      "query": {
+        "measures": [
+          "inventory.current_on_hand_quantity - inventory.current_safety_stock_quantity"
+        ],
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_window_expression",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Invalid query format: \"expression\" is not allowed",
+      "raw_sha256": "0e2470923b897cc4f9ffd0d154543364e192ccdbafd6c40abb09e5e14211896c",
+      "query": {
+        "measures": [
+          "online_sales.sales_amount"
+        ],
+        "dimensions": [
+          "product.ProductKey"
+        ],
+        "expression": "ROW_NUMBER() OVER (ORDER BY online_sales.sales_amount DESC)",
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_dynamic_group",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Invalid query format: \"dimensions[0]\" does not match any of the allowed types",
+      "raw_sha256": "408d276b1e436c2b2e58baa12f0f25bec831e4526d168acab7c5f8a13e04e695",
+      "query": {
+        "measures": [
+          "online_sales.sales_amount"
+        ],
+        "dimensions": [
+          {
+            "expression": "YEAR(MIN(${online_sales.DateKey}))",
+            "cubeName": "online_sales",
+            "name": "dynamic_period"
+          }
+        ],
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_self_join_key",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Invalid query format: \"join\" is not allowed",
+      "raw_sha256": "9ec5234a6e5045039d80ccd6500a79781c1c624ebc05d6ff0e88dcd2cee87675",
+      "query": {
+        "dimensions": [
+          "employee.EmployeeKey",
+          "employee.ParentEmployeeKey"
+        ],
+        "join": {
+          "employee": "employee"
+        },
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_date_chain_no_order",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 4,
+      "error": null,
+      "raw_sha256": "add5b3ee9bfc8401ad611fe81baa7ac6a10573b0b1aec37914b8f51d6583b1ff",
+      "query": "WITH raw_days AS (SELECT sales.\"StoreKey\" AS StoreKey,channel.\"ChannelName\" AS ChannelName,sales.\"DateKey\" AS TransactionDate FROM store CROSS JOIN sales CROSS JOIN channel WHERE channel.\"ChannelName\" <> '' GROUP BY 1,2,3), spans AS (SELECT StoreKey,ChannelName,MIN(TransactionDate) AS first_day,MAX(TransactionDate) AS last_day FROM raw_days GROUP BY StoreKey,ChannelName), day_counts AS (SELECT ChannelName,StoreKey,CAST(last_day AS DATE)-CAST(first_day AS DATE) AS day_count FROM spans) SELECT ChannelName AS \"分组\",ROUND(AVG(day_count),2) AS mean_days FROM day_counts GROUP BY ChannelName",
+      "numeric_baseline_match": true
+    },
+    {
+      "id": "G_date_chain_alias_order",
+      "interface": "sql",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 35 (``) (line 1, col 35): ``, ROUND(`day_counts`.`avg_day_counts_d`, 2) `mean_days` \nFROM (\n  SELECT `day_counts`.`channelname` `channelname`, AVG(`day_counts`.`day_count`) `avg_day_counts... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 599ba3d6-3b67-45d4-87b9-2056f9cbd41c-cca182be-d3f7-417d-b8df-9e040a542561",
+      "raw_sha256": "98bd5df4924da27c8d4ea7d68cb3eddd7999bd9760f9a8de48e0c0c562bbe3d5",
+      "query": "WITH raw_days AS (SELECT sales.\"StoreKey\" AS StoreKey,channel.\"ChannelName\" AS ChannelName,sales.\"DateKey\" AS TransactionDate FROM store CROSS JOIN sales CROSS JOIN channel WHERE channel.\"ChannelName\" <> '' GROUP BY 1,2,3), spans AS (SELECT StoreKey,ChannelName,MIN(TransactionDate) AS first_day,MAX(TransactionDate) AS last_day FROM raw_days GROUP BY StoreKey,ChannelName), day_counts AS (SELECT ChannelName,StoreKey,CAST(last_day AS DATE)-CAST(first_day AS DATE) AS day_count FROM spans) SELECT ChannelName AS \"分组\",ROUND(AVG(day_count),2) AS mean_days FROM day_counts GROUP BY ChannelName ORDER BY \"分组\"",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_single_cte_no_order",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 4,
+      "error": null,
+      "raw_sha256": "7cf7e327efad7100997f2bdefe86f992f434266d509313a3718fd86e64108efd",
+      "query": "WITH a AS (SELECT sales.\"channelKey\" AS group_key,MEASURE(sales.sales_amount) AS value FROM sales GROUP BY 1) SELECT group_key AS \"分组\",SUM(value) AS total_value FROM a GROUP BY group_key",
+      "numeric_baseline_match": true
+    },
+    {
+      "id": "G_single_cte_alias_order",
+      "interface": "sql",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 24 (``) (line 1, col 24): ``, `a`.`sum_a_value_` `total_value` \nFROM (\n  SELECT `a`.`group_key` `group_key`, SUM(`a`.`value`) `sum_a_value_` \n  FROM (\n    SELECT `sales`.channelKey `group_ke... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: b8c1846d-0766-46b6-ba4a-019d5a11c807-3e60707d-ffab-4683-ab9c-aa1005a02187",
+      "raw_sha256": "3e69fb295a516a59cdd1c6dbfb706a50215c71880e0b4732906a6adb96dfcd92",
+      "query": "WITH a AS (SELECT sales.\"channelKey\" AS group_key,MEASURE(sales.sales_amount) AS value FROM sales GROUP BY 1) SELECT group_key AS \"分组\",SUM(value) AS total_value FROM a GROUP BY group_key ORDER BY \"分组\"",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_dimension_self_direct",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 0,
+      "error": null,
+      "raw_sha256": "b2d255f972a67c9a02a2e2f16771009a02a9b183ca3ede95dc46603694672869",
+      "query": "SELECT l.\"ChannelKey\" AS lk,r.\"ChannelKey\" AS rk FROM channel l CROSS JOIN channel r WHERE r.\"ChannelKey\"=l.\"ChannelKey\"+1 ORDER BY 1",
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "G_dimension_self_aggregated",
+      "interface": "sql",
+      "generic": true,
+      "ok": true,
+      "row_count": 3,
+      "error": null,
+      "raw_sha256": "40d9a8a521ec4b5ad5284c97626477179fff455c8044f721345916c52ff4a361",
+      "query": "WITH a AS (SELECT channel.\"ChannelKey\" AS lk,MAX(channel.\"ChannelName\") AS left_name FROM channel GROUP BY 1), b AS (SELECT channel.\"ChannelKey\" AS rk,MAX(channel.\"ChannelName\") AS right_name FROM channel GROUP BY 1) SELECT a.lk,b.rk,a.left_name,b.right_name FROM a JOIN b ON b.rk=a.lk+1 ORDER BY 1",
+      "numeric_baseline_match": true
+    },
+    {
+      "id": "J_hidden_key",
+      "interface": "json",
+      "generic": true,
+      "ok": true,
+      "row_count": 3,
+      "error": null,
+      "raw_sha256": "2c218bbfe2e80a89c2e219b560a2a32ef06959d969e085d6dc9dc99a150ea61d",
+      "query": {
+        "dimensions": [
+          "channel.ChannelKey"
+        ],
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_hidden_measure",
+      "interface": "json",
+      "generic": true,
+      "ok": true,
+      "row_count": 1,
+      "error": null,
+      "raw_sha256": "1cf08b72dff715037719f258ce43ff7335bc1da5d996fc00226f02bd7191259c",
+      "query": {
+        "measures": [
+          "sales.sales_amount_in_scope"
+        ],
+        "limit": 3
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_expression_array_form",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Error: Can't match args for: store,return `AVG(${store.SellingAreaSize})`",
+      "raw_sha256": "57944451175f2c145a2769c5afce33361932eb4d0c644aff110d97114306082f",
+      "query": {
+        "measures": [
+          {
+            "cubeName": "store",
+            "name": "dynamic_mean",
+            "expression": [
+              "store",
+              "return `AVG(${store.SellingAreaSize})`"
+            ]
+          }
+        ]
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_expression_serialized_form",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Error: Expressions are not allowed in this context",
+      "raw_sha256": "f6688a9aab4ffee60a11ed903efcbaaab2fdbcba0333c302c5acbf4c5787eb3e",
+      "query": {
+        "measures": [
+          "{\"cubeName\": \"store\", \"alias\": \"dynamic_mean\", \"expr\": {\"type\": \"SqlFunction\", \"cubeParams\": [\"store\"], \"sql\": \"AVG(${store.SellingAreaSize})\"}}"
+        ]
+      },
+      "numeric_baseline_match": null
+    },
+    {
+      "id": "J_patch_measure_form",
+      "interface": "json",
+      "generic": true,
+      "ok": false,
+      "row_count": 0,
+      "error": "Error: JS Deserialization Error: invalid type: map, expected a string",
+      "raw_sha256": "81cdb5f9b6d9594e17b261921633ba6523655e4abd067bdf32fbd69b902916b3",
+      "query": {
+        "measures": [
+          {
+            "cubeName": "online_sales",
+            "name": "patched",
+            "expression": {
+              "type": "PatchMeasure",
+              "sourceMeasure": "online_sales.sales_amount",
+              "replaceAggregationType": "avg",
+              "addFilters": []
+            }
+          }
+        ]
+      },
+      "numeric_baseline_match": null
+    }
+  ],
+  "physical_checks": {
+    "G_date_chain_ascii": true,
+    "G_date_chain_no_order": true,
+    "G_join_aggregate_ascii": true,
+    "G_single_cte_ascii": true,
+    "G_single_cte_no_order": true,
+    "G_dimension_self_aggregated": true
+  },
+  "source_log_sha256": {
+    "SQL-L2": "70a81ed10ea60194f7f4f99c77c665186c96f5e6dd2615f805f3a7ddbb8be959",
+    "JSON-L2": "39b45621001d21574265d912c85e257303d4fe5ec074cb5b98c6b459572fab04"
+  },
+  "private_diagnostics": [
+    {
+      "id": "Q50_original",
+      "qid": "Q50",
+      "interface": "sql",
+      "ok": false,
+      "row_count": 0,
+      "raw_sha256": "405e7897485bece847d39f6f59cecea0f9ea3d69c38016553a512b47ab9e3dfb"
+    },
+    {
+      "id": "Q50_ascii_only",
+      "qid": "Q50",
+      "interface": "sql",
+      "ok": true,
+      "row_count": 1,
+      "raw_sha256": "b288ba3bfdc1349d87a5ae7161197ea811fb8fee4aca495090c440911fcc894a"
+    },
+    {
+      "id": "Q76_original",
+      "qid": "Q76",
+      "interface": "sql",
+      "ok": false,
+      "row_count": 0,
+      "raw_sha256": "52db565882481c76673fe4a4e1623bf7e32b757a3c2e6a639d5f7f050f451faa"
+    },
+    {
+      "id": "Q76_ascii_only",
+      "qid": "Q76",
+      "interface": "sql",
+      "ok": true,
+      "row_count": 9,
+      "raw_sha256": "ba2f25aa3690c8a45a997da623266cf8c33b58d7daf6a7abff208c55becdfccd"
+    },
+    {
+      "id": "Q80_original",
+      "qid": "Q80",
+      "interface": "sql",
+      "ok": false,
+      "row_count": 0,
+      "raw_sha256": "23cde85482afed0f396e8d76ef86cca3d5c4cb9647c1363fcc59874ad6cd49ac"
+    },
+    {
+      "id": "Q80_ascii_only",
+      "qid": "Q80",
+      "interface": "sql",
+      "ok": true,
+      "row_count": 29,
+      "raw_sha256": "aa2c2039979e0e0280160b3692cad1729b08437f16a27f395bf7d42820207903"
+    },
+    {
+      "id": "Q82_original",
+      "qid": "Q82",
+      "interface": "sql",
+      "ok": false,
+      "row_count": 0,
+      "raw_sha256": "ba9648e34a568f1546a1712c1e87d96d10ef8a84cac3761476e777a0ee4f9ef7"
+    },
+    {
+      "id": "Q82_ascii_only",
+      "qid": "Q82",
+      "interface": "sql",
+      "ok": true,
+      "row_count": 0,
+      "raw_sha256": "7a3b81b61eb7396248d394a2881f8bfddab2f1fb6d7b019ce70e1c3a096b0f86"
+    },
+    {
+      "id": "Q82_two_aggregated_ctes",
+      "interface": "sql",
+      "generic": false,
+      "ok": true,
+      "row_count": 11,
+      "raw_sha256": "549d202f21327d845e1bb9bcf0b3d569abe97cbeafcb70e84c4a3abdaaa98d39"
+    }
+  ],
+  "inventory_sha256": "bb5309992b3508a0976fbfe0a56aad581e829411578e70e0346024dce8a71ba2"
+}

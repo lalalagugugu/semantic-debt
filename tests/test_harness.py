@@ -35,6 +35,20 @@ needs_chdb = pytest.mark.skipif(not CHDB.exists(), reason="chDB data directory n
 # prompt
 
 
+@pytest.mark.parametrize("path", ["harness/prompt.py", "harness/scorer.py"])
+@pytest.mark.parametrize("baseline", [
+    "84f5e045dc9d3456c11c4453515c746047a69c74",  # experiment baseline, including PR #100
+    "88fd81c9d743ef93d1e00f65c7f5f8faa95d72ec",  # main at PR preparation, including T15
+    "89ce1b31b22e009b726448ff23fe0f55d5a26a80",  # main at interface-audit delivery
+])
+def test_t16_frozen_files_match_main_byte_for_byte(path, baseline):
+    import subprocess
+
+    expected = subprocess.check_output(["git", "show", f"{baseline}:{path}"], cwd=REPO)
+    actual = (REPO / path).read_bytes()
+    assert actual == expected, f"{path} differs from experiment main {baseline}"
+
+
 def test_prompt_order_and_stable_prefix():
     system = P.system_message("CTX-BODY", "SYNTAX-BODY")
     assert system.index(P.SYSTEM_PROMPT) < system.index("CTX-BODY") < system.index("SYNTAX-BODY")
@@ -224,6 +238,84 @@ def _scripted(*answers):
         calls.append(messages)
         return answers.pop(0)
     return respond, calls
+
+
+@pytest.mark.parametrize("fingerprints", [("unexpected",), (None,), ("expected", "unexpected")])
+def test_t16_stops_on_each_call_fingerprint(tmp_path, monkeypatch, fingerprints):
+    monkeypatch.setattr(R, "is_peak", lambda *a: False)
+    client = MockClient(lambda m: "```sql\nSELECT bad\n```", fingerprint=fingerprints[0])
+    calls = []
+
+    def respond(messages):
+        client.fingerprint = fingerprints[len(calls)]
+        calls.append(messages)
+        return "```sql\nSELECT bad\n```"
+
+    client.respond = respond
+    ex = FakeExecutor({})
+    ctx = _ctx(tmp_path, client, ex)
+    ctx.boundary = R.CallBoundary("expected")
+    rec = R.run_attempt(ctx, Q, 1)
+    assert rec["status"] == "stopped" and ctx.boundary.stopped.is_set()
+    assert len(calls) == len(fingerprints) and len(ex.seen) == len(fingerprints) - 1
+    assert rec["turns"][-1]["exec"]["status"] == "not_executed"
+    raw = ctx.raw_dir / f"{Q.qid}_r1_t{len(calls) - 1}.json"
+    assert R.sha256(raw.read_bytes()) == rec["turns"][-1]["raw_sha256"]
+    R.run_attempt(ctx, Q, 2)
+    assert len(calls) == len(fingerprints)
+
+
+def test_t16_peak_boundary_blocks_fix_call(tmp_path, monkeypatch):
+    peak = [False]
+    monkeypatch.setattr(R, "is_peak", lambda *a: peak[0])
+    calls = []
+
+    def respond(messages):
+        calls.append(messages)
+        peak[0] = True
+        return "```sql\nSELECT bad\n```"
+
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({}))
+    ctx.boundary = R.CallBoundary("fp_mock")
+    rec = R.run_attempt(ctx, Q, 1)
+    assert rec["status"] == "stopped" and len(calls) == 1
+    assert ctx.boundary.stopped.is_set() and len(rec["turns"]) == 1
+
+
+def test_t16_both_cube_factories_and_json_flow(tmp_path):
+    from harness.executors import CubeSqlExecutor, CubeJsonExecutor
+    assert isinstance(R.make_executor(CELLS["SQL-L2"], 7), CubeSqlExecutor)
+    assert isinstance(R.make_executor(CELLS["JSON-L2"], 7), CubeJsonExecutor)
+    query = '{"measures": ["sales.sales_amount"]}'
+    ex = FakeExecutor({query: ExecResult(rows=[[42]], columns=["sales.sales_amount"])})
+    ctx = _ctx(tmp_path, MockClient(lambda m: f"```json\n{query}\n```"), ex, "JSON-L2")
+    rec = R.run_attempt(ctx, Q, 1)
+    assert ex.seen == [query] and rec["final"]["outcome"] == "correct"
+    assert json.loads((ctx.raw_dir / f"{Q.qid}_r1_t0.exec.json").read_text())["rows"] == [[42]]
+
+
+def test_t16_request_boundary_also_checks_transport_retries(monkeypatch):
+    from harness import client as C
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "offline-test-placeholder")
+    monkeypatch.setattr(C.time, "sleep", lambda _: None)
+    requests = []
+
+    def fail(*a, **kw):
+        requests.append(1)
+        raise OSError("offline")
+
+    monkeypatch.setattr(C.urllib.request, "urlopen", fail)
+    checks = []
+
+    def boundary():
+        checks.append(1)
+        if len(checks) == 2:
+            raise R.RunStopped("peak hours")
+
+    client = C.DeepSeekClient("deepseek-flash", before_request=boundary)
+    with pytest.raises(R.RunStopped, match="peak hours"):
+        client.chat([])
+    assert len(checks) == 2 and len(requests) == 1
 
 
 def test_correct_first_try(tmp_path):
@@ -427,14 +519,14 @@ def test_dry_run_matches_board_unit_list(tmp_path):
     assert "| SQL 直答 | L1 调优 | T14 |" in board
     assert "| 英文锚点 | R-EN、L1c-EN" in board
     expected = {"SQL-L0", "SQL-R", "SQL-L1", "SQL-L1c", "SQL-L1.5W", "SQL-L1.5S", "SQL-L1-tuned", "SQL-L2",
-                "SQL-R-EN", "SQL-L1c-EN"}
+                "SQL-R-EN", "SQL-L1c-EN", "JSON-L2"}
     assert set(CELLS) == expected
     rows, total = R.dry_run(list(CELLS.values()), {"zh": 122, "en": 99}, 3, "deepseek-flash", fix_rate=0.1,
                             output_tokens=3000, hit_ratio=0.95, question_tokens=60, runs_root=tmp_path)
     by = {r["cell"]: r for r in rows}
     assert by["SQL-L1"]["attempts"] == 366 and by["SQL-L1"]["calls"] == round(366 * 1.1)
     assert by["SQL-R-EN"]["attempts"] == 297
-    assert sum(r["attempts"] for r in rows) == 8 * 366 + 2 * 297
+    assert sum(r["attempts"] for r in rows) == 9 * 366 + 2 * 297
     assert total > 0
 
 
@@ -1130,6 +1222,28 @@ def test_run_scoring_uses_scorer_v2_in_process_and_in_the_child():
     for timeout in (None, 60):
         assert R.score_question([[2009, 5]], YEAR, score_timeout_s=timeout)["outcome"] == "wrong"
         assert R.score_question([[2008, 5]], YEAR, score_timeout_s=timeout)["outcome"] == "correct"
+
+
+def test_rescore_restores_cube_numbers_without_coercing_string_dimensions(tmp_path):
+    from decimal import Decimal
+    from harness import rescore as RS
+
+    payload = {"columns": [{"name": "cube.code", "type": "string"},
+                           {"name": "cube.value", "type": "number"}],
+               "rows": [["001", "12345678901234567890.125"], ["002", None], ["003", 7]],
+               "error": None}
+    data = json.dumps(payload).encode()
+    path = tmp_path / "Q001_r1_t0.exec.json"
+    path.write_bytes(data)
+    turn = {"turn": 0, "exec": {"status": "ok", "exec_raw_sha256": R.sha256(data)}}
+    candidate = RS.candidate_of(turn, tmp_path, "Q001", 1)
+    assert candidate == [["001", Decimal("12345678901234567890.125")], ["002", None], ["003", 7]]
+    assert path.read_bytes() == data
+    payload["columns"][1]["type"] = "string"
+    data = json.dumps(payload).encode()
+    path.write_bytes(data)
+    turn["exec"]["exec_raw_sha256"] = R.sha256(data)
+    assert RS.candidate_of(turn, tmp_path, "Q001", 1)[0][1] == "12345678901234567890.125"
 
 
 def test_rescore_uses_scorer_v2(tmp_path):

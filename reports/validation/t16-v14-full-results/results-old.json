@@ -1,0 +1,622 @@
+{
+  "eval_tag": "eval-v1.2",
+  "semantic_tag": "semantic-v1.4",
+  "harness_protocol": "harness-v1.1",
+  "coverage_commit": "381ed1d",
+  "model_calls_by_this_report": 0,
+  "audited_units": [
+    "SQL-L2-notes-v12"
+  ],
+  "units_not_in_this_report": [
+    "SQL-L2",
+    "JSON-L2"
+  ],
+  "not_run_units": [
+    "JSON-L2"
+  ],
+  "integrity": {
+    "SQL-L2-notes-v12": {
+      "run_id": "20261019-T16-full-v14-sql-old-01",
+      "response_calls": 483,
+      "cost_cny": "5.45555508",
+      "transport_retries": 1,
+      "raw_responses_verified": 483,
+      "exec_files_verified": 483,
+      "successful_full_rowsets_verified": 229,
+      "source_log_sha256": "f58926226ebb7031d806437c100b5db2196e05b91f68f9002c3ca45be500e2a4",
+      "manifest": {
+        "run_id": "20261019-T16-full-v14-sql-old-01",
+        "cell": "SQL-L2-notes-v12",
+        "runner_commit": "dd42aba",
+        "eval_tag": "eval-v1.2",
+        "semantic_tag": "semantic-v1.4",
+        "harness_protocol": "harness-v1.1",
+        "syntax_tag": "semantic-v1.2",
+        "syntax_sha256": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+        "system_sha256": "1a59e6ce445ef6db6366e83fc7c08b8d586f5b964885b1397fd925d534086de7",
+        "context_sha256": "a84929df3f91a0317e592b8a7a50162d0df1fa87008a13d1c43cbd3647187790",
+        "coverage_commit": "381ed1d",
+        "started_at": "2026-10-20T01:42:54+08:00",
+        "questions": 109,
+        "reps": 3,
+        "concurrency": 4,
+        "authorized_unit_limit_cny": 10,
+        "authorized_batch_limit_cny": 30,
+        "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；单元串行；后续单元可并发4",
+        "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"
+      }
+    }
+  },
+  "results": {
+    "SQL-L2-notes-v12": {
+      "source": "20261019-T16-full-v14-sql-old-01",
+      "offline_run": "20261019-T16-full-v14-sql-old-01-rescore-01",
+      "all": {
+        "attempts": 327,
+        "outcomes": {
+          "correct": 164,
+          "wrong": 65,
+          "exec_error": 98
+        },
+        "scored_denominator": 327,
+        "accuracy_on_scored": 0.5015290519877675
+      },
+      "primary": {
+        "attempts": 294,
+        "outcomes": {
+          "correct": 151,
+          "exec_error": 88,
+          "wrong": 55
+        },
+        "scored_denominator": 294,
+        "accuracy_on_scored": 0.5136054421768708
+      },
+      "low_discrimination": {
+        "attempts": 33,
+        "outcomes": {
+          "wrong": 10,
+          "exec_error": 10,
+          "correct": 13
+        },
+        "scored_denominator": 33,
+        "accuracy_on_scored": 0.3939393939393939
+      },
+      "runtime_snapshot": {
+        "done": 327,
+        "outcomes": {
+          "correct": 164,
+          "wrong": 65,
+          "exec_error": 98
+        },
+        "mean_model_seconds_per_answer": 19.125779816513763,
+        "mean_cube_seconds_per_answer": 0.3954373088685015,
+        "final_error_families": {
+          "cube_generated_clickhouse_syntax": 19,
+          "backend_function_not_supported": 5,
+          "cube_join_path": 15,
+          "cube_rewrite": 28,
+          "engine_error": 9,
+          "cube_planning": 6,
+          "cube_postprocessing_type": 4,
+          "cube_response_type": 12
+        },
+        "all_turn_error_families": {
+          "cube_generated_clickhouse_syntax": 60,
+          "cube_join_path": 50,
+          "cube_planning": 21,
+          "backend_function_not_supported": 7,
+          "cube_rewrite": 66,
+          "engine_error": 21,
+          "cube_postprocessing_type": 5,
+          "cube_sql_generation": 1,
+          "cube_response_type": 23
+        },
+        "final_error_cases": [
+          {
+            "qid": "Q05",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q07",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q10",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q100",
+            "rep": 2,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q102",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q104",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q104",
+            "rep": 2,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q104",
+            "rep": 3,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q106",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q109",
+            "rep": 3,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q11",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q110",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q110",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q110",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q111",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q111",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q112",
+            "rep": 1,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q112",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q113",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q113",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q114",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q111",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q116",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q116",
+            "rep": 3,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q116",
+            "rep": 2,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q117",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q117",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q117",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q114",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q118",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q119",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q119",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q119",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q16",
+            "rep": 2,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q16",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q16",
+            "rep": 3,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q22",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q22",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q25",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q27",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q27",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q32",
+            "rep": 1,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q32",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q34",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q35",
+            "rep": 2,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q34",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q34",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q36",
+            "rep": 2,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q37",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q35",
+            "rep": 3,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q47",
+            "rep": 3,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q49",
+            "rep": 2,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q50",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q49",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q49",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q50",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q50",
+            "rep": 3,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q60",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q61",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q65",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q67",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q65",
+            "rep": 2,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q74",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q73",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q74",
+            "rep": 2,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q75",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q75",
+            "rep": 1,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q74",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q75",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q76",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q77",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q77",
+            "rep": 2,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q76",
+            "rep": 3,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q77",
+            "rep": 3,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q78",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q79",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q80",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q83",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q82",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q82",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q83",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q85",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q88",
+            "rep": 2,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q87",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q88",
+            "rep": 1,
+            "family": "engine_error"
+          },
+          {
+            "qid": "Q89",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q89",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q90",
+            "rep": 1,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q90",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q90",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q94",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q92",
+            "rep": 3,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q94",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q98",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q98",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q99",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q99",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q99",
+            "rep": 2,
+            "family": "engine_error"
+          }
+        ]
+      },
+      "first_try_correct": 132,
+      "attempts_repaired_once": 156,
+      "pending_reasons": {},
+      "exec_error_classes": {
+        "engine_error": 64,
+        "interface_limitation": 34
+      }
+    }
+  },
+  "json_failure_refusal_by_coverage": null,
+  "json_failure_refusal_cases": [],
+  "paired": null,
+  "json_mechanical_error_counts": {},
+  "json_mechanical_error_cases": [],
+  "total_cost_cny": "5.45555508"
+}

@@ -1,0 +1,4810 @@
+{
+  "eval_tag": "eval-v1.2",
+  "semantic_tag": "semantic-v1.4",
+  "harness_protocol": "harness-v1.1",
+  "coverage_commit": "381ed1d",
+  "model_calls_by_this_report": 0,
+  "audited_units": [
+    "SQL-L2",
+    "SQL-L2-notes-v12",
+    "JSON-L2"
+  ],
+  "units_not_in_this_report": [],
+  "not_run_units": [],
+  "integrity": {
+    "SQL-L2": {
+      "run_id": "20261019-T16-full-v14-sql-new-01",
+      "response_calls": 386,
+      "cost_cny": "5.28765880",
+      "transport_retries": 0,
+      "raw_responses_verified": 386,
+      "exec_files_verified": 386,
+      "successful_full_rowsets_verified": 313,
+      "source_log_sha256": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+      "manifest": {
+        "run_id": "20261019-T16-full-v14-sql-new-01",
+        "cell": "SQL-L2",
+        "runner_commit": "a8e3777",
+        "eval_tag": "eval-v1.2",
+        "semantic_tag": "semantic-v1.4",
+        "harness_protocol": "harness-v1.1",
+        "syntax_tag": "semantic-v1.4",
+        "syntax_sha256": "5afe370dd45dfaf37aa457b75c9d20ffc1e3809e2fd5494bd7ee6761aa8a4e8e",
+        "system_sha256": "c27b04b8047c175a7dcccabc35b0defbfc34d0b44dbf40e2545de299cb32ba02",
+        "context_sha256": "a84929df3f91a0317e592b8a7a50162d0df1fa87008a13d1c43cbd3647187790",
+        "coverage_commit": "381ed1d",
+        "started_at": "2026-10-19T23:40:54+08:00",
+        "questions": 109,
+        "reps": 3,
+        "concurrency": 1,
+        "authorized_unit_limit_cny": 10,
+        "authorized_batch_limit_cny": 30,
+        "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；不得并行",
+        "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"
+      }
+    },
+    "SQL-L2-notes-v12": {
+      "run_id": "20261019-T16-full-v14-sql-old-01",
+      "response_calls": 483,
+      "cost_cny": "5.45555508",
+      "transport_retries": 1,
+      "raw_responses_verified": 483,
+      "exec_files_verified": 483,
+      "successful_full_rowsets_verified": 229,
+      "source_log_sha256": "f58926226ebb7031d806437c100b5db2196e05b91f68f9002c3ca45be500e2a4",
+      "manifest": {
+        "run_id": "20261019-T16-full-v14-sql-old-01",
+        "cell": "SQL-L2-notes-v12",
+        "runner_commit": "dd42aba",
+        "eval_tag": "eval-v1.2",
+        "semantic_tag": "semantic-v1.4",
+        "harness_protocol": "harness-v1.1",
+        "syntax_tag": "semantic-v1.2",
+        "syntax_sha256": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+        "system_sha256": "1a59e6ce445ef6db6366e83fc7c08b8d586f5b964885b1397fd925d534086de7",
+        "context_sha256": "a84929df3f91a0317e592b8a7a50162d0df1fa87008a13d1c43cbd3647187790",
+        "coverage_commit": "381ed1d",
+        "started_at": "2026-10-20T01:42:54+08:00",
+        "questions": 109,
+        "reps": 3,
+        "concurrency": 4,
+        "authorized_unit_limit_cny": 10,
+        "authorized_batch_limit_cny": 30,
+        "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；单元串行；后续单元可并发4",
+        "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"
+      }
+    },
+    "JSON-L2": {
+      "run_id": "20261019-T16-full-v14-json-01",
+      "response_calls": 335,
+      "cost_cny": "2.58393312",
+      "transport_retries": 1,
+      "raw_responses_verified": 335,
+      "exec_files_verified": 203,
+      "successful_full_rowsets_verified": 192,
+      "source_log_sha256": "10a1ab5c480b8708c81f6bd9fa61a947cbaf81ed45194a205db23808f3a4c7cf",
+      "manifest": {
+        "run_id": "20261019-T16-full-v14-json-01",
+        "cell": "JSON-L2",
+        "runner_commit": "080e725",
+        "eval_tag": "eval-v1.2",
+        "semantic_tag": "semantic-v1.4",
+        "harness_protocol": "harness-v1.1",
+        "syntax_tag": "semantic-v1.4",
+        "syntax_sha256": "47ebdf71cb37574a3e4bb3ad1199ae656ce9f8bff2bfeb517d1bedf273094654",
+        "system_sha256": "4f2519a1d3db0a2cc2d39076d006fa6e5519a5d4c2bf073bd30cb45dfb907f2e",
+        "context_sha256": "1eaf4135842718f5c2af6c1ee9b89de117c735f53da91007d09ff1c34908d8a8",
+        "coverage_commit": "381ed1d",
+        "started_at": "2026-10-20T02:24:05+08:00",
+        "questions": 109,
+        "reps": 3,
+        "concurrency": 4,
+        "authorized_unit_limit_cny": 10,
+        "authorized_batch_limit_cny": 30,
+        "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；单元串行；后续单元可并发4",
+        "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"
+      }
+    }
+  },
+  "results": {
+    "SQL-L2": {
+      "source": "20261019-T16-full-v14-sql-new-01",
+      "offline_run": "20261019-T16-full-v14-sql-new-01-rescore-01",
+      "all": {
+        "attempts": 327,
+        "outcomes": {
+          "correct": 213,
+          "wrong": 100,
+          "exec_error": 14
+        },
+        "scored_denominator": 327,
+        "accuracy_on_scored": 0.6513761467889908
+      },
+      "primary": {
+        "attempts": 294,
+        "outcomes": {
+          "correct": 192,
+          "wrong": 88,
+          "exec_error": 14
+        },
+        "scored_denominator": 294,
+        "accuracy_on_scored": 0.6530612244897959
+      },
+      "low_discrimination": {
+        "attempts": 33,
+        "outcomes": {
+          "correct": 21,
+          "wrong": 12
+        },
+        "scored_denominator": 33,
+        "accuracy_on_scored": 0.6363636363636364
+      },
+      "runtime_snapshot": {
+        "done": 327,
+        "outcomes": {
+          "correct": 213,
+          "wrong": 100,
+          "exec_error": 14
+        },
+        "mean_model_seconds_per_answer": 19.454990825688075,
+        "mean_cube_seconds_per_answer": 0.321868501529052,
+        "final_error_families": {
+          "cube_rewrite": 5,
+          "cube_join_path": 1,
+          "cube_postprocessing_type": 2,
+          "cube_sql_generation": 1,
+          "cube_response_type": 2,
+          "cube_generated_clickhouse_syntax": 1,
+          "cube_planning": 1,
+          "backend_function_not_supported": 1
+        },
+        "all_turn_error_families": {
+          "cube_generated_clickhouse_syntax": 23,
+          "cube_join_path": 3,
+          "cube_rewrite": 20,
+          "engine_error": 3,
+          "cube_response_type": 4,
+          "cube_planning": 10,
+          "cube_postprocessing_type": 2,
+          "cube_sql_generation": 1,
+          "backend_function_not_supported": 7
+        },
+        "final_error_cases": [
+          {
+            "qid": "Q113",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q113",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q116",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q116",
+            "rep": 3,
+            "family": "cube_sql_generation"
+          },
+          {
+            "qid": "Q119",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q36",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q49",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q49",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q74",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q77",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q89",
+            "rep": 1,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q89",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q89",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q90",
+            "rep": 3,
+            "family": "backend_function_not_supported"
+          }
+        ]
+      },
+      "first_try_correct": 187,
+      "attempts_repaired_once": 59,
+      "pending_reasons": {},
+      "exec_error_classes": {
+        "engine_error": 10,
+        "interface_limitation": 4
+      }
+    },
+    "SQL-L2-notes-v12": {
+      "source": "20261019-T16-full-v14-sql-old-01",
+      "offline_run": "20261019-T16-full-v14-sql-old-01-rescore-01",
+      "all": {
+        "attempts": 327,
+        "outcomes": {
+          "correct": 164,
+          "wrong": 65,
+          "exec_error": 98
+        },
+        "scored_denominator": 327,
+        "accuracy_on_scored": 0.5015290519877675
+      },
+      "primary": {
+        "attempts": 294,
+        "outcomes": {
+          "correct": 151,
+          "exec_error": 88,
+          "wrong": 55
+        },
+        "scored_denominator": 294,
+        "accuracy_on_scored": 0.5136054421768708
+      },
+      "low_discrimination": {
+        "attempts": 33,
+        "outcomes": {
+          "wrong": 10,
+          "exec_error": 10,
+          "correct": 13
+        },
+        "scored_denominator": 33,
+        "accuracy_on_scored": 0.3939393939393939
+      },
+      "runtime_snapshot": {
+        "done": 327,
+        "outcomes": {
+          "correct": 164,
+          "wrong": 65,
+          "exec_error": 98
+        },
+        "mean_model_seconds_per_answer": 19.125779816513763,
+        "mean_cube_seconds_per_answer": 0.3954373088685015,
+        "final_error_families": {
+          "cube_generated_clickhouse_syntax": 19,
+          "backend_function_not_supported": 5,
+          "cube_join_path": 15,
+          "cube_rewrite": 28,
+          "cube_generated_query_size": 1,
+          "cube_generated_group_by": 6,
+          "cube_planning": 6,
+          "cube_postprocessing_type": 4,
+          "cube_response_type": 12,
+          "cube_member_expression": 2
+        },
+        "all_turn_error_families": {
+          "cube_generated_clickhouse_syntax": 60,
+          "cube_join_path": 50,
+          "cube_planning": 21,
+          "backend_function_not_supported": 7,
+          "cube_rewrite": 66,
+          "cube_generated_query_size": 1,
+          "cube_generated_group_by": 14,
+          "cube_postprocessing_type": 5,
+          "cube_sql_generation": 1,
+          "cube_response_type": 23,
+          "engine_error": 4,
+          "cube_member_expression": 2
+        },
+        "final_error_cases": [
+          {
+            "qid": "Q05",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q07",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q10",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q100",
+            "rep": 2,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q102",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q104",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q104",
+            "rep": 2,
+            "family": "cube_generated_query_size"
+          },
+          {
+            "qid": "Q104",
+            "rep": 3,
+            "family": "cube_generated_group_by"
+          },
+          {
+            "qid": "Q106",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q109",
+            "rep": 3,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q11",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q110",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q110",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q110",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q111",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q111",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q112",
+            "rep": 1,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q112",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q113",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q113",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q114",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q111",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q116",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q116",
+            "rep": 3,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q116",
+            "rep": 2,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q117",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q117",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q117",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q114",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q118",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q119",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q119",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q119",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q16",
+            "rep": 2,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q16",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q16",
+            "rep": 3,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q22",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q22",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q25",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q27",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q27",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q32",
+            "rep": 1,
+            "family": "cube_generated_group_by"
+          },
+          {
+            "qid": "Q32",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q34",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q35",
+            "rep": 2,
+            "family": "cube_member_expression"
+          },
+          {
+            "qid": "Q34",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q34",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q36",
+            "rep": 2,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q37",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q35",
+            "rep": 3,
+            "family": "cube_member_expression"
+          },
+          {
+            "qid": "Q47",
+            "rep": 3,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q49",
+            "rep": 2,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q50",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q49",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q49",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q50",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q50",
+            "rep": 3,
+            "family": "cube_generated_group_by"
+          },
+          {
+            "qid": "Q60",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q61",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q65",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q67",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q65",
+            "rep": 2,
+            "family": "cube_planning"
+          },
+          {
+            "qid": "Q74",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q73",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q74",
+            "rep": 2,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q75",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q75",
+            "rep": 1,
+            "family": "cube_generated_group_by"
+          },
+          {
+            "qid": "Q74",
+            "rep": 3,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q75",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q76",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q77",
+            "rep": 1,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q77",
+            "rep": 2,
+            "family": "cube_postprocessing_type"
+          },
+          {
+            "qid": "Q76",
+            "rep": 3,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q77",
+            "rep": 3,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q78",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q79",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q80",
+            "rep": 2,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q83",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q82",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q82",
+            "rep": 1,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q83",
+            "rep": 2,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q85",
+            "rep": 1,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q88",
+            "rep": 2,
+            "family": "cube_response_type"
+          },
+          {
+            "qid": "Q87",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q88",
+            "rep": 1,
+            "family": "cube_generated_group_by"
+          },
+          {
+            "qid": "Q89",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q89",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q90",
+            "rep": 1,
+            "family": "backend_function_not_supported"
+          },
+          {
+            "qid": "Q90",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q90",
+            "rep": 2,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q94",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q92",
+            "rep": 3,
+            "family": "cube_generated_clickhouse_syntax"
+          },
+          {
+            "qid": "Q94",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q98",
+            "rep": 3,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q98",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q99",
+            "rep": 3,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q99",
+            "rep": 1,
+            "family": "cube_rewrite"
+          },
+          {
+            "qid": "Q99",
+            "rep": 2,
+            "family": "cube_generated_group_by"
+          }
+        ]
+      },
+      "first_try_correct": 132,
+      "attempts_repaired_once": 156,
+      "pending_reasons": {},
+      "exec_error_classes": {
+        "engine_error": 64,
+        "interface_limitation": 34
+      }
+    },
+    "JSON-L2": {
+      "source": "20261019-T16-full-v14-json-01",
+      "offline_run": "20261019-T16-full-v14-json-01-rescore-01",
+      "all": {
+        "attempts": 327,
+        "outcomes": {
+          "refused": 132,
+          "correct": 94,
+          "wrong": 98,
+          "exec_error": 3
+        },
+        "scored_denominator": 327,
+        "accuracy_on_scored": 0.2874617737003058
+      },
+      "primary": {
+        "attempts": 294,
+        "outcomes": {
+          "refused": 121,
+          "correct": 91,
+          "wrong": 81,
+          "exec_error": 1
+        },
+        "scored_denominator": 294,
+        "accuracy_on_scored": 0.30952380952380953
+      },
+      "low_discrimination": {
+        "attempts": 33,
+        "outcomes": {
+          "wrong": 17,
+          "refused": 11,
+          "correct": 3,
+          "exec_error": 2
+        },
+        "scored_denominator": 33,
+        "accuracy_on_scored": 0.09090909090909091
+      },
+      "runtime_snapshot": {
+        "done": 327,
+        "outcomes": {
+          "refused": 132,
+          "correct": 94,
+          "wrong": 98,
+          "exec_error": 3
+        },
+        "mean_model_seconds_per_answer": 9.642865443425077,
+        "mean_cube_seconds_per_answer": 0.057758409785932725,
+        "final_error_families": {
+          "cube_join_path": 3
+        },
+        "all_turn_error_families": {
+          "cube_join_path": 6,
+          "engine_error": 5
+        },
+        "final_error_cases": [
+          {
+            "qid": "Q111",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q79",
+            "rep": 1,
+            "family": "cube_join_path"
+          },
+          {
+            "qid": "Q85",
+            "rep": 1,
+            "family": "cube_join_path"
+          }
+        ]
+      },
+      "first_try_correct": 91,
+      "attempts_repaired_once": 8,
+      "pending_reasons": {},
+      "exec_error_classes": {
+        "engine_error": 3
+      }
+    }
+  },
+  "json_failure_refusal_by_coverage": {
+    "covered": {
+      "attempts": 117,
+      "outcomes": {
+        "correct": 85,
+        "wrong": 32
+      },
+      "scored_denominator": 117,
+      "accuracy_on_scored": 0.7264957264957265,
+      "exec_error": 0,
+      "refused": 0
+    },
+    "a": {
+      "attempts": 102,
+      "outcomes": {
+        "refused": 78,
+        "wrong": 15,
+        "correct": 9
+      },
+      "scored_denominator": 102,
+      "accuracy_on_scored": 0.08823529411764706,
+      "exec_error": 0,
+      "refused": 78
+    },
+    "b": {
+      "attempts": 0,
+      "outcomes": {},
+      "scored_denominator": 0,
+      "accuracy_on_scored": null,
+      "exec_error": 0,
+      "refused": 0
+    },
+    "c": {
+      "attempts": 81,
+      "outcomes": {
+        "refused": 54,
+        "wrong": 25,
+        "exec_error": 2
+      },
+      "scored_denominator": 81,
+      "accuracy_on_scored": 0.0,
+      "exec_error": 2,
+      "refused": 54
+    },
+    "d": {
+      "attempts": 27,
+      "outcomes": {
+        "wrong": 26,
+        "exec_error": 1
+      },
+      "scored_denominator": 27,
+      "accuracy_on_scored": 0.0,
+      "exec_error": 1,
+      "refused": 0
+    }
+  },
+  "json_failure_refusal_cases": [
+    {
+      "qid": "Q01",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q01",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q100",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q100",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q100",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q107",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q107",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q107",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q112",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q112",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q115",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q115",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q116",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q116",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q116",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q115",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q112",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q120",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q120",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q120",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q121",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q121",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q122",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q121",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q122",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q122",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q26",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q37",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q37",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q37",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q38",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q47",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q47",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q56",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q56",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q56",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q59",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q60",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q60",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q59",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q60",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q59",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q70",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q70",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q70",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q73",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q73",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q73",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q76",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q76",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q76",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q78",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q78",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q78",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q80",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q80",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q80",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q81",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q81",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q82",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q81",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q83",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q82",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q82",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q83",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q84",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q84",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q84",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q83",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q87",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q87",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q87",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q89",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q89",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q89",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q96",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q96",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q96",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q103",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q103",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q103",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q104",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q104",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q104",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q109",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q109",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q111",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q111",
+      "rep": 1,
+      "category": "c",
+      "outcome": "exec_error"
+    },
+    {
+      "qid": "Q113",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q113",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q113",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q111",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q117",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q118",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q117",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q118",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q119",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q117",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q119",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q118",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q119",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q14",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q14",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q14",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q23",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q23",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q23",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q30",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q30",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q30",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q32",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q32",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q32",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q35",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q35",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q35",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q49",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q71",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q71",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q74",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q74",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q74",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q85",
+      "rep": 1,
+      "category": "c",
+      "outcome": "exec_error"
+    },
+    {
+      "qid": "Q88",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q85",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q88",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q88",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q90",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q90",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q90",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q98",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q98",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q98",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q99",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused"
+    },
+    {
+      "qid": "Q79",
+      "rep": 1,
+      "category": "d",
+      "outcome": "exec_error"
+    }
+  ],
+  "paired": {
+    "json_not_refused_primary": {
+      "SQL-L2": {
+        "attempts": 173,
+        "outcomes": {
+          "correct": 124,
+          "wrong": 46,
+          "exec_error": 3
+        },
+        "scored_denominator": 173,
+        "accuracy_on_scored": 0.7167630057803468
+      },
+      "SQL-L2-notes-v12": {
+        "attempts": 173,
+        "outcomes": {
+          "correct": 104,
+          "exec_error": 41,
+          "wrong": 28
+        },
+        "scored_denominator": 173,
+        "accuracy_on_scored": 0.6011560693641619
+      },
+      "JSON-L2": {
+        "attempts": 173,
+        "outcomes": {
+          "correct": 91,
+          "wrong": 81,
+          "exec_error": 1
+        },
+        "scored_denominator": 173,
+        "accuracy_on_scored": 0.5260115606936416
+      }
+    },
+    "json_refused_primary": {
+      "SQL-L2": {
+        "attempts": 121,
+        "outcomes": {
+          "correct": 68,
+          "wrong": 42,
+          "exec_error": 11
+        },
+        "scored_denominator": 121,
+        "accuracy_on_scored": 0.5619834710743802
+      },
+      "SQL-L2-notes-v12": {
+        "attempts": 121,
+        "outcomes": {
+          "correct": 47,
+          "exec_error": 47,
+          "wrong": 27
+        },
+        "scored_denominator": 121,
+        "accuracy_on_scored": 0.3884297520661157
+      },
+      "JSON-L2": {
+        "attempts": 121,
+        "outcomes": {
+          "refused": 121
+        },
+        "scored_denominator": 121,
+        "accuracy_on_scored": 0.0
+      }
+    }
+  },
+  "json_mechanical_error_counts": {
+    "refused": 132,
+    "outside_static_coverage_no_standard_set": 66,
+    "execution_error": 3,
+    "different_members": 30,
+    "same_members_different_result": 2
+  },
+  "json_mechanical_error_cases": [
+    {
+      "qid": "Q01",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q01",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q05",
+      "rep": 3,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q05",
+      "rep": 2,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q05",
+      "rep": 1,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q01",
+      "rep": 2,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q07",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q07",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q07",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q100",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q100",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q100",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q103",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q103",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q103",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q104",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q104",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q106",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q104",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q107",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q106",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q107",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q106",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q107",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q109",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q109",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q110",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q109",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q110",
+      "rep": 1,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q111",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q110",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q112",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q111",
+      "rep": 1,
+      "category": "c",
+      "outcome": "exec_error",
+      "mechanical_cause": "execution_error",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q112",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q113",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q113",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q114",
+      "rep": 1,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q114",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q113",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q111",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q114",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q115",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q115",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q116",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q116",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q116",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q115",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q112",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q117",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q118",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q117",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q118",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q119",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q117",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q119",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q12",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q118",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q119",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q12",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q120",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q120",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q120",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q12",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q121",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q121",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q122",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q121",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q122",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q122",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q14",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q14",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q16",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.CalendarYear",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q14",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q18",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ],
+      "selected_member_set": [
+        "online_sales.PromotionKey",
+        "online_sales.discount_amount",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q17",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q17",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q17",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q18",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "same_members_different_result",
+      "standard_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ],
+      "selected_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ]
+    },
+    {
+      "qid": "Q18",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ],
+      "selected_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q20",
+      "rep": 1,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q20",
+      "rep": 2,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q20",
+      "rep": 3,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q22",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q23",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q23",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q22",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q23",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q22",
+      "rep": 1,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q25",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount"
+      ],
+      "selected_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount",
+        "online_sales.selling_day_count"
+      ]
+    },
+    {
+      "qid": "Q25",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "same_members_different_result",
+      "standard_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount"
+      ],
+      "selected_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount"
+      ]
+    },
+    {
+      "qid": "Q26",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q26",
+      "rep": 1,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q27",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q27",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q27",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q29",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q30",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q30",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q30",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q26",
+      "rep": 3,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q29",
+      "rep": 1,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q29",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q32",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q34",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ],
+      "selected_member_set": [
+        "inventory.DateKey",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q32",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q32",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q35",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q34",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ],
+      "selected_member_set": [
+        "inventory.DateKey",
+        "inventory.inventory_turnover",
+        "product.ProductKey",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q35",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q35",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q36",
+      "rep": 1,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q37",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q36",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q37",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q37",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q34",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ],
+      "selected_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q36",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q38",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q38",
+      "rep": 3,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q47",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q47",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q47",
+      "rep": 2,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q38",
+      "rep": 2,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q49",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q49",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q49",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q50",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q50",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q56",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q56",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q56",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q50",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q57",
+      "rep": 3,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q57",
+      "rep": 2,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q58",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.SalesAmount"
+      ],
+      "selected_member_set": [
+        "online_sales.SalesOrderNumber",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q57",
+      "rep": 1,
+      "category": "a",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q59",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q60",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q60",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q58",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.SalesAmount"
+      ],
+      "selected_member_set": [
+        "online_sales.SalesOrderNumber",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q59",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q60",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q59",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q61",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.sales_amount",
+        "product_subcategory.ProductSubcategoryName"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount",
+        "product_subcategory.ProductSubcategoryName"
+      ]
+    },
+    {
+      "qid": "Q62",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.sales_amount",
+        "online_sales.sales_quantity",
+        "product.BrandName"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount",
+        "online_sales.sales_quantity",
+        "product.BrandName"
+      ]
+    },
+    {
+      "qid": "Q64",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct"
+      ]
+    },
+    {
+      "qid": "Q64",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct"
+      ]
+    },
+    {
+      "qid": "Q64",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q66",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.CalendarQuarterLabel",
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ]
+    },
+    {
+      "qid": "Q66",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.CalendarQuarterLabel",
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ]
+    },
+    {
+      "qid": "Q65",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q65",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q65",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.StoreKey",
+        "store.StoreName"
+      ]
+    },
+    {
+      "qid": "Q67",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q67",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q67",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q70",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q70",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q69",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ],
+      "selected_member_set": [
+        "online_sales.PromotionKey",
+        "online_sales.discount_rate",
+        "online_sales.sales_amount",
+        "promotion.PromotionCategory"
+      ]
+    },
+    {
+      "qid": "Q69",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ],
+      "selected_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionKey",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q70",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q69",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ],
+      "selected_member_set": [
+        "online_sales.PromotionKey",
+        "online_sales.discount_amount",
+        "online_sales.discount_rate",
+        "online_sales.list_amount_before_discount",
+        "online_sales.sales_amount",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q72",
+      "rep": 1,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q72",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q71",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q72",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q71",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q73",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q71",
+      "rep": 2,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q73",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q74",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q74",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q73",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q74",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q76",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q75",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.CustomerKey",
+        "online_sales.DateKey",
+        "online_sales.sales_amount_yoy_pct"
+      ],
+      "selected_member_set": [
+        "customer.CustomerKey",
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.sales_amount_yoy_pct"
+      ]
+    },
+    {
+      "qid": "Q76",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q76",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q75",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.CustomerKey",
+        "online_sales.DateKey",
+        "online_sales.sales_amount_yoy_pct"
+      ],
+      "selected_member_set": [
+        "customer.CustomerKey",
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.sales_amount_yoy_pct"
+      ]
+    },
+    {
+      "qid": "Q77",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q77",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q78",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q78",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q78",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q77",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q79",
+      "rep": 1,
+      "category": "d",
+      "outcome": "exec_error",
+      "mechanical_cause": "execution_error",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q80",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q79",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q79",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q80",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q80",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q81",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q81",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q82",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q81",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q83",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q82",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q82",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q83",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q84",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q84",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q84",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q83",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q85",
+      "rep": 1,
+      "category": "c",
+      "outcome": "exec_error",
+      "mechanical_cause": "execution_error",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q87",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q87",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q87",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q88",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q85",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q85",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q89",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q88",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q89",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q89",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q88",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q90",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q90",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q90",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q92",
+      "rep": 1,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q92",
+      "rep": 3,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q92",
+      "rep": 2,
+      "category": "d",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q94",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName",
+        "store.StoreType"
+      ]
+    },
+    {
+      "qid": "Q96",
+      "rep": 1,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q94",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName",
+        "store.StoreType"
+      ]
+    },
+    {
+      "qid": "Q96",
+      "rep": 3,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q96",
+      "rep": 2,
+      "category": "a",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q94",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName",
+        "store.StoreType"
+      ]
+    },
+    {
+      "qid": "Q98",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q98",
+      "rep": 3,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q98",
+      "rep": 1,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q99",
+      "rep": 1,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q99",
+      "rep": 3,
+      "category": "c",
+      "outcome": "wrong",
+      "mechanical_cause": "outside_static_coverage_no_standard_set",
+      "standard_member_set": null,
+      "selected_member_set": null
+    },
+    {
+      "qid": "Q99",
+      "rep": 2,
+      "category": "c",
+      "outcome": "refused",
+      "mechanical_cause": "refused",
+      "standard_member_set": null,
+      "selected_member_set": null
+    }
+  ],
+  "json_covered_wrong_cases": [
+    {
+      "qid": "Q12",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q12",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q12",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q16",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.CalendarYear",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q18",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ],
+      "selected_member_set": [
+        "online_sales.PromotionKey",
+        "online_sales.discount_amount",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q18",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "same_members_different_result",
+      "standard_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ],
+      "selected_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ]
+    },
+    {
+      "qid": "Q18",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ],
+      "selected_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q25",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount"
+      ],
+      "selected_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount",
+        "online_sales.selling_day_count"
+      ]
+    },
+    {
+      "qid": "Q25",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "same_members_different_result",
+      "standard_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount"
+      ],
+      "selected_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount"
+      ]
+    },
+    {
+      "qid": "Q34",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ],
+      "selected_member_set": [
+        "inventory.DateKey",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q34",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ],
+      "selected_member_set": [
+        "inventory.DateKey",
+        "inventory.inventory_turnover",
+        "product.ProductKey",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q34",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ],
+      "selected_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q58",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.SalesAmount"
+      ],
+      "selected_member_set": [
+        "online_sales.SalesOrderNumber",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q58",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.SalesAmount"
+      ],
+      "selected_member_set": [
+        "online_sales.SalesOrderNumber",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q61",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.sales_amount",
+        "product_subcategory.ProductSubcategoryName"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount",
+        "product_subcategory.ProductSubcategoryName"
+      ]
+    },
+    {
+      "qid": "Q62",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.sales_amount",
+        "online_sales.sales_quantity",
+        "product.BrandName"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount",
+        "online_sales.sales_quantity",
+        "product.BrandName"
+      ]
+    },
+    {
+      "qid": "Q64",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct"
+      ]
+    },
+    {
+      "qid": "Q64",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct"
+      ]
+    },
+    {
+      "qid": "Q64",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q66",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.CalendarQuarterLabel",
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ]
+    },
+    {
+      "qid": "Q66",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "calendar.CalendarQuarterLabel",
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ],
+      "selected_member_set": [
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ]
+    },
+    {
+      "qid": "Q65",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q65",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount"
+      ]
+    },
+    {
+      "qid": "Q65",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.StoreKey",
+        "store.StoreName"
+      ]
+    },
+    {
+      "qid": "Q69",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ],
+      "selected_member_set": [
+        "online_sales.PromotionKey",
+        "online_sales.discount_rate",
+        "online_sales.sales_amount",
+        "promotion.PromotionCategory"
+      ]
+    },
+    {
+      "qid": "Q69",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ],
+      "selected_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionKey",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q69",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ],
+      "selected_member_set": [
+        "online_sales.PromotionKey",
+        "online_sales.discount_amount",
+        "online_sales.discount_rate",
+        "online_sales.list_amount_before_discount",
+        "online_sales.sales_amount",
+        "promotion.PromotionName"
+      ]
+    },
+    {
+      "qid": "Q75",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.CustomerKey",
+        "online_sales.DateKey",
+        "online_sales.sales_amount_yoy_pct"
+      ],
+      "selected_member_set": [
+        "customer.CustomerKey",
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.sales_amount_yoy_pct"
+      ]
+    },
+    {
+      "qid": "Q75",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.CustomerKey",
+        "online_sales.DateKey",
+        "online_sales.sales_amount_yoy_pct"
+      ],
+      "selected_member_set": [
+        "customer.CustomerKey",
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.sales_amount_yoy_pct"
+      ]
+    },
+    {
+      "qid": "Q94",
+      "rep": 3,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName",
+        "store.StoreType"
+      ]
+    },
+    {
+      "qid": "Q94",
+      "rep": 1,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName",
+        "store.StoreType"
+      ]
+    },
+    {
+      "qid": "Q94",
+      "rep": 2,
+      "category": "covered",
+      "outcome": "wrong",
+      "mechanical_cause": "different_members",
+      "standard_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName"
+      ],
+      "selected_member_set": [
+        "sales.DateKey",
+        "sales.sales_amount",
+        "sales.sales_amount_qoq_pct",
+        "store.StoreName",
+        "store.StoreType"
+      ]
+    }
+  ],
+  "total_cost_cny": "13.32714700"
+}

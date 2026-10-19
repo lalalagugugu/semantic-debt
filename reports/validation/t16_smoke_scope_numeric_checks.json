@@ -1,0 +1,171 @@
+{
+  "model_calls": 0,
+  "scorer_calls": 0,
+  "records": [
+    {
+      "qid": "Q17",
+      "original_scores_preserved": true,
+      "required_columns": [
+        0,
+        2,
+        3
+      ],
+      "missing_base_ref_index": 3,
+      "numeric_checks": [
+        {
+          "group": "WorkDay",
+          "json_amount": 1944262271.8105097,
+          "reference_amount": 1944262271.8489246,
+          "json_ratio": 0.7152749579780483,
+          "reference_ratio": 0.71527495799168,
+          "reference_base": 2718202629.8081865,
+          "amount_matches": true,
+          "ratio_matches": true,
+          "inferred_json_base": 2718202629.8062835
+        },
+        {
+          "group": "WeekEnd",
+          "json_amount": 773940357.9956155,
+          "reference_amount": 773940358.0023623,
+          "json_ratio": 0.28472504202193444,
+          "reference_ratio": 0.2847250420241762,
+          "reference_base": 2718202629.8081865,
+          "amount_matches": true,
+          "ratio_matches": true,
+          "inferred_json_base": 2718202629.8058925
+        }
+      ],
+      "category": "d：必答基数无上下文暴露成员",
+      "sql_columns": [
+        {
+          "name": "day_type",
+          "type": "pg:25"
+        },
+        {
+          "name": "sales_amount",
+          "type": "pg:701"
+        },
+        {
+          "name": "total_sales",
+          "type": "pg:701"
+        },
+        {
+          "name": "share",
+          "type": "pg:701"
+        }
+      ],
+      "json_columns": [
+        {
+          "name": "calendar.IsWorkDay",
+          "type": "string"
+        },
+        {
+          "name": "online_sales.sales_amount",
+          "type": "number"
+        },
+        {
+          "name": "online_sales.sales_amount_share",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "qid": "Q69",
+      "original_scores_preserved": true,
+      "required_columns": [
+        0,
+        3,
+        4
+      ],
+      "missing_base_ref_index": 4,
+      "numeric_checks": [
+        {
+          "group": "Store",
+          "json_amount": 1782429980.5375113,
+          "reference_amount": 1782429980.5777142,
+          "json_ratio": 0.1310874311808193,
+          "reference_ratio": 0.1310874311794686,
+          "reference_base": 2051334097.990588,
+          "amount_matches": true,
+          "ratio_matches": true
+        }
+      ],
+      "category": "模型未遵循展示约定",
+      "sql_columns": [
+        {
+          "name": "促销类别",
+          "type": "pg:25"
+        },
+        {
+          "name": "线上促销营收",
+          "type": "pg:701"
+        },
+        {
+          "name": "折扣金额",
+          "type": "pg:701"
+        },
+        {
+          "name": "折扣前原价",
+          "type": "pg:701"
+        },
+        {
+          "name": "平均折扣比例",
+          "type": "pg:701"
+        }
+      ],
+      "json_columns": [
+        {
+          "name": "promotion.PromotionCategory",
+          "type": "string"
+        },
+        {
+          "name": "online_sales.discounted_sales_amount",
+          "type": "number"
+        },
+        {
+          "name": "online_sales.discount_rate",
+          "type": "number"
+        }
+      ],
+      "visible_base_member": "online_sales.list_amount_before_discount",
+      "base_from_visible_member": "2051334097.9288468",
+      "diagnostic_sha256": "d090b5b8778178186e9dadc5ae585b38addc81e4cb56c355afebfd0110586adf"
+    },
+    {
+      "qid": "Q50",
+      "failure_category": "引擎限制：Cube 生成 ClickHouse SQL 语法错误（空标识符）",
+      "task_expressibility": "其他通用写法可执行；不等于整题 SQL 不可表达",
+      "source_turn": 1,
+      "source_exec_sha256": "0212a2d21b84f6a461f9ffcf7875d7934f82eaf057769129a255247f731a0368",
+      "error_verbatim": "Database Execution Error: Query failed: Error: Syntax error: failed at position 152 (``) (line 1, col 152): ``, (((CAST(`s2008`.`sum_s2008_sales__1` AS DOUBLE) - `s2008`.`sum_s2008_sales_`) / NULLIF(`s2008`.`sum_s2008_sales_`, 0)) * 100) `_1` \nFROM (\n  SELECT SUM(`s2008... Expected one of: OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, token, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: acd1ea28-4c8a-4be8-8342-4f8a8eebf398-d8c43dd9-bf28-47dd-8c7a-965bf67948ae",
+      "original_scores_preserved": true
+    },
+    {
+      "qid": "Q76",
+      "failure_category": "引擎限制：Cube 生成 ClickHouse SQL 语法错误（空标识符）",
+      "task_expressibility": "其他通用写法可执行；不等于整题 SQL 不可表达",
+      "source_turn": 1,
+      "source_exec_sha256": "c9f148584aaa4882426c05a12468b16db220e64827aea58a8a21c563d6efbfbe",
+      "error_verbatim": "Database Execution Error: Query failed: Error: Syntax error: failed at position 30 (``) (line 1, col 30): ``, `ccs`.`sum_ccs_sales_am` `_1`, `ccs`.`sum_case_when_cc` `_2`, ROUND(((CAST(`ccs`.`sum_case_when_cc` AS DOUBLE) * 100) / NULLIF(CAST(`ccs`.`sum_ccs_sales_am`... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 7c67cce6-0a73-401d-98da-30eb9eb77634-f709fa11-bb47-4aaa-b81d-d6b6e98afb27",
+      "original_scores_preserved": true
+    },
+    {
+      "qid": "Q80",
+      "failure_category": "引擎限制：Cube 生成 ClickHouse SQL 语法错误（空标识符）",
+      "task_expressibility": "其他通用写法可执行；不等于整题 SQL 不可表达",
+      "source_turn": 1,
+      "source_exec_sha256": "086286d2ca7e948cdebbc5e211465702363cbd0f1a8948f61bcfa154da8f835b",
+      "error_verbatim": "Database Execution Error: Query failed: Error: Syntax error: failed at position 34 (``) (line 1, col 34): ``, ROUND(`customer_days`.`avg_customer_day`, 2) `_1` \nFROM (\n  SELECT `customer_days`.`country` `country`, AVG(`customer_days`.`days_between`) `avg_customer_day`... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: d1799dc6-0344-4855-985b-c7ee050e0d6e-08907c65-3597-456f-acb3-c51619cb4160",
+      "original_scores_preserved": true
+    },
+    {
+      "qid": "Q82",
+      "failure_category": "引擎限制：Cube 生成 ClickHouse SQL 语法错误（空标识符）",
+      "task_expressibility": "其他通用写法可执行；不等于整题 SQL 不可表达",
+      "source_turn": 1,
+      "source_exec_sha256": "e59c5fae9d1c7c13ee1a8b6c94b4753399e5282b8bccf45da810059698f864fd",
+      "error_verbatim": "Database Execution Error: Query failed: Error: Syntax error: failed at position 27 (``) (line 1, col 27): ``, `e1`.`lastname` `_1`, `e1`.`firstname` `_2`, `e1`.`title` `_3`, `e1`.`count_e2_employe` `_4`, `e1`.`avg_datediff_utf` `_5` \nFROM (\n  SELECT `employee`.Employe... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 11d6984c-1fdd-4d38-b13d-6aadee23425e-f040fa52-53d6-4f1c-907d-0b2906a0cc09",
+      "original_scores_preserved": true
+    }
+  ]
+}
