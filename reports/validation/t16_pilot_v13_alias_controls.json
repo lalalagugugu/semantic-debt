@@ -1,0 +1,310 @@
+[
+  {
+    "id": "join_plain_ascii",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS ka,MEASURE(sales.sales_amount) AS va FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS kb,MEASURE(sales.sales_quantity) AS vb FROM sales GROUP BY 1) SELECT a.ka AS channel_key, a.va AS amount_a, b.vb AS amount_b FROM a JOIN b ON a.ka=b.kb",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "channel_key",
+          "pg_oid": 701
+        },
+        {
+          "name": "amount_a",
+          "pg_oid": 701
+        },
+        {
+          "name": "amount_b",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          4.0,
+          1715197831.4421146,
+          7270570.0
+        ],
+        [
+          3.0,
+          1078007547.2266884,
+          4454373.0
+        ],
+        [
+          2.0,
+          2677599035.074874,
+          12506063.0
+        ],
+        [
+          1.0,
+          6942853195.142856,
+          29089448.0
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.171
+    }
+  },
+  {
+    "id": "join_plain_unicode",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS ka,MEASURE(sales.sales_amount) AS va FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS kb,MEASURE(sales.sales_quantity) AS vb FROM sales GROUP BY 1) SELECT a.ka AS \"通道\", a.va AS amount_a, b.vb AS amount_b FROM a JOIN b ON a.ka=b.kb",
+    "result": {
+      "ok": false,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 17 (``) (line 1, col 17): ``, `a`.`va` `amount_a`, `a`.`vb` `amount_b` \nFROM (\n  SELECT `a`.`ka` `ka`, `a`.`va` `va`, `b`.`vb` `vb` \n  FROM (\n    SELECT `sales`.channelKey `ka`, sum(`sales`.... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 338c1bfe-0c4f-4a43-8f5e-b9897fbc9493-8ca73d00-d24e-4438-9676-5dd3accb9517",
+      "sqlstate": "58000",
+      "elapsed_s": 0.13
+    }
+  },
+  {
+    "id": "join_aggregate_ascii",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS ka,MEASURE(sales.sales_amount) AS va FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS kb,MEASURE(sales.sales_quantity) AS vb FROM sales GROUP BY 1) SELECT a.ka AS channel_key,SUM(a.va) AS amount_a,SUM(CASE WHEN b.vb>0 THEN a.va ELSE 0 END) AS amount_b FROM a JOIN b ON a.ka=b.kb GROUP BY a.ka",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "channel_key",
+          "pg_oid": 701
+        },
+        {
+          "name": "amount_a",
+          "pg_oid": 701
+        },
+        {
+          "name": "amount_b",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          4.0,
+          1715197831.4421146,
+          1715197831.4421146
+        ],
+        [
+          3.0,
+          1078007547.2266884,
+          1078007547.2266884
+        ],
+        [
+          2.0,
+          2677599035.074874,
+          2677599035.074874
+        ],
+        [
+          1.0,
+          6942853195.142856,
+          6942853195.142856
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.173
+    }
+  },
+  {
+    "id": "join_aggregate_unicode",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS ka,MEASURE(sales.sales_amount) AS va FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS kb,MEASURE(sales.sales_quantity) AS vb FROM sales GROUP BY 1) SELECT a.ka AS \"通道\",SUM(a.va) AS amount_a,SUM(CASE WHEN b.vb>0 THEN a.va ELSE 0 END) AS amount_b FROM a JOIN b ON a.ka=b.kb GROUP BY a.ka",
+    "result": {
+      "ok": false,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 17 (``) (line 1, col 17): ``, `a`.`sum_a_va_` `amount_a`, `a`.`sum_case_when_a_` `amount_b` \nFROM (\n  SELECT `a`.`ka` `ka`, SUM(`a`.`va`) `sum_a_va_`, SUM(CASE WHEN (`a`.`vb` > 0) THEN `a`... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 4ab6f73d-d3bc-49a0-97cd-e334ddd14098-c74cfd46-b66b-4e2d-9215-e19191d0d54c",
+      "sqlstate": "58000",
+      "elapsed_s": 0.129
+    }
+  },
+  {
+    "id": "aggregate_cte_ascii",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS ka,MEASURE(sales.sales_amount) AS va FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS kb,MEASURE(sales.sales_quantity) AS vb FROM sales GROUP BY 1) SELECT ka AS channel_key,SUM(va) AS amount_a FROM a GROUP BY ka",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "channel_key",
+          "pg_oid": 701
+        },
+        {
+          "name": "amount_a",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          4.0,
+          1715197831.4421146
+        ],
+        [
+          2.0,
+          2677599035.074874
+        ],
+        [
+          3.0,
+          1078007547.2266884
+        ],
+        [
+          1.0,
+          6942853195.142856
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.097
+    }
+  },
+  {
+    "id": "aggregate_cte_unicode",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS ka,MEASURE(sales.sales_amount) AS va FROM sales GROUP BY 1), b AS (SELECT sales.\"channelKey\" AS kb,MEASURE(sales.sales_quantity) AS vb FROM sales GROUP BY 1) SELECT ka AS \"通道\",SUM(va) AS amount_a FROM a GROUP BY ka",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "通道",
+          "pg_oid": 701
+        },
+        {
+          "name": "amount_a",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          2.0,
+          2677599035.074874
+        ],
+        [
+          4.0,
+          1715197831.4421146
+        ],
+        [
+          3.0,
+          1078007547.2266884
+        ],
+        [
+          1.0,
+          6942853195.142856
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.097
+    }
+  },
+  {
+    "id": "date_cte_ascii",
+    "query": "WITH d AS (SELECT sales.\"channelKey\" AS ch,sales.\"DateKey\" AS dt FROM sales GROUP BY 1,2), x AS (SELECT ch,MIN(dt) AS lo,MAX(dt) AS hi FROM d GROUP BY ch), y AS (SELECT ch,CAST(hi AS DATE)-CAST(lo AS DATE) AS days FROM x) SELECT ch AS group_key,AVG(days) AS average_days FROM y GROUP BY ch",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "group_key",
+          "pg_oid": 701
+        },
+        {
+          "name": "average_days",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          3.0,
+          1095.0
+        ],
+        [
+          4.0,
+          1095.0
+        ],
+        [
+          2.0,
+          1095.0
+        ],
+        [
+          1.0,
+          1095.0
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.111
+    }
+  },
+  {
+    "id": "date_cte_unicode",
+    "query": "WITH d AS (SELECT sales.\"channelKey\" AS ch,sales.\"DateKey\" AS dt FROM sales GROUP BY 1,2), x AS (SELECT ch,MIN(dt) AS lo,MAX(dt) AS hi FROM d GROUP BY ch), y AS (SELECT ch,CAST(hi AS DATE)-CAST(lo AS DATE) AS days FROM x) SELECT ch AS \"分组\",AVG(days) AS average_days FROM y GROUP BY ch",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "分组",
+          "pg_oid": 701
+        },
+        {
+          "name": "average_days",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          2.0,
+          1095.0
+        ],
+        [
+          3.0,
+          1095.0
+        ],
+        [
+          4.0,
+          1095.0
+        ],
+        [
+          1.0,
+          1095.0
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.113
+    }
+  },
+  {
+    "id": "self_cube_ascii",
+    "query": "SELECT e1.\"EmployeeKey\" AS group_key,COUNT(e2.\"EmployeeKey\") AS employee_count FROM employee e1 CROSS JOIN employee e2 WHERE e2.\"ParentEmployeeKey\"=e1.\"EmployeeKey\" GROUP BY e1.\"EmployeeKey\" LIMIT 5",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "group_key",
+          "pg_oid": 701
+        },
+        {
+          "name": "employee_count",
+          "pg_oid": 20
+        }
+      ],
+      "rows": [],
+      "python_types": [],
+      "elapsed_s": 0.13
+    }
+  },
+  {
+    "id": "self_cube_unicode",
+    "query": "SELECT e1.\"EmployeeKey\" AS \"分组\",COUNT(e2.\"EmployeeKey\") AS employee_count FROM employee e1 CROSS JOIN employee e2 WHERE e2.\"ParentEmployeeKey\"=e1.\"EmployeeKey\" GROUP BY e1.\"EmployeeKey\" LIMIT 5",
+    "result": {
+      "ok": false,
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 27 (``) (line 1, col 27): ``, `e1`.`count_e2_employe` `employee_count` \nFROM (\n  SELECT `employee`.EmployeeKey `employeekey`, COUNT(`employee`.EmployeeKey) `count_e2_employe` \n  FROM  retai... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: d0b23c07-a48a-4d06-bf2d-522a28c07c5c-1d29eb73-4d71-40a8-908f-8d30132dd1b7",
+      "sqlstate": "58000",
+      "elapsed_s": 0.126
+    }
+  }
+]

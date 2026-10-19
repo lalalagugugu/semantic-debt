@@ -34,3 +34,7 @@
 - 原始响应目录：只记路径；里面的内容不入库，日志里记哈希。
 
 | 20261019-T16-pilot-v13-02 | 2026-10-19 | SQL-L2、JSON-L2 | T16 | 各23 × 1（pilot跳过judge Q40） | deepseek-flash，固定指纹e72d3c7f… | eval-v1.2 = 90e13b3；semantic-v1.3 = d2801b1 | 预算高峰合计≤3元，结果待追加 | $SEMDEBT_DATA_DIR/runs-raw/20261019-T16-pilot-v13-02 | **用户批准高峰执行**，仅此次冒烟，不含全量；--allow-peak、单并发、按单元依次跑；授权见本目录authorization.json；完整行集存外部runs-raw；指纹不符即停 |
+
+| 20261019-T16-pilot-v13-02（完成记录） | 2026-10-19 | SQL-L2、JSON-L2 | T16 | 46/46；各23×1，跳过judge | deepseek-flash，55次指纹均e72d3c7f… | eval-v1.2=90e13b3；semantic-v1.3=d2801b1 | 1.41452904（SQL0.98173872，JSON0.43279032） | $SEMDEBT_DATA_DIR/runs-raw/20261019-T16-pilot-v13-02 | **用户批准高峰执行**；本地commit22b6100；--allow-peak、单并发、SQL后JSON；55响应/45执行文件哈希及完整行数验证通过。SQL 13对6错4执行失败，JSON 6对6错10拒答1执行失败；主表/低区分度另列。SQL归因1条待定，尚不判通过，不估全量 |
+| 20261019-T16-pilot-v13-02-rescore-01 | 2026-10-19 | SQL-L2、JSON-L2 | T16 | 源运行46条 | 无模型调用 | eval-v1.2=90e13b3 | 0 | 沿用源运行raw | 首次v2离线重评；发现JSON Decimal字符串未按number注解恢复，4条误降；日志保留、不可用于最终分数，后续采用rescore-02 |
+| 20261019-T16-pilot-v13-02-rescore-02 | 2026-10-19 | SQL-L2、JSON-L2 | T16 | 源运行46条 | 无模型调用 | eval-v1.2=90e13b3 | 0 | 沿用源运行raw | commit c709ca5修复harness/rescore.py数值类型恢复，评分器v2不变；结果与运行时一致，无pending、无题面变更；主表SQL10/19、JSON5/19，低区分度SQL3/4、JSON1/4 |
