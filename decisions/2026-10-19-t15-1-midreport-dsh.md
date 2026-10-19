@@ -27,4 +27,4 @@
 
 ## 三、dsh 任务卡
 
-协调-1 的方向、排期与三条约束不变，写成任务卡 `tasks/T21-dsh-planning-agent.md`。第一步只做五条前提的可行性验证（一个会话，基本不付费）；一条不行就放弃 dsh，DAX 接在 T15 之后，中期报告照出（不含 -P）。
+协调-1 的方向、排期与三条约束不变，写成任务卡（原 `tasks/T21-dsh-planning-agent.md`，2026-10-19 改为自写 -P，现为 `tasks/T21-planning-agent.md`，见 `decisions/2026-10-19-self-built-p-and-cube-notes.md`）。第一步只做五条前提的可行性验证（一个会话，基本不付费）；一条不行就放弃 dsh，DAX 接在 T15 之后，中期报告照出（不含 -P）。
