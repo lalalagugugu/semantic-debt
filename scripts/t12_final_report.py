@@ -90,6 +90,18 @@ def load(final_json: Path, verdicts: Path) -> tuple[list[dict], dict, dict, dict
     return rows, pres, attr, p2s
 
 
+def exec_ref(r: dict) -> str:
+    """Error class and message hash of an answer's final execution error (never the message)."""
+    from harness.redact import exec_error_ref
+    from harness.run_direct import raw_root
+    run = {"deepseek-flash": "20261018-T12-pilot-flash-01", "deepseek-v4-pro": "20261018-T12-pilot-pro-01"}[r["model"]]
+    rec = next(json.loads(line) for line in (REPO / "runs" / f"{run}-rescore-01" / f"{r['cell']}.jsonl").open(encoding="utf-8")
+               if json.loads(line)["qid"] == r["qid"] and json.loads(line)["rep"] == r["rep"])
+    turn = rec["turns"][-1]
+    payload = json.loads((raw_root() / run / r["cell"] / f"{r['qid']}_r{r['rep']}_t{turn['turn']}.exec.json").read_bytes())
+    return exec_error_ref(payload["error"], turn["exec"].get("error_class"))
+
+
 def headers_of(qids) -> dict[str, list[list[str]]]:
     from scripts.t12_final_rescore import ref_files
     files = ref_files()
@@ -256,8 +268,9 @@ def main() -> int:
         for r in rs:
             a = attr[key(r)]
             tag = "（judge）" if r["qid"] in judge else "（低区分度）" if r["qid"] in low else ""
+            note = a["note"] + (f"（{exec_ref(r)}）" if r["final_out"] == "exec_error" else "")
             o.append(f"| {r['qid']}{tag} | {r['model'].removeprefix('deepseek-')} | r{r['rep']} | {r['final_out']} "
-                     f"| {a['category']} | {a['note']} |")
+                     f"| {a['category']} | {note} |")
         o.append("")
     keyonly = [r for r in rows if r["final_how"] and "key" in r["final_how"]]
     o += ["**按裁决判错：只给键、没给名称。** 严格口径下只因此判错的：" +

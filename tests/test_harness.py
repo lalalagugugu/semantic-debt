@@ -1148,6 +1148,26 @@ def test_unscored_is_not_a_verdict_in_the_summary(tmp_path):
     assert s["accuracy"] is None and s["accuracy_scored"] is None and s["outcomes"] == {"unscored": 1}
 
 
+def test_exec_error_reasons_are_redacted_for_reports():
+    from harness.redact import RAW_ENGINE_MESSAGE, exec_error_ref, report_reason
+    msg = "Code: 47. DB::Exception: Unknown expression identifier `SecretCol` in SELECT secret FROM t"
+    ref = exec_error_ref(msg, "engine_error")
+    assert ref.startswith("engine_error · sha256:") and len(ref.split(":")[-1]) == 16
+    assert "SecretCol" not in ref and not RAW_ENGINE_MESSAGE.search(ref)
+    assert exec_error_ref(msg) == exec_error_ref(msg, None) and exec_error_ref(msg).startswith("execution_failed")
+    assert report_reason("exec_error", msg, "timeout").startswith("timeout · sha256:")
+    assert report_reason("wrong", "values") == "values" and report_reason("exec_error", None) is None
+
+
+def test_reports_hold_no_raw_engine_message():
+    from harness.redact import RAW_ENGINE_MESSAGE
+    hits = [f"{p.relative_to(REPO)}:{n}" for p in sorted((REPO / "reports").rglob("*"))
+            if p.is_file() and p.suffix in (".md", ".json", ".jsonl", ".csv", ".txt")
+            for n, line in enumerate(p.read_text(encoding="utf-8", errors="replace").splitlines(), 1)
+            if RAW_ENGINE_MESSAGE.search(line)]
+    assert not hits, hits
+
+
 def test_a_bank_scorer_v2_rejects_stops_the_run_before_any_call(capsys):
     old_style = Question("Q011", QTEXT, refs=[[[1]]], rules={"ordered": False, "top_n": None})   # pre-v2 rules
     assert R.invalid_rules([Q, YEAR, Question("Q012", QTEXT, refs=None, rules=None)]) == []
