@@ -40,7 +40,7 @@ import yaml
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from render.common import CUBE_NAMES, SEMANTIC, metrics_file, source, summary
+from render.common import CUBE_NAMES, SEMANTIC, metrics_file, source, summary, variant_callables, variant_key
 from render.measures import cube_measures, dax_measures
 
 REPO = Path(__file__).resolve().parent.parent
@@ -199,6 +199,40 @@ def impl_classes() -> dict[str, str]:
     return out
 
 
+# L1 text that states a scope or a variant, and how each engine covers it (semantic-v1.4, decisions/
+# 2026-10-19-exposure-layers-l2-scope.md §二 1 and §六 1). Every other metric states none. The quotes
+# are from source.yaml; "how" is a reading of render/measures.py, checked against it in tests.
+VARIANT_TEXT = {
+    "销售额占比": ("分母的范围由问题决定（全公司、某渠道、某品类内）",
+              "主调用名是全公司（查询筛选后的全部）；补「渠道内」「品类内」两个变体"),
+    "销售额环比增长率": ("期的长度由问题的粒度决定（月、季）",
+                 "DAX 主度量值按查询的期取月、季、年；Cube 主成员固定为月，补「按季」变体（DAX 同补一个，两边对称）"),
+    "目标销售额": ("默认取预算场景", "DAX 主度量值查询没筛场景时套预算、筛了按查询；Cube 主成员固定预算，补「按查询场景」变体"),
+    "目标销量": ("默认取预算场景", "同「目标销售额」"),
+    "目标毛利": ("默认取预算场景", "同「目标销售额」"),
+    "计划收入": ("默认取预算场景", "同「目标销售额」"),
+    "销售额同比增长率": ("去年同期销售额", "两边都按查询的期取去年同期（SAMEPERIODLASTYEAR、time_shift 1 年），不需要变体"),
+    "新客数": ("截止日由时间窗口决定", "两边都取查询窗口的最后一天；Cube 只看得到窗口内有行的客户，已记为引擎限制（render/measures.py 头注）"),
+    "新客销售额": ("在窗口内", "同「新客数」"),
+    "同店销售额": ("两个对比年份", "两边都按查询年与前一年比，不需要变体"),
+    "同店销售额增长率": ("同店本年销售额 − 同店去年销售额", "同「同店销售额」"),
+    "计划金额": ("必须同时筛场景和科目", "两边都不套默认、由查询筛选，不需要变体"),
+}
+
+
+def variant_audit() -> list[dict]:
+    """One row per metric: the scope/variant the L1 text states, and the variant callables on each side."""
+    dax, cube = dax_measures(), cube_measures()
+    rows = []
+    for m in metrics_file()["metrics"]:
+        quote, how = VARIANT_TEXT.get(m["name"], ("—", "L1 没有写范围或变体"))
+        variants = [{"id": vid, "dataset": ds, "dax": (variant_key(m["name"], vid), ds) in dax,
+                     "cube": (variant_key(m["name"], vid), ds) in cube, "dax_measure": dm, "cube_member": cm}
+                    for vid, ds, dm, cm, _ in variant_callables(m)]
+        rows.append({"metric": m["name"], "l1": quote, "how": how, "variants": variants})
+    return rows
+
+
 def dax_vs_cube(ctxs: dict[str, dict]) -> list[dict]:
     dax, cube, cls = dax_measures(), cube_measures(), impl_classes()
     per_cell = {c: {m["name"]: len(m.get("callables") or []) for m in ctxs[c]["metrics"]} for c in L2_CELLS}
@@ -221,6 +255,7 @@ def run() -> dict:
     t1 = [convention_row(c, cell, ctxs[cell], lin, dims) for c in conv for cell in TIERS + OTHER]
     return {"conventions": t1, "table_choice": table_choice(ctxs["SQL-L1.5S"], lin),
             "summary_vs_metrics": summary_vs_metrics(lin, dims), "dax_vs_cube": dax_vs_cube(ctxs),
+            "variant_audit": variant_audit(),
             "rules": {c["id"]: c["rule"] for c in conv}, "groups": {c["id"]: c["group"] for c in conv}}
 
 
@@ -309,12 +344,27 @@ def render_md(r: dict) -> str:
         hit = [f"{x['metric']}·{x['dataset']}（{x['class']}）" for x in d if x["class"].startswith(k)]
         L.append(f"| {k} | {len(hit)}：{'、'.join(hit) or '—'} |")
     L.append(f"| 其余 | {sum(not x['class'] for x in d)} |")
+    va = r["variant_audit"]
+    stated = [x for x in va if x["l1"] != "—"]
+    L += ["", "### L1 写明的范围或变体（semantic-v1.4：逐个核对 69 个指标）", "",
+          f"- {len(va)} 个指标里，L1 文字写了范围或变体的 {len(stated)} 个；其中缺实现、本次照 L1 文字补成变体调用名的 "
+          f"{sum(bool(x['variants']) for x in va)} 个（{sum(len(x['variants']) for x in va)} 个调用名），"
+          "其余 L1 写了的已由主调用名覆盖或属已记的引擎限制。不改 L1 文字，不加 L1 没有的口径。",
+          "- 变体的 Cube 实现里，父组分母（渠道内、品类内）用多阶段成员的 `reduce_by`，只能在 Cube 里运行，"
+          "须经 T16 实测后再打 tag；DAX 变体须经 T17 实测。", "",
+          "| 指标 | L1 原文 | 处理 | 变体调用名（DAX / Cube） |", "|---|---|---|---|"]
+    for x in va:
+        vs = "；".join(f"{v['id']}·{v['dataset']}：`{v['dax_measure']}`{'' if v['dax'] else '（缺）'} / "
+                      f"`{v['cube_member']}`{'' if v['cube'] else '（缺）'}" for v in x["variants"]) or "—"
+        L.append(f"| {x['metric']} | {x['l1']} | {x['how']} | {vs} |")
     return "\n".join(L) + "\n"
 
 
 def failures(r: dict) -> list[str]:
     bad = [f"约定 {x['convention']} 在 {x['cell']}：仅条文" for x in r["conventions"] if x["verdict"] == "仅条文"]
     bad += [f"{t['table']} 没有点名约定 {t['conventions']}" for t in r["table_choice"] if not t["ok"]]
+    bad += [f"「{x['metric']}」的变体 {v['id']}·{v['dataset']} 缺 {'DAX' if not v['dax'] else 'Cube'} 实现"
+            for x in r["variant_audit"] for v in x["variants"] if not (v["dax"] and v["cube"])]
     return bad
 
 

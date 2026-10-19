@@ -155,7 +155,8 @@ def test_l2_each_stack_shows_only_its_own_call_syntax() -> None:
 def test_dual_dataset_metrics_have_two_callables() -> None:
     by_name = {m["name"]: m for m in ctx("DAX-L2")["metrics"]}
     for m in metrics_file()["metrics"]:
-        assert len(by_name[m["name"]]["callables"]) == (2 if m.get("alternate_dataset") else 1)
+        primary = [c for c in by_name[m["name"]]["callables"] if not c.get("scope")]   # variants carry a scope
+        assert len(primary) == (2 if m.get("alternate_dataset") else 1)
 
 
 def test_tuned_cells_merge_tuning_file(tmp_path, monkeypatch) -> None:
@@ -235,7 +236,10 @@ def test_syntax_notes_say_nothing_about_this_dataset() -> None:
 # Measures, Cube model, PBIP
 # ---------------------------------------------------------------------------
 def _callables() -> set[tuple[str, str]]:
-    return {(m["name"], ds) for m in metrics_file()["metrics"] for ds, _, _ in metric_callables(m)}
+    from render.common import variant_callables, variant_key
+    return ({(m["name"], ds) for m in metrics_file()["metrics"] for ds, _, _ in metric_callables(m)}
+            | {(variant_key(m["name"], vid), ds) for m in metrics_file()["metrics"]
+               for vid, ds, _, _, _ in variant_callables(m)})
 
 
 def test_every_callable_has_a_dax_and_a_cube_implementation() -> None:
@@ -246,7 +250,9 @@ def test_every_callable_has_a_dax_and_a_cube_implementation() -> None:
 def test_cube_model_carries_every_cube_member() -> None:
     model = build_model()
     members = {f"{c}.{m['name']}" for c, b in model.items() for m in b.get("measures", []) if m.get("public", True)}
+    from render.common import variant_callables
     want = {cube for m in metrics_file()["metrics"] for _, _, cube in metric_callables(m)}
+    want |= {cube for m in metrics_file()["metrics"] for _, _, _, cube, _ in variant_callables(m)}
     assert members == want
     assert set(model) == set(CUBE_NAMES.values())
 
@@ -375,3 +381,49 @@ def test_every_sales_summary_table_says_which_sales_it_comes_from() -> None:
     for n in (1, 2):
         assert all(x["verdict"] == "对象" for x in r["conventions"] if x["convention"] == n)
     assert all(x["dax"] and x["cube"] and x["contexts_agree"] for x in r["dax_vs_cube"])
+
+
+# ---------------------------------------------------------------------------
+# semantic-v1.4: metric variants the L1 text states (range/variant check)
+# ---------------------------------------------------------------------------
+def test_variant_audit_quotes_l1_and_every_variant_has_both_engines() -> None:
+    from render.check_conventions import VARIANT_TEXT, variant_audit
+    from render.common import variant_callables
+    texts = {m["name"]: " ".join(" ".join(str(m.get(k) or "") for k in ("definition", "note", "default_filters")).split())
+             for m in source()["metrics"]}
+    for name, (quote, _) in VARIANT_TEXT.items():
+        assert quote in texts[name], (name, quote)                 # the quote is the L1 text itself
+    rows = variant_audit()
+    assert len(rows) == len(metrics_file()["metrics"]) == 69
+    assert all(v["dax"] and v["cube"] for x in rows for v in x["variants"])
+    with_variants = {m["name"] for m in metrics_file()["metrics"] if variant_callables(m)}
+    assert with_variants <= set(VARIANT_TEXT)                       # a variant only where L1 states one
+
+
+def test_variant_callables_reach_every_l2_context_with_their_scope() -> None:
+    from render.common import variant_callables
+    want = {(m["name"], ds, scope) for m in metrics_file()["metrics"] for _, ds, _, _, scope in variant_callables(m)}
+    for cell in ("SQL-L2", "JSON-L2", "DAX-L2"):
+        path = REPO / "build" / "contexts" / f"{cell}.yaml"
+        if not path.exists():
+            pytest.skip("contexts not rendered")
+        ctx = yaml.safe_load(path.read_text(encoding="utf-8"))
+        got = {(m["name"], c["scope"]) for m in ctx["metrics"] for c in m.get("callables") or [] if c.get("scope")}
+        assert got == {(n, s) for n, _, s in want}, cell
+    for cell in ("SQL-L1", "SQL-L1.5W", "SQL-L1.5S"):               # L1-series contexts carry no callables
+        path = REPO / "build" / "contexts" / f"{cell}.yaml"
+        if path.exists():
+            assert "scope:" not in path.read_text(encoding="utf-8").split("metrics:", 1)[-1], cell
+
+
+def test_cube_variant_members_are_multi_stage_where_they_need_the_engine() -> None:
+    from render.common import variant_key
+    from render.measures import cube_measures
+    cube = cube_measures()
+    for vid in ("渠道内", "品类内"):
+        for (key, ds), specs in cube.items():
+            if key == variant_key("销售额占比", vid):
+                helper = specs[1]
+                assert helper["multi_stage"] and helper["reduce_by"] and helper["public"] is False
+    shifted = [s for (key, _), specs in cube.items() if key == variant_key("销售额环比增长率", "按季") for s in specs[1:]]
+    assert shifted and all(s["time_shift"][0]["interval"] == "1 quarter" for s in shifted)
