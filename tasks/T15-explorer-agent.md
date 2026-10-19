@@ -117,7 +117,7 @@
 - 工具：超时 0。被拒 4 次，均未执行：2 次 `;` 连写两条 SELECT（forbidden_statement），2 次查 `system.columns`（scope_violation）。L1-E 另有 1 次 scope_violation。回显截断 L0-E 33 次、L1-E 37 次，字符截断 0。
 - 每题平均（agent 税）：L0-E 输入 34.5k token、输出 2.5k、21 秒；L1-E 输入 175k、输出 2.2k、18 秒。缓存命中率 90% / 99%。
 - 验收：记录数 L0-E、L1-E 各 = 122 × 3，无缺失；工具调用全部只读（写语句、多语句都在执行前被拒）。SQL-L2-E 等 T16，第三个单元补齐后才满足「题数 × 3 × 3」。
-- 待办：harness-v1.1 离线重评后再写 `reports/results/explorer.md`（按语义依赖分列、与直答对比）。
+- 报告（暂定）：`reports/results/explorer.md`，由 `scripts/explorer_report.py` 生成（主表与直答对比、失败原因转移、工具调用分布、agent 税）。暂定 judge 题不计、不含低区分度：L0-E 38.2% vs 直答 36.1%（+2.1 点），L1-E 66.8% vs 66.0%（+0.8 点）。harness-v1.1 离线重评后重新生成，并加按语义依赖分列。
 
 - 产出：见上
 - 偏离与理由：
