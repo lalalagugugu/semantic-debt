@@ -1,0 +1,9 @@
+{
+  "name": "semdebt-dsh-runtime",
+  "private": true,
+  "description": "T21 feasibility: pinned DeepSeek Harness install, built only inside the container",
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-llm-pi-ai": "0.2.1-rc.2"
+  }
+}

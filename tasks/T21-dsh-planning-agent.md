@@ -54,6 +54,23 @@
 
 ## 记录（完成后填写）
 
+### 第一步：可行性验证（进行中，2026-10-19）
+
+**锁定版本**：源码 `deepseek-ai/deepseek-harness` 提交 `687f282e8625c6b8d11ff58211a90524be2e4317`（tag `dsh-v0.2.1-rc.2`，2026-10-17），克隆在 `$SEMDEBT_DATA_DIR/vendor/dsh`（用户手动克隆）；容器内装 npm `@deepseek-ai/dsh@0.2.1-rc.2`（integrity `sha512-tvY+yhfKRifthbqPe/OK0AYxM5ZkvqfYq/jMYgJcEUxiRRL1Vwra3Ti5TB6AXgSWQdiPHYh/Vp6SJa9yHwMNuw==`）与 `@deepseek-ai/dsh-llm-pi-ai@0.2.1-rc.2`。用户约束：依赖安装与 dsh 运行全部在 Docker 容器里（`harness/dsh/Dockerfile`）。
+
+**读源码的结论（未实测，实测后逐条改为证据）**
+
+| 前提 | 源码证据 | 初判 |
+|---|---|---|
+| ① 系统提示与工具可替换 | `packages/bundle/sdk-minimal/cordis.patch.yml` 是完整的显式插件树；`system-prompt.personaPrefix`（环境变量 `DSH_SYSTEM_PROMPT`）替换人设，`includeHarnessIdentity`、`includeRuntimeContext` 为 false；每个工具一行，可 `disabled`（bash、read_image、working_directory；联网工具只在 `dsh-base` 里）；`run_sql` 经 MCP client 接入 | 可行；待实测请求体里的 system 是否逐字节等于 `harness/prompt.py` + 工具说明、有无 `working-directory` 注入的用户上下文 |
+| ② 结构化交卷 | SDK `RunResult.final_response` 为最后一条助手文本 → harness 照直答规则解析、执行；修一次 = 同一会话再发一条报错消息。**`plan-mode` 要 `/plan` 进入并由人批准计划**，无人值守跑不了，「规划」可能只能用 todo / workflow 工具 | 可行；「规划」用什么要定 |
+| ③ 隔离 | 只能实测（容器无挂载、网络只到 DeepSeek、数据只经 `run_sql`） | 待测 |
+| ④ 版本锁定 | npm 精确版本 + 容器内生成的 lock；源码 `pnpm-lock.yaml` 锁 `@earendil-works/pi-ai@1.1.0` 并打补丁（hash `66eaf960…`）；镜像 digest 构建后记 | 可行 |
+| ⑤ 日志与封顶 | **官方适配器 `llm-deepseek` 调 `https://api.deepseek.com/anthropic/v1/messages`（`src/config.ts:115`、`src/adapter.ts:138`），不是直答用的 `chat/completions`；全源码不读 `system_fingerprint`**。agent 循环无步数上限（`core/agent-loop/src/agent.ts` `while (true)`）；`llm-retry` 是可删的一行（默认会重试）；`session-log-deepseek` 会把会话日志上传给 DeepSeek，须关 | 有风险。补救：换 `llm-pi-ai` 的 `openai-completions` 接口走同一 `chat/completions` 端点，另在宿主机放一个记录原始响应（token、指纹）并对请求数 / token / 费用封顶的中继 |
+
+**本会话的环境障碍**：沙箱连不上 Docker（无 `/var/run/docker.sock`，`~/.docker` 不可读）；沙箱不能监听本地端口（EPERM，中继与 `run_sql` 代理需要，要 `sandbox.network.allowLocalBinding: true`）；`uv` 读不到 `~/.local/share/uv/python`。克隆与 `git clone`、一次 WebFetch 被权限层拒绝，未绕过。
+
+
 - 产出：
 - 偏离与理由：
 - 工时：
