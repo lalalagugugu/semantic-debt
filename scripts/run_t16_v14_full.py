@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import threading
 import time
 import urllib.request
 
@@ -41,9 +42,8 @@ class BudgetBoundary(R.CallBoundary):
         self.limit = Decimal(limit)
         self.spent = Decimal("0")
         self.calls = 0
-        self.qid = None
-        self.rep = None
-        self.turn = 0
+        self.local = threading.local()
+        self.account_lock = threading.RLock()
 
     def wait_offpeak(self):
         paused = False
@@ -66,6 +66,10 @@ class BudgetBoundary(R.CallBoundary):
         super().before_request()  # Also covers every actual transport retry.
 
     def check_reply(self, reply):
+        with self.account_lock:
+            self.account_reply(reply)
+
+    def account_reply(self, reply):
         usage = reply.usage
         valid = all(isinstance(usage.get(k), int) and usage[k] >= 0 for k in
                     ("prompt_tokens", "cache_hit_tokens", "cache_miss_tokens", "completion_tokens"))
@@ -79,14 +83,15 @@ class BudgetBoundary(R.CallBoundary):
                     + Decimal(usage["completion_tokens"]) * Decimal(str(price["output"]))) / Decimal(1_000_000)
             self.spent += cost
         self.calls += 1
-        append_json(self.ledger, {"qid": self.qid, "rep": self.rep, "turn": self.turn, "call": self.calls,
+        append_json(self.ledger, {"qid": getattr(self.local, "qid", None), "rep": getattr(self.local, "rep", None),
+                                 "turn": getattr(self.local, "turn", 0), "call": self.calls,
                                  "at": datetime.now(R.BEIJING).isoformat(), "usage": usage,
                                  "system_fingerprint": reply.system_fingerprint,
                                  "raw_sha256": R.sha256(reply.raw), "transport_retries": reply.transport_retries,
                                  "cost_cny": str(cost) if cost is not None else None,
                                  "cumulative_cost_cny": str(self.spent), "limit_cny": str(self.limit),
                                  "pricing": "offpeak; all actual requests gated before sending"})
-        self.turn += 1
+        self.local.turn = getattr(self.local, "turn", 0) + 1
         super().check_reply(reply)
         if cost is None:
             self.stop("usage missing/invalid: cannot establish spend; stop before further requests")
@@ -100,7 +105,7 @@ class BudgetBoundary(R.CallBoundary):
         except R.RunStopped as exc:
             return {"run_id": ctx.run_id, "cell": ctx.cell.name, "qid": question.qid, "rep": rep,
                     "status": "stopped", "error": str(exc), "turns": []}
-        self.qid, self.rep, self.turn = question.qid, rep, 0
+        self.local.qid, self.local.rep, self.local.turn = question.qid, rep, 0
         result = R.run_attempt(ctx, question, rep)
         if result["status"] != "done" and not self.stopped.is_set():
             self.reason = f"attempt did not finish: {question.qid} r{rep}, {result['status']}"
@@ -147,30 +152,36 @@ def index_row(run_id, cell, started, cost, reason, count=327):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--execute", action="store_true", help="execute the explicitly approved batch")
+    parser.add_argument("--unit", choices=("new", "old", "json"), help="run one unit; review its summary before the next")
+    parser.add_argument("--concurrency", type=int, choices=(1, 4), default=1)
     args = parser.parse_args()
     if not args.execute:
         parser.error("actual batch requires --execute; use dry_run_t16_v14 for estimates")
     cells = configured_cells()
     questions = preflight(cells)
     run_ids = ["20261019-T16-full-v14-sql-new-01", "20261019-T16-full-v14-sql-old-01", "20261019-T16-full-v14-json-01"]
-    assert all(not (ROOT / "runs" / run).exists() for run in run_ids)
+    selected = {"new": 0, "old": 1, "json": 2}
+    units = list(zip(run_ids, cells))
+    if args.unit:
+        units = [units[selected[args.unit]]]
+    assert all(not (ROOT / "runs" / run).exists() or not any((ROOT / "runs" / run).iterdir()) for run, _ in units)
     run_commit = R.harness_commit()
     assert "dirty" not in run_commit
     C.CELLS[cells[1].name] = cells[1]  # Process-local identity for later offline scoring.
     total = Decimal("0")
-    for run_id, cell in zip(run_ids, cells):
+    for run_id, cell in units:
         questions = preflight(cells)
         directory = ROOT / "runs" / run_id
-        directory.mkdir(parents=True)
+        directory.mkdir(parents=True, exist_ok=True)
         started = datetime.now(R.BEIJING).isoformat(timespec="seconds")
         manifest = {"run_id": run_id, "cell": cell.name, "runner_commit": run_commit,
                     "eval_tag": "eval-v1.2", "semantic_tag": "semantic-v1.4", "harness_protocol": "harness-v1.1",
                     "syntax_tag": "semantic-v1.2" if cell.name == cells[1].name else "semantic-v1.4",
                     "syntax_sha256": R.sha256(C.syntax_path(cell.syntax).read_bytes()), "system_sha256": R.sha256(R.system_for(cell)),
                     "context_sha256": R.sha256(R.context_text(cell)), "coverage_commit": "381ed1d",
-                    "started_at": started, "questions": 109, "reps": 3, "concurrency": 1,
+                    "started_at": started, "questions": 109, "reps": 3, "concurrency": args.concurrency,
                     "authorized_unit_limit_cny": 10, "authorized_batch_limit_cny": 30,
-                    "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；不得并行",
+                    "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；单元串行；后续单元可并发4",
                     "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"}
         with (directory / "manifest.json").open("x") as out:
             json.dump(manifest, out, ensure_ascii=False, indent=2)
@@ -183,7 +194,7 @@ def main():
                                eval_tag="eval-v1.2", semantic_tag="semantic-v1.4", boundary=boundary)
         print(f"START {run_id} cell={cell.name} commit={run_commit} unit_limit=10 CNY", flush=True)
         try:
-            path = R.run_cell(context, questions, 3, 1, guard=R.FingerprintGuard(), attempt=boundary.attempt)
+            path = R.run_cell(context, questions, 3, args.concurrency, guard=R.FingerprintGuard(), attempt=boundary.attempt)
             records = [json.loads(s) for s in path.read_text().splitlines()]
             complete = len(records) == 327 and all(r["status"] == "done" for r in records)
             complete = complete and {(r["qid"], r["rep"]) for r in records} == {(q.qid, n) for q in questions for n in (1, 2, 3)}
@@ -191,7 +202,7 @@ def main():
                                                       "cost_cny": str(boundary.spent), "response_calls": boundary.calls, "reason": boundary.reason})
         finally:
             index_row(run_id, cell.name, started, str(boundary.spent),
-                      f"用户已批准单元10元/总30元；新run；单并发错峰，顺序新SQL/旧SQL/JSON；运行提交{run_commit}；说明{manifest['syntax_tag']}；逐次计费闸；实际状态见events.jsonl")
+                      f"用户已批准单元10元/总30元；新run；并发{args.concurrency}（用户批准后续单元提至4），错峰，单元串行；运行提交{run_commit}；说明{manifest['syntax_tag']}；逐次计费闸；单元后审查；实际状态见events.jsonl")
         total += boundary.spent
         print(f"END {run_id} complete={complete} calls={boundary.calls} cost={boundary.spent} batch_cost={total}", flush=True)
         if not complete or boundary.stopped.is_set() or boundary.spent > Decimal("10") or total > Decimal("30"):

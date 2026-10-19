@@ -3,6 +3,8 @@ from decimal import Decimal
 from pathlib import Path
 import sys
 from types import SimpleNamespace
+from concurrent.futures import ThreadPoolExecutor
+import json
 
 import pytest
 
@@ -71,3 +73,20 @@ def test_peak_wait_does_not_send_or_change_prompt(tmp_path, monkeypatch):
     guard = BudgetBoundary(tmp_path / "budget.jsonl")
     guard.before_request()
     assert state["slept"] == 30 and guard.calls == 0 and not guard.stopped.is_set()
+
+
+def test_concurrent_accounting_keeps_attempt_identity_and_every_charge(tmp_path):
+    guard = BudgetBoundary(tmp_path / "budget.jsonl")
+
+    def receive(index):
+        guard.local.qid, guard.local.rep, guard.local.turn = f"Q{index}", 2, 0
+        guard.check_reply(reply(10))
+        guard.check_reply(reply(20))
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(receive, range(20)))
+    ledger = [json.loads(s) for s in guard.ledger.read_text().splitlines()]
+    assert guard.calls == len(ledger) == 40
+    assert [r["call"] for r in ledger] == list(range(1, 41))
+    assert {(r["qid"], r["rep"], r["turn"]) for r in ledger} == {(f"Q{i}", 2, t) for i in range(20) for t in (0, 1)}
+    assert sum(Decimal(r["cost_cny"]) for r in ledger) == guard.spent == Decimal(ledger[-1]["cumulative_cost_cny"])
