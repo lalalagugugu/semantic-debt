@@ -15,7 +15,7 @@
 | 3 | 时间 | ✅ 对象 · 锚 3/3 · 表 0·指标 2 | ✅ 对象 · 锚 3/3 · 表 0·视图 1·指标 2 | ✅ 对象 · 锚 3/3 · 表 16·指标 1 | ✅ 对象 · 锚 3/3 · 表 0·指标 2（可调用 2） |
 | 4 | 时间 | ✅ 对象 · 锚 1/1 · 表 1·指标 2 | ✅ 对象 · 锚 1/1 · 表 1·视图 0·指标 2 | ✅ 对象 · 锚 1/1 · 表 8·指标 1 | ✅ 对象 · 锚 1/1 · 表 1·指标 2（可调用 2） |
 | 5 | 地理与币种 | ✅ 对象 · 锚 3/3 · 表 4·指标 0 | ✅ 对象 · 锚 3/3 · 表 4·视图 1·指标 0 | ✅ 对象 · 锚 2/3 · 表 5·指标 0 | ✅ 对象 · 锚 3/3 · 表 4·指标 0（可调用 0） |
-| 6 | 地理与币种 | ✅ 对象 · 锚 6/6 · 表 4·指标 0 | ✅ 对象 · 锚 6/6 · 表 4·视图 0·指标 0 | ❌ 仅条文 · 锚 5/6 · 表 0·指标 0 | ✅ 对象 · 锚 6/6 · 表 4·指标 0（可调用 0） |
+| 6 | 地理与币种 | ✅ 对象 · 锚 6/6 · 表 4·指标 0 | ✅ 对象 · 锚 6/6 · 表 4·视图 0·指标 0 | ✅ 对象 · 锚 5/6 · 表 16·指标 0 | ✅ 对象 · 锚 6/6 · 表 4·指标 0（可调用 0） |
 | 7 | 口径与业务词 | ✅ 对象 · 锚 0/0 · 表 2·指标 6 | ✅ 对象 · 锚 0/0 · 表 2·视图 2·指标 6 | ✅ 对象 · 锚 0/0 · 表 12·指标 5 | ✅ 对象 · 锚 0/0 · 表 2·指标 6（可调用 6） |
 | 8 | 口径与业务词 | ✅ 对象 · 锚 1/1 · 表 1·指标 2 | ✅ 对象 · 锚 1/1 · 表 1·视图 1·指标 2 | ✅ 对象 · 锚 1/1 · 表 4·指标 2 | ✅ 对象 · 锚 1/1 · 表 1·指标 2（可调用 2） |
 | 9 | 口径与业务词 | ✅ 对象 · 锚 1/1 · 表 2·指标 3 | ✅ 对象 · 锚 1/1 · 表 2·视图 1·指标 3 | ✅ 对象 · 锚 1/1 · 表 1·指标 3 | ✅ 对象 · 锚 1/1 · 表 2·指标 3（可调用 3） |
@@ -53,7 +53,7 @@ L1 的 data_quality、多路径默认、关系用途里点名某条约定的条�
 | 3 | DimDate → `dim_date`；FactSales → `ads_promotion_month_channel`、`ads_quota_month_channel_store_category` 等 8 个；FactOnlineSales → `ads_online_customer_month_tier`、`ads_online_customer_profile_quarter` 等 4 个 | `ads_inventory_week_store_category`、`ads_online_customer_month_tier`、`ads_online_customer_profile_quarter` 等 16 个 | `销售额同比增长率` |
 | 4 | DimDate → `dim_date` | `ads_online_week_store`、`ads_online_week_total`、`ads_sales_day_store` 等 8 个 | `日均销售额` |
 | 5 | DimGeography → —；DimCustomer → `dim_customer`；DimStore → `dim_store` | `ads_online_customer_profile_quarter`、`ads_sales_month_store`、`ads_sales_week_channel_country` 等 5 个 | — |
-| 6 | FactOnlineSales → `ads_online_customer_month_tier`、`ads_online_customer_profile_quarter` 等 4 个；FactSales → `ads_promotion_month_channel`、`ads_quota_month_channel_store_category` 等 8 个；FactInventory → `ads_inventory_current_store_category`、`ads_inventory_week_store_category`；FactSalesQuota → `ads_quota_month_channel_store_category`；FactStrategyPlan → `ads_plan_month_category_account`、`ads_plan_month_store_account`；DimCurrency → — | — | — |
+| 6 | FactOnlineSales → `ads_online_customer_month_tier`、`ads_online_customer_profile_quarter` 等 4 个；FactSales → `ads_promotion_month_channel`、`ads_quota_month_channel_store_category` 等 8 个；FactInventory → `ads_inventory_current_store_category`、`ads_inventory_week_store_category`；FactSalesQuota → `ads_quota_month_channel_store_category`；FactStrategyPlan → `ads_plan_month_category_account`、`ads_plan_month_store_account`；DimCurrency → — | `ads_inventory_current_store_category`、`ads_inventory_week_store_category`、`ads_online_customer_month_tier` 等 16 个 | — |
 | 7 | —（无 applies_to） | `ads_online_customer_month_tier`、`ads_online_customer_profile_quarter`、`ads_online_week_store` 等 12 个 | `销售额`、`净销售额`、`退货率` 等 5 个 |
 | 8 | FactOnlineSales → `ads_online_customer_month_tier`、`ads_online_customer_profile_quarter` 等 4 个 | `ads_online_customer_month_tier`、`ads_online_customer_profile_quarter`、`ads_online_week_store` 等 4 个 | `订单数`、`客单价` |
 | 9 | DimProduct → `dim_product` | `dim_product` | `产品标价`、`产品单位成本`、`产品利润率` |
