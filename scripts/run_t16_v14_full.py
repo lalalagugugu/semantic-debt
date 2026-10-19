@@ -1,0 +1,205 @@
+"""Approved serial T16 batch, with per-response accounting and stop boundaries.
+
+No prompt, scorer, request body, question selection, or correction rule changes.
+Every paid response is saved by run_direct before check_reply can stop a run.
+"""
+import argparse
+from dataclasses import replace
+from datetime import datetime
+from decimal import Decimal
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+import urllib.request
+
+from harness import cells as C
+from harness import run_direct as R
+from harness.client import DeepSeekClient
+from harness.questions import load_questions, verify_eval_tag
+from harness.semantic_version import verify_semantic_tag
+
+ROOT = Path(__file__).resolve().parents[1]
+FP = "e72d3c7f663d3e1383b00b3884cb4501"
+MODEL = "deepseek-flash"
+
+
+def append_json(path, record):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, ensure_ascii=False) + "\n")
+        stream.flush()
+        os.fsync(stream.fileno())
+
+
+class BudgetBoundary(R.CallBoundary):
+    def __init__(self, ledger, limit=Decimal("10")):
+        super().__init__(FP)
+        self.ledger = Path(ledger)
+        self.limit = Decimal(limit)
+        self.spent = Decimal("0")
+        self.calls = 0
+        self.qid = None
+        self.rep = None
+        self.turn = 0
+
+    def wait_offpeak(self):
+        paused = False
+        while R.is_peak() and not self.stopped.is_set():
+            if not paused:
+                print("PAUSED: peak window; no requests until off-peak", flush=True)
+                append_json(self.ledger.parent / "events.jsonl", {"event": "peak_pause", "at": datetime.now(R.BEIJING).isoformat()})
+                paused = True
+            time.sleep(30)
+        if paused:
+            append_json(self.ledger.parent / "events.jsonl", {"event": "offpeak_resume", "at": datetime.now(R.BEIJING).isoformat()})
+            print("RESUMED: off-peak", flush=True)
+
+    def before_request(self):
+        if self.stopped.is_set():
+            raise R.RunStopped(self.reason)
+        if self.spent >= self.limit:
+            self.stop(f"unit budget exhausted: {self.spent} CNY / {self.limit} CNY")
+        self.wait_offpeak()
+        super().before_request()  # Also covers every actual transport retry.
+
+    def check_reply(self, reply):
+        usage = reply.usage
+        valid = all(isinstance(usage.get(k), int) and usage[k] >= 0 for k in
+                    ("prompt_tokens", "cache_hit_tokens", "cache_miss_tokens", "completion_tokens"))
+        valid = valid and usage["prompt_tokens"] + usage["completion_tokens"] > 0
+        cost = None
+        if valid:
+            hit = usage["cache_hit_tokens"]
+            miss = max(usage["cache_miss_tokens"], usage["prompt_tokens"] - hit)
+            price = C.PRICES_OFFPEAK[MODEL]
+            cost = (Decimal(hit) * Decimal(str(price["hit"])) + Decimal(miss) * Decimal(str(price["miss"]))
+                    + Decimal(usage["completion_tokens"]) * Decimal(str(price["output"]))) / Decimal(1_000_000)
+            self.spent += cost
+        self.calls += 1
+        append_json(self.ledger, {"qid": self.qid, "rep": self.rep, "turn": self.turn, "call": self.calls,
+                                 "at": datetime.now(R.BEIJING).isoformat(), "usage": usage,
+                                 "system_fingerprint": reply.system_fingerprint,
+                                 "raw_sha256": R.sha256(reply.raw), "transport_retries": reply.transport_retries,
+                                 "cost_cny": str(cost) if cost is not None else None,
+                                 "cumulative_cost_cny": str(self.spent), "limit_cny": str(self.limit),
+                                 "pricing": "offpeak; all actual requests gated before sending"})
+        self.turn += 1
+        super().check_reply(reply)
+        if cost is None:
+            self.stop("usage missing/invalid: cannot establish spend; stop before further requests")
+        if self.spent > self.limit:
+            self.stop(f"unit budget exceeded on returned response: {self.spent} CNY > {self.limit} CNY")
+
+    def attempt(self, ctx, question, rep):
+        # Wait before run_attempt stamps started_at / its pricing period.
+        try:
+            self.before_request()
+        except R.RunStopped as exc:
+            return {"run_id": ctx.run_id, "cell": ctx.cell.name, "qid": question.qid, "rep": rep,
+                    "status": "stopped", "error": str(exc), "turns": []}
+        self.qid, self.rep, self.turn = question.qid, rep, 0
+        result = R.run_attempt(ctx, question, rep)
+        if result["status"] != "done" and not self.stopped.is_set():
+            self.reason = f"attempt did not finish: {question.qid} r{rep}, {result['status']}"
+            self.stopped.set()
+        return result
+
+
+def configured_cells():
+    path = Path(os.environ["SEMDEBT_DATA_DIR"]) / "dry-runs/T16-semantic-v1.4-234ad68/cube_sql.semantic-v1.2.md"
+    expected = subprocess.check_output(["git", "show", "semantic-v1.2:render/syntax/cube_sql.md"], cwd=ROOT)
+    assert path.read_bytes() == expected
+    old = replace(C.CELLS["SQL-L2"], name="SQL-L2-notes-v12", syntax=str(path))
+    return [C.CELLS["SQL-L2"], old, C.CELLS["JSON-L2"]]
+
+
+def preflight(cells):
+    assert os.environ.get("DEEPSEEK_API_KEY"), "DEEPSEEK_API_KEY is not available"
+    assert verify_eval_tag("eval-v1.2") == "90e13b385a639a9164ac78430c50c11a7859f976"
+    assert verify_semantic_tag("semantic-v1.4", ["SQL-L2.yaml", "JSON-L2.yaml"], root=ROOT, contexts_dir=C.CONTEXTS) == "234ad684f69a9a632a78f1ab2079b4ebf5f789d1"
+    approved = json.loads((ROOT / "reports/validation/t16-v14-full-dry-run/estimates.json").read_text())
+    for cell, spec in zip(cells, approved["cells"]):
+        assert cell.name == spec["cell"] and R.sha256(R.system_for(cell)) == spec["system_message_sha256"]
+    for file in ("harness/prompt.py", "harness/scorer.py", "harness/scorer_v2.py", "harness/score_guard.py"):
+        assert (ROOT / file).read_bytes() == subprocess.check_output(["git", "show", "harness-v1.1:" + file], cwd=ROOT)
+    models = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT / "build/cube/model/cubes").glob("*.yml")}
+    assert models == approved["cube"]["model_sha256"]
+    container = subprocess.check_output(["docker", "compose", "ps", "-q", "cube"], cwd=ROOT, text=True).strip()
+    mounts = json.loads(subprocess.check_output(["docker", "inspect", "--format", "{{json .Mounts}}", container], text=True))
+    assert Path(next(m["Source"] for m in mounts if m["Destination"] == "/cube/conf/model")).resolve() == (ROOT / "build/cube/model").resolve()
+    with urllib.request.urlopen("http://127.0.0.1:14000/cubejs-api/v1/meta", timeout=60) as response:
+        assert response.status == 200 and len(json.load(response)["cubes"]) == 25
+    questions = R.questions_for(cells[0], load_questions(), skip_judge=True)
+    assert len(questions) == 109 and not R.invalid_rules(questions)
+    return questions
+
+
+def index_row(run_id, cell, started, cost, reason, count=327):
+    path = ROOT / "runs/INDEX.md"
+    assert f"| {run_id} |" not in path.read_text()
+    with path.open("a", encoding="utf-8") as out:
+        out.write(f"| {run_id} | {started[:10]} | {cell} | T16 | {count}条作答（跳过judge） | deepseek-flash，指纹e72d3c7f… | eval-v1.2=90e13b3；semantic-v1.4=234ad68 | {cost} | $SEMDEBT_DATA_DIR/runs-raw/{run_id} | {reason} |\n")
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--execute", action="store_true", help="execute the explicitly approved batch")
+    args = parser.parse_args()
+    if not args.execute:
+        parser.error("actual batch requires --execute; use dry_run_t16_v14 for estimates")
+    cells = configured_cells()
+    questions = preflight(cells)
+    run_ids = ["20261019-T16-full-v14-sql-new-01", "20261019-T16-full-v14-sql-old-01", "20261019-T16-full-v14-json-01"]
+    assert all(not (ROOT / "runs" / run).exists() for run in run_ids)
+    run_commit = R.harness_commit()
+    assert "dirty" not in run_commit
+    C.CELLS[cells[1].name] = cells[1]  # Process-local identity for later offline scoring.
+    total = Decimal("0")
+    for run_id, cell in zip(run_ids, cells):
+        questions = preflight(cells)
+        directory = ROOT / "runs" / run_id
+        directory.mkdir(parents=True)
+        started = datetime.now(R.BEIJING).isoformat(timespec="seconds")
+        manifest = {"run_id": run_id, "cell": cell.name, "runner_commit": run_commit,
+                    "eval_tag": "eval-v1.2", "semantic_tag": "semantic-v1.4", "harness_protocol": "harness-v1.1",
+                    "syntax_tag": "semantic-v1.2" if cell.name == cells[1].name else "semantic-v1.4",
+                    "syntax_sha256": R.sha256(C.syntax_path(cell.syntax).read_bytes()), "system_sha256": R.sha256(R.system_for(cell)),
+                    "context_sha256": R.sha256(R.context_text(cell)), "coverage_commit": "381ed1d",
+                    "started_at": started, "questions": 109, "reps": 3, "concurrency": 1,
+                    "authorized_unit_limit_cny": 10, "authorized_batch_limit_cny": 30,
+                    "authorization": "用户批准三个单元各10元、合计30元；T15排在本批之后；仅错峰；不得并行",
+                    "request_config": "unchanged DeepSeekClient defaults; 3000 tokens was an estimate, not an output cap"}
+        with (directory / "manifest.json").open("x") as out:
+            json.dump(manifest, out, ensure_ascii=False, indent=2)
+        boundary = BudgetBoundary(directory / "budget.jsonl")
+        client = DeepSeekClient(MODEL, before_request=boundary.before_request)
+        context = R.RunContext(run_id=run_id, cell=cell, client=client, executor=R.make_executor(cell, 120),
+                               system=R.system_for(cell), eval_commit="90e13b385a639a9164ac78430c50c11a7859f976",
+                               harness_commit=run_commit, timeout_s=120, raw_dir=R.raw_root() / run_id / cell.name,
+                               limits={"max_result_rows": R.DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": R.DEFAULT_MAX_MEMORY_BYTES},
+                               eval_tag="eval-v1.2", semantic_tag="semantic-v1.4", boundary=boundary)
+        print(f"START {run_id} cell={cell.name} commit={run_commit} unit_limit=10 CNY", flush=True)
+        try:
+            path = R.run_cell(context, questions, 3, 1, guard=R.FingerprintGuard(), attempt=boundary.attempt)
+            records = [json.loads(s) for s in path.read_text().splitlines()]
+            complete = len(records) == 327 and all(r["status"] == "done" for r in records)
+            complete = complete and {(r["qid"], r["rep"]) for r in records} == {(q.qid, n) for q in questions for n in (1, 2, 3)}
+            append_json(directory / "events.jsonl", {"event": "complete" if complete else "stopped", "at": datetime.now(R.BEIJING).isoformat(),
+                                                      "cost_cny": str(boundary.spent), "response_calls": boundary.calls, "reason": boundary.reason})
+        finally:
+            index_row(run_id, cell.name, started, str(boundary.spent),
+                      f"用户已批准单元10元/总30元；新run；单并发错峰，顺序新SQL/旧SQL/JSON；运行提交{run_commit}；说明{manifest['syntax_tag']}；逐次计费闸；实际状态见events.jsonl")
+        total += boundary.spent
+        print(f"END {run_id} complete={complete} calls={boundary.calls} cost={boundary.spent} batch_cost={total}", flush=True)
+        if not complete or boundary.stopped.is_set() or boundary.spent > Decimal("10") or total > Decimal("30"):
+            print("STOP ALL: " + (boundary.reason or "incomplete unit"), flush=True)
+            return 3
+    print(f"ALL MODEL UNITS COMPLETE; total_cost={total}; offline rescore and audit still required", flush=True)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
