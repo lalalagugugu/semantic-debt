@@ -1,0 +1,19 @@
+--- a/render/syntax/cube_sql.md
++++ b/render/syntax/cube_sql.md
+@@ -20 +20 @@
+-  - 一个事实 cube 加三个维度 cube：用括号向右嵌套，事实 cube 放在最里层，`维度甲 CROSS JOIN (维度乙 CROSS JOIN (事实 CROSS JOIN 维度丙))`。平铺的写法都找不到路径。
++  - 一个事实 cube 加三个维度 cube：用括号向右嵌套，事实 cube 放在最里层，`维度甲 CROSS JOIN (维度乙 CROSS JOIN (事实 CROSS JOIN 维度丙))`。
+@@ -60,3 +59,0 @@
+-- 能执行但算出错误的数（不报错，要特别避开）：
+-  - 两个含 `MEASURE()` 的 CTE 用同一个输出列名（例如都叫 `v`），外层再用 `JOIN … ON` 或 `LEFT JOIN … ON` 连起来同时选出这两列：第二列会变成第一列的值。
+-  - 一个聚合 CTE，和由它派生出来的 CTE（例如从它取出的键集合）`JOIN` 之后再 `SUM` / `GROUP BY`：每组得到的是全部的合计，不是本组的值。要这样筛选时改用上面的 `IN (SELECT …)`。
+@@ -66 +62,0 @@
+-  - 三个维度 cube 平铺 `CROSS JOIN`（任何顺序都不行）；两个维度 cube 时把它们写在相邻位置、事实 cube 放在一端。
+@@ -69 +65 @@
+-  - 窗口函数的结果不转 `BIGINT` 就作为输出列；输出里有窗口函数结果时用中文别名。
++  - 输出里有窗口函数结果时用中文别名。
+--- a/render/syntax/cube_json.md
++++ b/render/syntax/cube_json.md
+@@ -6 +6 @@
+-- 键：`"measures"`（指标数组）、`"dimensions"`（分组维度数组）、`"timeDimensions"`（时间维度数组）、`"filters"`（筛选数组）、`"order"`（排序）、`"limit"`（行数上限，整数）。其他键（例如 `"join"`、`"expression"`）会被拒绝。
++- 键：`"measures"`（指标数组）、`"dimensions"`（分组维度数组）、`"timeDimensions"`（时间维度数组）、`"filters"`（筛选数组）、`"order"`（排序）、`"limit"`（行数上限，整数）。

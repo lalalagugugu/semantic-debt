@@ -1,0 +1,2044 @@
+{
+  "versions": {
+    "cube": "1.8.6",
+    "clickhouse": "25.8.20.4"
+  },
+  "manifests": [
+    {
+      "directory": "reports/validation/t16-cube-capabilities-20261019-01",
+      "cases": 105,
+      "metadata": {
+        "started_utc": "2026-10-18T23:38:55.878267+00:00",
+        "manifest_sha256": "e9c88573bca6d747df3a6fce04097a26b3311a58dca9dfed05c1354ceba09169",
+        "script_sha256": "70d7e91a891a7f06059d511708c0c4df0418bc50bb8e8cab8a45405c727d885c",
+        "syntax_sha256": {
+          "render/syntax/cube_sql.md": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+          "render/syntax/cube_json.md": "426e382a0c474e2a492f29ac57ded25024bdec0f873bfcd6f8001288048329e0"
+        },
+        "model_sha256": {
+          "build/cube/model/cubes/account.yml": "6a768858ea27761d68e7a0d4fd6988ba2446bda43db8e72560606fe5edf932ea",
+          "build/cube/model/cubes/calendar.yml": "df513d0f2d2311251e7ead5eb9a81018e94afc5a50b2154f6f5666341f564269",
+          "build/cube/model/cubes/channel.yml": "f7dc69d2b83a4e7fa1e4a606e3ece6e43d8e7dff84c078e008b42e54a8c91a2c",
+          "build/cube/model/cubes/currency.yml": "a595d46ea4e823cf25400c59c67bbcac8031689c7abab0323f4a3e25d77698fd",
+          "build/cube/model/cubes/customer.yml": "9cb0fbeb5e54236e5b8987bd4ab3eba64e18320ab0f833891739c1ec1abe4849",
+          "build/cube/model/cubes/employee.yml": "191802552610ba4f4e0ef97fb53729f93b6e6f1b48c8cc844daba834ecf0d344",
+          "build/cube/model/cubes/entity.yml": "e02da552c5769626f24ae2900ec502f1243185c5dc92abdfd2ccf96f6d8e19a9",
+          "build/cube/model/cubes/exchange_rate.yml": "af6d293abc8fe3420589cf7d1014400ca08a8a514b524ee83b057172f7542120",
+          "build/cube/model/cubes/geography.yml": "fc415eed1c7721401a07753badb1041fb7e6527053ed97afb1ad1ce4d2330ed8",
+          "build/cube/model/cubes/inventory.yml": "83d4a0fa763d6e1312e7d2030c59b94f21a9392487b5db3d143d7d08dfaf7e7f",
+          "build/cube/model/cubes/it_machine.yml": "a93293cf517bd29d82d484dc077b8856895aff2f8e80fd58e15eb88194293ea8",
+          "build/cube/model/cubes/it_sla.yml": "56b3a9c8fab314ad3bb5672377837fef5d55d300b56e5371781f3f6307a54709",
+          "build/cube/model/cubes/machine.yml": "a0bfef59a60e6cd3d06b5cf842d014338903b85058bfa445fec2130e33dde0c8",
+          "build/cube/model/cubes/online_sales.yml": "a33f90abe663f2abc068e61741c875f2005725151f36d465495e9a1f83048040",
+          "build/cube/model/cubes/outage.yml": "fb0fafaaf3eee43a39b67f2cda67d87283fd46c7f6b2436e12eacc639a684f0c",
+          "build/cube/model/cubes/product.yml": "cb6779ba48b732f2edf5a14a080ece682324b58982985537c12ddf3c02758c90",
+          "build/cube/model/cubes/product_category.yml": "e587e43e6597ff7fd7dd51df0363925eaa19f6c5bd099b4cc281e71fa0596f71",
+          "build/cube/model/cubes/product_subcategory.yml": "56945bd87626240f789fc2f424665ddd5bb59ec5fe8a9926fe1598071618efac",
+          "build/cube/model/cubes/promotion.yml": "38feaa2e43cfd376a6006a0eedff373969af667a6fefa886af25c23b352368b0",
+          "build/cube/model/cubes/sales.yml": "fca4595db0e707e1aba8ab233a7f2fafc35818043ca318c1ee31eb8024facae2",
+          "build/cube/model/cubes/sales_quota.yml": "4dd64f8a6dfa89992e004f7ae26b027f72fb56000d44a83e702a9f509702ab66",
+          "build/cube/model/cubes/sales_territory.yml": "e90cb0a99b6a168b1418c5a61a302f20fea0da77eb6b2d020290876b8a2f1399",
+          "build/cube/model/cubes/scenario.yml": "969acffb5a6d8ab779a7ac32a8e834be4b8cddfb6e2b44da263caa4d92d83949",
+          "build/cube/model/cubes/store.yml": "cc963b5f6ba0d40fddd0b23926211b3eea82494834841078a0e38a6118be8524",
+          "build/cube/model/cubes/strategy_plan.yml": "870ab3d92714a0792ed5076b07d17795a9cf31b76a8d5a57d74d620572c043aa"
+        },
+        "commit": "522427031bf4c123cf7d6813101a4d34b4ea10f2",
+        "independence": "Only syntax documents and deployed model used; no evaluation-bank or model-response input."
+      },
+      "results_sha256": "80a7b917cd5811be1d834a8385796d09329e7fbceba12f91ed29750a411e7bf8"
+    },
+    {
+      "directory": "reports/validation/t16-cube-capabilities-20261019-02",
+      "cases": 51,
+      "metadata": {
+        "started_utc": "2026-10-18T23:40:30.649315+00:00",
+        "manifest_sha256": "49eb6c0fb76497f444a2b7185689ac8b624020ef5bc4da3d288c54217841175a",
+        "script_sha256": "75047f66117f0045f7188f6ecab5b26fcc1b3742a06f799f8d320070fa4f06b4",
+        "syntax_sha256": {
+          "render/syntax/cube_sql.md": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+          "render/syntax/cube_json.md": "426e382a0c474e2a492f29ac57ded25024bdec0f873bfcd6f8001288048329e0"
+        },
+        "model_sha256": {
+          "build/cube/model/cubes/account.yml": "6a768858ea27761d68e7a0d4fd6988ba2446bda43db8e72560606fe5edf932ea",
+          "build/cube/model/cubes/calendar.yml": "df513d0f2d2311251e7ead5eb9a81018e94afc5a50b2154f6f5666341f564269",
+          "build/cube/model/cubes/channel.yml": "f7dc69d2b83a4e7fa1e4a606e3ece6e43d8e7dff84c078e008b42e54a8c91a2c",
+          "build/cube/model/cubes/currency.yml": "a595d46ea4e823cf25400c59c67bbcac8031689c7abab0323f4a3e25d77698fd",
+          "build/cube/model/cubes/customer.yml": "9cb0fbeb5e54236e5b8987bd4ab3eba64e18320ab0f833891739c1ec1abe4849",
+          "build/cube/model/cubes/employee.yml": "191802552610ba4f4e0ef97fb53729f93b6e6f1b48c8cc844daba834ecf0d344",
+          "build/cube/model/cubes/entity.yml": "e02da552c5769626f24ae2900ec502f1243185c5dc92abdfd2ccf96f6d8e19a9",
+          "build/cube/model/cubes/exchange_rate.yml": "af6d293abc8fe3420589cf7d1014400ca08a8a514b524ee83b057172f7542120",
+          "build/cube/model/cubes/geography.yml": "fc415eed1c7721401a07753badb1041fb7e6527053ed97afb1ad1ce4d2330ed8",
+          "build/cube/model/cubes/inventory.yml": "83d4a0fa763d6e1312e7d2030c59b94f21a9392487b5db3d143d7d08dfaf7e7f",
+          "build/cube/model/cubes/it_machine.yml": "a93293cf517bd29d82d484dc077b8856895aff2f8e80fd58e15eb88194293ea8",
+          "build/cube/model/cubes/it_sla.yml": "56b3a9c8fab314ad3bb5672377837fef5d55d300b56e5371781f3f6307a54709",
+          "build/cube/model/cubes/machine.yml": "a0bfef59a60e6cd3d06b5cf842d014338903b85058bfa445fec2130e33dde0c8",
+          "build/cube/model/cubes/online_sales.yml": "a33f90abe663f2abc068e61741c875f2005725151f36d465495e9a1f83048040",
+          "build/cube/model/cubes/outage.yml": "fb0fafaaf3eee43a39b67f2cda67d87283fd46c7f6b2436e12eacc639a684f0c",
+          "build/cube/model/cubes/product.yml": "cb6779ba48b732f2edf5a14a080ece682324b58982985537c12ddf3c02758c90",
+          "build/cube/model/cubes/product_category.yml": "e587e43e6597ff7fd7dd51df0363925eaa19f6c5bd099b4cc281e71fa0596f71",
+          "build/cube/model/cubes/product_subcategory.yml": "56945bd87626240f789fc2f424665ddd5bb59ec5fe8a9926fe1598071618efac",
+          "build/cube/model/cubes/promotion.yml": "38feaa2e43cfd376a6006a0eedff373969af667a6fefa886af25c23b352368b0",
+          "build/cube/model/cubes/sales.yml": "fca4595db0e707e1aba8ab233a7f2fafc35818043ca318c1ee31eb8024facae2",
+          "build/cube/model/cubes/sales_quota.yml": "4dd64f8a6dfa89992e004f7ae26b027f72fb56000d44a83e702a9f509702ab66",
+          "build/cube/model/cubes/sales_territory.yml": "e90cb0a99b6a168b1418c5a61a302f20fea0da77eb6b2d020290876b8a2f1399",
+          "build/cube/model/cubes/scenario.yml": "969acffb5a6d8ab779a7ac32a8e834be4b8cddfb6e2b44da263caa4d92d83949",
+          "build/cube/model/cubes/store.yml": "cc963b5f6ba0d40fddd0b23926211b3eea82494834841078a0e38a6118be8524",
+          "build/cube/model/cubes/strategy_plan.yml": "870ab3d92714a0792ed5076b07d17795a9cf31b76a8d5a57d74d620572c043aa"
+        },
+        "commit": "522427031bf4c123cf7d6813101a4d34b4ea10f2",
+        "independence": "Only syntax documents and deployed model used; no evaluation-bank or model-response input."
+      },
+      "results_sha256": "e628c4648105aedd1cd1eef931d81c43492155df14d0fcedfe83cc989054dad7"
+    },
+    {
+      "directory": "reports/validation/t16-cube-capabilities-20261019-03",
+      "cases": 17,
+      "metadata": {
+        "started_utc": "2026-10-18T23:41:41.290444+00:00",
+        "manifest_sha256": "ff3b4b9efdc908b3b560f012d925e8db1a04ea1d5868ae840980f5b3a1fc683d",
+        "script_sha256": "65c1c04a7b14e66a7ef8d94776fc633c9e55bc3984df05d1bfcf1b7114e851ce",
+        "syntax_sha256": {
+          "render/syntax/cube_sql.md": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+          "render/syntax/cube_json.md": "426e382a0c474e2a492f29ac57ded25024bdec0f873bfcd6f8001288048329e0"
+        },
+        "model_sha256": {
+          "build/cube/model/cubes/account.yml": "6a768858ea27761d68e7a0d4fd6988ba2446bda43db8e72560606fe5edf932ea",
+          "build/cube/model/cubes/calendar.yml": "df513d0f2d2311251e7ead5eb9a81018e94afc5a50b2154f6f5666341f564269",
+          "build/cube/model/cubes/channel.yml": "f7dc69d2b83a4e7fa1e4a606e3ece6e43d8e7dff84c078e008b42e54a8c91a2c",
+          "build/cube/model/cubes/currency.yml": "a595d46ea4e823cf25400c59c67bbcac8031689c7abab0323f4a3e25d77698fd",
+          "build/cube/model/cubes/customer.yml": "9cb0fbeb5e54236e5b8987bd4ab3eba64e18320ab0f833891739c1ec1abe4849",
+          "build/cube/model/cubes/employee.yml": "191802552610ba4f4e0ef97fb53729f93b6e6f1b48c8cc844daba834ecf0d344",
+          "build/cube/model/cubes/entity.yml": "e02da552c5769626f24ae2900ec502f1243185c5dc92abdfd2ccf96f6d8e19a9",
+          "build/cube/model/cubes/exchange_rate.yml": "af6d293abc8fe3420589cf7d1014400ca08a8a514b524ee83b057172f7542120",
+          "build/cube/model/cubes/geography.yml": "fc415eed1c7721401a07753badb1041fb7e6527053ed97afb1ad1ce4d2330ed8",
+          "build/cube/model/cubes/inventory.yml": "83d4a0fa763d6e1312e7d2030c59b94f21a9392487b5db3d143d7d08dfaf7e7f",
+          "build/cube/model/cubes/it_machine.yml": "a93293cf517bd29d82d484dc077b8856895aff2f8e80fd58e15eb88194293ea8",
+          "build/cube/model/cubes/it_sla.yml": "56b3a9c8fab314ad3bb5672377837fef5d55d300b56e5371781f3f6307a54709",
+          "build/cube/model/cubes/machine.yml": "a0bfef59a60e6cd3d06b5cf842d014338903b85058bfa445fec2130e33dde0c8",
+          "build/cube/model/cubes/online_sales.yml": "a33f90abe663f2abc068e61741c875f2005725151f36d465495e9a1f83048040",
+          "build/cube/model/cubes/outage.yml": "fb0fafaaf3eee43a39b67f2cda67d87283fd46c7f6b2436e12eacc639a684f0c",
+          "build/cube/model/cubes/product.yml": "cb6779ba48b732f2edf5a14a080ece682324b58982985537c12ddf3c02758c90",
+          "build/cube/model/cubes/product_category.yml": "e587e43e6597ff7fd7dd51df0363925eaa19f6c5bd099b4cc281e71fa0596f71",
+          "build/cube/model/cubes/product_subcategory.yml": "56945bd87626240f789fc2f424665ddd5bb59ec5fe8a9926fe1598071618efac",
+          "build/cube/model/cubes/promotion.yml": "38feaa2e43cfd376a6006a0eedff373969af667a6fefa886af25c23b352368b0",
+          "build/cube/model/cubes/sales.yml": "fca4595db0e707e1aba8ab233a7f2fafc35818043ca318c1ee31eb8024facae2",
+          "build/cube/model/cubes/sales_quota.yml": "4dd64f8a6dfa89992e004f7ae26b027f72fb56000d44a83e702a9f509702ab66",
+          "build/cube/model/cubes/sales_territory.yml": "e90cb0a99b6a168b1418c5a61a302f20fea0da77eb6b2d020290876b8a2f1399",
+          "build/cube/model/cubes/scenario.yml": "969acffb5a6d8ab779a7ac32a8e834be4b8cddfb6e2b44da263caa4d92d83949",
+          "build/cube/model/cubes/store.yml": "cc963b5f6ba0d40fddd0b23926211b3eea82494834841078a0e38a6118be8524",
+          "build/cube/model/cubes/strategy_plan.yml": "870ab3d92714a0792ed5076b07d17795a9cf31b76a8d5a57d74d620572c043aa"
+        },
+        "commit": "522427031bf4c123cf7d6813101a4d34b4ea10f2",
+        "independence": "Only syntax documents and deployed model used; no evaluation-bank or model-response input."
+      },
+      "results_sha256": "5508d9493372bbf5be4eb2eecfb763d9094b68f4d991d8f0fcc98df4fa8eff5d"
+    },
+    {
+      "directory": "reports/validation/t16-cube-capabilities-20261019-04",
+      "cases": 7,
+      "metadata": {
+        "started_utc": "2026-10-18T23:42:45.980629+00:00",
+        "manifest_sha256": "7c64b5a2c6366bfdb507ec92af002f6bb63284772479664fad684c7871858672",
+        "script_sha256": "f553a052efeb2da7aff1c6aa9273bbb81c3ba74a641a3a0ca79e0bdbcbbca455",
+        "syntax_sha256": {
+          "render/syntax/cube_sql.md": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+          "render/syntax/cube_json.md": "426e382a0c474e2a492f29ac57ded25024bdec0f873bfcd6f8001288048329e0"
+        },
+        "model_sha256": {
+          "build/cube/model/cubes/account.yml": "6a768858ea27761d68e7a0d4fd6988ba2446bda43db8e72560606fe5edf932ea",
+          "build/cube/model/cubes/calendar.yml": "df513d0f2d2311251e7ead5eb9a81018e94afc5a50b2154f6f5666341f564269",
+          "build/cube/model/cubes/channel.yml": "f7dc69d2b83a4e7fa1e4a606e3ece6e43d8e7dff84c078e008b42e54a8c91a2c",
+          "build/cube/model/cubes/currency.yml": "a595d46ea4e823cf25400c59c67bbcac8031689c7abab0323f4a3e25d77698fd",
+          "build/cube/model/cubes/customer.yml": "9cb0fbeb5e54236e5b8987bd4ab3eba64e18320ab0f833891739c1ec1abe4849",
+          "build/cube/model/cubes/employee.yml": "191802552610ba4f4e0ef97fb53729f93b6e6f1b48c8cc844daba834ecf0d344",
+          "build/cube/model/cubes/entity.yml": "e02da552c5769626f24ae2900ec502f1243185c5dc92abdfd2ccf96f6d8e19a9",
+          "build/cube/model/cubes/exchange_rate.yml": "af6d293abc8fe3420589cf7d1014400ca08a8a514b524ee83b057172f7542120",
+          "build/cube/model/cubes/geography.yml": "fc415eed1c7721401a07753badb1041fb7e6527053ed97afb1ad1ce4d2330ed8",
+          "build/cube/model/cubes/inventory.yml": "83d4a0fa763d6e1312e7d2030c59b94f21a9392487b5db3d143d7d08dfaf7e7f",
+          "build/cube/model/cubes/it_machine.yml": "a93293cf517bd29d82d484dc077b8856895aff2f8e80fd58e15eb88194293ea8",
+          "build/cube/model/cubes/it_sla.yml": "56b3a9c8fab314ad3bb5672377837fef5d55d300b56e5371781f3f6307a54709",
+          "build/cube/model/cubes/machine.yml": "a0bfef59a60e6cd3d06b5cf842d014338903b85058bfa445fec2130e33dde0c8",
+          "build/cube/model/cubes/online_sales.yml": "a33f90abe663f2abc068e61741c875f2005725151f36d465495e9a1f83048040",
+          "build/cube/model/cubes/outage.yml": "fb0fafaaf3eee43a39b67f2cda67d87283fd46c7f6b2436e12eacc639a684f0c",
+          "build/cube/model/cubes/product.yml": "cb6779ba48b732f2edf5a14a080ece682324b58982985537c12ddf3c02758c90",
+          "build/cube/model/cubes/product_category.yml": "e587e43e6597ff7fd7dd51df0363925eaa19f6c5bd099b4cc281e71fa0596f71",
+          "build/cube/model/cubes/product_subcategory.yml": "56945bd87626240f789fc2f424665ddd5bb59ec5fe8a9926fe1598071618efac",
+          "build/cube/model/cubes/promotion.yml": "38feaa2e43cfd376a6006a0eedff373969af667a6fefa886af25c23b352368b0",
+          "build/cube/model/cubes/sales.yml": "fca4595db0e707e1aba8ab233a7f2fafc35818043ca318c1ee31eb8024facae2",
+          "build/cube/model/cubes/sales_quota.yml": "4dd64f8a6dfa89992e004f7ae26b027f72fb56000d44a83e702a9f509702ab66",
+          "build/cube/model/cubes/sales_territory.yml": "e90cb0a99b6a168b1418c5a61a302f20fea0da77eb6b2d020290876b8a2f1399",
+          "build/cube/model/cubes/scenario.yml": "969acffb5a6d8ab779a7ac32a8e834be4b8cddfb6e2b44da263caa4d92d83949",
+          "build/cube/model/cubes/store.yml": "cc963b5f6ba0d40fddd0b23926211b3eea82494834841078a0e38a6118be8524",
+          "build/cube/model/cubes/strategy_plan.yml": "870ab3d92714a0792ed5076b07d17795a9cf31b76a8d5a57d74d620572c043aa"
+        },
+        "commit": "522427031bf4c123cf7d6813101a4d34b4ea10f2",
+        "independence": "Only syntax documents and deployed model used; no evaluation-bank or model-response input."
+      },
+      "results_sha256": "925b03648049ee13ded86e239db2c11b45f9c7952dd78fa13dde8cf6cac8da61"
+    }
+  ],
+  "counts": {
+    "sql": 146,
+    "json": 34
+  },
+  "probe_script_sha256": "f553a052efeb2da7aff1c6aa9273bbb81c3ba74a641a3a0ca79e0bdbcbbca455",
+  "report_script_sha256": "8188677ca775e477a50b600989fe44aad6a2622c9a181f370babdc11ea3f57fb",
+  "all_frozen_manifests_reproduced": true,
+  "accepted": 104,
+  "errors": 76,
+  "correctness_checks": {
+    "S01": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ClickHouse channel_month"
+    },
+    "S30": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ClickHouse channel_month"
+    },
+    "S31": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ClickHouse channel_month"
+    },
+    "F06": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ClickHouse channel_month"
+    },
+    "B23": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ClickHouse channel_month"
+    },
+    "S02": {
+      "ok": true,
+      "expected": [
+        [
+          298215968.349796,
+          1160226
+        ]
+      ],
+      "basis": "ClickHouse channel_month totals"
+    },
+    "S32_cte": {
+      "ok": true,
+      "expected": [
+        [
+          298215968.349796
+        ]
+      ],
+      "basis": "sum of complete grouped baseline"
+    },
+    "S32_subquery": {
+      "ok": true,
+      "expected": [
+        [
+          298215968.349796
+        ]
+      ],
+      "basis": "sum of complete grouped baseline"
+    },
+    "S33_cte": {
+      "ok": true,
+      "expected": [
+        [
+          "a",
+          215849187.15199572
+        ],
+        [
+          "b",
+          82366781.19780028
+        ]
+      ],
+      "basis": "regroup baseline keys"
+    },
+    "S33_subquery": {
+      "ok": true,
+      "expected": [
+        [
+          "a",
+          215849187.15199572
+        ],
+        [
+          "b",
+          82366781.19780028
+        ]
+      ],
+      "basis": "regroup baseline keys"
+    },
+    "S34_inner": {
+      "ok": false,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "S34_left": {
+      "ok": false,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "S34_cross_filter": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "F01": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "F02_same_alias": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "F02_distinct_alias": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "F03": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "F04": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "ClickHouse channel_month: amount and quantity must remain distinct"
+    },
+    "F05": {
+      "ok": false,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "one row per key in both inputs: join + group must preserve per-key totals"
+    },
+    "S35_ROW_NUMBER_bigint": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          1
+        ],
+        [
+          2,
+          53212337.09040005,
+          2
+        ],
+        [
+          3,
+          42739462.42910004,
+          3
+        ],
+        [
+          4,
+          39627318.768700235,
+          4
+        ]
+      ],
+      "basis": "descending metric baseline has no ties; pg_oid=20"
+    },
+    "S35_RANK_bigint": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          1
+        ],
+        [
+          2,
+          53212337.09040005,
+          2
+        ],
+        [
+          3,
+          42739462.42910004,
+          3
+        ],
+        [
+          4,
+          39627318.768700235,
+          4
+        ]
+      ],
+      "basis": "descending metric baseline has no ties; pg_oid=20"
+    },
+    "F10_ROW_NUMBER": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ]
+      ],
+      "basis": "top two baseline values; window used only as filter"
+    },
+    "F11_ROW_NUMBER": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          1
+        ],
+        [
+          2,
+          53212337.09040005,
+          2
+        ]
+      ],
+      "basis": "top two with cast rank"
+    },
+    "F10_RANK": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ]
+      ],
+      "basis": "top two baseline values; window used only as filter"
+    },
+    "F11_RANK": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          1
+        ],
+        [
+          2,
+          53212337.09040005,
+          2
+        ]
+      ],
+      "basis": "top two with cast rank"
+    },
+    "S40": {
+      "ok": true,
+      "expected": [
+        [
+          2,
+          2.5,
+          null
+        ]
+      ],
+      "basis": "constant arithmetic"
+    },
+    "S20_eq": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ]
+      ],
+      "basis": "independent grouped predicate"
+    },
+    "S20_ne": {
+      "ok": true,
+      "expected": [
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "independent grouped predicate"
+    },
+    "S20_in": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ]
+      ],
+      "basis": "independent grouped predicate"
+    },
+    "S20_between": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ]
+      ],
+      "basis": "independent grouped predicate"
+    },
+    "S20_null": {
+      "ok": true,
+      "expected": [],
+      "basis": "independent grouped predicate"
+    },
+    "S20_and_or": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ]
+      ],
+      "basis": "independent grouped predicate"
+    },
+    "S21": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ]
+      ],
+      "basis": "HAVING all positive + alias DESC + LIMIT2"
+    },
+    "S37": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005,
+          215849187.15199572
+        ],
+        [
+          3,
+          42739462.42910004,
+          258588649.58109576
+        ],
+        [
+          4,
+          39627318.768700235,
+          298215968.349796
+        ]
+      ],
+      "basis": "cumulative sum over independent ordered groups"
+    },
+    "S38": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          1.0,
+          "positive",
+          162636850.06159568
+        ],
+        [
+          2,
+          1.0,
+          "positive",
+          53212337.09040005
+        ],
+        [
+          3,
+          1.0,
+          "positive",
+          42739462.42910004
+        ],
+        [
+          4,
+          1.0,
+          "positive",
+          39627318.768700235
+        ]
+      ],
+      "basis": "division, NULLIF, CASE and COALESCE(v,0)"
+    },
+    "F20_round": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06
+        ],
+        [
+          2,
+          53212337.09
+        ],
+        [
+          3,
+          42739462.43
+        ],
+        [
+          4,
+          39627318.77
+        ]
+      ],
+      "basis": "numeric ROUND"
+    },
+    "F20_pct": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          100
+        ],
+        [
+          2,
+          100
+        ],
+        [
+          3,
+          100
+        ],
+        [
+          4,
+          100
+        ]
+      ],
+      "basis": "metric divided by itself times 100"
+    },
+    "F22": {
+      "ok": true,
+      "expected": [
+        [
+          2007,
+          298215968.349796
+        ]
+      ],
+      "basis": "EXTRACT in outer materialized time bucket"
+    },
+    "F23": {
+      "ok": true,
+      "expected": [
+        [
+          2007,
+          298215968.349796
+        ]
+      ],
+      "basis": "calendar dimension alternative"
+    },
+    "F32": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          "Store",
+          2007,
+          464722.6694999999
+        ],
+        [
+          2,
+          "Store",
+          2007,
+          483362.61249999993
+        ],
+        [
+          3,
+          "Store",
+          2007,
+          437575.46499999985
+        ],
+        [
+          4,
+          "Store",
+          2007,
+          409631.71549999993
+        ]
+      ],
+      "basis": "independent physical star join"
+    },
+    "T03": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ASCII/non-ASCII aliases do not change baseline values without window projection"
+    },
+    "T04": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ASCII/non-ASCII aliases do not change baseline values without window projection"
+    },
+    "T06": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ASCII/non-ASCII aliases do not change baseline values without window projection"
+    },
+    "T07": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "ASCII/non-ASCII aliases do not change baseline values without window projection"
+    },
+    "B01": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          464722.6694999999,
+          null
+        ],
+        [
+          2,
+          483362.61249999993,
+          null
+        ],
+        [
+          3,
+          437575.46499999985,
+          null
+        ],
+        [
+          4,
+          409631.71549999993,
+          null
+        ]
+      ],
+      "basis": "two separately aggregated fact baselines, FULL OUTER JOIN"
+    },
+    "B02": {
+      "ok": true,
+      "expected": [
+        [
+          199,
+          16183016.723700015,
+          31369542.91929915
+        ],
+        [
+          306,
+          22291763.5959,
+          35606108.028906286
+        ],
+        [
+          307,
+          14737556.770800022,
+          16358280.111998983
+        ]
+      ],
+      "basis": "two separately aggregated fact baselines, INNER JOIN"
+    },
+    "B25": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235,
+          39627318.768700235
+        ]
+      ],
+      "basis": "self CTE projection join"
+    },
+    "B26": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005,
+          53212337.09040005
+        ]
+      ],
+      "basis": "self CTE filtered branch join"
+    },
+    "B27": {
+      "ok": true,
+      "expected": [
+        [
+          215849187.15199572,
+          82366781.19780028
+        ]
+      ],
+      "basis": "conditional SUM partitions"
+    },
+    "J01": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          6942853195.142856
+        ],
+        [
+          2,
+          2677599035.074874
+        ],
+        [
+          3,
+          1078007547.2266884
+        ],
+        [
+          4,
+          1715197831.4421146
+        ]
+      ],
+      "basis": "REST grouping and order vs independent physical aggregate"
+    },
+    "J04": {
+      "ok": true,
+      "expected": [
+        [
+          2007,
+          4561940955.02121,
+          1010803395.0382938
+        ]
+      ],
+      "observed_column_order": [
+        "calendar.CalendarYear",
+        "online_sales.sales_amount",
+        "sales.sales_amount"
+      ],
+      "basis": "independent fact totals, aligned by REST member annotation"
+    },
+    "J20_equals": {
+      "ok": true,
+      "basis": "independent channel totals and Python predicate"
+    },
+    "J20_notEquals": {
+      "ok": true,
+      "basis": "independent channel totals and Python predicate"
+    },
+    "J20_contains": {
+      "ok": true,
+      "basis": "independent channel totals and Python predicate"
+    },
+    "J20_notContains": {
+      "ok": true,
+      "basis": "independent channel totals and Python predicate"
+    },
+    "J20_set": {
+      "ok": true,
+      "basis": "independent channel totals and Python predicate"
+    },
+    "J20_notSet": {
+      "ok": true,
+      "basis": "independent channel totals and Python predicate"
+    },
+    "J20_gt": {
+      "ok": true,
+      "expected": [
+        [
+          3,
+          1078007547.2266884
+        ],
+        [
+          4,
+          1715197831.4421146
+        ]
+      ],
+      "basis": "independent numeric predicate"
+    },
+    "J20_gte": {
+      "ok": true,
+      "expected": [
+        [
+          2,
+          2677599035.074874
+        ],
+        [
+          3,
+          1078007547.2266884
+        ],
+        [
+          4,
+          1715197831.4421146
+        ]
+      ],
+      "basis": "independent numeric predicate"
+    },
+    "J20_lt": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          6942853195.142856
+        ]
+      ],
+      "basis": "independent numeric predicate"
+    },
+    "J20_lte": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          6942853195.142856
+        ],
+        [
+          2,
+          2677599035.074874
+        ]
+      ],
+      "basis": "independent numeric predicate"
+    },
+    "J21_or": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          6942853195.142856
+        ],
+        [
+          2,
+          2677599035.074874
+        ]
+      ],
+      "basis": "OR of two disjoint equality filters"
+    },
+    "J21_and": {
+      "ok": true,
+      "expected": [],
+      "basis": "AND of two disjoint equality filters"
+    },
+    "J21_default": {
+      "ok": true,
+      "expected": [],
+      "basis": "default conjunction"
+    },
+    "J22": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          6942853195.142856
+        ],
+        [
+          2,
+          2677599035.074874
+        ],
+        [
+          3,
+          1078007547.2266884
+        ],
+        [
+          4,
+          1715197831.4421146
+        ]
+      ],
+      "basis": "measure HAVING > 0"
+    },
+    "J23": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          6942853195.142856
+        ],
+        [
+          2,
+          2677599035.074874
+        ],
+        [
+          4,
+          1715197831.4421146
+        ],
+        [
+          3,
+          1078007547.2266884
+        ]
+      ],
+      "basis": "array order semantics"
+    },
+    "J20_inDateRange": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "inclusive date interval vs independent physical aggregate"
+    },
+    "J20_beforeDate": {
+      "ok": true,
+      "boundary_matches": [
+        "before_strict"
+      ],
+      "basis": "compare strict and inclusive boundary independently"
+    },
+    "J20_afterDate": {
+      "ok": true,
+      "boundary_matches": [
+        "after_strict"
+      ],
+      "basis": "compare strict and inclusive boundary independently"
+    },
+    "J10_day": {
+      "ok": true,
+      "basis": "independent daily fact totals, Python buckets, including partial boundary bucket"
+    },
+    "S100": {
+      "ok": true,
+      "basis": "DATE_TRUNC grouping independently reconstructed from daily fact totals"
+    },
+    "J10_week": {
+      "ok": true,
+      "basis": "independent daily fact totals, Python buckets, including partial boundary bucket"
+    },
+    "S101": {
+      "ok": true,
+      "basis": "DATE_TRUNC grouping independently reconstructed from daily fact totals"
+    },
+    "J10_month": {
+      "ok": true,
+      "basis": "independent daily fact totals, Python buckets, including partial boundary bucket"
+    },
+    "S102": {
+      "ok": true,
+      "basis": "DATE_TRUNC grouping independently reconstructed from daily fact totals"
+    },
+    "J10_quarter": {
+      "ok": true,
+      "basis": "independent daily fact totals, Python buckets, including partial boundary bucket"
+    },
+    "S103": {
+      "ok": true,
+      "basis": "DATE_TRUNC grouping independently reconstructed from daily fact totals"
+    },
+    "J10_year": {
+      "ok": true,
+      "basis": "independent daily fact totals, Python buckets, including partial boundary bucket"
+    },
+    "S104": {
+      "ok": true,
+      "basis": "DATE_TRUNC grouping independently reconstructed from daily fact totals"
+    },
+    "J10_None": {
+      "ok": true,
+      "basis": "independent daily fact totals, Python buckets, including partial boundary bucket"
+    }
+  },
+  "coverage": [
+    {
+      "id": "SQL-1",
+      "claim": "只读单条 SELECT",
+      "status": "成立",
+      "probes": "S01",
+      "conditions": "探针只发送只读 SELECT/WITH；写操作未执行，执行器边界另有既有测试。"
+    },
+    {
+      "id": "SQL-2",
+      "claim": "cube/成员对象",
+      "status": "成立",
+      "probes": "S01,S02",
+      "conditions": "已定义成员可查询；不能据此推断任意物理 SQL 也支持。"
+    },
+    {
+      "id": "SQL-3",
+      "claim": "MEASURE 与 GROUP BY",
+      "status": "成立",
+      "probes": "S01,S02,S03",
+      "conditions": "直接粒度的指标查询成立；SUM(MEASURE()) 同层嵌套反例失败，与说明一致。"
+    },
+    {
+      "id": "SQL-4",
+      "claim": "多个 cube 的 CROSS JOIN",
+      "status": "有条件成立",
+      "probes": "S50_*,F30_*,F32,F33,S52_*,B01,B02,J03,J04",
+      "conditions": "必须有可用模型路径，且 SQL 的树形括号/顺序影响路径；两个维度 6 种平铺仅2种成功；三个维度24种平铺均失败，右嵌套 F32 数值正确。双事实直接平铺失败，但分别聚合 CTE 后 B01/B02 可且数值正确。普通 ON 原始 cube 失败。"
+    },
+    {
+      "id": "SQL-5",
+      "claim": "Postgres 标识符与大小写",
+      "status": "有条件成立",
+      "probes": "S01,S04,F24,T03,T04,T05,T06,T07",
+      "conditions": "双引号大写成员和普通中文别名成立；大小写成员混合重复投影可失败。中文输出别名+窗口后处理 T05 生成空标识符，不能承诺全部遵循 Postgres。"
+    },
+    {
+      "id": "SQL-6",
+      "claim": "DATE/DATE_TRUNC/EXTRACT",
+      "status": "有条件成立",
+      "probes": "S100,S101,S102,S103,S104,S11,F21,F22,F23",
+      "conditions": "五粒度 DATE_TRUNC 与 DATE 字面量成立；EXTRACT 常量/外层桶成立，与 MEASURE 直接分组 S11 却触发引擎生成的未分组列错误。"
+    },
+    {
+      "id": "SQL-7",
+      "claim": "维度筛选/HAVING",
+      "status": "成立",
+      "probes": "S20_*,S21",
+      "conditions": "列举的维度运算、AND/OR、HAVING 在独立案例成立；组合到有缺陷的 CTE 不在此保证。"
+    },
+    {
+      "id": "SQL-8",
+      "claim": "ORDER BY 别名/LIMIT",
+      "status": "成立",
+      "probes": "S01,S21",
+      "conditions": "按指标别名排序及 LIMIT 成立。"
+    },
+    {
+      "id": "SQL-9",
+      "claim": "子查询/CTE 后算术、再聚合、排名、累计",
+      "status": "有条件成立",
+      "probes": "S30,S31,S32_*,S33_*,S34_*,F01,F02_*,F03,F04,F05,F06,S35_*,F10_*,F11_*,S37,B01,B02,B24,T05",
+      "conditions": "简单再聚合/累计成立；双 CTE 必须核对输出别名及数值，S34_inner/left 执行成功却把数量列替换为金额，cross_filter 数值正确；F05 再聚合得到每组总和而不是组内值。UInt64 窗口输出需 BIGINT；仅筛选不输出可成立。不能无限外推普通 SQL 组合。"
+    },
+    {
+      "id": "SQL-10",
+      "claim": "整数除法、DOUBLE、NULLIF",
+      "status": "成立",
+      "probes": "S38,S40,S42_double",
+      "conditions": "5/2=2，显式 DOUBLE=2.5，NULLIF 零分母得到 NULL。"
+    },
+    {
+      "id": "SQL-11",
+      "claim": "CASE/COALESCE",
+      "status": "有条件成立",
+      "probes": "S38,F20_coalesce,F20_coalesce_cast,B22,B23",
+      "conditions": "CASE 和 COALESCE(v,0) 成立；COALESCE(NULL,v) 即使 NULL 显式类型也触发数组长度错误，纯 VALUES 亦复现。"
+    },
+    {
+      "id": "SQL-12",
+      "claim": "ROUND 与乘100",
+      "status": "成立",
+      "probes": "F20_round,F20_pct",
+      "conditions": "数值舍入与百分比运算独立核验通过；S41 联合失败来自 COALESCE，而不是 ROUND。"
+    },
+    {
+      "id": "JSON-1",
+      "claim": "一个对象及已有成员",
+      "status": "成立",
+      "probes": "J01,J02",
+      "conditions": "模型成员正例通过，未知成员反例报错。"
+    },
+    {
+      "id": "JSON-2",
+      "claim": "列举的查询键",
+      "status": "成立",
+      "probes": "J01,J10_*,J20_*,J23",
+      "conditions": "列举键均接受；额外 join/expression 键被拒绝。"
+    },
+    {
+      "id": "JSON-3",
+      "claim": "示例对象结构",
+      "status": "成立",
+      "probes": "J01,J20_equals,J23",
+      "conditions": "使用部署中真实通用成员替代甲乙占位符，结构成立。"
+    },
+    {
+      "id": "JSON-4",
+      "claim": "分组及多 cube 自动连接",
+      "status": "有条件成立",
+      "probes": "J01,J03,J04,J05",
+      "conditions": "已有可连路径的维度星形与双事实成功；不能写任意 join 条件。多成员允许不等于所有无路径 cube 都可连接。"
+    },
+    {
+      "id": "JSON-5",
+      "claim": "时间维度、五粒度、不写粒度",
+      "status": "成立",
+      "probes": "J10_*",
+      "conditions": "五粒度及只区间过滤均对独立每日事实聚合重新分桶核验，含周/季度/年起始桶越出筛选区间的部分桶。"
+    },
+    {
+      "id": "JSON-6",
+      "claim": "13个过滤运算、字符串 values、AND/OR",
+      "status": "成立",
+      "probes": "J20_*,J21_*,J24",
+      "conditions": "全部运算正例和分组值对独立基线核验；contains 的 o 也匹配 Online，按本次观测不区分大小写。日期前/后边界对严格与含边界两份物理聚合独立辨别。服务端还接受数值 values 数组，不影响文档的更严格客户端规范。"
+    },
+    {
+      "id": "JSON-7",
+      "claim": "指标 filters/HAVING",
+      "status": "成立",
+      "probes": "J22",
+      "conditions": "指标正数过滤与独立汇总一致。"
+    },
+    {
+      "id": "JSON-8",
+      "claim": "对象/数组 order",
+      "status": "成立",
+      "probes": "J01,J23",
+      "conditions": "两种排序实际行序均与独立基线一致。"
+    },
+    {
+      "id": "JSON-9",
+      "claim": "不能临时表达式；只能定义好的计算",
+      "status": "成立",
+      "probes": "J30,J31,J32,J33",
+      "conditions": "临时指标表达式、临时维度、额外窗口表达式键均拒绝；预定义计算指标可执行。"
+    },
+    {
+      "id": "PERCENTILE_CONT",
+      "claim": "用户追加核验",
+      "status": "不成立",
+      "probes": "S60,S61,S62,F40,F41",
+      "conditions": "整数参数先被类型守卫拒绝；Float64 参数在纯 VALUES 中仍明确 execution is not implemented。仅指该函数实现，不证明分位数业务完全不可表达。"
+    },
+    {
+      "id": "CAST",
+      "claim": "用户追加核验",
+      "status": "有条件成立",
+      "probes": "S42_*,S35_*_bigint,F11_*,S64,T01,T02",
+      "conditions": "数字/文本及窗口 UInt64->BIGINT 成立；Interval(MonthDayNano)->Float64 明确不支持。"
+    },
+    {
+      "id": "AVG(interval)",
+      "claim": "审计类型对照",
+      "status": "不成立",
+      "probes": "T01,T02,F42,F43",
+      "conditions": "时间戳列之差的 AVG、转 Float64 不成立；DATE 常量被优化为天数时成立，不能以常量正例替代列类型测试。"
+    }
+  ],
+  "all_errors_verbatim": [
+    {
+      "id": "S03",
+      "interface": "sql",
+      "error": "Database Execution Error: Query failed: Error: Aggregate function sum(sales.SalesAmount) is found inside another aggregate function in query. ; query id: e9c1bf76-ddd9-444e-b419-3cc0af5c42d5-54798450-6719-403b-9e87-78ca5896f661",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S11",
+      "interface": "sql",
+      "error": "Post-Processing Error: Database Execution Error: Query failed: Error: Column 'fk_aggregate.saleskey' is not under aggregate function and not in GROUP BY keys. In query cte_7 AS (SELECT fk_aggregate.saleskey AS saleskey, fk_aggregate.datekey AS datekey, fk_aggregate.channelkey AS channelkey, fk_aggregate.storekey AS storekey, fk_aggregate.productkey AS productkey, fk_aggregate.promotionkey AS promotionkey, fk_aggregate.currencykey AS currencykey, fk_aggregate.unitcost AS unitcost, fk_aggregate.unitprice AS unitprice, fk_aggregate.salesquantity AS salesquantity, fk_aggregate.returnquantity AS returnquantity, fk_aggregate.returnamount AS returnamount, fk_aggregate.discountquantity AS discountquantity, fk_aggregate.discountamount AS discountamount, fk_aggregate.totalcost AS totalcost, fk_aggregate.salesamount AS salesamount, fk_aggregate.__user AS __user, fk_aggregate.__cubejoinfield AS __cubejoinfield, sum(sum(fk_aggregate.sales__sales_amount)) OVER () AS sales__sales_amount_in_scope FROM cte_0 AS fk_aggregate). ; query id: 2092275a-e3e5-492a-af66-b6156fbc265a-b44eb48e-655b-44e4-9ba1-cc895388a676",
+      "sqlstate": "22000"
+    },
+    {
+      "id": "S35_ROW_NUMBER_native",
+      "interface": "sql",
+      "error": "Database Execution Error: Type UInt64 is not supported in response transformation from Cube",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S36_ROW_NUMBER",
+      "interface": "sql",
+      "error": "Database Execution Error: Type UInt64 is not supported in response transformation from Cube",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S35_RANK_native",
+      "interface": "sql",
+      "error": "Database Execution Error: Type UInt64 is not supported in response transformation from Cube",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S36_RANK",
+      "interface": "sql",
+      "error": "Database Execution Error: Type UInt64 is not supported in response transformation from Cube",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S41",
+      "interface": "sql",
+      "error": "Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length",
+      "sqlstate": "22000"
+    },
+    {
+      "id": "S50_sales_store_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'store', 'channel', 'store', 'channel', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_sales_channel_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'channel', 'store', 'channel', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_store_channel_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'store', 'channel', 'store', 'channel', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_channel_store_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'channel,store', 'store,sales', 'store', 'channel', 'store', 'channel', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_sales_store_channel_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_sales_store_calendar_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,store', 'store,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_sales_channel_store_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_sales_channel_calendar_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,channel', 'channel,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_sales_calendar_store_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_sales_calendar_channel_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_store_sales_channel_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,sales', 'sales,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_store_channel_sales_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S50_store_channel_calendar_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,channel', 'channel,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S51",
+      "interface": "sql",
+      "error": "Planning Error: Initial planning error: Error during planning: Schema contains duplicate qualified field name 'sales.sales_amount'\nQUERY: SELECT store.\"StoreKey\", channel.\"ChannelName\", MEASURE(sales.sales_amount) AS v FROM sales CROSS JOIN store CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1, 2 ORDER BY 1, 2 LIMIT 4",
+      "sqlstate": "42000"
+    },
+    {
+      "id": "S52_sales_online_sales_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,online_sales', 'online_sales,calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S52_sales_calendar_online_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,online_sales', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S52_online_sales_sales_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'online_sales,sales', 'sales,calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S52_online_sales_calendar_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'online_sales,calendar', 'calendar,sales', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S52_calendar_sales_online_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,online_sales', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S52_calendar_online_sales_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,online_sales', 'online_sales,sales', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S53",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,online_sales', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "S60",
+      "interface": "sql",
+      "error": "Unsupported Error: percentile_cont(...) execution is not implemented",
+      "sqlstate": "0A000"
+    },
+    {
+      "id": "S61",
+      "interface": "sql",
+      "error": "Unsupported Error: percentile_cont(...) execution is not implemented",
+      "sqlstate": "0A000"
+    },
+    {
+      "id": "S62",
+      "interface": "sql",
+      "error": "Database Execution Error: Query failed: Error: Column 'fk_aggregate.saleskey' is not under aggregate function and not in GROUP BY keys. In query cte_7 AS (SELECT fk_aggregate.saleskey AS saleskey, fk_aggregate.datekey AS datekey, fk_aggregate.channelkey AS channelkey, fk_aggregate.storekey AS storekey, fk_aggregate.productkey AS productkey, fk_aggregate.promotionkey AS promotionkey, fk_aggregate.currencykey AS currencykey, fk_aggregate.unitcost AS unitcost, fk_aggregate.unitprice AS unitprice, fk_aggregate.salesquantity AS salesquantity, fk_aggregate.returnquantity AS returnquantity, fk_aggregate.returnamount AS returnamount, fk_aggregate.discountquantity AS discountquantity, fk_aggregate.discountamount AS discountamount, fk_aggregate.totalcost AS totalcost, fk_aggregate.salesamount AS salesamount, fk_aggregate.__user AS __user, fk_aggregate.__cubejoinfield AS __cubejoinfield, sum(sum(fk_aggregate.sales__sales_amount)) OVER () AS sales__sales_amount_in_scope FROM cte_0 AS fk_aggregate). ; query id: 581f7c34-43c0-4571-98e4-1d26623e2e3f-9df68a26-6be7-4f7c-8cb7-90446f480e03",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "J02",
+      "interface": "json",
+      "error": "'not_a_member' not found for path 'sales.not_a_member'",
+      "sqlstate": null
+    },
+    {
+      "id": "J05",
+      "interface": "json",
+      "error": "Invalid query format: \"join\" is not allowed",
+      "sqlstate": null
+    },
+    {
+      "id": "J30",
+      "interface": "json",
+      "error": "Invalid query format: \"measures[0]\" with value \"sales.sales_amount + sales.sales_quantity\" fails to match the required pattern: /^[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+$/",
+      "sqlstate": null
+    },
+    {
+      "id": "J31",
+      "interface": "json",
+      "error": "Invalid query format: \"dimensions[0]\" with value \"CAST(sales.channelKey AS TEXT)\" fails to match the required pattern: /^[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+(\\.[a-zA-Z0-9_]+)?$/",
+      "sqlstate": null
+    },
+    {
+      "id": "J32",
+      "interface": "json",
+      "error": "Invalid query format: \"expression\" is not allowed",
+      "sqlstate": null
+    },
+    {
+      "id": "F20_coalesce",
+      "interface": "sql",
+      "error": "Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length",
+      "sqlstate": "22000"
+    },
+    {
+      "id": "F20_coalesce_cast",
+      "interface": "sql",
+      "error": "Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length",
+      "sqlstate": "22000"
+    },
+    {
+      "id": "F24",
+      "interface": "sql",
+      "error": "Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information\nQUERY: SELECT sales.channelkey, sales.\"channelKey\", MEASURE(sales.sales_amount) FROM sales GROUP BY 1, 2 LIMIT 1",
+      "sqlstate": "XX000"
+    },
+    {
+      "id": "F30_sales_store_channel_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,store', 'store,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_sales_store_calendar_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,store', 'store,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_sales_channel_store_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,channel', 'channel,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_sales_channel_calendar_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,channel', 'channel,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_sales_calendar_store_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_sales_calendar_channel_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'sales,calendar', 'calendar,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_store_sales_channel_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,sales', 'sales,channel', 'channel,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_store_sales_calendar_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,sales', 'sales,calendar', 'calendar,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_store_channel_sales_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,channel', 'channel,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_store_channel_calendar_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,channel', 'channel,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_store_calendar_sales_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,calendar', 'calendar,sales', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_store_calendar_channel_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,calendar', 'calendar,channel', 'channel,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_channel_sales_store_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'channel,sales', 'sales,store', 'store,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_channel_sales_calendar_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'channel,sales', 'sales,calendar', 'calendar,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_channel_store_sales_calendar",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'channel,store', 'store,sales', 'sales,calendar', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_channel_store_calendar_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'channel,store', 'store,calendar', 'calendar,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_channel_calendar_sales_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'channel,calendar', 'calendar,sales', 'sales,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_channel_calendar_store_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'channel,calendar', 'calendar,store', 'store,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_calendar_sales_store_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,store', 'store,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_calendar_sales_channel_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,sales', 'sales,channel', 'channel,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_calendar_store_sales_channel",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,store', 'store,sales', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_calendar_store_channel_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,store', 'store,channel', 'channel,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_calendar_channel_sales_store",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,channel', 'channel,sales', 'sales,store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F30_calendar_channel_store_sales",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,channel', 'channel,store', 'store,sales', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F31",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'store,sales', 'channel,calendar', 'sales,channel', 'store', 'channel', 'calendar', 'store', 'channel', 'calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "F33",
+      "interface": "sql",
+      "error": "Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information\nQUERY: SELECT store.\"StoreKey\", MEASURE(sales.sales_amount) FROM sales JOIN store ON sales.\"StoreKey\" = store.\"StoreKey\" WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1 LIMIT 4",
+      "sqlstate": "XX000"
+    },
+    {
+      "id": "F34",
+      "interface": "sql",
+      "error": "Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information\nQUERY: WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT a.k, a.v, channel.\"ChannelName\" FROM a LEFT JOIN channel ON a.k = channel.\"ChannelKey\" ORDER BY a.k",
+      "sqlstate": "XX000"
+    },
+    {
+      "id": "F40",
+      "interface": "sql",
+      "error": "Planning Error: WITHIN GROUP (ORDER BY ...) must be Float64 or Interval, got Int64",
+      "sqlstate": "42000"
+    },
+    {
+      "id": "F41",
+      "interface": "sql",
+      "error": "Unsupported Error: percentile_cont(...) execution is not implemented",
+      "sqlstate": "0A000"
+    },
+    {
+      "id": "B03",
+      "interface": "sql",
+      "error": "Database Execution Error: Can't find join path to join 'calendar,online_sales', 'sales,calendar', 'sales'",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "B11",
+      "interface": "sql",
+      "error": "Database Execution Error: Type UInt64 is not supported in response transformation from Cube",
+      "sqlstate": "58000"
+    },
+    {
+      "id": "B20",
+      "interface": "sql",
+      "error": "Planning Error: Initial planning error: This feature is not implemented: Unsupported value TypedString(TypedString { data_type: Timestamp(None, None), value: ValueWithSpan { value: SingleQuotedString(\"2007-02-01 00:00:00\"), span: Span(Location(1,41)..Location(1,62)) }, uses_odbc_syntax: false }) in a values list expression\nQUERY: SELECT AVG(b - a) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00', TIMESTAMP '2007-02-03 00:00:00'), (TIMESTAMP '2007-02-02 00:00:00', TIMESTAMP '2007-02-03 00:00:00')) t (a, b)",
+      "sqlstate": "42000"
+    },
+    {
+      "id": "B21",
+      "interface": "sql",
+      "error": "Planning Error: Initial planning error: This feature is not implemented: Unsupported value TypedString(TypedString { data_type: Timestamp(None, None), value: ValueWithSpan { value: SingleQuotedString(\"2007-02-01 00:00:00\"), span: Span(Location(1,67)..Location(1,88)) }, uses_odbc_syntax: false }) in a values list expression\nQUERY: SELECT AVG(CAST(b - a AS DOUBLE PRECISION)) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00', TIMESTAMP '2007-02-03 00:00:00'), (TIMESTAMP '2007-02-02 00:00:00', TIMESTAMP '2007-02-03 00:00:00')) t (a, b)",
+      "sqlstate": "42000"
+    },
+    {
+      "id": "B22",
+      "interface": "sql",
+      "error": "Post-Processing Error: Compute error: Cannot perform bitwise operation on arrays of different length",
+      "sqlstate": "22000"
+    },
+    {
+      "id": "T01",
+      "interface": "sql",
+      "error": "Planning Error: Initial planning error: Error during planning: The function Avg does not support inputs of type Interval(MonthDayNano).\nQUERY: SELECT AVG(CAST(b AS TIMESTAMP) - CAST(a AS TIMESTAMP)) FROM (VALUES ('2007-02-01', '2007-02-03'), ('2007-02-02', '2007-02-03')) t (a, b)",
+      "sqlstate": "42000"
+    },
+    {
+      "id": "T02",
+      "interface": "sql",
+      "error": "Internal Error: Unsupported CAST from Interval(MonthDayNano) to Float64",
+      "sqlstate": "XX000"
+    },
+    {
+      "id": "T05",
+      "interface": "sql",
+      "error": "Database Execution Error: Query failed: Error: Syntax error: failed at position 16 (``) (line 1, col 16): ``, `a`.`v` `_1`, CAST(`a`.`row_number_order` AS BIGINT) `_2` \nFROM (\n  SELECT ROW_NUMBER() OVER (ORDER BY `sales`.`measure_sales_sa` DESC NULLS FIRST) `row_numbe... Expected one of: ParserArrayOfJSONIdentifierDelimiter, token sequence, OpeningSquareBracket, Dot, token, OR, AND, IS NOT DISTINCT FROM, IS NULL, IS NOT NULL, BETWEEN, NOT BETWEEN, LIKE, ILIKE, NOT LIKE, NOT ILIKE, REGEXP, IN, NOT IN, GLOBAL IN, GLOBAL NOT IN, MOD, DIV, alias, AS, identifier, Comma, FROM, PREWHERE, WHERE, GROUP BY, WITH, HAVING, WINDOW, QUALIFY, ORDER BY, LIMIT, OFFSET, FETCH, SETTINGS, UNION, EXCEPT, INTERSECT, INTO OUTFILE, FORMAT, ParallelWithClause, PARALLEL WITH, end of query. ; query id: 84a457ad-e596-4cd5-b271-fbbf9ce6fa32-dc7a995e-fe99-4159-879f-8eccbb914167",
+      "sqlstate": "58000"
+    }
+  ],
+  "baseline_queries": {
+    "channel_month": "SELECT channelKey,sum(SalesAmount),sum(SalesQuantity) FROM retail.FactSales WHERE DateKey >= '2007-02-01' AND DateKey < '2007-03-01' GROUP BY channelKey ORDER BY channelKey",
+    "store_month": "SELECT StoreKey,sum(SalesAmount) FROM retail.FactSales WHERE DateKey >= '2007-02-01' AND DateKey < '2007-03-01' GROUP BY StoreKey ORDER BY StoreKey",
+    "online_store_month": "SELECT StoreKey,sum(SalesAmount) FROM retail.FactOnlineSales WHERE DateKey >= '2007-02-01' AND DateKey < '2007-03-01' GROUP BY StoreKey ORDER BY StoreKey",
+    "channel_all": "SELECT channelKey,sum(SalesAmount) FROM retail.FactSales GROUP BY channelKey ORDER BY channelKey",
+    "year_both": "SELECT 2007,(SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey)=2007),(SELECT sum(SalesAmount) FROM retail.FactOnlineSales WHERE toYear(DateKey)=2007)",
+    "star_month": "SELECT f.StoreKey,c.ChannelName,toYear(f.DateKey),sum(f.SalesAmount) FROM retail.FactSales f LEFT JOIN retail.DimChannel c ON f.channelKey=c.ChannelKey WHERE f.DateKey >= '2007-02-01' AND f.DateKey < '2007-03-01' GROUP BY 1,2,3 ORDER BY 1,2,3 LIMIT 4",
+    "daily_month": "SELECT toString(toDate(DateKey)),sum(SalesAmount) FROM retail.FactSales WHERE DateKey >= '2007-02-01' AND DateKey < '2007-03-01' GROUP BY 1 ORDER BY 1",
+    "before_strict": "SELECT channelKey,sum(SalesAmount) FROM retail.FactSales WHERE DateKey < '2007-02-02' GROUP BY 1 ORDER BY 1",
+    "before_inclusive": "SELECT channelKey,sum(SalesAmount) FROM retail.FactSales WHERE DateKey <= '2007-02-02' GROUP BY 1 ORDER BY 1",
+    "after_strict": "SELECT channelKey,sum(SalesAmount) FROM retail.FactSales WHERE DateKey > '2007-02-27' GROUP BY 1 ORDER BY 1",
+    "after_inclusive": "SELECT channelKey,sum(SalesAmount) FROM retail.FactSales WHERE DateKey >= '2007-02-27' GROUP BY 1 ORDER BY 1"
+  },
+  "baseline_archive": "$SEMDEBT_DATA_DIR/interface-probes/t16-20261019/independent-baselines.json"
+}

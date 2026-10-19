@@ -1,0 +1,1262 @@
+{
+  "model_calls": 0,
+  "scorer_calls": 0,
+  "eval_tag": "eval-v1.2",
+  "semantic_basis": "semantic-v1.3 plus approved M-SHARE scope variants (bindings pending v1.4)",
+  "context_sha256": "79ac5fb5e0c4fed7a3439c01849323c2b44b59471b8b861a6df6c2d5676107bc",
+  "status": "pre-v1.4 static preregistration; rebind and freeze commit before full run",
+  "category_counts": {
+    "a": 34,
+    "covered": 38,
+    "d": 9,
+    "c": 26,
+    "b": 2
+  },
+  "rows": [
+    {
+      "qid": "Q01",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q02",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": []
+    },
+    {
+      "qid": "Q03",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.customer_count"
+      ],
+      "measures": [
+        "online_sales.customer_count"
+      ],
+      "dimensions_and_filter_time_members": []
+    },
+    {
+      "qid": "Q04",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "product.BrandName",
+        "product.ProductKey",
+        "product.ProductName"
+      ],
+      "measures": [],
+      "dimensions_and_filter_time_members": [
+        "product.BrandName",
+        "product.ProductKey",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q05",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q06",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q07",
+      "stratum": "low_discrimination",
+      "category": "d",
+      "capability": "mandatory_rank_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q08",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.IsSalesPerson",
+        "employee.LastName"
+      ],
+      "measures": [],
+      "dimensions_and_filter_time_members": [
+        "employee.EmployeeKey",
+        "employee.FirstName",
+        "employee.IsSalesPerson",
+        "employee.LastName"
+      ]
+    },
+    {
+      "qid": "Q09",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "product.unit_cost"
+      ],
+      "measures": [
+        "product.unit_cost"
+      ],
+      "dimensions_and_filter_time_members": []
+    },
+    {
+      "qid": "Q10",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q11",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.sales_amount",
+        "product_category.ProductCategoryName"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "product_category.ProductCategoryName"
+      ]
+    },
+    {
+      "qid": "Q12",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q13",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "sales.average_unit_price",
+        "sales.sales_amount",
+        "sales.sales_quantity",
+        "store.StoreName"
+      ],
+      "measures": [
+        "sales.average_unit_price",
+        "sales.sales_amount",
+        "sales.sales_quantity"
+      ],
+      "dimensions_and_filter_time_members": [
+        "store.StoreName"
+      ]
+    },
+    {
+      "qid": "Q14",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "aggregate_then_reaggregate",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q15",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "geography.RegionCountryName",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "geography.RegionCountryName"
+      ]
+    },
+    {
+      "qid": "Q16",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "calendar.CalendarYear",
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "calendar.CalendarYear",
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q17",
+      "stratum": "low_discrimination",
+      "category": "d",
+      "capability": "mandatory_denominator_not_exposed",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q18",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.discount_amount",
+        "promotion.PromotionType"
+      ],
+      "measures": [
+        "online_sales.discount_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "promotion.PromotionType"
+      ]
+    },
+    {
+      "qid": "Q19",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "customer.Gender",
+        "online_sales.average_order_value"
+      ],
+      "measures": [
+        "online_sales.average_order_value"
+      ],
+      "dimensions_and_filter_time_members": [
+        "customer.Gender"
+      ]
+    },
+    {
+      "qid": "Q20",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "stock_gap_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q21",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "inventory.current_on_hand_quantity",
+        "store.StoreName"
+      ],
+      "measures": [
+        "inventory.current_on_hand_quantity"
+      ],
+      "dimensions_and_filter_time_members": [
+        "store.StoreName"
+      ]
+    },
+    {
+      "qid": "Q22",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q23",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q24",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.return_rate",
+        "online_sales.sales_quantity",
+        "product_category.ProductCategoryName"
+      ],
+      "measures": [
+        "online_sales.return_rate",
+        "online_sales.sales_quantity"
+      ],
+      "dimensions_and_filter_time_members": [
+        "product_category.ProductCategoryName"
+      ]
+    },
+    {
+      "qid": "Q25",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName",
+        "online_sales.average_daily_sales_amount"
+      ],
+      "measures": [
+        "online_sales.average_daily_sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "calendar.NorthAmericaSeason",
+        "geography.ContinentName"
+      ]
+    },
+    {
+      "qid": "Q26",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q27",
+      "stratum": "primary",
+      "category": "d",
+      "capability": "mandatory_rank_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q28",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "channel.ChannelName",
+        "sales.average_unit_price"
+      ],
+      "measures": [
+        "sales.average_unit_price"
+      ],
+      "dimensions_and_filter_time_members": [
+        "channel.ChannelName"
+      ]
+    },
+    {
+      "qid": "Q29",
+      "stratum": "low_discrimination",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q30",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q31",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "account.AccountName",
+        "product_category.ProductCategoryName",
+        "scenario.ScenarioName",
+        "strategy_plan.DateKey",
+        "strategy_plan.plan_amount"
+      ],
+      "measures": [
+        "strategy_plan.plan_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "account.AccountName",
+        "product_category.ProductCategoryName",
+        "scenario.ScenarioName",
+        "strategy_plan.DateKey"
+      ]
+    },
+    {
+      "qid": "Q32",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "aggregate_then_reaggregate",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q34",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover",
+        "product.ProductName"
+      ],
+      "measures": [
+        "inventory.average_on_hand_value",
+        "inventory.inventory_turnover"
+      ],
+      "dimensions_and_filter_time_members": [
+        "inventory.DateKey",
+        "inventory.ProductKey",
+        "product.ProductName"
+      ]
+    },
+    {
+      "qid": "Q35",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "self_join_or_recursive_rollup",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q36",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "wide_metrics_cannot_return_labeled_rows",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q37",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "quantile_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q38",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q41",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q43",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "geography.ContinentName",
+        "online_sales.gross_margin"
+      ],
+      "measures": [
+        "online_sales.gross_margin"
+      ],
+      "dimensions_and_filter_time_members": [
+        "geography.ContinentName"
+      ]
+    },
+    {
+      "qid": "Q47",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q49",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "self_join_or_recursive_rollup",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q50",
+      "stratum": "primary",
+      "category": "d",
+      "capability": "mandatory_growth_amount_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q51",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q52",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "product.UnitPrice"
+      ],
+      "measures": [],
+      "dimensions_and_filter_time_members": [
+        "product.UnitPrice"
+      ]
+    },
+    {
+      "qid": "Q53",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.DateKey",
+        "online_sales.order_count"
+      ],
+      "measures": [
+        "online_sales.order_count"
+      ],
+      "dimensions_and_filter_time_members": [
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q54",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.return_amount"
+      ],
+      "measures": [
+        "online_sales.return_amount"
+      ],
+      "dimensions_and_filter_time_members": []
+    },
+    {
+      "qid": "Q55",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q56",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q57",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q58",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.SalesAmount"
+      ],
+      "measures": [],
+      "dimensions_and_filter_time_members": [
+        "online_sales.SalesAmount"
+      ]
+    },
+    {
+      "qid": "Q59",
+      "stratum": "low_discrimination",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q60",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q61",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.sales_amount",
+        "product_subcategory.ProductSubcategoryName"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "product_subcategory.ProductSubcategoryName"
+      ]
+    },
+    {
+      "qid": "Q62",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.sales_amount",
+        "online_sales.sales_quantity",
+        "product.BrandName"
+      ],
+      "measures": [
+        "online_sales.sales_amount",
+        "online_sales.sales_quantity"
+      ],
+      "dimensions_and_filter_time_members": [
+        "product.BrandName"
+      ]
+    },
+    {
+      "qid": "Q63",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "customer.Occupation",
+        "online_sales.average_order_value"
+      ],
+      "measures": [
+        "online_sales.average_order_value"
+      ],
+      "dimensions_and_filter_time_members": [
+        "customer.Occupation"
+      ]
+    },
+    {
+      "qid": "Q64",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey",
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.gross_margin",
+        "online_sales.gross_margin_pct",
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "calendar.MonthNumber",
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q65",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "employee.FirstName",
+        "employee.LastName",
+        "sales.sales_amount",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ],
+      "measures": [
+        "sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "employee.FirstName",
+        "employee.LastName",
+        "store.EmployeeKey",
+        "store.StoreName"
+      ]
+    },
+    {
+      "qid": "Q66",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "calendar.CalendarQuarterLabel",
+        "online_sales.DateKey",
+        "online_sales.discount_amount"
+      ],
+      "measures": [
+        "online_sales.discount_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "calendar.CalendarQuarterLabel",
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q67",
+      "stratum": "primary",
+      "category": "d",
+      "capability": "mandatory_rank_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q68",
+      "stratum": "low_discrimination",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "calendar.IsHoliday",
+        "online_sales.DateKey",
+        "online_sales.order_count",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.order_count",
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "calendar.IsHoliday",
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q69",
+      "stratum": "low_discrimination",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount",
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ],
+      "measures": [
+        "online_sales.discount_rate",
+        "online_sales.discounted_sales_amount",
+        "online_sales.list_amount_before_discount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "promotion.PromotionCategory",
+        "promotion.PromotionKey"
+      ]
+    },
+    {
+      "qid": "Q70",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "dimension_aggregate_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q71",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q72",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q73",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "stock_gap_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q74",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q75",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.CustomerKey",
+        "online_sales.DateKey",
+        "online_sales.sales_amount_yoy_pct"
+      ],
+      "measures": [
+        "online_sales.sales_amount_yoy_pct"
+      ],
+      "dimensions_and_filter_time_members": [
+        "customer.FirstName",
+        "customer.LastName",
+        "online_sales.CustomerKey",
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q76",
+      "stratum": "low_discrimination",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q77",
+      "stratum": "primary",
+      "category": "d",
+      "capability": "mandatory_growth_amount_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q78",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q79",
+      "stratum": "low_discrimination",
+      "category": "d",
+      "capability": "mandatory_rank_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q80",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "span_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q81",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q82",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "hr_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q83",
+      "stratum": "low_discrimination",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q84",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q85",
+      "stratum": "low_discrimination",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q87",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q88",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q89",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q90",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q92",
+      "stratum": "primary",
+      "category": "d",
+      "capability": "mandatory_rank_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q94",
+      "stratum": "primary",
+      "category": "b",
+      "capability": "quarter_shift_variant_not_encoded",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q96",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q98",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q99",
+      "stratum": "low_discrimination",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q100",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "quantile_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q101",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.DateKey",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q102",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "online_sales.DateKey",
+        "online_sales.net_sales_amount",
+        "product_category.ProductCategoryName"
+      ],
+      "measures": [
+        "online_sales.net_sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "online_sales.DateKey",
+        "product_category.ProductCategoryName"
+      ]
+    },
+    {
+      "qid": "Q103",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "aggregate_then_reaggregate",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q104",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q105",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "sales.sales_amount",
+        "store.StoreName"
+      ],
+      "measures": [
+        "sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "store.StoreName"
+      ]
+    },
+    {
+      "qid": "Q106",
+      "stratum": "primary",
+      "category": "d",
+      "capability": "mandatory_growth_amount_column",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q107",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q108",
+      "stratum": "primary",
+      "category": "covered",
+      "capability": "exposed_members",
+      "standard_member_set": [
+        "geography.RegionCountryName",
+        "online_sales.DateKey",
+        "online_sales.order_count",
+        "online_sales.sales_amount"
+      ],
+      "measures": [
+        "online_sales.order_count",
+        "online_sales.sales_amount"
+      ],
+      "dimensions_and_filter_time_members": [
+        "geography.RegionCountryName",
+        "online_sales.DateKey"
+      ]
+    },
+    {
+      "qid": "Q109",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q110",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q111",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q112",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q113",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "dynamic_arithmetic_or_window",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q114",
+      "stratum": "primary",
+      "category": "b",
+      "capability": "new_customer_cohort_reading_mismatch",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q115",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q116",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "cohort_metric_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q117",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "multi_stage_attribution",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q118",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q119",
+      "stratum": "primary",
+      "category": "c",
+      "capability": "group_top_n_or_nested_selection",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q120",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q121",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    },
+    {
+      "qid": "Q122",
+      "stratum": "primary",
+      "category": "a",
+      "capability": "business_formula_not_defined",
+      "standard_member_set": null
+    }
+  ],
+  "hidden_measures": [
+    {
+      "member": "online_sales.discounted_list_amount",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "折扣率",
+      "source": "semantic/source.yaml:2478",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "online_sales.sales_amount_prior_year",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "销售额同比增长率",
+      "source": "semantic/source.yaml:2734",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "online_sales.sales_amount_prior_month",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "销售额环比增长率",
+      "source": "semantic/source.yaml:2743",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "online_sales.sales_amount_in_scope",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "销售额占比",
+      "source": "semantic/source.yaml:2751",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "sales.discounted_list_amount",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "折扣率",
+      "source": "semantic/source.yaml:2478",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "sales.sales_amount_prior_year",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "销售额同比增长率",
+      "source": "semantic/source.yaml:2734",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "sales.sales_amount_prior_month",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "销售额环比增长率",
+      "source": "semantic/source.yaml:2743",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "sales.sales_amount_in_scope",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "销售额占比",
+      "source": "semantic/source.yaml:2751",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "sales.same_store_base",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "同店销售额／同店销售额增长率",
+      "source": "semantic/source.yaml:2759",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    },
+    {
+      "member": "sales.same_store_base_prior_year",
+      "exposed": false,
+      "counts_as_coverage": false,
+      "l1_existing_promise": "同店销售额／同店销售额增长率",
+      "source": "semantic/source.yaml:2759",
+      "standalone_callable_promised": false,
+      "handoff": "T12 范围或变体检查：判断暴露辅助成员或另建可调用变体；不是自动全部公开"
+    }
+  ]
+}

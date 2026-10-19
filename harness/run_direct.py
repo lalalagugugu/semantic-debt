@@ -57,7 +57,7 @@ from harness.cells import (  # noqa: E402
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
-    DEFAULT_MAX_MEMORY_BYTES, DEFAULT_MAX_RESULT_ROWS, ChdbExecutor, ExecResult, Executor,
+    DEFAULT_MAX_MEMORY_BYTES, DEFAULT_MAX_RESULT_ROWS, ChdbExecutor, CubeSqlExecutor, CubeJsonExecutor, ExecResult, Executor,
 )
 from harness.questions import Question  # noqa: E402
 from harness.score_guard import SCORE_TIMEOUT, SCORE_TIMEOUT_S, score_with_timeout  # noqa: E402
@@ -148,6 +148,51 @@ class RunContext:
     eval_tag: str | None = None     # the bank tag eval_commit was verified against
     semantic_tag: str | None = None  # the semantic-layer tag the contexts were verified against
     tool_executor: Executor | None = None  # explorer agent (T15): run_sql's own executor (shorter timeout)
+    boundary: CallBoundary | None = None
+
+
+class RunStopped(RuntimeError):
+    reply: Reply | None = None
+
+
+class CallBoundary:
+    """Shared by all workers; stop before further calls on a version or time violation."""
+
+    def __init__(self, expected_fingerprint: str | None, allow_peak: bool = False) -> None:
+        self.expected_fingerprint = expected_fingerprint
+        self.allow_peak = allow_peak
+        self.stopped = threading.Event()
+        self.reason = ""
+
+    def stop(self, reason: str) -> None:
+        self.reason = reason
+        self.stopped.set()
+        raise RunStopped(reason)
+
+    def before_request(self) -> None:
+        if self.stopped.is_set():
+            raise RunStopped(self.reason)
+        if not self.allow_peak and is_peak():
+            self.stop("peak hours reached; resume off-peak")
+
+    def check_reply(self, reply: Reply) -> None:
+        if self.expected_fingerprint is not None and reply.system_fingerprint != self.expected_fingerprint:
+            self.stop(f"system_fingerprint mismatch: expected {self.expected_fingerprint}, got {reply.system_fingerprint!r}; ask the user")
+
+
+def _chat(ctx: RunContext, q: Question, rep: int, turn: int, messages: list[dict[str, str]]) -> Reply:
+    if ctx.boundary is not None:
+        ctx.boundary.before_request()
+    reply = ctx.client.chat(messages)
+    # Preserve even a mismatching response before stopping; never send its query to the engine.
+    _save_raw(ctx, q, rep, turn, reply)
+    if ctx.boundary is not None:
+        try:
+            ctx.boundary.check_reply(reply)
+        except RunStopped as exc:
+            exc.reply = reply
+            raise
+    return reply
 
 
 def _candidate(parsed: P.Parsed, result: ExecResult | None):
@@ -278,7 +323,7 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
     replies: list[Reply] = []
     base = _base(ctx, q, rep, started)
     try:
-        reply = ctx.client.chat(messages)
+        reply = _chat(ctx, q, rep, 0, messages)
         replies.append(reply)
         parsed = P.parse_response(reply.content)
         result = ctx.executor.execute(parsed.query) if parsed.query and not parsed.refused else None
@@ -289,13 +334,20 @@ def run_attempt(ctx: RunContext, q: Question, rep: int) -> dict:
         if result is not None and not result.ok:
             # the one and only fix: send the error back (assistant turn without reasoning_content)
             messages = messages + [{"role": "assistant", "content": reply.content}, P.fix_message(result.error or "")]
-            reply2 = ctx.client.chat(messages)
+            reply2 = _chat(ctx, q, rep, 1, messages)
             replies.append(reply2)
             parsed2 = P.parse_response(reply2.content)
             result2 = ctx.executor.execute(parsed2.query) if parsed2.query and not parsed2.refused else None
             turns.append(_turn_record(ctx, q, rep, 1, reply2, parsed2, result2))
             final_candidate = _candidate(parsed2, result2)
             fixed = True
+    except RunStopped as exc:
+        reply = getattr(exc, "reply", None)
+        if reply is not None:
+            turns.append({"turn": len(turns), "system_fingerprint": reply.system_fingerprint,
+                          "usage": reply.usage, "raw_sha256": sha256(reply.raw),
+                          "exec": {"status": "not_executed"}})
+        return {**base, "status": "stopped", "error": str(exc), "turns": turns}
     except APIError as exc:
         return {**base, "status": "api_error", "error": str(exc)[:500], "turns": turns,
                 "transport_retries": exc.transport_retries}
@@ -498,8 +550,8 @@ def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency:
                 emit(out, warm.submit(run_attempt_, ctx, q0, rep0), q0.qid, rep0)
         else:
             todo_rest = []
-        if guard is not None and guard.conflict:
-            progress(f"  stop: second system_fingerprint: {guard.seen}")
+        if (guard is not None and guard.conflict) or (ctx.boundary is not None and ctx.boundary.stopped.is_set()):
+            progress("  stop: call boundary or fingerprint guard")
             return path
         with ThreadPoolExecutor(max_workers=max(1, concurrency)) as pool:
             futures = {pool.submit(run_attempt_, ctx, q, rep): (q.qid, rep) for q, rep in todo_rest}
@@ -509,9 +561,10 @@ def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency:
                     continue
                 qid, rep = futures[future]
                 emit(out, future, qid, rep)
-                if guard is not None and guard.conflict and not stopped:
+                if ((guard is not None and guard.conflict) or
+                        (ctx.boundary is not None and ctx.boundary.stopped.is_set())) and not stopped:
                     stopped = True
-                    progress(f"  stop: second system_fingerprint: {guard.seen}; cancelling attempts not yet started")
+                    progress("  stop: call boundary or fingerprint guard; cancelling attempts not yet started")
                     for f in futures:
                         f.cancel()
     return path
@@ -648,6 +701,10 @@ def harness_commit() -> str:
 
 
 def make_executor(cell: Cell, timeout_s: int) -> Executor:
+    if cell.stack == "cube_sql":
+        return CubeSqlExecutor(timeout_s=timeout_s)
+    if cell.stack == "cube_json":
+        return CubeJsonExecutor(timeout_s=timeout_s)
     if cell.stack != "chdb":
         raise NotImplementedError(f"{cell.name}: the {cell.stack} executor is implemented in {cell.card}")
     return ChdbExecutor(cell.allowed, timeout_s=timeout_s, name=f"chdb_{cell.allowed[0]}")
@@ -684,6 +741,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--dry-run", action="store_true", help="count calls and estimate cost; no API call")
     ap.add_argument("--budget", type=float, help="CNY; refuse to start if the estimate exceeds it")
     ap.add_argument("--allow-peak", action="store_true", help="allow starting in DeepSeek peak hours")
+    ap.add_argument("--expected-fingerprint", help="stop on any differing or missing response fingerprint")
     ap.add_argument("--est-output-tokens", type=int, default=3000)
     ap.add_argument("--est-fix-rate", type=float, default=0.10)
     ap.add_argument("--est-hit-ratio", type=float, default=0.95)
@@ -818,7 +876,8 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     from harness.client import DeepSeekClient
 
-    client = DeepSeekClient(args.model)
+    boundary = CallBoundary(args.expected_fingerprint, args.allow_peak)
+    client = DeepSeekClient(args.model, before_request=boundary.before_request)
     commit = eval_commit()
     guard = FingerprintGuard.from_logs(log_path(args.run_id, "x").parent, args.model)
     for cell in cells:
@@ -826,9 +885,12 @@ def main(argv: list[str] | None = None, load=None) -> int:
                          system=system_for(cell), eval_commit=commit, harness_commit=harness_commit(),
                          timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name,
                          limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
-                         eval_tag=args.eval_tag, semantic_tag=args.semantic_tag)
+                         eval_tag=args.eval_tag, semantic_tag=args.semantic_tag, boundary=boundary)
         path = run_cell(ctx, per_cell[cell.name], args.reps, args.concurrency, guard=guard)
         print(json.dumps(summarize(path), ensure_ascii=False, indent=2))
+        if boundary.stopped.is_set():
+            print(f"STOP: {boundary.reason}")
+            return 3
         if guard.conflict:
             print(f"STOP: {args.model} answered with more than one system_fingerprint in this run: {guard.seen}. "
                   "Ask the user before going on (decisions/2026-10-17-model-version-fingerprint.md).")

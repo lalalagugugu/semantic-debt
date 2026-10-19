@@ -1,0 +1,6 @@
+question bank: eval-v1.2 = 90e13b385a639a9164ac78430c50c11a7859f976
+semantic layer: semantic-v1.4 = 234ad684f69a9a632a78f1ab2079b4ebf5f789d1
+model=deepseek-flash reps=3 fix_rate=10% (off-peak prices; peak = x2)
+cell          card  stack         Q  attempts   calls   in/call  out/call       CNY  source
+SQL-L2        T16   cube_sql    109       327     360     43846      3000      5.41  estimated
+total                                     327     360                          5.41  (peak 10.82)

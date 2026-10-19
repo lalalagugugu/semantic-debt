@@ -1,0 +1,2 @@
+{"event": "json_gate_authorized", "at": "2026-10-20T02:24:05+08:00", "covered_questions": 39, "covered_attempts_planned": 117, "rule": "已完成能答题作答的执行失败率>20%停；任何Cube超时/连接错误即停；其余拒答与失败不触发SQL检查点"}
+{"event": "complete", "at": "2026-10-20T02:37:38.444397+08:00", "cost_cny": "2.58393312", "response_calls": 335, "reason": ""}

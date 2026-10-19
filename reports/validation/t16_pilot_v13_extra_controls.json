@@ -1,0 +1,185 @@
+[
+  {
+    "id": "multi_dim_date_ascii",
+    "query": "WITH d AS (SELECT sales.\"StoreKey\" AS st,calendar.\"CalendarYear\" AS yr,sales.\"DateKey\" AS dt FROM store CROSS JOIN sales CROSS JOIN calendar WHERE sales.\"DateKey\">=DATE '2007-01-01' AND sales.\"DateKey\"<DATE '2008-01-01' GROUP BY 1,2,3), x AS (SELECT st,yr,MIN(dt) AS lo,MAX(dt) AS hi FROM d GROUP BY st,yr), y AS (SELECT yr,st,CAST(hi AS DATE)-CAST(lo AS DATE) AS days FROM x) SELECT yr AS year_key,ROUND(AVG(days),2) AS average_days FROM y GROUP BY yr",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "year_key",
+          "pg_oid": 701
+        },
+        {
+          "name": "average_days",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          2007.0,
+          359.7
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.417
+    }
+  },
+  {
+    "id": "multi_dim_date_unicode",
+    "query": "WITH d AS (SELECT sales.\"StoreKey\" AS st,calendar.\"CalendarYear\" AS yr,sales.\"DateKey\" AS dt FROM store CROSS JOIN sales CROSS JOIN calendar WHERE sales.\"DateKey\">=DATE '2007-01-01' AND sales.\"DateKey\"<DATE '2008-01-01' GROUP BY 1,2,3), x AS (SELECT st,yr,MIN(dt) AS lo,MAX(dt) AS hi FROM d GROUP BY st,yr), y AS (SELECT yr,st,CAST(hi AS DATE)-CAST(lo AS DATE) AS days FROM x) SELECT yr AS \"年份\",ROUND(AVG(days),2) AS average_days FROM y GROUP BY yr",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "年份",
+          "pg_oid": 701
+        },
+        {
+          "name": "average_days",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          2007.0,
+          359.7
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.243
+    }
+  },
+  {
+    "id": "json_unneeded_fact_False",
+    "query": {
+      "measures": [
+        "inventory.inventory_turnover"
+      ],
+      "dimensions": [
+        "inventory.StoreKey"
+      ],
+      "timeDimensions": [
+        {
+          "dimension": "inventory.DateKey",
+          "dateRange": [
+            "2007-01-01",
+            "2007-12-31"
+          ]
+        }
+      ],
+      "limit": 2
+    },
+    "result": {
+      "status": "ok",
+      "row_count": 2,
+      "columns": [
+        {
+          "name": "inventory.StoreKey",
+          "type": "number"
+        },
+        {
+          "name": "inventory.inventory_turnover",
+          "type": "number"
+        }
+      ],
+      "result_sha256": "77c2f8928ced3631539d8e606b0bf43a4df1a39fe696bce3468413544e8988c7",
+      "elapsed_s": 0.089
+    }
+  },
+  {
+    "id": "json_unneeded_fact_True",
+    "query": {
+      "measures": [
+        "inventory.inventory_turnover"
+      ],
+      "dimensions": [
+        "inventory.StoreKey"
+      ],
+      "timeDimensions": [
+        {
+          "dimension": "inventory.DateKey",
+          "dateRange": [
+            "2007-01-01",
+            "2007-12-31"
+          ]
+        },
+        {
+          "dimension": "sales.DateKey",
+          "dateRange": [
+            "2007-01-01",
+            "2007-12-31"
+          ]
+        }
+      ],
+      "limit": 2
+    },
+    "result": {
+      "status": "error",
+      "error_class": "engine_error",
+      "error": "Can't find join path to join 'inventory', 'sales', 'inventory'",
+      "elapsed_s": 0.019
+    }
+  },
+  {
+    "id": "slash_alias",
+    "query": "WITH d AS (SELECT sales.\"StoreKey\" AS st,calendar.\"CalendarYear\" AS yr,sales.\"DateKey\" AS dt FROM store CROSS JOIN sales CROSS JOIN calendar WHERE sales.\"DateKey\">=DATE '2007-01-01' AND sales.\"DateKey\"<DATE '2008-01-01' GROUP BY 1,2,3), x AS (SELECT st,yr,MIN(dt) AS lo,MAX(dt) AS hi FROM d GROUP BY st,yr), y AS (SELECT yr,st,CAST(hi AS DATE)-CAST(lo AS DATE) AS days FROM x) SELECT yr AS \"组/别\",ROUND(AVG(days),2) AS average_days FROM y GROUP BY yr",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "组/别",
+          "pg_oid": 701
+        },
+        {
+          "name": "average_days",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          2007.0,
+          359.7
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.258
+    }
+  },
+  {
+    "id": "camel_alias",
+    "query": "WITH d AS (SELECT sales.\"StoreKey\" AS st,calendar.\"CalendarYear\" AS PeriodKey,sales.\"DateKey\" AS dt FROM store CROSS JOIN sales CROSS JOIN calendar WHERE sales.\"DateKey\">=DATE '2007-01-01' AND sales.\"DateKey\"<DATE '2008-01-01' GROUP BY 1,2,3), x AS (SELECT st,PeriodKey,MIN(dt) AS lo,MAX(dt) AS hi FROM d GROUP BY st,PeriodKey), y AS (SELECT PeriodKey,st,CAST(hi AS DATE)-CAST(lo AS DATE) AS days FROM x) SELECT PeriodKey AS year_key,ROUND(AVG(days),2) AS average_days FROM y GROUP BY PeriodKey",
+    "result": {
+      "ok": true,
+      "columns": [
+        {
+          "name": "year_key",
+          "pg_oid": 701
+        },
+        {
+          "name": "average_days",
+          "pg_oid": 701
+        }
+      ],
+      "rows": [
+        [
+          2007.0,
+          359.7
+        ]
+      ],
+      "python_types": [
+        "float",
+        "float"
+      ],
+      "elapsed_s": 0.207
+    }
+  }
+]

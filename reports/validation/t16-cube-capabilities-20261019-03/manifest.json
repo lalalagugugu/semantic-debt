@@ -1,0 +1,121 @@
+[
+  {
+    "id": "B01",
+    "interface": "sql",
+    "claim": "SQL-4/9/two-facts",
+    "query": "WITH a AS (SELECT sales.\"StoreKey\" AS k, MEASURE(sales.sales_amount) AS av FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT online_sales.\"StoreKey\" AS k, MEASURE(online_sales.sales_amount) AS bv FROM online_sales WHERE online_sales.\"DateKey\" >= DATE '2007-02-01' AND online_sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT COALESCE(a.k,b.k) AS k,a.av,b.bv FROM a FULL OUTER JOIN b ON a.k=b.k ORDER BY 1 LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "B02",
+    "interface": "sql",
+    "claim": "SQL-4/9/two-facts",
+    "query": "WITH a AS (SELECT sales.\"StoreKey\" AS k, MEASURE(sales.sales_amount) AS av FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT online_sales.\"StoreKey\" AS k, MEASURE(online_sales.sales_amount) AS bv FROM online_sales WHERE online_sales.\"DateKey\" >= DATE '2007-02-01' AND online_sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT a.k,a.av,b.bv FROM a JOIN b ON a.k=b.k ORDER BY a.k LIMIT 4",
+    "note": ""
+  },
+  {
+    "id": "B03",
+    "interface": "sql",
+    "claim": "SQL-4/two-facts",
+    "query": "SELECT calendar.\"CalendarYear\",MEASURE(sales.sales_amount),MEASURE(online_sales.sales_amount) FROM sales CROSS JOIN (calendar CROSS JOIN online_sales) WHERE calendar.\"CalendarYear\"=2007 GROUP BY 1",
+    "note": ""
+  },
+  {
+    "id": "B10_False_False",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT store.\"StoreType\" AS k,channel.\"ChannelName\" AS label,MEASURE(sales.sales_amount) AS v FROM store CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2),r AS (SELECT k,label,v,RANK() OVER (PARTITION BY k ORDER BY v DESC) AS n FROM a) SELECT k,label,v FROM r WHERE n=1 ORDER BY 1,2",
+    "note": "两个字符串分组列，排名只用于筛选"
+  },
+  {
+    "id": "B10_False_True",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT store.\"StoreType\" AS k,channel.\"ChannelName\" AS label,MEASURE(sales.sales_amount) AS v FROM store CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2),r AS (SELECT k,label,v,RANK() OVER (PARTITION BY k ORDER BY v DESC) AS n FROM a) SELECT r.k,r.label,r.v FROM r WHERE n=1 ORDER BY 1,2",
+    "note": "两个字符串分组列，排名只用于筛选"
+  },
+  {
+    "id": "B10_True_False",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT store.\"StoreType\" AS k,channel.\"ChannelName\" AS label,MEASURE(sales.sales_amount) AS v FROM store CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2),r AS (SELECT k,label,v,CAST(RANK() OVER (PARTITION BY k ORDER BY v DESC) AS BIGINT) AS n FROM a) SELECT k,label,v FROM r WHERE n=1 ORDER BY 1,2",
+    "note": "两个字符串分组列，排名只用于筛选"
+  },
+  {
+    "id": "B10_True_True",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT store.\"StoreType\" AS k,channel.\"ChannelName\" AS label,MEASURE(sales.sales_amount) AS v FROM store CROSS JOIN sales CROSS JOIN channel WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1,2),r AS (SELECT k,label,v,CAST(RANK() OVER (PARTITION BY k ORDER BY v DESC) AS BIGINT) AS n FROM a) SELECT r.k,r.label,r.v FROM r WHERE n=1 ORDER BY 1,2",
+    "note": "两个字符串分组列，排名只用于筛选"
+  },
+  {
+    "id": "B11",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k,v,ROW_NUMBER() OVER (ORDER BY v DESC) AS n FROM a) SELECT n AS position,k AS grouping_key,v AS amount FROM b ORDER BY n LIMIT 2",
+    "note": "外层重命名窗口列"
+  },
+  {
+    "id": "B12",
+    "interface": "sql",
+    "claim": "SQL-9/CAST",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1), b AS (SELECT k,v,CAST(ROW_NUMBER() OVER (ORDER BY v DESC) AS BIGINT) AS n FROM a) SELECT n AS position,k AS grouping_key,v AS amount FROM b ORDER BY n LIMIT 2",
+    "note": ""
+  },
+  {
+    "id": "B20",
+    "interface": "sql",
+    "claim": "SQL-6/CAST",
+    "query": "SELECT AVG(b-a) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00',TIMESTAMP '2007-02-03 00:00:00'),(TIMESTAMP '2007-02-02 00:00:00',TIMESTAMP '2007-02-03 00:00:00')) t(a,b)",
+    "note": ""
+  },
+  {
+    "id": "B21",
+    "interface": "sql",
+    "claim": "SQL-6/CAST",
+    "query": "SELECT AVG(CAST(b-a AS DOUBLE PRECISION)) FROM (VALUES (TIMESTAMP '2007-02-01 00:00:00',TIMESTAMP '2007-02-03 00:00:00'),(TIMESTAMP '2007-02-02 00:00:00',TIMESTAMP '2007-02-03 00:00:00')) t(a,b)",
+    "note": ""
+  },
+  {
+    "id": "B22",
+    "interface": "sql",
+    "claim": "SQL-11",
+    "query": "SELECT COALESCE(CAST(NULL AS DOUBLE PRECISION),x) FROM (VALUES (1.0),(2.0)) a(x)",
+    "note": ""
+  },
+  {
+    "id": "B23",
+    "interface": "sql",
+    "claim": "SQL-11",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k,CASE WHEN v IS NULL THEN 0 ELSE v END FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "B24",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k,AVG(v),MIN(v),MAX(v),COUNT(*) FROM a GROUP BY k ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "B25",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1),b AS (SELECT k,v FROM a) SELECT a.k,a.v AS av,b.v AS bv FROM a JOIN b ON a.k=b.k ORDER BY a.k",
+    "note": ""
+  },
+  {
+    "id": "B26",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1),b AS (SELECT k,v FROM a WHERE k <= 2) SELECT a.k,a.v AS av,b.v AS bv FROM a JOIN b ON a.k=b.k ORDER BY a.k",
+    "note": ""
+  },
+  {
+    "id": "B27",
+    "interface": "sql",
+    "claim": "SQL-9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT SUM(CASE WHEN k <= 2 THEN v ELSE 0 END) AS lo,SUM(CASE WHEN k > 2 THEN v ELSE 0 END) AS hi FROM a",
+    "note": ""
+  }
+]

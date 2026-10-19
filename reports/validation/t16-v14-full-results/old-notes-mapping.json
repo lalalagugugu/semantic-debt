@@ -1,0 +1,743 @@
+{
+  "syntax_tag": "semantic-v1.2",
+  "syntax_sha256": "b147d9567d2af90e4d66f3f86587017397502317a6d09eb6190f8f4e3e27a691",
+  "groups": {
+    "empty_identifier": {
+      "questions": 18,
+      "attempts": 19
+    },
+    "cannot_detect": {
+      "questions": 15,
+      "attempts": 18
+    }
+  },
+  "unique_questions_union": 32,
+  "mapping_type": "逐题日志特征与说明条目对应；不等同逐条因果证明；无重跑、无新探针、无模型调用",
+  "rows": [
+    {
+      "mapping_id": "E-window",
+      "failure_group": "empty_identifier",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "old_rule_verbatim": [
+        "标识符遵循 Postgres 规则：不加引号的名字会被转成小写；成员名里有大写字母时要用双引号，例如 `cube名.\"OrderDate\"`。",
+        "需要在指标结果上再算一步（相除、排名、累计）时，把含 `MEASURE()` 的查询写成子查询或 CTE（`WITH 名 AS (…)`），在外层用普通 SQL 表达式、`CASE WHEN` 和窗口函数（`OVER (PARTITION BY … ORDER BY …)`）继续计算。"
+      ],
+      "issue": "窗口后处理中文别名条件缺失；均有中文输出别名和窗口函数形态",
+      "evidence_boundary": "已有关联通用探针T05/T06；不是逐题单变量因果证明",
+      "distinct_questions": 8,
+      "qids": [
+        "Q07",
+        "Q110",
+        "Q22",
+        "Q37",
+        "Q61",
+        "Q73",
+        "Q78",
+        "Q92"
+      ],
+      "failed_attempts": 8
+    },
+    {
+      "mapping_id": "E-cte",
+      "failure_group": "empty_identifier",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "old_rule_verbatim": [
+        "标识符遵循 Postgres 规则：不加引号的名字会被转成小写；成员名里有大写字母时要用双引号，例如 `cube名.\"OrderDate\"`。",
+        "需要在指标结果上再算一步（相除、排名、累计）时，把含 `MEASURE()` 的查询写成子查询或 CTE（`WITH 名 AS (…)`），在外层用普通 SQL 表达式、`CASE WHEN` 和窗口函数（`OVER (PARTITION BY … ORDER BY …)`）继续计算。"
+      ],
+      "issue": "CTE聚合/互连/排序的中文别名限制未交代",
+      "evidence_boundary": "既有G_single_cte/G_join_aggregate等探针支持组合边界；各题可能还有其他限制",
+      "distinct_questions": 5,
+      "qids": [
+        "Q109",
+        "Q111",
+        "Q116",
+        "Q76",
+        "Q80"
+      ],
+      "failed_attempts": 6
+    },
+    {
+      "mapping_id": "E-other",
+      "failure_group": "empty_identifier",
+      "old_rule_ids": [
+        5,
+        4
+      ],
+      "old_rule_verbatim": [
+        "标识符遵循 Postgres 规则：不加引号的名字会被转成小写；成员名里有大写字母时要用双引号，例如 `cube名.\"OrderDate\"`。",
+        "多个 cube 一起查询时写 `FROM 甲 CROSS JOIN 乙`，不写 `ON` 条件：连接路径由数据模型预先定义，引擎自动套用。"
+      ],
+      "issue": "把通用Postgres标识符规则外推到Cube聚合/连接的别名处理",
+      "evidence_boundary": "仅核实共同中文别名特征，未证明换英文可修复这5题；Q82还含同cube多别名",
+      "distinct_questions": 5,
+      "qids": [
+        "Q05",
+        "Q10",
+        "Q11",
+        "Q60",
+        "Q82"
+      ],
+      "failed_attempts": 5
+    },
+    {
+      "mapping_id": "R-extract",
+      "failure_group": "cannot_detect",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "old_rule_verbatim": [
+        "字符串用单引号。日期字面量写 `DATE '2020-06-30'`；按时间粒度分组用 `DATE_TRUNC('month', 时间维度)`（粒度可选 day、week、month、quarter、year）；取年份用 `EXTRACT(YEAR FROM 时间维度)`。",
+        "需要在指标结果上再算一步（相除、排名、累计）时，把含 `MEASURE()` 的查询写成子查询或 CTE（`WITH 名 AS (…)`），在外层用普通 SQL 表达式、`CASE WHEN` 和窗口函数（`OVER (PARTITION BY … ORDER BY …)`）继续计算。"
+      ],
+      "issue": "EXTRACT与MEASURE同层分组条件缺失",
+      "evidence_boundary": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因",
+      "distinct_questions": 10,
+      "qids": [
+        "Q110",
+        "Q113",
+        "Q117",
+        "Q32",
+        "Q50",
+        "Q75",
+        "Q83",
+        "Q90",
+        "Q94",
+        "Q99"
+      ],
+      "failed_attempts": 13
+    },
+    {
+      "mapping_id": "R-outer-join",
+      "failure_group": "cannot_detect",
+      "old_rule_ids": [
+        9,
+        4
+      ],
+      "old_rule_verbatim": [
+        "需要在指标结果上再算一步（相除、排名、累计）时，把含 `MEASURE()` 的查询写成子查询或 CTE（`WITH 名 AS (…)`），在外层用普通 SQL 表达式、`CASE WHEN` 和窗口函数（`OVER (PARTITION BY … ORDER BY …)`）继续计算。",
+        "多个 cube 一起查询时写 `FROM 甲 CROSS JOIN 乙`，不写 `ON` 条件：连接路径由数据模型预先定义，引擎自动套用。"
+      ],
+      "issue": "外层普通SQL的泛化未交代聚合CTE与原始cube互连/自关联边界",
+      "evidence_boundary": "同时出现JOIN ON，旧条目4已有不写ON的要求；属混合问题，不声称全为说明错误",
+      "distinct_questions": 2,
+      "qids": [
+        "Q112",
+        "Q49"
+      ],
+      "failed_attempts": 2
+    },
+    {
+      "mapping_id": "R-range",
+      "failure_group": "cannot_detect",
+      "old_rule_ids": [
+        9
+      ],
+      "old_rule_verbatim": [
+        "需要在指标结果上再算一步（相除、排名、累计）时，把含 `MEASURE()` 的查询写成子查询或 CTE（`WITH 名 AS (…)`），在外层用普通 SQL 表达式、`CASE WHEN` 和窗口函数（`OVER (PARTITION BY … ORDER BY …)`）继续计算。"
+      ],
+      "issue": "普通SQL概括没有保证日期范围CTE非等值关联可执行",
+      "evidence_boundary": "关联到表达范围缺口，非旧句直接写出的正例；未定位唯一根因",
+      "distinct_questions": 1,
+      "qids": [
+        "Q114"
+      ],
+      "failed_attempts": 1
+    },
+    {
+      "mapping_id": "R-common-engine",
+      "failure_group": "cannot_detect",
+      "old_rule_ids": [
+        9
+      ],
+      "old_rule_verbatim": [
+        "需要在指标结果上再算一步（相除、排名、累计）时，把含 `MEASURE()` 的查询写成子查询或 CTE（`WITH 名 AS (…)`），在外层用普通 SQL 表达式、`CASE WHEN` 和窗口函数（`OVER (PARTITION BY … ORDER BY …)`）继续计算。"
+      ],
+      "issue": "不是旧说明独有错误：CASE/CTE派生列组合的新旧说明共同引擎限制",
+      "evidence_boundary": "新说明同题3次亦失败；按用户裁决留到下一轮通用说明修订",
+      "distinct_questions": 1,
+      "qids": [
+        "Q89"
+      ],
+      "failed_attempts": 1
+    },
+    {
+      "mapping_id": "R-existing-rule",
+      "failure_group": "cannot_detect",
+      "old_rule_ids": [
+        3
+      ],
+      "old_rule_verbatim": [
+        "调用指标必须写 `MEASURE(cube名.指标名)`，不要对指标再套 `SUM`、`COUNT`；指标由引擎按定义计算。其余选出的维度列都要写进 `GROUP BY`。"
+      ],
+      "issue": "无可直接归入的旧说明错误：作答未用MEASURE调用指标",
+      "evidence_boundary": "旧条目3已明确要求MEASURE；不将此例硬算某条错误说明的直接后果",
+      "distinct_questions": 1,
+      "qids": [
+        "Q104"
+      ],
+      "failed_attempts": 1
+    }
+  ],
+  "cases": [
+    {
+      "qid": "Q07",
+      "rep": 2,
+      "exec_raw_sha256": "8dfef8b426ed2c9161637f5f79b9e1bab055e522ec8b60c6d4adfc66dfa828d2",
+      "raw_response_sha256": "b19429c6c6a69a02c694dd912ad2d8da309e9390431603ea9eca4cfa878cc21d",
+      "query_sha256": "1940f4fdfe2ebf771c0a3398b576b08c4df985f2c5b768bc18514ae5b4a6ddde",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q110",
+      "rep": 1,
+      "exec_raw_sha256": "66d9b7c116355b45831b4c25cffe0eadead9ec1757e5e7bd978784f3cacdd8fe",
+      "raw_response_sha256": "66ea3b4646922d8fc29bf1c979c476632516d4b8080da9998608a99add74f78a",
+      "query_sha256": "a332b5f63b0e80f4009afed7a2435a0b4d35ffa17daac0b4adfad4e8c1840909",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q22",
+      "rep": 2,
+      "exec_raw_sha256": "ec7658d4af299ea3f4f5ac870204b18a1656f625137e6cf76d40990f0f09fde6",
+      "raw_response_sha256": "9cc1c345d067bca5ab04119d2fabf44be9f084b39ac584a3e046bb9db13171c7",
+      "query_sha256": "d7e7fb34e3bd952b97f0640a7995d673c553bdcf6feb881ad6907d076fe74c05",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q37",
+      "rep": 2,
+      "exec_raw_sha256": "7dd5ba7ea5dbf82d05b316c72a4f3e0b033fbbafdf2670e336b5c29b26a13b3d",
+      "raw_response_sha256": "bbb836cd0f403f4774c499b0125ca54ef14ec069fc63b60771ec5d4ab1ade7bf",
+      "query_sha256": "8a058225e2d16c0bcdb333f9bfbdf026bc4cdb88062858bd4d496259b3896f1f",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q61",
+      "rep": 2,
+      "exec_raw_sha256": "a50ddf6b2fd932c3a1a863dae9ed1096f2815fbcc6ff60dba8a3dceb4800a477",
+      "raw_response_sha256": "cc7ef196f06e3a447f18deefcb3ea229bbcd2073e4fa7a5c74868a47f9bd04fc",
+      "query_sha256": "33890540dab7c375cdf7bc7920331a83aa141295eae183d99c9fd5a160e5b97f",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q73",
+      "rep": 1,
+      "exec_raw_sha256": "0081c6b3ee499cdd645a51f5524afd0e0f15c2511affbc0a39b20802b8d21b41",
+      "raw_response_sha256": "b3fe2f385a33aa823bffd1c04522e473cd8736fbb315c16db288dc464133a940",
+      "query_sha256": "a1c26b3a088ee2a25b1fd5f115727d9c55b77c4d51789f8acb4e40f864682b12",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q78",
+      "rep": 2,
+      "exec_raw_sha256": "30b9aaa9b492d94774ec26baed30cd077f03ef8f38e9a8c7d9724107e5765381",
+      "raw_response_sha256": "92877cef4a1620f0aa15a62ea217b6de99aab8a5bd2ed74ebe0b7a3903242ad1",
+      "query_sha256": "48f0c36e5746eb26b7831f3fbfe0f5a0aa4762611bed5716589e41335b4670e3",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q92",
+      "rep": 3,
+      "exec_raw_sha256": "07df28598a3cbb67374e61fd753b24e3e1a6e32f112a93b734eb28f1b62f73e0",
+      "raw_response_sha256": "756a1683fcdd81f7b5c9967501b8338cf47327b7cdfd02584a9a9240bab88957",
+      "query_sha256": "6f5cd79dd6a4209bd2d3b72ab3291579520f1adc00840b7ac42ba769f0168bfc",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-window",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "已有关联通用探针T05/T06；不是逐题单变量因果证明"
+    },
+    {
+      "qid": "Q109",
+      "rep": 3,
+      "exec_raw_sha256": "25df37b29a2667458e6833f13a34d55dc8421d5702d3e968e4ef5d1cedf6b3be",
+      "raw_response_sha256": "a193704b010d21674dafbf711cb2c6b3d94bade8e19f991c3fded9ea824663cb",
+      "query_sha256": "08a5ed09493b345f748b767504081e5e1445ef9cdc98c8c9201c4de74fa39901",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-cte",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "既有G_single_cte/G_join_aggregate等探针支持组合边界；各题可能还有其他限制"
+    },
+    {
+      "qid": "Q111",
+      "rep": 1,
+      "exec_raw_sha256": "beaac67586ea76b66c632837176231e7e972233aa3752e08e7682f639a27a31c",
+      "raw_response_sha256": "4504f159ddfc8c50df528161a06018bd1b21e2b95f57334aace6a2099dd41e33",
+      "query_sha256": "6461bfb8d7a297d4fff36bb2e2d9724a889e260775c2d9cd6b3e574bd9b957b5",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-cte",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "既有G_single_cte/G_join_aggregate等探针支持组合边界；各题可能还有其他限制"
+    },
+    {
+      "qid": "Q116",
+      "rep": 1,
+      "exec_raw_sha256": "badc539a9174cfc8e9a2962e5c8c427863eaf629beb75e9d6c95903bc64e4867",
+      "raw_response_sha256": "4753456bb68d04cd3dd44c4b36add06887862560e497e1755d4cacb06b366e79",
+      "query_sha256": "ef0924e5104da467a872b4e9e8e7e81ce5ede69f9c4860b8f833e14e029417af",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-cte",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "既有G_single_cte/G_join_aggregate等探针支持组合边界；各题可能还有其他限制"
+    },
+    {
+      "qid": "Q76",
+      "rep": 1,
+      "exec_raw_sha256": "f9cdd9875005bb4f80070821b770809b1f9de96f06592b0a0eb57c09b04b95f0",
+      "raw_response_sha256": "8df60bca386728971ec0fe999479d2f1322132c4d97eefa80c972d1c7a2b3a16",
+      "query_sha256": "7b046e18a180a84217d2f4890eb1476871fc201f560d00fe5af0a87b8f7f01e1",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-cte",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "既有G_single_cte/G_join_aggregate等探针支持组合边界；各题可能还有其他限制"
+    },
+    {
+      "qid": "Q76",
+      "rep": 3,
+      "exec_raw_sha256": "d6227b845617f963233ebbafa3f18fc5737bf58d3981c18af636744cf36f6bce",
+      "raw_response_sha256": "89197dac48d876c3c5e21e14cea01bd94225d32754c47b01e070cbc6fd054bf8",
+      "query_sha256": "6db390b35405f1a590a3828081a6d8687f167202c4c3a992093c024f98ff9db8",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-cte",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "既有G_single_cte/G_join_aggregate等探针支持组合边界；各题可能还有其他限制"
+    },
+    {
+      "qid": "Q80",
+      "rep": 2,
+      "exec_raw_sha256": "0565e3d5508b4817e2d6d2c333142562bd14242826fc3bd2ee75f99402a9d799",
+      "raw_response_sha256": "ebf442d678ce8f074f1797e819deeb29697dcc62dc8adc6759ee9eb1723d5184",
+      "query_sha256": "3d021e0b33d9b3e6dfff2a427d9a6533dcbc86cd2f2f8f97e4576a65aee3b269",
+      "old_rule_ids": [
+        5,
+        9
+      ],
+      "mapping_id": "E-cte",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "既有G_single_cte/G_join_aggregate等探针支持组合边界；各题可能还有其他限制"
+    },
+    {
+      "qid": "Q05",
+      "rep": 2,
+      "exec_raw_sha256": "63aa6ebe9c791d007f8c889e70df9d917a141146acf9be9436fcf1f626ab2e63",
+      "raw_response_sha256": "31d5d3284925d6ee877519e27c6262d2801f256646c1c7393bf881f8f4e0015d",
+      "query_sha256": "26199fa35f9fed3c55ff463e8496bf7149a22fad90dc9c7d4b60ea333b5e5390",
+      "old_rule_ids": [
+        5,
+        4
+      ],
+      "mapping_id": "E-other",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "仅核实共同中文别名特征，未证明换英文可修复这5题；Q82还含同cube多别名"
+    },
+    {
+      "qid": "Q10",
+      "rep": 1,
+      "exec_raw_sha256": "3ae271b048b773cf01cfc13726af0f071ed7d62f74302e31fcf0116451800864",
+      "raw_response_sha256": "9271e26a2bcde1f5cc3cee74bb3c0ab6708327031b01a3cd4ad6206f12fff807",
+      "query_sha256": "090156ca29fd9ea182738650e1756a7ee39581b24c81e204390585d69bafecd5",
+      "old_rule_ids": [
+        5,
+        4
+      ],
+      "mapping_id": "E-other",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "仅核实共同中文别名特征，未证明换英文可修复这5题；Q82还含同cube多别名"
+    },
+    {
+      "qid": "Q11",
+      "rep": 2,
+      "exec_raw_sha256": "233771b8b8a8e5885a2efd10c2c4e10d0dda2dd8b69439b923f9085fe4543da0",
+      "raw_response_sha256": "fb31f1c15961e7cdbb42edba15e97ad4341f7c7c791d9e557c55d6e876f8425c",
+      "query_sha256": "b8d0458634ea0356d7cee34b668960773d358e057d364e8243370bea72e1a8f4",
+      "old_rule_ids": [
+        5,
+        4
+      ],
+      "mapping_id": "E-other",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "仅核实共同中文别名特征，未证明换英文可修复这5题；Q82还含同cube多别名"
+    },
+    {
+      "qid": "Q60",
+      "rep": 2,
+      "exec_raw_sha256": "85d9d12f5bc2ec0433618ab81b391f2244bb3bca85595402d10d5d10ded745f0",
+      "raw_response_sha256": "fa659e1f0093fd7a17ca70adbcd9fecf9e18ccd147f5d1ecd7651b47ed5c1a35",
+      "query_sha256": "2373878be64f50d74571c3dd419e3f7127b70b0b9fca824e9c0479116a28496a",
+      "old_rule_ids": [
+        5,
+        4
+      ],
+      "mapping_id": "E-other",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "仅核实共同中文别名特征，未证明换英文可修复这5题；Q82还含同cube多别名"
+    },
+    {
+      "qid": "Q82",
+      "rep": 1,
+      "exec_raw_sha256": "feccc622203d0ceaa7d3a87b2136382fce69781b5c9a0b2f6ed0b1245223b0f0",
+      "raw_response_sha256": "57fd5bfe2e70a9383ab1d4fcb2d40ade03c5464cabeea4a43d067dfc521e252c",
+      "query_sha256": "2ecbc5e206d23d0ee9b6f8d57618b8a45b3bace97a20f8c98beb2fa6968c3064",
+      "old_rule_ids": [
+        5,
+        4
+      ],
+      "mapping_id": "E-other",
+      "group": "empty_identifier",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "仅核实共同中文别名特征，未证明换英文可修复这5题；Q82还含同cube多别名"
+    },
+    {
+      "qid": "Q110",
+      "rep": 3,
+      "exec_raw_sha256": "03ab478c5267a249c4dd62ed68123792e36fb9d7d01cb6c29462ba9474907a31",
+      "raw_response_sha256": "e93d5bf07470c56441c77c8d6c965ae96fdb0a59cec21444068d57deb27d26c5",
+      "query_sha256": "98b4fc4bfe703ec263613122c6c035387428c2659733ec29a3aa5f4f8695981a",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q113",
+      "rep": 2,
+      "exec_raw_sha256": "cc50c77f82cb33a8c864eed6ea9bdb86e9965ebfd945fb0562863d444ae48cee",
+      "raw_response_sha256": "8e685e9be27105bda5de485f5c17515e877b4b4bd853a026b0de2c6df487698a",
+      "query_sha256": "233aa398f57b28bd47340c68dbd0b53dbe9c8cefaa529ef49445d5abccb83189",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q113",
+      "rep": 1,
+      "exec_raw_sha256": "57718d292762bbfd25c395de3f2a3c9669b0d712cce60b5ac48756f44cf88aaf",
+      "raw_response_sha256": "ff2a78f36664cc8972470d0d571b827deaa034b4dccec59d85efb4181c5e542c",
+      "query_sha256": "f98569570043bdeec0b039088a67304789b1e39df12f47f6eda819b2c9d9599e",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q117",
+      "rep": 1,
+      "exec_raw_sha256": "30315f1154fafc3d3432f2ca4e84e77e09a6d710870676fed38810302fa4d36d",
+      "raw_response_sha256": "20a2426f4d575fd579e4f8b9346899a83423028356c4dd40be76570c65455d23",
+      "query_sha256": "b198b0d36e6bfbd8d75651bbe1b0874681a52be68bb02dd5863d7b988051af1b",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q32",
+      "rep": 2,
+      "exec_raw_sha256": "c5fb05d170ec881da1132f13bf4e58aaf35c6a2946f43aebe95a41cacbf5587b",
+      "raw_response_sha256": "77cc79ac70617d25f45f96673283317603f3689b80e407774607acb2233e18f3",
+      "query_sha256": "191826b0fecf75b5edba1724baa40eab61628d729c7b483b3732741658006c56",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q50",
+      "rep": 1,
+      "exec_raw_sha256": "5715164253bb3c0ea3f19bbb9ec0ae59f2e47bcd8eb7e953efbdc4a87ecbd5c2",
+      "raw_response_sha256": "24415f863ea9f49bf82e74ccd4b77f0f38568591145fd8c73fa5bedb5a0df310",
+      "query_sha256": "1cdfacd97d87be746a3f9e1230c5cd9f6a3ef613a33c70799a0de8c0429b03a8",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q50",
+      "rep": 2,
+      "exec_raw_sha256": "c375f1df87b953d63d2122f720aad7fa07626c301ca6953ac26faf5446a8c133",
+      "raw_response_sha256": "1970a69a4b557ccdc21258d4551e1ab79b31032c1e3e74c68424195a2fdbc80a",
+      "query_sha256": "ecbe605271f39adb2476f0be3463453a226e587776bc34d2d7520300dd520fd4",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q75",
+      "rep": 3,
+      "exec_raw_sha256": "d1cd353f10c0b867b4652055df4a96947ff601a3eee12ed2ca1ba4b02eb727f0",
+      "raw_response_sha256": "de6a0981b1116a3bc7d38c0d469b4b2c721fc0ffaa25fbe59c3297dc32403e38",
+      "query_sha256": "7d1fe286e4999d7674e1fed6ee4a96833dfba56af8fc2080589eaa6972bdb480",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q83",
+      "rep": 1,
+      "exec_raw_sha256": "9b04e01fdf1058182b202496b8aa5ab8af007951de62da860c1de4075c317a16",
+      "raw_response_sha256": "557014e3fc52bbf2e9279e88a69c9529a5c71a88d31f1d1cb2804e885b35d086",
+      "query_sha256": "4234bcd5ca52e10e5718a0286e73dcadddb443f3f84cf8509be54c84bb558198",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q83",
+      "rep": 2,
+      "exec_raw_sha256": "5ce95c1212f8540ff9d328b0e05007944d1a5672babae7594a7ffd6eaf504504",
+      "raw_response_sha256": "2de35442c2f0875e9b7776bf96cc8bfd0ea99ff420cbc8065f37eac5584ac482",
+      "query_sha256": "0c3bfebebcb141747bb6112f44dd261ef6d6daed9b110656790670afd8d6fd5b",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q90",
+      "rep": 3,
+      "exec_raw_sha256": "a2ed2fe4297200d137921119b7131bdc1221d42877ea3c5fe2d9c42a2209aae2",
+      "raw_response_sha256": "f09daac83946ad418a00c6368008ee02f6227ca7130ae6612b75eb21afa1d190",
+      "query_sha256": "6cc23057a05c60d1b428d96422b2b2bb576e6db09626537100e4597cd8b25fac",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q94",
+      "rep": 1,
+      "exec_raw_sha256": "2203825be0213ee4f0cfe0ca8db2589efdeed409de9327ba6cc3d3c4c55fd40a",
+      "raw_response_sha256": "129174b192a12d01bf6ac237a2537f560168214d1d95097f6c0657b5aa0de935",
+      "query_sha256": "cd84230c234b8ca488b97dd72cb0408ce85731b50483dce9259d409874528f6c",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q99",
+      "rep": 3,
+      "exec_raw_sha256": "77881a981f7f1a4dc4d099dd030567de9d899852d3e5c233f95afead42a547da",
+      "raw_response_sha256": "37292b6bf5bb19a7ec3ebd08d56cef48d384dc79b9f3d0d9a499d7a173e2799e",
+      "query_sha256": "913debc84274d79c3bcfc7554e5b582d24a222014060fd9aebd5e80a3bcf85f0",
+      "old_rule_ids": [
+        6,
+        9
+      ],
+      "mapping_id": "R-extract",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "每题至少一个失败轮次具有该形态；Q50 r2、Q113 r2是另外的组合，不能套用此归因"
+    },
+    {
+      "qid": "Q112",
+      "rep": 2,
+      "exec_raw_sha256": "8ddf193d166cf94c149d166a9cbc3f6bbf8a5901bd442e262ad998f38ea31724",
+      "raw_response_sha256": "88f9d9bf92b272b905a0ac5b0156b19e9818a85382427f9826225ddccf6efb19",
+      "query_sha256": "e739192217d985f9144c1efa56007ecd91f50ab2410247f7293d5a81f2fdecaf",
+      "old_rule_ids": [
+        9,
+        4
+      ],
+      "mapping_id": "R-outer-join",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "同时出现JOIN ON，旧条目4已有不写ON的要求；属混合问题，不声称全为说明错误"
+    },
+    {
+      "qid": "Q49",
+      "rep": 3,
+      "exec_raw_sha256": "54a89857f5b1355071d966cf0c59c73be92c4fd9521cb3fe6e52ff1fd58172d2",
+      "raw_response_sha256": "0a37f1ce8f08bfb94b30939a62f02a263f31a27804f59a7c5ab620c88b24288d",
+      "query_sha256": "4bd7b2d76bc09f5e2ed95f47433a8baeecb162aead3cb5f62f609ec8451f168c",
+      "old_rule_ids": [
+        9,
+        4
+      ],
+      "mapping_id": "R-outer-join",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "同时出现JOIN ON，旧条目4已有不写ON的要求；属混合问题，不声称全为说明错误"
+    },
+    {
+      "qid": "Q114",
+      "rep": 3,
+      "exec_raw_sha256": "e19bb827e784da9e17123e6f4f652ba58b857ac4088969df2917aaabfe2a88ec",
+      "raw_response_sha256": "ac7fc9d5fb84c0e5a35932cb1a4b94d05d697fe9d60a99e0a0defd9b749498c2",
+      "query_sha256": "576fa2e951923a23c96514fba7fdc7633239a9b044a5e42874b8049ed1f5f714",
+      "old_rule_ids": [
+        9
+      ],
+      "mapping_id": "R-range",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "关联到表达范围缺口，非旧句直接写出的正例；未定位唯一根因"
+    },
+    {
+      "qid": "Q89",
+      "rep": 3,
+      "exec_raw_sha256": "fabe8218053675839cda36ebbe3362f25f5c4b06a654a8d80d04a7263f952df1",
+      "raw_response_sha256": "3a025680cdb6463e9ebc0dc9ea94123a57e8470d3b451d9c4ecd0d013d48dfe9",
+      "query_sha256": "2b024465f19000c3941439198e87aab8821ccc278f59826d5881d8ccf00f681b",
+      "old_rule_ids": [
+        9
+      ],
+      "mapping_id": "R-common-engine",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": false,
+      "mapping_scope": "新说明同题3次亦失败；按用户裁决留到下一轮通用说明修订"
+    },
+    {
+      "qid": "Q104",
+      "rep": 1,
+      "exec_raw_sha256": "3ab0266a88264508fda693a81b9e9147f9117d77f946adb345b98383f1a38637",
+      "raw_response_sha256": "e87923febd7eb7c097fbb6f60289eda4fa9635ccebd9a84d45e3c041b1a6abf4",
+      "query_sha256": "4e2807d8f753621b82a96dd3560dd51387f90e70c1bbe8bb95bf853b851d8a43",
+      "old_rule_ids": [
+        3
+      ],
+      "mapping_id": "R-existing-rule",
+      "group": "cannot_detect",
+      "contains_chinese_output_alias": true,
+      "mapping_scope": "旧条目3已明确要求MEASURE；不将此例硬算某条错误说明的直接后果"
+    }
+  ]
+}

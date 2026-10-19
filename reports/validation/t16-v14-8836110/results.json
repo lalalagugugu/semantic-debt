@@ -1,0 +1,3162 @@
+{
+  "candidate_commit": "883611029a65c12d8cc507bc363dda84a4db10b1",
+  "model_calls": 0,
+  "scorer_calls": 0,
+  "full_model_load_passed": true,
+  "meta_status": 200,
+  "cube_count": 25,
+  "public_measure_count": 102,
+  "meta_file_sha256": "6c6737f259996697f977b286bc83269bffd90b1618f0b7586e88f7071d8a84cf",
+  "source_model_modified_for_test": false,
+  "complete_model": true,
+  "restored_original_mount_after_validation": true,
+  "restored_meta_status": 200,
+  "static_byte_checks": {
+    "main_commit": "0e5f9bb061516d58f83dd6e69868371a7fd20412",
+    "new_customer_rendered_yaml_byte_identical": true,
+    "new_customer_source_line_byte_identical": true,
+    "new_customer_rendered_yaml_sha256": "129fb63a2ea5242ff13ac23f15394034c1fa762a1347eda5bf505718389bf75a",
+    "new_customer_rendered_yaml": "  - name: new_customer_count\n    title: 新客数\n    description: 首次购买日落在截止日前 90 天内的去重客户数；首次购买指该客户有史以来第一次购买； 截止日由时间窗口决定，按月看就是每个月的最后一天（约定 14）。 「购买」指客户在线上销售表里的任何一行，含只有退货的行。\n    type: number\n    sql: length(arrayDistinct(arrayMap(t -> t.1, arrayFilter((t, m) -> t.2 >= m - 89 AND t.2 <= m, groupArray(({CUBE}.CustomerKey,\n      {CUBE}.FirstPurchaseDate, {CUBE}.SalesAmount)), arrayWithConstant(count(), least(max({CUBE}.DateKey),\n      toDate('2009-12-31')))))))\n",
+    "new_customer_source_line": "    add(\"新客数\", o, {\"type\": \"number\", \"sql\": f\"length(arrayDistinct(arrayMap(t -> t.1, {new_rows})))\"})\n",
+    "parent_helpers_identical_to_prior_deletion_diagnostic": [
+      "online_sales.sales_amount_in_category",
+      "sales.sales_amount_in_channel",
+      "sales.sales_amount_in_category"
+    ]
+  },
+  "probe_file_sha256": "a5e7e46e7a5ddc52a45ad2a5978544e077d881098c88f0dae219d887188157bc",
+  "positive_count": 68,
+  "expected_negative_count": 4,
+  "records": [
+    {
+      "id": "sales_category_product_subcategory",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_category",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product_subcategory.ProductSubcategoryName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product_subcategory.ProductSubcategoryName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product_subcategory.\"ProductSubcategoryName\", MEASURE(sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN sales CROSS JOIN product_subcategory WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,ps.ProductSubcategoryName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,ps.ProductSubcategoryName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 30,
+      "expected_error": null,
+      "row_count": 30,
+      "rows_sha256": "d10c0d3fae99d18c5c1ed9da3490226dbdff45a8c76d4b0bf4e20e8ca1e353df",
+      "physical_rows_sha256": "6aab0f77373da93b1074eb7c53719ef93a039743747ddc6cb77ec4751088f5f8"
+    },
+    {
+      "id": "sales_category_product_subcategory",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_category",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product_subcategory.ProductSubcategoryName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product_subcategory.ProductSubcategoryName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product_subcategory.\"ProductSubcategoryName\", MEASURE(sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN sales CROSS JOIN product_subcategory WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,ps.ProductSubcategoryName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,ps.ProductSubcategoryName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 30,
+      "expected_error": null,
+      "row_count": 30,
+      "rows_sha256": "d6cea39e86a8295813d094ba205641702162a753b39b5ec4a79d4ce3fc75b8b0",
+      "physical_rows_sha256": "6aab0f77373da93b1074eb7c53719ef93a039743747ddc6cb77ec4751088f5f8"
+    },
+    {
+      "id": "sales_category_product",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_category",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN sales CROSS JOIN product WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1290,
+      "expected_error": null,
+      "row_count": 1290,
+      "rows_sha256": "d34c61981aa80954bc6dd5beabddf67c542110761892b376dbda7c22139e9f65",
+      "physical_rows_sha256": "d1db1419094d1eaf57efe06b88646aceb04a30b25fbf23ba085cd09b2d562ed2"
+    },
+    {
+      "id": "sales_category_product",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_category",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN sales CROSS JOIN product WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1290,
+      "expected_error": null,
+      "row_count": 1290,
+      "rows_sha256": "d1db1419094d1eaf57efe06b88646aceb04a30b25fbf23ba085cd09b2d562ed2",
+      "physical_rows_sha256": "d1db1419094d1eaf57efe06b88646aceb04a30b25fbf23ba085cd09b2d562ed2"
+    },
+    {
+      "id": "online_sales_category_product_subcategory",
+      "mode": "full",
+      "member": "online_sales.sales_amount_share_in_category",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product_subcategory.ProductSubcategoryName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product_subcategory.ProductSubcategoryName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product_subcategory.\"ProductSubcategoryName\", MEASURE(online_sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN online_sales CROSS JOIN product_subcategory WHERE online_sales.\"DateKey\">=DATE '2007-02-01' AND online_sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,ps.ProductSubcategoryName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactOnlineSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,ps.ProductSubcategoryName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 30,
+      "expected_error": null,
+      "row_count": 30,
+      "rows_sha256": "5cfa4857b2ee3cf2cec0240fe2d1cf5b6d47f56a29da4eca1655b9578b61d4de",
+      "physical_rows_sha256": "3bc2715d17acd0c0c7f03950b88a65e47f0716789f5edd32195fbe3f41cd420e"
+    },
+    {
+      "id": "online_sales_category_product_subcategory",
+      "mode": "full",
+      "member": "online_sales.sales_amount_share_in_category",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product_subcategory.ProductSubcategoryName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product_subcategory.ProductSubcategoryName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product_subcategory.\"ProductSubcategoryName\", MEASURE(online_sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN online_sales CROSS JOIN product_subcategory WHERE online_sales.\"DateKey\">=DATE '2007-02-01' AND online_sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,ps.ProductSubcategoryName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactOnlineSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,ps.ProductSubcategoryName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 30,
+      "expected_error": null,
+      "row_count": 30,
+      "rows_sha256": "0b7ea81faed62d46d24d6f7d01851e542af3d819d05829700484d0c4dbbf759c",
+      "physical_rows_sha256": "3bc2715d17acd0c0c7f03950b88a65e47f0716789f5edd32195fbe3f41cd420e"
+    },
+    {
+      "id": "online_sales_category_product",
+      "mode": "full",
+      "member": "online_sales.sales_amount_share_in_category",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(online_sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN online_sales CROSS JOIN product WHERE online_sales.\"DateKey\">=DATE '2007-02-01' AND online_sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactOnlineSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1285,
+      "expected_error": null,
+      "row_count": 1285,
+      "rows_sha256": "a0321d2df31306330117577749886c91b7784992c97748e6c8e72d55d65e33d6",
+      "physical_rows_sha256": "4ec3025b67e01b1f93d3185f2092f9e7279f248f9a6d21c0d0e692b62683981b"
+    },
+    {
+      "id": "online_sales_category_product",
+      "mode": "full",
+      "member": "online_sales.sales_amount_share_in_category",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(online_sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN online_sales CROSS JOIN product WHERE online_sales.\"DateKey\">=DATE '2007-02-01' AND online_sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactOnlineSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nGROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1285,
+      "expected_error": null,
+      "row_count": 1285,
+      "rows_sha256": "f8a5d09cfe7c14a0ff88c9ff06654faa4db75dd341195471d412e03c4dba4d4c",
+      "physical_rows_sha256": "4ec3025b67e01b1f93d3185f2092f9e7279f248f9a6d21c0d0e692b62683981b"
+    },
+    {
+      "id": "sales_channel",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_channel",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_channel"
+        ],
+        "dimensions": [
+          "channel.ChannelName",
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "channel.ChannelName": "asc",
+          "store.StoreName": "asc"
+        }
+      },
+      "sql": "SELECT channel.\"ChannelName\", store.\"StoreName\", MEASURE(sales.sales_amount_share_in_channel) AS value FROM channel CROSS JOIN sales CROSS JOIN store WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "\nSELECT c.ChannelName,s.StoreName,sum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY c.ChannelName)\nFROM retail.FactSales f LEFT JOIN retail.DimChannel c ON f.channelKey=c.ChannelKey\nLEFT JOIN retail.DimStore s ON f.StoreKey=s.StoreKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY c.ChannelName,s.StoreName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 301,
+      "expected_error": null,
+      "row_count": 301,
+      "rows_sha256": "eb6c1c7bd203f66fb5ca159db6e45f0cde4cbb028bbaffed4ed8d20904fc1f4d",
+      "physical_rows_sha256": "40ca0d88a0eae3abea4fc63c90ee0d78cafdbac36fe02011b46cb6daa45a94a0"
+    },
+    {
+      "id": "sales_channel",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_channel",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_channel"
+        ],
+        "dimensions": [
+          "channel.ChannelName",
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "channel.ChannelName": "asc",
+          "store.StoreName": "asc"
+        }
+      },
+      "sql": "SELECT channel.\"ChannelName\", store.\"StoreName\", MEASURE(sales.sales_amount_share_in_channel) AS value FROM channel CROSS JOIN sales CROSS JOIN store WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "\nSELECT c.ChannelName,s.StoreName,sum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY c.ChannelName)\nFROM retail.FactSales f LEFT JOIN retail.DimChannel c ON f.channelKey=c.ChannelKey\nLEFT JOIN retail.DimStore s ON f.StoreKey=s.StoreKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY c.ChannelName,s.StoreName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 301,
+      "expected_error": null,
+      "row_count": 301,
+      "rows_sha256": "027d76f549eb17054fefc37650c3b89f529d6174eec15265bccae8ccd986fb3a",
+      "physical_rows_sha256": "40ca0d88a0eae3abea4fc63c90ee0d78cafdbac36fe02011b46cb6daa45a94a0"
+    },
+    {
+      "id": "sales_quarter",
+      "mode": "full",
+      "member": "sales.sales_amount_qoq_pct",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2008-01-01",
+              "2008-09-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('quarter', sales.\"DateKey\"), MEASURE(sales.sales_amount_qoq_pct) AS value FROM sales WHERE sales.\"DateKey\">=DATE '2008-01-01' AND sales.\"DateKey\"<DATE '2008-10-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH p AS (SELECT toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a FROM retail.FactSales GROUP BY d)\nSELECT toString(c.d),(c.a-p.a)/nullIf(p.a,0) FROM p c LEFT JOIN p ON p.d=addQuarters(c.d,-1)\nWHERE c.d>='2008-01-01' AND c.d<'2008-10-01' ORDER BY c.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "ecd5159c8507a3e9e7c5d52f498b4eb2efca2c961199f3c15205465488a98f4a",
+      "physical_rows_sha256": "dc8feb545e732a292543c29b71536a4b2e14ef7344bbf89f396564812786641e"
+    },
+    {
+      "id": "sales_quarter",
+      "mode": "full",
+      "member": "sales.sales_amount_qoq_pct",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2008-01-01",
+              "2008-09-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('quarter', sales.\"DateKey\"), MEASURE(sales.sales_amount_qoq_pct) AS value FROM sales WHERE sales.\"DateKey\">=DATE '2008-01-01' AND sales.\"DateKey\"<DATE '2008-10-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH p AS (SELECT toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a FROM retail.FactSales GROUP BY d)\nSELECT toString(c.d),(c.a-p.a)/nullIf(p.a,0) FROM p c LEFT JOIN p ON p.d=addQuarters(c.d,-1)\nWHERE c.d>='2008-01-01' AND c.d<'2008-10-01' ORDER BY c.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "68b022c05f2807ae4222d8d45edfa960058b7949980d474749f5dc3da3fc132c",
+      "physical_rows_sha256": "dc8feb545e732a292543c29b71536a4b2e14ef7344bbf89f396564812786641e"
+    },
+    {
+      "id": "online_sales_quarter",
+      "mode": "full",
+      "member": "online_sales.sales_amount_qoq_pct",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2008-01-01",
+              "2008-09-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "online_sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('quarter', online_sales.\"DateKey\"), MEASURE(online_sales.sales_amount_qoq_pct) AS value FROM online_sales WHERE online_sales.\"DateKey\">=DATE '2008-01-01' AND online_sales.\"DateKey\"<DATE '2008-10-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH p AS (SELECT toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a FROM retail.FactOnlineSales GROUP BY d)\nSELECT toString(c.d),(c.a-p.a)/nullIf(p.a,0) FROM p c LEFT JOIN p ON p.d=addQuarters(c.d,-1)\nWHERE c.d>='2008-01-01' AND c.d<'2008-10-01' ORDER BY c.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "7b49214628f3f702a214b8fc7209abd6b421829a8e4ac1cfcc61112e5b46d1c8",
+      "physical_rows_sha256": "a212c00992be950dd7ba9393b78ef6bcf8f7f4d3ef8c5bd0e95024a29e2f1535"
+    },
+    {
+      "id": "online_sales_quarter",
+      "mode": "full",
+      "member": "online_sales.sales_amount_qoq_pct",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2008-01-01",
+              "2008-09-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "online_sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('quarter', online_sales.\"DateKey\"), MEASURE(online_sales.sales_amount_qoq_pct) AS value FROM online_sales WHERE online_sales.\"DateKey\">=DATE '2008-01-01' AND online_sales.\"DateKey\"<DATE '2008-10-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH p AS (SELECT toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a FROM retail.FactOnlineSales GROUP BY d)\nSELECT toString(c.d),(c.a-p.a)/nullIf(p.a,0) FROM p c LEFT JOIN p ON p.d=addQuarters(c.d,-1)\nWHERE c.d>='2008-01-01' AND c.d<'2008-10-01' ORDER BY c.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "f68a1e12e5e4415d86bb889b4b90766c475bea0eea60d5cc460b47f0f5318aeb",
+      "physical_rows_sha256": "a212c00992be950dd7ba9393b78ef6bcf8f7f4d3ef8c5bd0e95024a29e2f1535"
+    },
+    {
+      "id": "sales_amount_quota_None_explicit_budget",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Budget"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Budget' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Budget' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "8b18b771f88ccb4806047b64474d0d9ceea5c735ad404f261d44257b2fde255b",
+      "physical_rows_sha256": "2ab3ea6a83a9781cf24e947eb954d426c7d1d68b3c4e0a21b9b82151bad489b8"
+    },
+    {
+      "id": "sales_amount_quota_None_explicit_budget",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Budget"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Budget' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Budget' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "2ab3ea6a83a9781cf24e947eb954d426c7d1d68b3c4e0a21b9b82151bad489b8",
+      "physical_rows_sha256": "2ab3ea6a83a9781cf24e947eb954d426c7d1d68b3c4e0a21b9b82151bad489b8"
+    },
+    {
+      "id": "sales_amount_quota_Actual",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Actual' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "dffc5bbed8df1283a91c82907c7c1f3e770a16e7aeec84cd1309b8007ec31ebf",
+      "physical_rows_sha256": "a21edea2fec36394017ce0968942ddd07c9cb578c39538cb3ae9125eebaed626"
+    },
+    {
+      "id": "sales_amount_quota_Actual",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Actual' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "a21edea2fec36394017ce0968942ddd07c9cb578c39538cb3ae9125eebaed626",
+      "physical_rows_sha256": "a21edea2fec36394017ce0968942ddd07c9cb578c39538cb3ae9125eebaed626"
+    },
+    {
+      "id": "sales_amount_quota_Forecast",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Forecast' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "7bc7e30f96380b5b2f5fef9c25cfcdf9c9dc3d4957e4a5fc1003585875aec170",
+      "physical_rows_sha256": "1c6fcdc1e67a1f9ef85639909f71b0235d9cd5606220b8fabf30d9f446a26a7a"
+    },
+    {
+      "id": "sales_amount_quota_Forecast",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Forecast' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "1c6fcdc1e67a1f9ef85639909f71b0235d9cd5606220b8fabf30d9f446a26a7a",
+      "physical_rows_sha256": "1c6fcdc1e67a1f9ef85639909f71b0235d9cd5606220b8fabf30d9f446a26a7a"
+    },
+    {
+      "id": "sales_quantity_quota_None_explicit_budget",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Budget"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Budget' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Budget' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "224eb2bcbd352024f990e6df1caed479c0baed87eeba7e9473dee2a1886a494e",
+      "physical_rows_sha256": "224eb2bcbd352024f990e6df1caed479c0baed87eeba7e9473dee2a1886a494e"
+    },
+    {
+      "id": "sales_quantity_quota_None_explicit_budget",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Budget"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Budget' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Budget' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "b6844cbe5b28fffac62ea7010dce051435cb10a5cdec966f59c2733cb04ac334",
+      "physical_rows_sha256": "224eb2bcbd352024f990e6df1caed479c0baed87eeba7e9473dee2a1886a494e"
+    },
+    {
+      "id": "sales_quantity_quota_Actual",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Actual' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "1efa4de15c206f6e92472029b69613bc266eba7a863e92ff8b8f4b42c3d45af9",
+      "physical_rows_sha256": "1efa4de15c206f6e92472029b69613bc266eba7a863e92ff8b8f4b42c3d45af9"
+    },
+    {
+      "id": "sales_quantity_quota_Actual",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Actual' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "e3b6f5f58826e9b8ad54eade3998bcc869fd59558582b7e8565fb0455cd1b38c",
+      "physical_rows_sha256": "1efa4de15c206f6e92472029b69613bc266eba7a863e92ff8b8f4b42c3d45af9"
+    },
+    {
+      "id": "sales_quantity_quota_Forecast",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Forecast' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "d7d50943cc5eb6929a82c2189f3d5d67c1a7b207e47354c6b677fffc66a1ab40",
+      "physical_rows_sha256": "d7d50943cc5eb6929a82c2189f3d5d67c1a7b207e47354c6b677fffc66a1ab40"
+    },
+    {
+      "id": "sales_quantity_quota_Forecast",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Forecast' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "67c7b75703388532326f74b87d1ecafc6fa2875261d02f2147db3854ee614b1c",
+      "physical_rows_sha256": "d7d50943cc5eb6929a82c2189f3d5d67c1a7b207e47354c6b677fffc66a1ab40"
+    },
+    {
+      "id": "gross_margin_quota_None_explicit_budget",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Budget"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Budget' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Budget' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "5881afa957190845072e0f25b6210fd43a2bd5fd6be60ccf7bb40d0109a3b592",
+      "physical_rows_sha256": "553cb36e321ac85a5acf6ba9216e1d47124d9621af5da24341e0b35dc91953bd"
+    },
+    {
+      "id": "gross_margin_quota_None_explicit_budget",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Budget"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Budget' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Budget' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "553cb36e321ac85a5acf6ba9216e1d47124d9621af5da24341e0b35dc91953bd",
+      "physical_rows_sha256": "553cb36e321ac85a5acf6ba9216e1d47124d9621af5da24341e0b35dc91953bd"
+    },
+    {
+      "id": "gross_margin_quota_Actual",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Actual' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "06ed5a7d3be6d6cd1db71c924aa95adc81bc7ddfd97cfafab46adb9d258302d6",
+      "physical_rows_sha256": "cdcb984e94becb8dbd01872e4a4c5f21a1926d0101b155bfa1b924929078ae79"
+    },
+    {
+      "id": "gross_margin_quota_Actual",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Actual' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "cdcb984e94becb8dbd01872e4a4c5f21a1926d0101b155bfa1b924929078ae79",
+      "physical_rows_sha256": "cdcb984e94becb8dbd01872e4a4c5f21a1926d0101b155bfa1b924929078ae79"
+    },
+    {
+      "id": "gross_margin_quota_Forecast",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Forecast' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "5c6e38e4ed79bd64abd23702f874fe33148a6d8f9ac8fa3e0bd2130d8068e2a0",
+      "physical_rows_sha256": "82758d6aa07a3c596aee1ec308ec699bbd881950b7f7afe9fbc0a482cbbba966"
+    },
+    {
+      "id": "gross_margin_quota_Forecast",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND s.ScenarioName='Forecast' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "82758d6aa07a3c596aee1ec308ec699bbd881950b7f7afe9fbc0a482cbbba966",
+      "physical_rows_sha256": "82758d6aa07a3c596aee1ec308ec699bbd881950b7f7afe9fbc0a482cbbba966"
+    },
+    {
+      "id": "plan_None",
+      "mode": "full",
+      "member": "strategy_plan.plan_revenue_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "strategy_plan.plan_revenue_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "strategy_plan.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(strategy_plan.plan_revenue_by_scenario) AS value FROM strategy_plan CROSS JOIN scenario WHERE strategy_plan.\"DateKey\">=DATE '2007-02-01' AND strategy_plan.\"DateKey\"<DATE '2007-03-01' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.Amount) FROM retail.FactStrategyPlan f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.AccountKey=4\nGROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "4f285e804cebe8cc982f37999c26e6656c08674bfba992411cde974fba31cc14",
+      "physical_rows_sha256": "50879e551e4c54b72bea623c3e366127f8aa2c0ed90088496f82e4aa910de9b3"
+    },
+    {
+      "id": "plan_None",
+      "mode": "full",
+      "member": "strategy_plan.plan_revenue_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "strategy_plan.plan_revenue_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "strategy_plan.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(strategy_plan.plan_revenue_by_scenario) AS value FROM strategy_plan CROSS JOIN scenario WHERE strategy_plan.\"DateKey\">=DATE '2007-02-01' AND strategy_plan.\"DateKey\"<DATE '2007-03-01' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.Amount) FROM retail.FactStrategyPlan f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.AccountKey=4\nGROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "50879e551e4c54b72bea623c3e366127f8aa2c0ed90088496f82e4aa910de9b3",
+      "physical_rows_sha256": "50879e551e4c54b72bea623c3e366127f8aa2c0ed90088496f82e4aa910de9b3"
+    },
+    {
+      "id": "plan_Actual",
+      "mode": "full",
+      "member": "strategy_plan.plan_revenue_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "strategy_plan.plan_revenue_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "strategy_plan.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(strategy_plan.plan_revenue_by_scenario) AS value FROM strategy_plan CROSS JOIN scenario WHERE strategy_plan.\"DateKey\">=DATE '2007-02-01' AND strategy_plan.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.Amount) FROM retail.FactStrategyPlan f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.AccountKey=4 AND s.ScenarioName='Actual'\nGROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "779347935680f00b0fcc2b458e016d610e7ec6999eae9da8a4552f25db02cdb2",
+      "physical_rows_sha256": "7b8b59c4cb6a838fcbc252622de362a766a9990d9c3cbacf6fcfc4df436c85a8"
+    },
+    {
+      "id": "plan_Actual",
+      "mode": "full",
+      "member": "strategy_plan.plan_revenue_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "strategy_plan.plan_revenue_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "strategy_plan.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Actual"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(strategy_plan.plan_revenue_by_scenario) AS value FROM strategy_plan CROSS JOIN scenario WHERE strategy_plan.\"DateKey\">=DATE '2007-02-01' AND strategy_plan.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Actual' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.Amount) FROM retail.FactStrategyPlan f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.AccountKey=4 AND s.ScenarioName='Actual'\nGROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "7b8b59c4cb6a838fcbc252622de362a766a9990d9c3cbacf6fcfc4df436c85a8",
+      "physical_rows_sha256": "7b8b59c4cb6a838fcbc252622de362a766a9990d9c3cbacf6fcfc4df436c85a8"
+    },
+    {
+      "id": "plan_Forecast",
+      "mode": "full",
+      "member": "strategy_plan.plan_revenue_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "strategy_plan.plan_revenue_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "strategy_plan.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(strategy_plan.plan_revenue_by_scenario) AS value FROM strategy_plan CROSS JOIN scenario WHERE strategy_plan.\"DateKey\">=DATE '2007-02-01' AND strategy_plan.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.Amount) FROM retail.FactStrategyPlan f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.AccountKey=4 AND s.ScenarioName='Forecast'\nGROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "903c157969e170b1041557b220e56d26911fecc9e2603fb8505149c0f3f37537",
+      "physical_rows_sha256": "98ec7b8c5d4f11739b1aba324ba9a96aca2b12eb325bbd911160262986c95fc1"
+    },
+    {
+      "id": "plan_Forecast",
+      "mode": "full",
+      "member": "strategy_plan.plan_revenue_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "strategy_plan.plan_revenue_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "strategy_plan.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "equals",
+            "values": [
+              "Forecast"
+            ]
+          }
+        ],
+        "order": {
+          "scenario.ScenarioName": "asc"
+        }
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(strategy_plan.plan_revenue_by_scenario) AS value FROM strategy_plan CROSS JOIN scenario WHERE strategy_plan.\"DateKey\">=DATE '2007-02-01' AND strategy_plan.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\"='Forecast' GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.Amount) FROM retail.FactStrategyPlan f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.AccountKey=4 AND s.ScenarioName='Forecast'\nGROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "98ec7b8c5d4f11739b1aba324ba9a96aca2b12eb325bbd911160262986c95fc1",
+      "physical_rows_sha256": "98ec7b8c5d4f11739b1aba324ba9a96aca2b12eb325bbd911160262986c95fc1"
+    },
+    {
+      "id": "same_store_base_2007",
+      "mode": "full",
+      "member": "sales.same_store_sales_as_base_year",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.same_store_sales_as_base_year"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-01-01",
+              "2007-12-31"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales.same_store_sales_as_base_year) AS value FROM sales WHERE sales.\"DateKey\">=DATE '2007-01-01' AND sales.\"DateKey\"<DATE '2008-01-01'",
+      "physical": "SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey)=2007 AND StoreKey IN\n(SELECT StoreKey FROM retail.FactSales WHERE toYear(DateKey) IN (2007,2008) GROUP BY StoreKey HAVING uniqExact(toYear(DateKey))=2)",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "de80e42ddfc32d2f0a5973aad625c3f5a0109d4fb26af69eab7b290ca866994a",
+      "physical_rows_sha256": "48f410588c80b2f8e4d0c1e4f82401be94bad5e6e72c29013d71d9c2a84a685f"
+    },
+    {
+      "id": "same_store_base_2007",
+      "mode": "full",
+      "member": "sales.same_store_sales_as_base_year",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.same_store_sales_as_base_year"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-01-01",
+              "2007-12-31"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales.same_store_sales_as_base_year) AS value FROM sales WHERE sales.\"DateKey\">=DATE '2007-01-01' AND sales.\"DateKey\"<DATE '2008-01-01'",
+      "physical": "SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey)=2007 AND StoreKey IN\n(SELECT StoreKey FROM retail.FactSales WHERE toYear(DateKey) IN (2007,2008) GROUP BY StoreKey HAVING uniqExact(toYear(DateKey))=2)",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "297d787064118c9f4cffa5c696a6abfad938868d905007abb94474c72a8ba8ad",
+      "physical_rows_sha256": "48f410588c80b2f8e4d0c1e4f82401be94bad5e6e72c29013d71d9c2a84a685f"
+    },
+    {
+      "id": "same_store_base_2008",
+      "mode": "full",
+      "member": "sales.same_store_sales_as_base_year",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.same_store_sales_as_base_year"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2008-01-01",
+              "2008-12-31"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales.same_store_sales_as_base_year) AS value FROM sales WHERE sales.\"DateKey\">=DATE '2008-01-01' AND sales.\"DateKey\"<DATE '2009-01-01'",
+      "physical": "SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey)=2008 AND StoreKey IN\n(SELECT StoreKey FROM retail.FactSales WHERE toYear(DateKey) IN (2008,2009) GROUP BY StoreKey HAVING uniqExact(toYear(DateKey))=2)",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "b7a315bd1d20a79a6440d78b7d10267da3f04d586e62a567be11e4be0c3bfd44",
+      "physical_rows_sha256": "908faa2f4963338c7b24fe065c8247f4ac2a0c717a5269c61ac5ab3b33baf048"
+    },
+    {
+      "id": "same_store_base_2008",
+      "mode": "full",
+      "member": "sales.same_store_sales_as_base_year",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.same_store_sales_as_base_year"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2008-01-01",
+              "2008-12-31"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales.same_store_sales_as_base_year) AS value FROM sales WHERE sales.\"DateKey\">=DATE '2008-01-01' AND sales.\"DateKey\"<DATE '2009-01-01'",
+      "physical": "SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey)=2008 AND StoreKey IN\n(SELECT StoreKey FROM retail.FactSales WHERE toYear(DateKey) IN (2008,2009) GROUP BY StoreKey HAVING uniqExact(toYear(DateKey))=2)",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "908faa2f4963338c7b24fe065c8247f4ac2a0c717a5269c61ac5ab3b33baf048",
+      "physical_rows_sha256": "908faa2f4963338c7b24fe065c8247f4ac2a0c717a5269c61ac5ab3b33baf048"
+    },
+    {
+      "id": "inventory_owner_month",
+      "mode": "full",
+      "member": "inventory.inventory_turnover",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "inventory.inventory_turnover"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "inventory.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "inventory.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', inventory.\"DateKey\"), MEASURE(inventory.inventory_turnover) AS value FROM inventory WHERE inventory.\"DateKey\">=DATE '2007-02-01' AND inventory.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH daily AS (SELECT DateKey,sum(OnHandQuantity*UnitCost) AS v FROM retail.FactInventory\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY DateKey),\ni AS (SELECT toStartOfMonth(DateKey) AS d,avg(v) AS a FROM daily GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(TotalCost) AS cost FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(i.d),s.cost/nullIf(i.a,0) FROM i LEFT JOIN s ON i.d=s.d ORDER BY i.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "27f468fffcc5a53909b07118893af551027228ef871a966f88bd4510a1447954",
+      "physical_rows_sha256": "6c8481fc0ab2b490ff19c7913d23445bf46f7bb191539b8604c04dea1dd947e2"
+    },
+    {
+      "id": "inventory_owner_month",
+      "mode": "full",
+      "member": "inventory.inventory_turnover",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "inventory.inventory_turnover"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "inventory.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "inventory.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', inventory.\"DateKey\"), MEASURE(inventory.inventory_turnover) AS value FROM inventory WHERE inventory.\"DateKey\">=DATE '2007-02-01' AND inventory.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH daily AS (SELECT DateKey,sum(OnHandQuantity*UnitCost) AS v FROM retail.FactInventory\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY DateKey),\ni AS (SELECT toStartOfMonth(DateKey) AS d,avg(v) AS a FROM daily GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(TotalCost) AS cost FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(i.d),s.cost/nullIf(i.a,0) FROM i LEFT JOIN s ON i.d=s.d ORDER BY i.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "3cc4456ba983bf680e0104d031d4efd2b93c324e7c2b5760ac1358c0c14a660d",
+      "physical_rows_sha256": "6c8481fc0ab2b490ff19c7913d23445bf46f7bb191539b8604c04dea1dd947e2"
+    },
+    {
+      "id": "inventory_calendar_month",
+      "mode": "full",
+      "member": "inventory.inventory_turnover",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "inventory.inventory_turnover"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "calendar.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "calendar.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', calendar.\"DateKey\"), MEASURE(inventory.inventory_turnover) AS value FROM inventory CROSS JOIN calendar WHERE calendar.\"DateKey\">=DATE '2007-02-01' AND calendar.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH daily AS (SELECT DateKey,sum(OnHandQuantity*UnitCost) AS v FROM retail.FactInventory\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY DateKey),\ni AS (SELECT toStartOfMonth(DateKey) AS d,avg(v) AS a FROM daily GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(TotalCost) AS cost FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(i.d),s.cost/nullIf(i.a,0) FROM i LEFT JOIN s ON i.d=s.d ORDER BY i.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "e79c08ec410ef0e8ddcd691248b507bb5cf059f431dd1bb86c97b8519c1b83fb",
+      "physical_rows_sha256": "6c8481fc0ab2b490ff19c7913d23445bf46f7bb191539b8604c04dea1dd947e2"
+    },
+    {
+      "id": "inventory_calendar_month",
+      "mode": "full",
+      "member": "inventory.inventory_turnover",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "inventory.inventory_turnover"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "calendar.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "calendar.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', calendar.\"DateKey\"), MEASURE(inventory.inventory_turnover) AS value FROM inventory CROSS JOIN calendar WHERE calendar.\"DateKey\">=DATE '2007-02-01' AND calendar.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH daily AS (SELECT DateKey,sum(OnHandQuantity*UnitCost) AS v FROM retail.FactInventory\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY DateKey),\ni AS (SELECT toStartOfMonth(DateKey) AS d,avg(v) AS a FROM daily GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(TotalCost) AS cost FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(i.d),s.cost/nullIf(i.a,0) FROM i LEFT JOIN s ON i.d=s.d ORDER BY i.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "b41dced6aed54fdb7899ac64856e7e700807903157486967f2a029963850bf57",
+      "physical_rows_sha256": "6c8481fc0ab2b490ff19c7913d23445bf46f7bb191539b8604c04dea1dd947e2"
+    },
+    {
+      "id": "sales_quota_owner_month",
+      "mode": "full",
+      "member": "sales_quota.quota_attainment_pct",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.quota_attainment_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "sales_quota.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', sales_quota.\"DateKey\"), MEASURE(sales_quota.quota_attainment_pct) AS value FROM sales_quota WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH q AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmountQuota) AS amount FROM retail.FactSalesQuota\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' AND ScenarioKey=2 GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmount) AS amount FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(q.d),s.amount/nullIf(q.amount,0) FROM q LEFT JOIN s ON q.d=s.d ORDER BY q.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "223ce0292a79d86d923af8e1a2bb2effab92b31fdcce18b7c55160f2155e6f40",
+      "physical_rows_sha256": "a73f420725e6d8dc39078eed2ebec6969f0b6e4bd98bbe4d5eb31574b6111539"
+    },
+    {
+      "id": "sales_quota_owner_month",
+      "mode": "full",
+      "member": "sales_quota.quota_attainment_pct",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.quota_attainment_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "sales_quota.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', sales_quota.\"DateKey\"), MEASURE(sales_quota.quota_attainment_pct) AS value FROM sales_quota WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH q AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmountQuota) AS amount FROM retail.FactSalesQuota\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' AND ScenarioKey=2 GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmount) AS amount FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(q.d),s.amount/nullIf(q.amount,0) FROM q LEFT JOIN s ON q.d=s.d ORDER BY q.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "1af1ff29064d8ada0850471690e1841743b15c89c405993fc874d61ea46c150f",
+      "physical_rows_sha256": "a73f420725e6d8dc39078eed2ebec6969f0b6e4bd98bbe4d5eb31574b6111539"
+    },
+    {
+      "id": "sales_quota_calendar_month",
+      "mode": "full",
+      "member": "sales_quota.quota_attainment_pct",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.quota_attainment_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "calendar.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "calendar.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', calendar.\"DateKey\"), MEASURE(sales_quota.quota_attainment_pct) AS value FROM sales_quota CROSS JOIN calendar WHERE calendar.\"DateKey\">=DATE '2007-02-01' AND calendar.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH q AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmountQuota) AS amount FROM retail.FactSalesQuota\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' AND ScenarioKey=2 GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmount) AS amount FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(q.d),s.amount/nullIf(q.amount,0) FROM q LEFT JOIN s ON q.d=s.d ORDER BY q.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "48fe7af1961330a3b88be4a47f859449213346e8664c855e5f8c5ddc6d3ec6ac",
+      "physical_rows_sha256": "a73f420725e6d8dc39078eed2ebec6969f0b6e4bd98bbe4d5eb31574b6111539"
+    },
+    {
+      "id": "sales_quota_calendar_month",
+      "mode": "full",
+      "member": "sales_quota.quota_attainment_pct",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.quota_attainment_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "calendar.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-03-31"
+            ],
+            "granularity": "month"
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "calendar.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT DATE_TRUNC('month', calendar.\"DateKey\"), MEASURE(sales_quota.quota_attainment_pct) AS value FROM sales_quota CROSS JOIN calendar WHERE calendar.\"DateKey\">=DATE '2007-02-01' AND calendar.\"DateKey\"<DATE '2007-04-01' GROUP BY 1 ORDER BY 1",
+      "physical": "WITH q AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmountQuota) AS amount FROM retail.FactSalesQuota\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' AND ScenarioKey=2 GROUP BY d),\ns AS (SELECT toStartOfMonth(DateKey) AS d,sum(SalesAmount) AS amount FROM retail.FactSales\nWHERE DateKey>='2007-02-01' AND DateKey<'2007-04-01' GROUP BY d)\nSELECT toString(q.d),s.amount/nullIf(q.amount,0) FROM q LEFT JOIN s ON q.d=s.d ORDER BY q.d",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 2,
+      "expected_error": null,
+      "row_count": 2,
+      "rows_sha256": "07626c35f40bd6f0e0b307de876b72540066e334400aa059a08b6765c0abf51b",
+      "physical_rows_sha256": "a73f420725e6d8dc39078eed2ebec6969f0b6e4bd98bbe4d5eb31574b6111539"
+    },
+    {
+      "id": "quota_partial_month_not_prorated",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-14"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales_quota.sales_amount_quota) AS value FROM sales_quota WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-02-15'",
+      "physical": "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota WHERE DateKey>='2007-02-01' AND DateKey<'2007-03-01' AND ScenarioKey=2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "cf74633125e55ddb480fd97d0fb5461568e1216315e44459691e3dae3bd3ca9d",
+      "physical_rows_sha256": "643331a12168d285a5b4593aea5231660b000bf75dbde18f06a691cc00ce72c9"
+    },
+    {
+      "id": "quota_partial_month_not_prorated",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-14"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales_quota.sales_amount_quota) AS value FROM sales_quota WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-02-15'",
+      "physical": "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota WHERE DateKey>='2007-02-01' AND DateKey<'2007-03-01' AND ScenarioKey=2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 1,
+      "expected_error": null,
+      "row_count": 1,
+      "rows_sha256": "f75e426a8dbed47b3378b376f02861f0bb355d78fc95a0c30ee11ff537fca9c2",
+      "physical_rows_sha256": "643331a12168d285a5b4593aea5231660b000bf75dbde18f06a691cc00ce72c9"
+    },
+    {
+      "id": "sales_amount_quota_None_set",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "set",
+            "values": []
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\" IS NOT NULL GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "f23179c11c980d11f9ebd294e49db7a710326979480b8a948c0028343e8d8627",
+      "physical_rows_sha256": "06608f176ab7e1e2ce8def62b645ebfb81067671577c7fcec7e2adc834fda2f7"
+    },
+    {
+      "id": "sales_amount_quota_None_set",
+      "mode": "full",
+      "member": "sales_quota.sales_amount_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_amount_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "set",
+            "values": []
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_amount_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\" IS NOT NULL GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesAmountQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "06608f176ab7e1e2ce8def62b645ebfb81067671577c7fcec7e2adc834fda2f7",
+      "physical_rows_sha256": "06608f176ab7e1e2ce8def62b645ebfb81067671577c7fcec7e2adc834fda2f7"
+    },
+    {
+      "id": "sales_quantity_quota_None_set",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "set",
+            "values": []
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\" IS NOT NULL GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "c958dae9461f28f661c98066d9fc96cdcdd9ba53ca4849b2c98697b0b50d1b53",
+      "physical_rows_sha256": "c958dae9461f28f661c98066d9fc96cdcdd9ba53ca4849b2c98697b0b50d1b53"
+    },
+    {
+      "id": "sales_quantity_quota_None_set",
+      "mode": "full",
+      "member": "sales_quota.sales_quantity_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.sales_quantity_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "set",
+            "values": []
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.sales_quantity_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\" IS NOT NULL GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.SalesQuantityQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "17b6c520f08a9dabca06d2bee2b237a8639871669eaa2f277640b6980739630f",
+      "physical_rows_sha256": "c958dae9461f28f661c98066d9fc96cdcdd9ba53ca4849b2c98697b0b50d1b53"
+    },
+    {
+      "id": "gross_margin_quota_None_set",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "set",
+            "values": []
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\" IS NOT NULL GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "2e29452f454a41ab8e817174dfe7e3c45e649c3fb9ea16b009a5cf64cd8483aa",
+      "physical_rows_sha256": "84819b02dfe6622ae75fae98e683a30a3599ae4b18e14964e0382c7cff51ebff"
+    },
+    {
+      "id": "gross_margin_quota_None_set",
+      "mode": "full",
+      "member": "sales_quota.gross_margin_quota_by_scenario",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.gross_margin_quota_by_scenario"
+        ],
+        "dimensions": [
+          "scenario.ScenarioName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "scenario.ScenarioName": "asc"
+        },
+        "filters": [
+          {
+            "member": "scenario.ScenarioName",
+            "operator": "set",
+            "values": []
+          }
+        ]
+      },
+      "sql": "SELECT scenario.\"ScenarioName\", MEASURE(sales_quota.gross_margin_quota_by_scenario) AS value FROM sales_quota CROSS JOIN scenario WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND scenario.\"ScenarioName\" IS NOT NULL GROUP BY 1 ORDER BY 1",
+      "physical": "SELECT s.ScenarioName,sum(f.GrossMarginQuota) FROM retail.FactSalesQuota f\nLEFT JOIN retail.DimScenario s ON f.ScenarioKey=s.ScenarioKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' GROUP BY s.ScenarioName ORDER BY 1",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "84819b02dfe6622ae75fae98e683a30a3599ae4b18e14964e0382c7cff51ebff",
+      "physical_rows_sha256": "84819b02dfe6622ae75fae98e683a30a3599ae4b18e14964e0382c7cff51ebff"
+    },
+    {
+      "id": "sales_category_product_child_filter",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_category",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          },
+          {
+            "member": "sales.ProductKey",
+            "operator": "lte",
+            "values": [
+              "60"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN sales CROSS JOIN product WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 AND sales.\"ProductKey\"<=60 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nAND f.ProductKey<=60 GROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 14,
+      "expected_error": null,
+      "row_count": 14,
+      "rows_sha256": "051a7dbcaa7e8ac4249f276f0f2d44100253f4e2f7215dac71e6fd553acd9d83",
+      "physical_rows_sha256": "9dc319f8303464cdba14b79787c1752177cd39bb73c6fc494224599271f2f3cb"
+    },
+    {
+      "id": "sales_category_product_child_filter",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_category",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          },
+          {
+            "member": "sales.ProductKey",
+            "operator": "lte",
+            "values": [
+              "60"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN sales CROSS JOIN product WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 AND sales.\"ProductKey\"<=60 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nAND f.ProductKey<=60 GROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 14,
+      "expected_error": null,
+      "row_count": 14,
+      "rows_sha256": "9dc319f8303464cdba14b79787c1752177cd39bb73c6fc494224599271f2f3cb",
+      "physical_rows_sha256": "9dc319f8303464cdba14b79787c1752177cd39bb73c6fc494224599271f2f3cb"
+    },
+    {
+      "id": "online_sales_category_product_child_filter",
+      "mode": "full",
+      "member": "online_sales.sales_amount_share_in_category",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          },
+          {
+            "member": "online_sales.ProductKey",
+            "operator": "lte",
+            "values": [
+              "60"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(online_sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN online_sales CROSS JOIN product WHERE online_sales.\"DateKey\">=DATE '2007-02-01' AND online_sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 AND online_sales.\"ProductKey\"<=60 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactOnlineSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nAND f.ProductKey<=60 GROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 15,
+      "expected_error": null,
+      "row_count": 15,
+      "rows_sha256": "bb27e40a013be6787baa6bba61355af81d279f8f2b82698a35246d7d412879de",
+      "physical_rows_sha256": "976e2e369ae5d467c32ee11191579de256b677c2e78631b27a61f697d0ba11cf"
+    },
+    {
+      "id": "online_sales_category_product_child_filter",
+      "mode": "full",
+      "member": "online_sales.sales_amount_share_in_category",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_share_in_category"
+        ],
+        "dimensions": [
+          "product_category.ProductCategoryName",
+          "product.ProductName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "product_category.ProductCategoryKey",
+            "operator": "gt",
+            "values": [
+              "0"
+            ]
+          },
+          {
+            "member": "online_sales.ProductKey",
+            "operator": "lte",
+            "values": [
+              "60"
+            ]
+          }
+        ],
+        "order": {
+          "product_category.ProductCategoryName": "asc",
+          "product.ProductName": "asc"
+        }
+      },
+      "sql": "SELECT product_category.\"ProductCategoryName\", product.\"ProductName\", MEASURE(online_sales.sales_amount_share_in_category) AS value FROM product_category CROSS JOIN online_sales CROSS JOIN product WHERE online_sales.\"DateKey\">=DATE '2007-02-01' AND online_sales.\"DateKey\"<DATE '2007-03-01' AND product_category.\"ProductCategoryKey\">0 AND online_sales.\"ProductKey\"<=60 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "SELECT pc.ProductCategoryName,p.ProductName,\nsum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY pc.ProductCategoryName)\nFROM retail.FactOnlineSales f LEFT JOIN retail.DimProduct p ON f.ProductKey=p.ProductKey\nLEFT JOIN retail.DimProductSubcategory ps ON p.ProductSubcategoryKey=ps.ProductSubcategoryKey\nLEFT JOIN retail.DimProductCategory pc ON ps.ProductCategoryKey=pc.ProductCategoryKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND pc.ProductCategoryKey>0\nAND f.ProductKey<=60 GROUP BY pc.ProductCategoryName,p.ProductName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 15,
+      "expected_error": null,
+      "row_count": 15,
+      "rows_sha256": "976e2e369ae5d467c32ee11191579de256b677c2e78631b27a61f697d0ba11cf",
+      "physical_rows_sha256": "976e2e369ae5d467c32ee11191579de256b677c2e78631b27a61f697d0ba11cf"
+    },
+    {
+      "id": "sales_channel_child_filter",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_channel",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_channel"
+        ],
+        "dimensions": [
+          "channel.ChannelName",
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "channel.ChannelName": "asc",
+          "store.StoreName": "asc"
+        },
+        "filters": [
+          {
+            "member": "sales.StoreKey",
+            "operator": "lte",
+            "values": [
+              "3"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT channel.\"ChannelName\", store.\"StoreName\", MEASURE(sales.sales_amount_share_in_channel) AS value FROM channel CROSS JOIN sales CROSS JOIN store WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND sales.\"StoreKey\"<=3 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "\nSELECT c.ChannelName,s.StoreName,sum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY c.ChannelName)\nFROM retail.FactSales f LEFT JOIN retail.DimChannel c ON f.channelKey=c.ChannelKey\nLEFT JOIN retail.DimStore s ON f.StoreKey=s.StoreKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.StoreKey<=3 GROUP BY c.ChannelName,s.StoreName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "22b79c03f10eea21f7bfb3dd6dc39a808e28a0cf50819d01ffb717592a64004b",
+      "physical_rows_sha256": "a695181c6e6a818275f6298457561534ef99fa9a20e3f31bbb3920339e05d927"
+    },
+    {
+      "id": "sales_channel_child_filter",
+      "mode": "full",
+      "member": "sales.sales_amount_share_in_channel",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.sales_amount_share_in_channel"
+        ],
+        "dimensions": [
+          "channel.ChannelName",
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000,
+        "order": {
+          "channel.ChannelName": "asc",
+          "store.StoreName": "asc"
+        },
+        "filters": [
+          {
+            "member": "sales.StoreKey",
+            "operator": "lte",
+            "values": [
+              "3"
+            ]
+          }
+        ]
+      },
+      "sql": "SELECT channel.\"ChannelName\", store.\"StoreName\", MEASURE(sales.sales_amount_share_in_channel) AS value FROM channel CROSS JOIN sales CROSS JOIN store WHERE sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01' AND sales.\"StoreKey\"<=3 GROUP BY 1,2 ORDER BY 1,2",
+      "physical": "\nSELECT c.ChannelName,s.StoreName,sum(f.SalesAmount)/sum(sum(f.SalesAmount)) OVER(PARTITION BY c.ChannelName)\nFROM retail.FactSales f LEFT JOIN retail.DimChannel c ON f.channelKey=c.ChannelKey\nLEFT JOIN retail.DimStore s ON f.StoreKey=s.StoreKey\nWHERE f.DateKey>='2007-02-01' AND f.DateKey<'2007-03-01' AND f.StoreKey<=3 GROUP BY c.ChannelName,s.StoreName ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 3,
+      "expected_error": null,
+      "row_count": 3,
+      "rows_sha256": "a695181c6e6a818275f6298457561534ef99fa9a20e3f31bbb3920339e05d927",
+      "physical_rows_sha256": "a695181c6e6a818275f6298457561534ef99fa9a20e3f31bbb3920339e05d927"
+    },
+    {
+      "id": "inventory_extra_fact_date",
+      "mode": "full",
+      "member": "inventory.inventory_turnover",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "inventory.inventory_turnover"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "inventory.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          },
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(inventory.inventory_turnover) AS value FROM inventory CROSS JOIN sales WHERE inventory.\"DateKey\">=DATE '2007-02-01' AND inventory.\"DateKey\"<DATE '2007-03-01' AND sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01'",
+      "physical": "",
+      "error": "Can't find join path to join 'inventory', 'sales', 'inventory'",
+      "detail": "Can't find join path to join 'inventory', 'sales', 'inventory'",
+      "matched": true,
+      "physical_row_count": 0,
+      "expected_error": "join path",
+      "row_count": null,
+      "rows_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "physical_rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "inventory_extra_fact_date",
+      "mode": "full",
+      "member": "inventory.inventory_turnover",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "inventory.inventory_turnover"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "inventory.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          },
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(inventory.inventory_turnover) AS value FROM inventory CROSS JOIN sales WHERE inventory.\"DateKey\">=DATE '2007-02-01' AND inventory.\"DateKey\"<DATE '2007-03-01' AND sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01'",
+      "physical": "",
+      "error": "Database Execution Error: Can't find join path to join 'inventory,sales', 'inventory'",
+      "detail": "Database Execution Error: Can't find join path to join 'inventory,sales', 'inventory'",
+      "matched": true,
+      "physical_row_count": 0,
+      "expected_error": "join path",
+      "row_count": null,
+      "rows_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "physical_rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "sales_quota_extra_fact_date",
+      "mode": "full",
+      "member": "sales_quota.quota_attainment_pct",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales_quota.quota_attainment_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          },
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales_quota.quota_attainment_pct) AS value FROM sales_quota CROSS JOIN sales WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01'",
+      "physical": "",
+      "error": "Can't find join path to join 'sales_quota', 'sales', 'sales_quota'",
+      "detail": "Can't find join path to join 'sales_quota', 'sales', 'sales_quota'",
+      "matched": true,
+      "physical_row_count": 0,
+      "expected_error": "join path",
+      "row_count": null,
+      "rows_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "physical_rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "sales_quota_extra_fact_date",
+      "mode": "full",
+      "member": "sales_quota.quota_attainment_pct",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales_quota.quota_attainment_pct"
+        ],
+        "dimensions": [],
+        "timeDimensions": [
+          {
+            "dimension": "sales_quota.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          },
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2007-02-01",
+              "2007-02-28"
+            ]
+          }
+        ],
+        "limit": 10000
+      },
+      "sql": "SELECT MEASURE(sales_quota.quota_attainment_pct) AS value FROM sales_quota CROSS JOIN sales WHERE sales_quota.\"DateKey\">=DATE '2007-02-01' AND sales_quota.\"DateKey\"<DATE '2007-03-01' AND sales.\"DateKey\">=DATE '2007-02-01' AND sales.\"DateKey\"<DATE '2007-03-01'",
+      "physical": "",
+      "error": "Database Execution Error: Can't find join path to join 'sales_quota,sales', 'sales_quota'",
+      "detail": "Database Execution Error: Can't find join path to join 'sales_quota,sales', 'sales_quota'",
+      "matched": true,
+      "physical_row_count": 0,
+      "expected_error": "join path",
+      "row_count": null,
+      "rows_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "physical_rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "sales_quarter_store_negative",
+      "mode": "full",
+      "member": "sales.sales_amount_qoq_pct",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2008-04-01",
+              "2008-06-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "sales.sales_amount_qoq_pct",
+            "operator": "lt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "store.StoreName": "asc",
+          "sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT store.\"StoreName\", DATE_TRUNC('quarter', sales.\"DateKey\"), MEASURE(sales.sales_amount_qoq_pct) AS value FROM sales CROSS JOIN store WHERE sales.\"DateKey\">=DATE '2008-04-01' AND sales.\"DateKey\"<DATE '2008-07-01' GROUP BY 1,2 HAVING MEASURE(sales.sales_amount_qoq_pct)<0 ORDER BY 1,2",
+      "physical": "WITH p AS (SELECT StoreKey,toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a\nFROM retail.FactSales GROUP BY StoreKey,d)\nSELECT s.StoreName,toString(c.d),(c.a-p.a)/nullIf(p.a,0) AS rate FROM p c\nLEFT JOIN p ON p.StoreKey=c.StoreKey AND p.d=addQuarters(c.d,-1)\nLEFT JOIN retail.DimStore s ON c.StoreKey=s.StoreKey\nWHERE c.d='2008-04-01' AND rate<0 ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 6,
+      "expected_error": null,
+      "row_count": 6,
+      "rows_sha256": "1f8aedbb51d0dd62fd543d176677715141c5c83ab2ff569f094c6716eabe2c88",
+      "physical_rows_sha256": "2e0bb7b94e7b1886770a5c5c40024fd21f1e70a4f3b829ca5b54ef1bdb06b150"
+    },
+    {
+      "id": "sales_quarter_store_negative",
+      "mode": "full",
+      "member": "sales.sales_amount_qoq_pct",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "sales.DateKey",
+            "dateRange": [
+              "2008-04-01",
+              "2008-06-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "sales.sales_amount_qoq_pct",
+            "operator": "lt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "store.StoreName": "asc",
+          "sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT store.\"StoreName\", DATE_TRUNC('quarter', sales.\"DateKey\"), MEASURE(sales.sales_amount_qoq_pct) AS value FROM sales CROSS JOIN store WHERE sales.\"DateKey\">=DATE '2008-04-01' AND sales.\"DateKey\"<DATE '2008-07-01' GROUP BY 1,2 HAVING MEASURE(sales.sales_amount_qoq_pct)<0 ORDER BY 1,2",
+      "physical": "WITH p AS (SELECT StoreKey,toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a\nFROM retail.FactSales GROUP BY StoreKey,d)\nSELECT s.StoreName,toString(c.d),(c.a-p.a)/nullIf(p.a,0) AS rate FROM p c\nLEFT JOIN p ON p.StoreKey=c.StoreKey AND p.d=addQuarters(c.d,-1)\nLEFT JOIN retail.DimStore s ON c.StoreKey=s.StoreKey\nWHERE c.d='2008-04-01' AND rate<0 ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 6,
+      "expected_error": null,
+      "row_count": 6,
+      "rows_sha256": "80372eebf59833dc9958955d4e626f41783386068c3f43a4a6b9c648dfb53d3d",
+      "physical_rows_sha256": "2e0bb7b94e7b1886770a5c5c40024fd21f1e70a4f3b829ca5b54ef1bdb06b150"
+    },
+    {
+      "id": "online_sales_quarter_store_negative",
+      "mode": "full",
+      "member": "online_sales.sales_amount_qoq_pct",
+      "interface": "json",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2008-04-01",
+              "2008-06-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "online_sales.sales_amount_qoq_pct",
+            "operator": "lt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "store.StoreName": "asc",
+          "online_sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT store.\"StoreName\", DATE_TRUNC('quarter', online_sales.\"DateKey\"), MEASURE(online_sales.sales_amount_qoq_pct) AS value FROM online_sales CROSS JOIN store WHERE online_sales.\"DateKey\">=DATE '2008-04-01' AND online_sales.\"DateKey\"<DATE '2008-07-01' GROUP BY 1,2 HAVING MEASURE(online_sales.sales_amount_qoq_pct)<0 ORDER BY 1,2",
+      "physical": "WITH p AS (SELECT StoreKey,toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a\nFROM retail.FactOnlineSales GROUP BY StoreKey,d)\nSELECT s.StoreName,toString(c.d),(c.a-p.a)/nullIf(p.a,0) AS rate FROM p c\nLEFT JOIN p ON p.StoreKey=c.StoreKey AND p.d=addQuarters(c.d,-1)\nLEFT JOIN retail.DimStore s ON c.StoreKey=s.StoreKey\nWHERE c.d='2008-04-01' AND rate<0 ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 0,
+      "expected_error": null,
+      "row_count": 0,
+      "rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "physical_rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "online_sales_quarter_store_negative",
+      "mode": "full",
+      "member": "online_sales.sales_amount_qoq_pct",
+      "interface": "sql",
+      "json": {
+        "measures": [
+          "online_sales.sales_amount_qoq_pct"
+        ],
+        "dimensions": [
+          "store.StoreName"
+        ],
+        "timeDimensions": [
+          {
+            "dimension": "online_sales.DateKey",
+            "dateRange": [
+              "2008-04-01",
+              "2008-06-30"
+            ],
+            "granularity": "quarter"
+          }
+        ],
+        "limit": 10000,
+        "filters": [
+          {
+            "member": "online_sales.sales_amount_qoq_pct",
+            "operator": "lt",
+            "values": [
+              "0"
+            ]
+          }
+        ],
+        "order": {
+          "store.StoreName": "asc",
+          "online_sales.DateKey": "asc"
+        }
+      },
+      "sql": "SELECT store.\"StoreName\", DATE_TRUNC('quarter', online_sales.\"DateKey\"), MEASURE(online_sales.sales_amount_qoq_pct) AS value FROM online_sales CROSS JOIN store WHERE online_sales.\"DateKey\">=DATE '2008-04-01' AND online_sales.\"DateKey\"<DATE '2008-07-01' GROUP BY 1,2 HAVING MEASURE(online_sales.sales_amount_qoq_pct)<0 ORDER BY 1,2",
+      "physical": "WITH p AS (SELECT StoreKey,toStartOfQuarter(DateKey) AS d,sum(SalesAmount) AS a\nFROM retail.FactOnlineSales GROUP BY StoreKey,d)\nSELECT s.StoreName,toString(c.d),(c.a-p.a)/nullIf(p.a,0) AS rate FROM p c\nLEFT JOIN p ON p.StoreKey=c.StoreKey AND p.d=addQuarters(c.d,-1)\nLEFT JOIN retail.DimStore s ON c.StoreKey=s.StoreKey\nWHERE c.d='2008-04-01' AND rate<0 ORDER BY 1,2",
+      "error": null,
+      "detail": null,
+      "matched": true,
+      "physical_row_count": 0,
+      "expected_error": null,
+      "row_count": 0,
+      "rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "physical_rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "render_tests": {
+    "command": "env -u DEEPSEEK_API_KEY uv run --offline --no-sync pytest tests/test_render.py -k 'reduce_by or cube_variant_members' -q",
+    "passed": 2
+  },
+  "frozen_harness_byte_checks": [
+    {
+      "file": "harness/prompt.py",
+      "sha256": "86fefce2157ff4fc09819fe8c8c5ad4fe7e6e064850f9ce9c8b1b67e97919e5e",
+      "byte_identical_to_main": true
+    },
+    {
+      "file": "harness/scorer.py",
+      "sha256": "3be6d29f5a11fafa5843c086362b6ddcfd3b2391413e82e3a98c09f09de50efd",
+      "byte_identical_to_main": true
+    },
+    {
+      "file": "harness/scorer_v2.py",
+      "sha256": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4",
+      "byte_identical_to_main": true
+    },
+    {
+      "file": "harness/score_guard.py",
+      "sha256": "c56c5502db8dc106ea9817905db20fb6f4d761a0870fc67778c62e936033f516",
+      "byte_identical_to_main": true
+    }
+  ],
+  "main_commit": "0e5f9bb061516d58f83dd6e69868371a7fd20412",
+  "coverage_file_sha256": "54d88eb347548023521ee0ede1c7e8788669a4612b13c35f4dfc158a60102329",
+  "probe_script_sha256": "c388dc153777fd32621083eb3d2c5163fad64e420afd2293bee19500437ea97a",
+  "freeze_script_sha256": "8f49b58da349c2bd555d978fdc1c344356003930f485017f5a53401f4ba27fe6"
+}
