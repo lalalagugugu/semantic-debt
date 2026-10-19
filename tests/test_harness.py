@@ -1188,3 +1188,75 @@ def test_the_bank_of_the_run_passes_scorer_v2_validation():
     if tag != "eval-v1.2":
         pytest.skip(f"bank checkout is {tag or 'untagged'}, not eval-v1.2")
     assert R.invalid_rules(load_questions(EVAL)) == []
+
+
+# ---------------------------------------------------------------------------
+# C13: syntax-note teaching ladder (decisions/2026-10-19-phase1-replan.md §三)
+
+
+def test_ladder_cells_change_only_the_syntax_note_and_nest():
+    from harness.cells import CELLS, LADDER_CELLS, syntax_path
+    l1 = CELLS["SQL-L1"]
+    notes = [syntax_path(l1.syntax).read_text(encoding="utf-8")]
+    for name in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4"):
+        c = LADDER_CELLS[name]
+        assert (c.stack, c.allowed, c.context, c.lang) == (l1.stack, l1.allowed, l1.context, l1.lang)
+        assert c.skip_judge and c.card == "C13" and name not in CELLS        # never in --cell all
+        text = syntax_path(c.syntax).read_text(encoding="utf-8")
+        assert text.startswith(notes[-1].rstrip("\n")) and len(text) > len(notes[-1])   # each level adds to the last
+        notes.append(text)
+    assert [LADDER_CELLS[n].split for n in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4")] == ["all", "all", "heldout"]
+    if (REPO / "build" / "contexts" / "SQL-L1.yaml").exists():
+        base, t2 = R.system_for(l1), R.system_for(LADDER_CELLS["SQL-L1-T2"])
+        assert base.replace(notes[0].strip(), notes[1].strip()) == t2                  # same prompt and context
+
+
+def test_questions_for_skips_judge_and_keeps_the_cells_split():
+    from harness.cells import CELLS, LADDER_CELLS
+    qs = [Question(f"Q{i:03d}", QTEXT, refs=[[[1]]], rules=Q.rules, scoring=s, meta={"split": sp})
+          for i, (s, sp) in enumerate([("deterministic", "tuning"), ("deterministic", "heldout"),
+                                       ("judge", "tuning"), ("judge", "heldout")])]
+    ids = lambda cell, **kw: [q.qid for q in R.questions_for(cell, qs, **kw)]   # noqa: E731
+    assert ids(CELLS["SQL-L1"]) == ["Q000", "Q001", "Q002", "Q003"]
+    assert ids(CELLS["SQL-L1"], skip_judge=True) == ["Q000", "Q001"]
+    assert ids(LADDER_CELLS["SQL-L1-T2"]) == ids(LADDER_CELLS["SQL-L1-T3"]) == ["Q000", "Q001"]
+    assert ids(LADDER_CELLS["SQL-L1-T4"]) == ["Q001"]                           # held-out only, no judge
+
+
+def test_dry_run_counts_each_cells_own_questions():
+    from harness.cells import LADDER_CELLS
+    cells = [LADDER_CELLS["SQL-L1-T2"], LADDER_CELLS["SQL-L1-T4"]]
+    rows, _ = R.dry_run(cells, {"SQL-L1-T2": 109, "SQL-L1-T4": 55, "zh": 122}, 3, "deepseek-flash", fix_rate=0.0,
+                        output_tokens=1000, hit_ratio=0.9, question_tokens=60, use_measured=False)
+    assert [(r["cell"], r["questions"], r["attempts"]) for r in rows] == [("SQL-L1-T2", 109, 327), ("SQL-L1-T4", 55, 165)]
+
+
+@needs_eval
+def test_ladder_level4_examples_are_tuning_questions_only():
+    """Level 4's few-shot questions are tuning-split, deterministic, single-reference questions, picked
+    by the stated rule (per Q level, the two at the median reference-SQL length); never held-out."""
+    import yaml
+    from harness.cells import LADDER_CELLS, syntax_path
+    from harness.questions import question_files
+    recs = []
+    for f in question_files(EVAL):
+        d = yaml.safe_load(f.read_text(encoding="utf-8"))
+        recs += d["questions"] if isinstance(d, dict) else d
+    by_text = {r["text_zh"].strip(): r for r in recs}
+    text = syntax_path(LADDER_CELLS["SQL-L1-T4"].syntax).read_text(encoding="utf-8")
+    asked = [line[2:].strip() for line in text.splitlines() if line.startswith("问：")]
+    assert len(asked) == 6
+    picked = [by_text[a] for a in asked]
+    assert all(r["split"] == "tuning" and r["scoring"] == "deterministic" and len(r["refs"]) == 1 for r in picked)
+    pool = [r for r in recs if r.get("split") == "tuning" and r["scoring"] == "deterministic"
+            and len(r["refs"]) == 1 and not r["refs"][0].get("postprocess")]
+    rule = []
+    for lv in ("Q1", "Q2", "Q3"):
+        level = sorted((r for r in pool if (r.get("labels") or {}).get("q_level") == lv),
+                       key=lambda r: (len(r["refs"][0]["sql"]), r["id"]))
+        n = len(level)
+        assert n % 2 == 0                      # the two middle positions; every level has an even count
+        rule += [level[n // 2 - 1]["id"], level[n // 2]["id"]]
+    assert [r["id"] for r in picked] == rule
+    for r in picked:
+        assert r["refs"][0]["sql"].strip() in text

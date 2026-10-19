@@ -53,7 +53,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    PRICES_OFFPEAK, REPO, SYNTAX, Cell,
+    LADDER_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -101,7 +101,7 @@ def context_text(cell: Cell) -> str:
 
 def system_for(cell: Cell) -> str:
     lang = "yaml" if cell.context.startswith("build:") else None
-    return P.system_message(context_text(cell), (SYNTAX / cell.syntax).read_text(encoding="utf-8"), lang)
+    return P.system_message(context_text(cell), syntax_path(cell.syntax).read_text(encoding="utf-8"), lang)
 
 
 def sha256(data: bytes | str) -> str:
@@ -597,7 +597,7 @@ def dry_run(cells: list[Cell], n_questions: dict[str, int], reps: int, model: st
     rows = []
     price = PRICES_OFFPEAK[model]
     for cell in cells:
-        nq = n_questions.get(cell.lang, 0)
+        nq = n_questions.get(cell.name, n_questions.get(cell.lang, 0))   # per cell, or per language
         attempts = nq * reps
         calls = round(attempts * (1 + fix_rate))
         m = measured(cell.name, runs_root) if use_measured else None
@@ -660,7 +660,10 @@ def raw_root() -> Path:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--cell", action="append", help="cell name (repeatable); 'all' = every cell in harness/cells.py")
+    ap.add_argument("--cell", action="append",
+                    help="cell name (repeatable); 'all' = every cell in CELLS (not the C13 ladder cells)")
+    ap.add_argument("--skip-judge", action="store_true",
+                    help="leave out judge questions (phase 1 replan §二; the C13 ladder cells always do)")
     ap.add_argument("--run-id", help="runs/<run-id>/; required unless --dry-run")
     ap.add_argument("--model", default="deepseek-flash", choices=sorted(PRICES_OFFPEAK))
     ap.add_argument("--reps", type=int, default=DEFAULT_REPS)
@@ -713,6 +716,15 @@ def invalid_rules(questions: list[Question]) -> list[str]:
     return bad
 
 
+def questions_for(cell: Cell, questions: list[Question], skip_judge: bool = False) -> list[Question]:
+    """The questions a cell answers: its split (all / tuning / heldout), and no judge question
+    when the cell says so or ``--skip-judge`` is given (phase 1 replan §二)."""
+    out = [q for q in questions if cell.split == "all" or q.meta.get("split") == cell.split]
+    if skip_judge or cell.skip_judge:
+        out = [q for q in out if q.scoring != "judge"]
+    return out
+
+
 def select_questions(questions: list[Question], args: argparse.Namespace, pilot: list[str] | None = None) -> list[Question]:
     if pilot is not None:
         questions = [q for q in questions if q.qid in set(pilot)]
@@ -733,7 +745,8 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     args = parse_args(argv)
     names = args.cell or ["all"]
-    cells = list(CELLS.values()) if "all" in names else [CELLS[n] for n in names]
+    known = {**CELLS, **LADDER_CELLS}
+    cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
     if load is None:
         try:
             eval_full = verify_eval_tag(args.eval_tag)
@@ -782,10 +795,11 @@ def main(argv: list[str] | None = None, load=None) -> int:
                          raw_dir=raw_root() / args.run_id / cell.name,
                          limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
                          eval_tag=args.eval_tag, semantic_tag=args.semantic_tag)
-        backfill_cell(ctx, by_lang[cell.lang], pairs, args.backfill_note)
+        backfill_cell(ctx, questions_for(cell, by_lang[cell.lang], args.skip_judge), pairs, args.backfill_note)
         return 0
 
-    rows, total = dry_run([c for c in cells], {k: len(v) for k, v in by_lang.items()}, args.reps, args.model,
+    per_cell = {c.name: questions_for(c, by_lang[c.lang], args.skip_judge) for c in cells}
+    rows, total = dry_run([c for c in cells], {k: len(v) for k, v in per_cell.items()}, args.reps, args.model,
                           fix_rate=args.est_fix_rate, output_tokens=args.est_output_tokens,
                           hit_ratio=args.est_hit_ratio, question_tokens=args.est_question_tokens,
                           use_measured=not args.est_from_args)
@@ -811,7 +825,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
                          timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name,
                          limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
                          eval_tag=args.eval_tag, semantic_tag=args.semantic_tag)
-        path = run_cell(ctx, by_lang[cell.lang], args.reps, args.concurrency, guard=guard)
+        path = run_cell(ctx, per_cell[cell.name], args.reps, args.concurrency, guard=guard)
         print(json.dumps(summarize(path), ensure_ascii=False, indent=2))
         if guard.conflict:
             print(f"STOP: {args.model} answered with more than one system_fingerprint in this run: {guard.seen}. "
