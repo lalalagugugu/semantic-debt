@@ -878,6 +878,22 @@ def test_rescore_rebuilds_candidates_from_runs_raw(tmp_path):
                    questions={"Q008": q_new}, commit="evalnew")
 
 
+def test_rescore_records_the_eval_tag_it_was_scored_on(tmp_path):
+    """The rescored line says which bank tag scored it; the source run's tag stays under rescored_from."""
+    from harness import rescore as RS
+    respond, _ = _scripted("```sql\nSELECT 42\n```")
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({"SELECT 42": ExecResult(rows=[[42]])}))
+    ctx.raw_dir = tmp_path / "raw" / "src" / "SQL-L1"
+    ctx.run_id, ctx.eval_tag = "src", "eval-old"
+    R.run_cell(ctx, [Q], reps=1, concurrency=1, runs_root=tmp_path / "runs", progress=lambda *_: None)
+    kw = dict(runs_root=tmp_path / "runs", raw_root=tmp_path / "raw", questions={Q.qid: Q}, commit="evalnew")
+    rec = json.loads(RS.rescore("src", "SQL-L1", "rs-tag", eval_tag="eval-new", **kw).read_text(encoding="utf-8"))
+    assert (rec["eval_tag"], rec["eval_commit"]) == ("eval-new", "evalnew")
+    assert (rec["rescored_from"]["eval_tag"], rec["rescored_from"]["eval_commit"]) == ("eval-old", "evalabc")
+    rec = json.loads(RS.rescore("src", "SQL-L1", "rs-untagged", **kw).read_text(encoding="utf-8"))
+    assert rec["eval_tag"] is None                    # not verified against a tag: never the source's tag
+
+
 def _rescore_source(tmp_path):
     """One finished source run "src" (Q008 answered SELECT 42) and its runs-raw."""
     respond, _ = _scripted("```sql\nSELECT 42\n```")
