@@ -40,3 +40,9 @@ eval-v1.2（题库 90e13b3）、harness-agent-v1 / v1.1、harness-v1.1（评分�
 ## 已知结论（暂定口径见 reports/hypotheses.md）
 
 治理：L0 39.1% → R 42.9% → L1 67.7%；探查 agent +0.7（L0、L1）；宽表无增益；汇总层覆盖内低 12.7 点，主因是汇总文档漏了约定 1、2（交付缺陷，待修）；ClickHouse 首轮报错 77% 来自中文别名未加反引号（说明只到 1 级）；JSON-L2 冒烟 26.3%，10/23 拒答。
+
+## T12 进度更新（16:50，分支 `T12-v14`，头 6f5be3e）
+
+- 已完成：T16 两条 Cube SQL 说明增补（1231bc9，只有 SQL-L2、SQL-L2-E 变）；引用检查脚本 `render/check_references.py` + 测试（6f5be3e），全部 10 个上下文只有 L1.5S 有 2 处缺口（坪效、门店人均销售额引用 DimStore 列），已在 summary.yaml 映射到可见列，现在 0 缺口。
+- 未完成：约定 × 档位覆盖表（L1、L1.5W、L1.5S、L2）；汇总层度量 vs 指标层、DAX vs Cube 两张覆盖表；按覆盖表修 L1.5S 约定 1、2（ads_online_* vs ads_sales_* 的 Online 渠道）；汇总报告；JSON-L2 · 3 级说明。
+- 注意：引用检查只查「名字是否可见」，查不出约定 1、2 这种「约定没对应到可见表」的缺口，所以覆盖表（人工 + Codex 复核）必须做。
