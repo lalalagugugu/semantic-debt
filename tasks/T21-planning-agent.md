@@ -156,3 +156,33 @@
 1. 按裁决定单元：建议主单元为「-P 整份上下文」（C11），现在的检索版保留为对照（C12），次数上限对齐方式由用户选。改单元要改 `harness/plan_prompt.py`，并重新冻结（`harness-plan-v1.1` 或类似）。
 2. 新单元先跑同 24 题 × 1 的小样本（L1 约 0.6 元 / 单元），再按实测估全量，交用户定上限。
 3. 全量之后的归因：L1-P 的错答里，有多少是「该取的条目没取」（逐题比对取回的名称与错因）。
+
+### 用户裁决与交接（2026-10-19 下午，云端会话）
+
+**T21-1 已部分裁决**（用户）：主单元放整份上下文（C11）；现在的检索版保留为对照单元（C12）；按新定义重跑小样本，≤ 5 元，**18:00 后错峰**。
+
+**次数上限：待用户确认，建议如下**
+
+- 现状：-E 是 `run_sql` ≤ 8 次；-P 是 `lookup` + `run_sql` + `python` 合计 ≤ 12 次（`plan` 不计）。
+- 问题：主单元放整份上下文后不需要 `lookup`，如果上限还是 12，它就比 -E 多 4 次查库，C11 的差距里会混进「多查 4 次」。L0-E 全量有 216/366 条作答用满了 8 次，可见上限对 L0 是实际约束。
+- 建议：
+  - **所有 agent 单元的「干活」次数统一为 8**：`run_sql` + `python` 合计 ≤ 8，与 -E 一样。
+  - **检索版另给 `lookup` ≤ 4 次，单独计数**，不占那 8 次。这样两个 -P 单元之间只差「上下文在系统消息里，还是要自己取」，检索不挤占查库次数。小样本里每题最多只调过 2 次 `lookup`，4 次不会成为约束。
+  - `plan` 不计数（前 3 次）、18 次模型调用的兜底，照旧。
+- 要改的代码：`harness/plan_prompt.py`（两种单元的系统消息与工具说明；计数分开）、`harness/run_plan.py`（单元名，如 SQL-L1-P 与 SQL-L1-PR；计数逻辑）、测试。工具说明变了，要重新冻结（如 `harness-plan-v1.1`），由用户合并后打 tag。
+- 小样本：4 个单元 × 24 题 × 1 次（L0-P、L1-P 整份上下文；L0-PR、L1-PR 检索），按上一轮实测约 0.6 元 / 单元，合计约 2.5 元。先 `--dry-run`，≤ 5 元，18:00 后跑。
+
+**T21-2：比对已完成，处理方式待裁决**
+
+- 结果在 `reports/validation/metric-text-vs-impl.md`：69 个指标里 14 个属 A 类（实现选定了文字没写明的读法），8 个属 B 类（DAX 与 Cube 不一致，或引擎做不到文字的全部）。
+- 本地会话能读题库，请补一步：按 A、B 类的指标名，列出题集里用到它们的题和各单元在这些题上的对错（只写题号，不写题面），追加到那份报告。
+
+**还要本地会话跑的分析**（这个云端会话读不到题库，`add_repo` 被权限拒绝）
+
+    SEMDEBT_EVAL_DIR=$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2 uv run python scripts/hypothesis_splits.py --run 20261018-T13-sql-direct-01-rescore-01 --eval-tag eval-v1.2
+    # 第一次不带 --user-key：脚本会列出题库里的标注字段名；找出表示「用户类型」的那个，再带上它跑
+    SEMDEBT_EVAL_DIR=$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2 uv run python scripts/hypothesis_splits.py --run 20261018-T13-sql-direct-01-rescore-01 --eval-tag eval-v1.2 --user-key <字段> > reports/results/hypothesis_splits.md
+
+  输出 C2（按 `source` 字段，用来复核云端按题号算的数）、C3（同一批覆盖内题上 L1 vs L1.5S、L1.5W 的配对比较）、C9（按用户类型）。结果更新进 `reports/hypotheses.md` 对应行。
+
+**常设追踪板**：`reports/hypotheses.md`（C1–C13，每条的状态、证据和缺口；「现在能写的结论」一节供阶段报告用）。
