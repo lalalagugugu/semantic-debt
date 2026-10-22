@@ -27,18 +27,28 @@
 | T11 | SQL harness | Claude Code | 普通 | G1、T02 | 2 元（冒烟） | 已完成（2026-10-16，PR #32、#40、#43 已合并）：逐参考 `rules` 与分组选择透传、英文锚点按原始参考评分、冒烟离线重评；中文只剩 judge 13 道待定 |
 | T12 | 最小样本试跑与选模型 | Claude Code + 用户 | 普通 | G2、T11 | 20 元 | 试跑完成（2026-10-18，约 11.3 元）：先裁决选 Flash（指纹 `e72d3c7f…`），后改为 G3 按最终重评定（`decisions/model.md`）；严格口径 SQL-L1 Flash 50.0%、Pro 33.3%（judge 题不计）。**已完成**：最终完整重评（#95，288 条，`eval-v1.1`）SQL-L1 主表严格 Flash 70.2%、Pro 61.4%，最终 86.0%、84.2%，规则给出 Flash；英文锚点修复待合并 |
 | **G3** | **检查点：模型选定，系统提示与评分冻结（tag `harness-v1`）** | 用户 | — | T12 | — | **✅ 通过（2026-10-18）**：选 Flash（`e72d3c7f…`）；tag `harness-v1` 在 `6516fcc`（#87、#90、#91、#97）；英文锚点第一期不跑；见 `decisions/2026-10-18-g3-passed.md` |
-| T13 | SQL 直答全量（6 个中文单元；英文锚点第一期不跑，G3 第三节） | Claude Code | 普通 | G3 | 80 / 250 元 | 完成（2026-10-18 运行，6 × 366 条齐全，24.80 元，指纹唯一；2026-10-19 `harness-v1.1` + `eval-v1.2` 离线重评定稿，0 打分超时）；judge 13 题待 `judge-v1` |
+| T13 | SQL 直答全量（6 个中文单元；英文锚点第一期不跑，G3 第三节） | Claude Code | 普通 | G3 | 80 / 250 元 | 完成（2026-10-18 运行，6 × 366 条齐全，24.80 元，指纹唯一；2026-10-19 `harness-v1.1` + `eval-v1.2` 离线重评定稿，0 打分超时）；judge 13 题待 `judge-v1`。**SQL-L1.5S 在 `semantic-v1.4` 上重跑**（`20261019-T13-l15s-v14-01`，2.70 元，#146）：覆盖内 42 题 56.3% → 61.9%，对 L1 的差距 −12.7 → −7.1 点（`reports/results/l15s-covered-analysis.md` 第 4 节） |
 | T14 | 调优（SQL-L1 调优；DAX-L2 调优同法） | Claude Code（A 普通，B 调优包） | 普通 / 调优包 | T13 | 15 / 50 元 | 未开始 |
-| T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | **L0-E、L1-E 全量已跑完并按 harness-v1.1 离线重评**（`20261019-T15-explorer-01-rescore-01`，最终：L0-E 39.8%、L1-E 68.4%，judge 不计、不含低区分度）；对 T13 重评后的直答各 **+0.7 点**（`reports/results/explorer.md`）；L2-E 等 T16 |
-| T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | 实验运行完成（2026-10-20）：新/旧说明SQL、JSON各327次齐，v2主表65.3%/51.4%/31.0%，usage费用13.327147元；JSON覆盖内117次0执行失败、无Cube超时/连接错误，Cube已释放。日志/报告/旧条目映射已齐，PR #114待Claude Code复审及用户合并；详见reports/validation/t16-v14-full-results/README.md |
+| T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | **完成**（第一期范围）：L0-E 39.8%、L1-E 68.4%（对直答各 +0.7 点）；**SQL-L2-E**（`semantic-v1.4`，`20261020-T15-explorer-l2e-02` + `-03`，合计 5.87 元，#148、#150）主表 66.0%，对 SQL-L2 直答 65.3% 差 +0.7 [−5.1, +6.5]；执行失败 14 → 1，多出的 13 个答案 2 对 11 错（`reports/results/explorer.md` L2-E 一节） |
+| T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | **完成**（2026-10-20，#114 已合并；Cube 已停、自动重启已关）：`semantic-v1.4` 全量 109 题 × 3，主表 SQL-L2 新说明 65.3%、旧说明 51.4%、JSON-L2 31.0%，费用 13.33 元。JSON 未拒答的 173 次配对：SQL 71.7%（错答 46）vs JSON 52.6%（错答 81）；静态能答 117 次中 JSON 错 32 次，30 次是成员集合不同（`reports/validation/t16-v14-full-results/README.md`）。待办：指标层补足覆盖需新增多少指标的统计（用户定为之后再做） |
 | T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | 未开始（用家里那台 Windows，装 Claude Code 后按卡片首选做法执行） |
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
 | T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 第一期暂停，第二期再做（2026-10-19 用户裁决，与 judge-v1 一起）；小样本保留（`20261019-T21-pilot-01`，1.18 元，L0-P 50.0%、L1-P 58.3%，Python 0/48） |
-| T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | 未开始；排在 DAX 线之前 |
-| T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | 未开始；结果进中期报告 |
+| C13 | 写法说明教学阶梯（ClickHouse SQL，档位 L1；`tasks/C13-syntax-ladder.md`） | Claude Code（T12） | 普通 | `harness-ladder-v1`；`semantic-v1.4` | 15 元 | **完成**（`20261019-C13-ladder-02`，7.17 元，#147）：首轮执行报错 32% → 3%（2 级），正确率 64.2% → 68.2%（+4.0 [−0.9, +9.2]）；3 级、4 级没有再提高（`reports/results/C13-ladder.md`） |
+| T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
+| T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | 裁决与任务卡在 PR #151 待合并；合并后 T13 会话写编码手册、提示词、dry-run（≤3 元），用户批准后错峰运行；之后 Codex 独立复核。L1 Pro 全量对照（约 30 元）放第二期候选 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
+
+## 2026-10-22 刷新：第一期 SQL 线运行完成
+
+- 已合并：#142–#148、#150；`semantic-v1.4` 在 `234ad68`。#138 已被 #146 取代，待用户确认后关闭。
+- 第一期 SQL 线的单元全部跑完：T13（6 单元 + L1.5S 在 v1.4 上重跑）、T15（L0-E、L1-E、SQL-L2-E）、T16（SQL-L2 新旧说明、JSON-L2）、C13（2、3、4 级）。
+- 进行中：中期报告 T19a（PR #149）；失败归类 T19b（PR #151）。
+- 未开始：T14 调优（用户开 A、B 两个会话）；DAX 线 T17、T18（先过 `decisions/2026-10-19-l15s-reporting-l2-ladder-dax-checklist.md` 第三节的检查清单）；T19、T20、G4。
+- 第二期候选：规划 agent（T21）与 `judge-v1`；「指标层优先 + 明细退路 + 探查」单元；L1 Pro 全量对照；检索相似调优题的单元。
+- 协调交接与最终报告要写的点：`tasks/COORDINATION-HANDOFF.md`。
 
 ## 当前进行中与待办（2026-10-16，T05b 开工后刷新）
 
