@@ -72,7 +72,8 @@ def usage_summary(usage: dict) -> dict[str, int]:
 
 class DeepSeekClient:
     def __init__(self, model: str, *, effort: str = DEFAULT_EFFORT, max_attempts: int = 6,
-                 request_timeout_s: float = 900.0, url: str = API_URL) -> None:
+                 request_timeout_s: float = 900.0, url: str = API_URL,
+                 before_request: Callable[[], None] | None = None) -> None:
         key = os.environ.get("DEEPSEEK_API_KEY")
         if not key:
             raise RuntimeError("DEEPSEEK_API_KEY is not set")
@@ -82,6 +83,7 @@ class DeepSeekClient:
         self.max_attempts = max_attempts
         self.request_timeout_s = request_timeout_s
         self.url = url
+        self.before_request = before_request
 
     def chat(self, messages: list[dict[str, Any]], *, tools: list[dict] | None = None,
              tool_choice: str | None = None) -> Reply:
@@ -102,6 +104,8 @@ class DeepSeekClient:
         retries = 0
         last_error = ""
         for attempt in range(self.max_attempts):
+            if self.before_request is not None:
+                self.before_request()
             request = urllib.request.Request(self.url, data=body, method="POST", headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {self._key}",

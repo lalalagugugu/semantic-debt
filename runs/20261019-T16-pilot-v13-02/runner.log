@@ -1,0 +1,131 @@
+question bank: eval-v1.2 = 90e13b385a639a9164ac78430c50c11a7859f976
+semantic layer: semantic-v1.3 = d2801b1c4de5132910732db498aef7c5ed9a89b4
+model=deepseek-flash reps=1 fix_rate=100% (off-peak prices; peak = x2)
+cell          card  stack         Q  attempts   calls   in/call  out/call       CNY  source
+SQL-L2        T16   cube_sql     23        23      46     47677      3230      0.72  measured
+JSON-L2       T16   cube_json    23        23      46     42049      3000      0.69  estimated
+total                                      46      92                          1.40  (peak 2.80)
+SQL-L2: 0 done, 23 to run
+  [1/23] Q08 r1: correct
+  [2/23] Q100 r1: correct
+  [3/23] Q102 r1: correct
+  [4/23] Q117 r1: wrong
+  [5/23] Q15 r1: correct
+  [6/23] Q17 r1: correct
+  [7/23] Q28 r1: correct
+  [8/23] Q34 r1: wrong
+  [9/23] Q49 r1: wrong
+  [10/23] Q50 r1: exec_error
+  [11/23] Q51 r1: correct
+  [12/23] Q66 r1: wrong
+  [13/23] Q68 r1: correct
+  [14/23] Q69 r1: correct
+  [15/23] Q70 r1: correct
+  [16/23] Q71 r1: wrong
+  [17/23] Q73 r1: correct
+  [18/23] Q74 r1: correct
+  [19/23] Q75 r1: wrong
+  [20/23] Q76 r1: exec_error
+  [21/23] Q80 r1: exec_error
+  [22/23] Q81 r1: correct
+  [23/23] Q82 r1: exec_error
+{
+  "attempts": 23,
+  "accuracy": 0.5652173913043478,
+  "accuracy_scored": 0.5652173913043478,
+  "outcomes": {
+    "correct": 13,
+    "wrong": 6,
+    "exec_error": 4
+  },
+  "outcomes_on_revised_refs": null,
+  "pending_reasons": {},
+  "first_try_correct": 11,
+  "final_exec_error_classes": {
+    "engine_error": 4
+  },
+  "final_resource_limits": {},
+  "turn_error_classes": {
+    "interface_limitation": 1,
+    "engine_error": 10
+  },
+  "attempts_with_no_query": 0,
+  "attempts_with_scope_violation": 0,
+  "not_done_lines": 0,
+  "system_fingerprints": {
+    "e72d3c7f663d3e1383b00b3884cb4501": 30
+  },
+  "calls_without_fingerprint": 0,
+  "tokens": {
+    "prompt_tokens": 1463702,
+    "cache_hit_tokens": 1453568,
+    "cache_miss_tokens": 10134,
+    "completion_tokens": 112916,
+    "reasoning_tokens": 104118
+  },
+  "cache_hit_ratio": 0.9930764595525592,
+  "cost_cny": 0.9817
+}
+JSON-L2: 0 done, 23 to run
+  [1/23] Q08 r1: correct
+  [2/23] Q100 r1: refused
+  [3/23] Q102 r1: correct
+  [4/23] Q117 r1: refused
+  [5/23] Q15 r1: correct
+  [6/23] Q17 r1: wrong
+  [7/23] Q28 r1: correct
+  [8/23] Q34 r1: exec_error
+  [9/23] Q49 r1: wrong
+  [10/23] Q50 r1: wrong
+  [11/23] Q51 r1: correct
+  [12/23] Q66 r1: wrong
+  [13/23] Q68 r1: correct
+  [14/23] Q69 r1: wrong
+  [15/23] Q70 r1: refused
+  [16/23] Q71 r1: refused
+  [17/23] Q73 r1: refused
+  [18/23] Q74 r1: refused
+  [19/23] Q75 r1: wrong
+  [20/23] Q76 r1: refused
+  [21/23] Q80 r1: refused
+  [22/23] Q81 r1: refused
+  [23/23] Q82 r1: refused
+{
+  "attempts": 23,
+  "accuracy": 0.2608695652173913,
+  "accuracy_scored": 0.2608695652173913,
+  "outcomes": {
+    "correct": 6,
+    "refused": 10,
+    "wrong": 6,
+    "exec_error": 1
+  },
+  "outcomes_on_revised_refs": null,
+  "pending_reasons": {},
+  "first_try_correct": 5,
+  "final_exec_error_classes": {
+    "engine_error": 1
+  },
+  "final_resource_limits": {},
+  "turn_error_classes": {
+    "engine_error": 3
+  },
+  "attempts_with_no_query": 0,
+  "attempts_with_scope_violation": 0,
+  "not_done_lines": 0,
+  "system_fingerprints": {
+    "e72d3c7f663d3e1383b00b3884cb4501": 25
+  },
+  "calls_without_fingerprint": 0,
+  "tokens": {
+    "prompt_tokens": 1185779,
+    "cache_hit_tokens": 1169408,
+    "cache_miss_tokens": 16371,
+    "completion_tokens": 44159,
+    "reasoning_tokens": 42095
+  },
+  "cache_hit_ratio": 0.9861938860445327,
+  "cost_cny": 0.4328
+}
+
+授权摘要：用户批准高峰执行；仅本轮 SQL-L2、JSON-L2 各23×1，合计预算3元；实际1.41452904元，使用--allow-peak。实际运行提交22b6100，固定指纹55/55通过；全量未启动。见authorization.json。

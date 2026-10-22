@@ -1,0 +1,340 @@
+{
+  "date": "2026-10-19",
+  "source_audit": "t16_l2_delivery_audit.json",
+  "eval_tag": "eval-v1.2",
+  "semantic_tag": "semantic-v1.3",
+  "model_calls": 0,
+  "model_cost_cny": 0,
+  "classification_basis": "工程判断：一般水平以上、覆盖所交付业务主题的指标层应提供可复用常用口径；不是行业强制预置清单，也不是现有69项合同漏实现的直接计数。",
+  "rows": [
+    {
+      "qid": "Q100",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-RANK",
+        "M-QUANTILE"
+      ],
+      "reason": "两个常用分位标志的普通AND不是必须固化为专用指标的组合。",
+      "confidence": "中"
+    },
+    {
+      "qid": "Q117",
+      "category": "② JSON接口组合限制",
+      "proposals": [],
+      "reason": "常用增长/占比/排名只是组成部分；剩余为依次选择总体、归因、改变父子统计范围和再选择的流程，不要求预定义整个专用链。",
+      "confidence": "中"
+    },
+    {
+      "qid": "Q70",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-AREA"
+      ],
+      "reason": "基础数值维度的按实体等权平均可复用。",
+      "confidence": "高"
+    },
+    {
+      "qid": "Q71",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-RANK"
+      ],
+      "reason": "销售额的常用父子层级组内排名，不把Top-N参数本身当专用计算。",
+      "confidence": "高"
+    },
+    {
+      "qid": "Q73",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-STOCK",
+        "M-RANK"
+      ],
+      "reason": "常用库存差额及其通用名次。",
+      "confidence": "高"
+    },
+    {
+      "qid": "Q74",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-SHARE",
+        "M-RANK"
+      ],
+      "reason": "常用父组分母、分母辅助量与组内名次应由可复用对象承担。",
+      "confidence": "高"
+    },
+    {
+      "qid": "Q76",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-REPEAT"
+      ],
+      "reason": "可复用的客户分层销售额和占比，应先治理口径再提供成员。",
+      "confidence": "中"
+    },
+    {
+      "qid": "Q80",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-SPAN"
+      ],
+      "reason": "生命周期基础属性及观察跨度可复用，分组平均不是只为一道题固化的对象。",
+      "confidence": "中"
+    },
+    {
+      "qid": "Q81",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-COHORT"
+      ],
+      "reason": "首购队列与历史累计客均金额属于常用客户分析。",
+      "confidence": "高"
+    },
+    {
+      "qid": "Q82",
+      "category": "① 指标层交付不足",
+      "proposals": [
+        "M-HR"
+      ],
+      "reason": "给定员工主题下，直属规模和任职年限是可复用基础口径。",
+      "confidence": "高"
+    }
+  ],
+  "counts": {
+    "metric_delivery_insufficiency": 9,
+    "question_specific_json_composition": 1
+  },
+  "proposed_metrics": [
+    {
+      "id": "M-RANK",
+      "name": "指标名次（全局/组内）",
+      "proposed_definition": "先按业务对象键聚合基础指标，再在已声明的排名人群/父组内按该指标降序做RANK；并列同名次、后续跳号。排名人群在名次筛选之前确定，父组总量不随Top-N截断重算。严格只取N行的并列取舍须另行约定。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 2374,
+          "quote": "销售金额合计，已扣折扣、未扣退货（约定 7）。",
+          "relation": "基础指标定义"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2532,
+          "quote": "去重的线上订单号个数（约定 8）。",
+          "relation": "基础指标定义"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2557,
+          "quote": "销售额 ÷ 去重订单数（约定 8）。",
+          "relation": "基础指标定义"
+        }
+      ],
+      "l1_coverage": "基础指标已定义；排名、并列和排名人群没有独立L1指标口径。",
+      "notes": "通用指标族，需按常用对象/父组落成既定义成员；不是声称当前JSON存在RANK函数或动态参数。",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-QUANTILE",
+      "name": "客户订单数/客单价上分位标志",
+      "proposed_definition": "分别按客户计算订单数和客单价；对事先声明的人群和时间范围求各自的p分位阈值，指标值不小于阈值记1。建议连续分位阈值、包含等于阈值对象；NULL不参与分位和标志判定。两个标志允许普通AND筛选，不能先筛一个标志再缩小另一个的排名总体。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 2532,
+          "quote": "去重的线上订单号个数（约定 8）。",
+          "relation": "基础订单指标"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2557,
+          "quote": "销售额 ÷ 去重订单数（约定 8）。",
+          "relation": "基础金额指标"
+        }
+      ],
+      "l1_coverage": "仅有基础指标；分位算法、参数p及并列边界无直接L1定义。",
+      "notes": "p是待批准业务口径的设计记号，不是现有Cube JSON参数；不得从参考答案反推阈值或固化题目专用客户名单。",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-AREA",
+      "name": "平均门店营业面积",
+      "proposed_definition": "按当前筛选范围内去重StoreKey，对非NULL SellingAreaSize等权取平均。未发生销售的门店仍属于门店属性总体，不按销售行重复加权；单位沿用原字段，不擅自补成平方米。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 965,
+          "quote": "营业面积，450 ~ 93,800。单位数据里没写。",
+          "relation": "维度字段说明"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2716,
+          "quote": "销售额 ÷ 门店营业面积合计（DimStore.SellingAreaSize）。只对实体店有意义。",
+          "relation": "相关指标，但不是平均面积口径"
+        }
+      ],
+      "l1_coverage": "有字段和相关分母说明；没有独立平均面积指标。",
+      "notes": "",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-STOCK",
+      "name": "当前安全库存差额",
+      "proposed_definition": "在相同当前快照和筛选范围内：当前在手库存数量减当前安全库存数量；正值为结余、负值为不足。先按每个门店×产品各自最近快照取值，再按可加维度汇总；不能跨日期相加。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 2802,
+          "quote": "每个门店 × 产品最近一次快照的在手数量之和（约定 11）。",
+          "relation": "基础半可加指标"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2832,
+          "quote": "每个门店 × 产品最近一次快照的安全库存水位之和。",
+          "relation": "基础半可加指标"
+        }
+      ],
+      "l1_coverage": "基础指标和快照规则已定义；差额独立指标未定义。",
+      "notes": "",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-SHARE",
+      "name": "销售额占比（显式父组范围）及父组销售额",
+      "proposed_definition": "分子为对象在筛选范围内的销售额；分母为同一期间、渠道及其他筛选下、在已声明父组内取消对象维度后的销售额合计。先计算父组总量再做名次筛选；分母0返回NULL。模型应交付常用父组范围的成员和分母辅助量，而不是只有全局group_by=[]。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 2753,
+          "quote": "某一组的销售额 ÷ 对应范围内的销售额合计。分母的范围由问题决定（全公司、某渠道、某品类内）。",
+          "relation": "既有完整比率主干，分母范围明确随分析范围变化"
+        }
+      ],
+      "l1_coverage": "部分直接承诺：销售额占比及范围已在L1；常用父组成员、零分母规则需明确，现实现只覆盖全局归约。",
+      "notes": "这里包含对既有口径覆盖范围的补足；名次仍须另由M-RANK供给。",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-REPEAT",
+      "name": "回头客销售额、回头客销售额占比",
+      "proposed_definition": "建议以截止日及以前历史线上去重订单数至少2定义客户标志，先按客户判定且不受当前产品分组影响；分子为当前分析范围内这些客户的销售额，分母为同范围全部销售额，分母0为NULL。订单必须按订单号去重，不能拿订单行数代替。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 2532,
+          "quote": "去重的线上订单号个数（约定 8）。",
+          "relation": "计数基础"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2374,
+          "quote": "销售金额合计，已扣折扣、未扣退货（约定 7）。",
+          "relation": "金额基础"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 188,
+          "quote": "首次购买指该客户有史以来第一次购买",
+          "relation": "已有历史客户属性概念，不是回头客定义"
+        }
+      ],
+      "l1_coverage": "没有回头客定义或该比率；只有订单/销售和历史客户属性基础。",
+      "notes": "历史还是窗口内复购、截止日与退货行处理均须补入L1。本段是建议口径，不冒充现有约定。",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-SPAN",
+      "name": "客户首次/最近购买日、客户观察跨度（日）、平均客户观察跨度",
+      "proposed_definition": "按客户从历史记录取最小及最大购买日期；观察跨度为两者的日期差，单次购买为0。对当前客户集合的非NULL跨度按客户等权平均，而不是对交易行加权；分组地理路径沿用L1约定。此为已观察历史跨度，不是预测寿命或平均两次购买间隔。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 197,
+          "quote": "首次购买日取该客户所有行的最小日期",
+          "relation": "首购属性规则"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 183,
+          "quote": "最近一次购买日取该客户所有行的最大日期",
+          "relation": "最近购买属性规则"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 83,
+          "quote": "按国家、地区、大洲分析销售时，默认按客户所在地",
+          "relation": "地理归属规则"
+        }
+      ],
+      "l1_coverage": "首购/末购属性规则已给出；跨度及等权平均未作为指标定义。",
+      "notes": "归①为中等把握的工程判断：把已有生命周期基础属性及其可复用派生做成对象；不声称各产品均默认提供此精确公式。",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-COHORT",
+      "name": "首购日期/队列维度、历史客户累计销售额、队列客户数及历史客均累计销售额",
+      "proposed_definition": "以客户有史以来首购日期确定队列，队列时间粒度是维度选择，不随当前销售窗口重新判首购。客户累计额为截至分析截止日的历史销售额；队列客均累计额=队列累计销售额/队列去重客户数。明确这是已观察累计消费，不是预测未来CLV。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 197,
+          "quote": "首次购买日取该客户所有行的最小日期",
+          "relation": "队列键基础"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2570,
+          "quote": "去重的客户键个数。",
+          "relation": "去重分母基础"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 2578,
+          "quote": "销售额 ÷ 客户数。",
+          "relation": "客均金额基础"
+        }
+      ],
+      "l1_coverage": "历史首购、客户数及客均公式有基础；队列维度和累计时间范围没有独立完整合同。",
+      "notes": "",
+      "status": "建议，未批准、未实现"
+    },
+    {
+      "id": "M-HR",
+      "name": "直属下属数、员工任职年限、直属团队平均任职年限",
+      "proposed_definition": "按ParentEmployeeKey=管理者EmployeeKey识别当前静态直属关系，按员工键去重计数，不递归计入间接下属。建议任职年限=(分析日D−HireDate的日期天数)/365.25，团队均值按直属员工等权；无有效入职日者不进均值。历史组织关系不可由当前静态表反推。",
+      "l1_evidence": [
+        {
+          "path": "semantic/source.yaml",
+          "line": 1649,
+          "quote": "上级员工键，指向本表的 EmployeeKey。",
+          "relation": "直属关系字段说明"
+        },
+        {
+          "path": "semantic/source.yaml",
+          "line": 1662,
+          "quote": "入职日，字符串日期",
+          "relation": "日期字段说明"
+        }
+      ],
+      "l1_coverage": "只有关系和字段说明；没有员工数、任职年限、年换算和均值的完整指标口径。",
+      "notes": "365.25、分析日以及缺失日期处理均为待批准建议，不是L1既定规则。",
+      "status": "建议，未批准、未实现"
+    }
+  ],
+  "l1_source_sha256": "086f438b43600ffc003ecf11e95f9753a5ee915ae5494370725757ad160fcb65",
+  "l1_frozen_contract_warning": "semantic/metrics.yaml第3–6行要求与L1指标名字双向一致。未定义的新口径须先经用户审定L1再同步L2；不实施扩模，不出新tag，不将建议伪装成既有合同。",
+  "references": [
+    {
+      "url": "https://help.shopify.com/en/manual/reports-and-analytics/shopify-reports/report-types/default-reports/customers-reports",
+      "supports": "回头客、首购队列和队列客均消费是可复用客户分析；不是对本库精确口径的背书。"
+    },
+    {
+      "url": "https://www.oracle.com/fusion-data-intelligence/hcm-analytics/workforce-analytics-product-tour/",
+      "supports": "管理跨度及平均服务年限是可复用人事分析。"
+    },
+    {
+      "url": "https://github.com/cube-js/cube/issues/8486",
+      "supports": "开发方将增长、受控分母占比和分群列为指标建模用例；不是1.8.6全部新口径可执行的证明。"
+    }
+  ]
+}

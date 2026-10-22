@@ -37,6 +37,7 @@ from render.common import (  # noqa: E402
     dump_yaml,
     l0_map,
     metric_callables,
+    variant_callables,
     metrics_file,
     physical_schema,
     source,
@@ -215,6 +216,8 @@ def _metrics_l1(n: Namer, with_callables: bool) -> list[dict]:
         if with_callables:
             d["callables"] = [{"dataset": n.ref(ds), "call": n.call(dax, cube)}
                               for ds, dax, cube in metric_callables(l2[m["name"]])]
+            d["callables"] += [{"dataset": n.ref(ds), "call": n.call(dax, cube), "scope": scope}
+                               for _, ds, dax, cube, scope in variant_callables(l2[m["name"]])]
         out.append(d)
     return out
 

@@ -15,21 +15,29 @@ CONTEXTS = REPO / "build" / "contexts"
 SYNTAX = REPO / "render" / "syntax"
 
 
+def syntax_path(name: str) -> Path:
+    """A cell's syntax note: a bare file name is under render/syntax/ (the semantic-layer tag);
+    a path with a slash is relative to the repository (the C13 ladder notes under
+    harness/syntax_ladder/, which belong to the harness tag, not to the semantic layer)."""
+    return REPO / name if "/" in name else SYNTAX / name
+
+
 @dataclass(frozen=True)
 class Cell:
     name: str
     stack: str                      # executor family: chdb / cube_sql / cube_json / dax
     allowed: tuple[str, ...]        # chDB databases; first = default database
     context: str                    # "build:<file>" (rendered) or "external:<key>" (benchmark docs verbatim)
-    syntax: str                     # file under render/syntax/
+    syntax: str                     # file under render/syntax/, or a repo-relative path (syntax_path)
     lang: str = "zh"                # question language
     card: str = "T13"               # card that runs it at full scale
-    split: str = "all"              # which questions this cell answers
+    split: str = "all"              # which questions this cell answers: all / tuning / heldout
+    skip_judge: bool = False        # never answer judge questions (phase 1 replan §二)
 
     @property
     def runnable_here(self) -> bool:
-        """T11 implements chDB only; other stacks reuse this harness with their own executor."""
-        return self.stack == "chdb"
+        """Executors available to the direct-answer runner on this host."""
+        return self.stack in {"chdb", "cube_sql", "cube_json"}
 
 
 CELLS: dict[str, Cell] = {c.name: c for c in [
@@ -41,10 +49,27 @@ CELLS: dict[str, Cell] = {c.name: c for c in [
     Cell("SQL-L1.5S", "chdb", ("ads",), "build:SQL-L1.5S.yaml", "clickhouse_sql.md"),
     Cell("SQL-L1-tuned", "chdb", ("retail",), "build:SQL-L1-tuned.yaml", "clickhouse_sql.md", card="T14"),
     Cell("SQL-L2", "cube_sql", (), "build:SQL-L2.yaml", "cube_sql.md", card="T16"),
+    Cell("JSON-L2", "cube_json", (), "build:JSON-L2.yaml", "cube_json.md", card="T16"),
     Cell("SQL-R-EN", "chdb", ("retail",), "external:r-en", "clickhouse_sql.md", lang="en"),
     Cell("SQL-L1c-EN", "chdb", ("retail",), "external:l1c-en", "clickhouse_sql.md", lang="en"),
 ]}
 
+
+# C13 syntax-note teaching ladder (decisions/2026-10-19-phase1-replan.md §三): SQL-L1's system
+# prompt and semantic context, only the syntax note changes. Depth per
+# decisions/2026-10-19-self-built-p-and-cube-notes.md §五: T2 = rules + conditions and pitfalls,
+# T3 = T2 + generic examples tied to no question, T4 = T3 + few-shot examples from tuning-split
+# questions, so T4 answers held-out questions only. None answers judge questions. Kept apart from
+# CELLS so that ``run_direct --cell all`` never picks them up.
+LADDER = "harness/syntax_ladder"
+LADDER_CELLS: dict[str, Cell] = {c.name: c for c in [
+    Cell("SQL-L1-T2", "chdb", ("retail",), "build:SQL-L1.yaml", f"{LADDER}/clickhouse_sql_t2.md", card="C13",
+         skip_judge=True),
+    Cell("SQL-L1-T3", "chdb", ("retail",), "build:SQL-L1.yaml", f"{LADDER}/clickhouse_sql_t3.md", card="C13",
+         skip_judge=True),
+    Cell("SQL-L1-T4", "chdb", ("retail",), "build:SQL-L1.yaml", f"{LADDER}/clickhouse_sql_t4.md", card="C13",
+         split="heldout", skip_judge=True),
+]}
 
 # Explorer agent cells (-E, T15): the direct cell's prompt, context and execution scope,
 # plus the read-only ``run_sql`` tool on the same backend. Kept apart from CELLS so that

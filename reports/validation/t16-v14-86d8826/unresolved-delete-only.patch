@@ -1,0 +1,48 @@
+--- a/build/cube/model/cubes/online_sales.yml
++++ b/build/cube/model/cubes/online_sales.yml
+@@ -382,17 +382,12 @@
+     - product.ProductSubcategoryKey
+     - product.Manufacturer
+     - product.BrandName
+-    - product.ClassID
+     - product.ClassName
+-    - product.StyleID
+     - product.StyleName
+-    - product.ColorID
+     - product.ColorName
+     - product.Weight
+     - product.WeightUnitMeasureID
+-    - product.UnitOfMeasureID
+     - product.UnitOfMeasureName
+-    - product.StockTypeID
+     - product.StockTypeName
+     - product.UnitCost
+     - product.UnitPrice
+--- a/build/cube/model/cubes/sales.yml
++++ b/build/cube/model/cubes/sales.yml
+@@ -322,7 +322,6 @@
+     - store.CloseReason
+     - store.EmployeeCount
+     - store.SellingAreaSize
+-    - store.LastRemodelDate
+     - store.EmployeeKey
+     public: false
+   - name: sales_amount_share_in_category
+@@ -343,17 +342,12 @@
+     - product.ProductSubcategoryKey
+     - product.Manufacturer
+     - product.BrandName
+-    - product.ClassID
+     - product.ClassName
+-    - product.StyleID
+     - product.StyleName
+-    - product.ColorID
+     - product.ColorName
+     - product.Weight
+     - product.WeightUnitMeasureID
+-    - product.UnitOfMeasureID
+     - product.UnitOfMeasureName
+-    - product.StockTypeID
+     - product.StockTypeName
+     - product.UnitCost
+     - product.UnitPrice

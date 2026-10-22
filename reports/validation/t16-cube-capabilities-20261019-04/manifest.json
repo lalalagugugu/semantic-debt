@@ -1,0 +1,51 @@
+[
+  {
+    "id": "T01",
+    "interface": "sql",
+    "claim": "CAST/interval",
+    "query": "SELECT AVG(CAST(b AS TIMESTAMP)-CAST(a AS TIMESTAMP)) FROM (VALUES ('2007-02-01','2007-02-03'),('2007-02-02','2007-02-03')) t(a,b)",
+    "note": "先从文本 VALUES cast，避开 typed TIMESTAMP literal 的 VALUES 限制"
+  },
+  {
+    "id": "T02",
+    "interface": "sql",
+    "claim": "CAST/interval",
+    "query": "SELECT AVG(CAST(CAST(b AS TIMESTAMP)-CAST(a AS TIMESTAMP) AS DOUBLE PRECISION)) FROM (VALUES ('2007-02-01','2007-02-03'),('2007-02-02','2007-02-03')) t(a,b)",
+    "note": ""
+  },
+  {
+    "id": "T03",
+    "interface": "sql",
+    "claim": "SQL-5/9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k AS \"探针维度\", v AS \"探针数值\" FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "T04",
+    "interface": "sql",
+    "claim": "SQL-5/9",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k AS \"probe_key\", v AS \"probe_value\" FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "T05",
+    "interface": "sql",
+    "claim": "SQL-5/9/CAST",
+    "query": "WITH a AS (SELECT sales.\"channelKey\" AS k, MEASURE(sales.sales_amount) AS v FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1) SELECT k AS \"探针维度\", v AS \"探针数值\", CAST(ROW_NUMBER() OVER (ORDER BY v DESC) AS BIGINT) AS \"探针序号\" FROM a ORDER BY k",
+    "note": ""
+  },
+  {
+    "id": "T06",
+    "interface": "sql",
+    "claim": "SQL-5",
+    "query": "SELECT sales.\"channelKey\" AS \"探针维度\",MEASURE(sales.sales_amount) AS \"探针数值\" FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1 ORDER BY 1",
+    "note": ""
+  },
+  {
+    "id": "T07",
+    "interface": "sql",
+    "claim": "SQL-5",
+    "query": "SELECT sales.\"channelKey\" AS \"probe_key\",MEASURE(sales.sales_amount) AS \"probe_value\" FROM sales WHERE sales.\"DateKey\" >= DATE '2007-02-01' AND sales.\"DateKey\" < DATE '2007-03-01' GROUP BY 1 ORDER BY 1",
+    "note": ""
+  }
+]

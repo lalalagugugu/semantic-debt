@@ -1,0 +1,59 @@
+{
+  "model_calls": 0,
+  "scorer_calls": 0,
+  "main": "0e5f9bb061516d58f83dd6e69868371a7fd20412",
+  "merge_commits": [
+    "4659cf1",
+    "f0c7531"
+  ],
+  "frozen_byte_checks": [
+    {
+      "file": "harness/prompt.py",
+      "main": "0e5f9bb061516d58f83dd6e69868371a7fd20412",
+      "byte_identical": true,
+      "sha256": "86fefce2157ff4fc09819fe8c8c5ad4fe7e6e064850f9ce9c8b1b67e97919e5e"
+    },
+    {
+      "file": "harness/scorer.py",
+      "main": "0e5f9bb061516d58f83dd6e69868371a7fd20412",
+      "byte_identical": true,
+      "sha256": "3be6d29f5a11fafa5843c086362b6ddcfd3b2391413e82e3a98c09f09de50efd"
+    },
+    {
+      "file": "harness/scorer_v2.py",
+      "main": "0e5f9bb061516d58f83dd6e69868371a7fd20412",
+      "byte_identical": true,
+      "sha256": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4"
+    },
+    {
+      "file": "harness/score_guard.py",
+      "main": "0e5f9bb061516d58f83dd6e69868371a7fd20412",
+      "byte_identical": true,
+      "sha256": "c56c5502db8dc106ea9817905db20fb6f4d761a0870fc67778c62e936033f516"
+    }
+  ],
+  "semantic_render_identical_to": "semantic-v1.3",
+  "index_rows_from_both_parents_preserved": true,
+  "original_logs": [
+    {
+      "file": "runs/20261019-T16-pilot-v13-02/SQL-L2.jsonl",
+      "sha256": "70a81ed10ea60194f7f4f99c77c665186c96f5e6dd2615f805f3a7ddbb8be959",
+      "unchanged": true
+    },
+    {
+      "file": "runs/20261019-T16-pilot-v13-02/JSON-L2.jsonl",
+      "sha256": "39b45621001d21574265d912c85e257303d4fe5ec074cb5b98c6b459572fab04",
+      "unchanged": true
+    }
+  ],
+  "tests": [
+    {
+      "command": "env -u DEEPSEEK_API_KEY uv run --offline pytest tests/test_harness.py -k 'boundary or fingerprint or rescore or questions_for or skip_judge' -q",
+      "passed": 19
+    },
+    {
+      "command": "env -u DEEPSEEK_API_KEY uv run --offline pytest tests/test_harness.py -k frozen_files_match_main_byte_for_byte -q",
+      "passed": 6
+    }
+  ]
+}

@@ -15,6 +15,9 @@ banner (use it on rescored runs only). The semantic-dependency split reads each 
 from __future__ import annotations
 
 import argparse
+import json
+import random
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -25,9 +28,12 @@ import yaml  # noqa: E402
 
 from harness.run_direct import cost_cny  # noqa: E402
 from harness.questions import eval_dir, load_questions, question_files, verify_eval_tag  # noqa: E402
-from scripts.sql_direct_report import FOUR, REPS, all_three, correct, pct, records, share  # noqa: E402
+from scripts.sql_direct_report import FOUR, REPO, REPS, all_three, correct, pct, records, share  # noqa: E402
 
 PAIRS = (("SQL-L0-E", "SQL-L0"), ("SQL-L1-E", "SQL-L1"))
+L2_PAIR = ("SQL-L2-E", "SQL-L2")
+COVERAGE_PATH = "reports/validation/t16-v14-8836110/coverage.json"   # JSON-L2 coverage table (T16)
+BOOT_REPS, BOOT_SEED = 10_000, 20261020
 BUCKETS = ("0", "1–3", "4–7", "8（用满）")
 
 
@@ -65,10 +71,150 @@ def dependency() -> dict[str, str]:
     return out
 
 
+def merged(run_ids: list[str], cell: str) -> tuple[list[dict], list[tuple[str, int, str]]]:
+    """One record per (question, rep) over several runs of a cell, in the order given: a later run's
+    ``done`` line replaces an earlier one for the same pair (a continuation run that redoes void
+    attempts). Returns the records and the replaced pairs as (qid, rep, run it came from)."""
+    by_pair: dict[tuple[str, int], dict] = {}
+    replaced = []
+    for run_id in run_ids:
+        for r in records(run_id, cell):
+            if r.get("status") != "done":
+                continue
+            key = (r["qid"], r["rep"])
+            if key in by_pair:
+                replaced.append((*key, by_pair[key]["run_id"]))
+            by_pair[key] = r
+    return list(by_pair.values()), replaced
+
+
+def json_coverage(commit: str, path: str = COVERAGE_PATH) -> dict[str, str]:
+    """Question id → JSON-L2 coverage category (``covered`` or a / b / c / d), from the frozen table at ``commit``."""
+    text = subprocess.run(["git", "-C", str(REPO), "show", f"{commit}:{path}"], check=True,
+                          capture_output=True, text=True).stdout
+    return {row["qid"]: row["category"] for row in json.loads(text)["rows"]}
+
+
+def per_question(recs: list[dict]) -> dict[str, float]:
+    """Question id → share of its attempts that are correct."""
+    n, k = Counter(r["qid"] for r in recs), Counter(r["qid"] for r in recs if r["final"]["outcome"] == "correct")
+    return {q: k[q] / n[q] for q in n}
+
+
+def paired_bootstrap(e: list[dict], d: list[dict], reps: int = BOOT_REPS, seed: int = BOOT_SEED) -> tuple[float, float, float]:
+    """Difference in mean per-question accuracy (e − d) over the questions both answered, and its 95%
+    percentile interval from resampling questions with replacement (attempts stay paired by question)."""
+    pe, pd = per_question(e), per_question(d)
+    ids = sorted(set(pe) & set(pd))
+    diffs = [pe[q] - pd[q] for q in ids]
+    rng = random.Random(seed)
+    boots = sorted(sum(rng.choice(diffs) for _ in ids) / len(ids) for _ in range(reps))
+    return sum(diffs) / len(ids), boots[int(0.025 * reps)], boots[int(0.975 * reps) - 1]
+
+
+def l2_section(e_runs: list[str], d_run: str, cov_commit: str, judge: set[str], low: set[str]) -> list[str]:
+    e_all, replaced = merged(e_runs, L2_PAIR[0])
+    d_all = [r for r in records(d_run, L2_PAIR[1]) if r.get("status") == "done"]
+    verdict = lambda rs: [r for r in rs if r["final"].get("pending") != "score_timeout"]  # noqa: E731
+    e_sc = [r for r in verdict(e_all) if r["qid"] not in judge]
+    d_sc = [r for r in verdict(d_all) if r["qid"] not in judge]
+    cov = json_coverage(cov_commit)
+    e_ids = {r["qid"] for r in e_sc}
+    e, d = L2_PAIR
+    out = ["", f"## {e} vs {d}（Cube SQL API，semantic-v1.4）", "",
+           f"- 探查：{' + '.join(f'`runs/{r}/`' for r in e_runs)}，按 (题, 次) 合并，后面的 run 覆盖前面的同一 (题, 次)；"
+           f"被覆盖的：{', '.join(f'{q} r{k}（{src}）' for q, k, src in sorted(replaced)) or '无'}",
+           f"- 直答对照：`runs/{d_run}/`",
+           f"- 两边都不答 judge 题：探查 {len({r['qid'] for r in e_all})} 题 × 3 = {len(e_all)} 条，"
+           f"直答 {len({r['qid'] for r in d_all})} 题 × 3 = {len(d_all)} 条（judge 行 {sum(r['qid'] in judge for r in d_all)} 条，不计）",
+           f"- 版本（日志）：{e} {sorted({(r.get('eval_tag'), r['eval_commit'][:7], r.get('semantic_tag')) for r in e_all})}；"
+           f"{d} {sorted({(r.get('eval_tag'), r['eval_commit'][:7], r.get('semantic_tag')) for r in d_all})}",
+           f"- 区间：按题配对的自助法（{BOOT_REPS} 次，种子 {BOOT_SEED}），对题有放回抽样，取每题 3 次里答对的比例之差的均值的 2.5% / 97.5% 分位", ""]
+
+    out += ["### 主表（judge 题不计；准确率 = 最终正确 / 作答）", "",
+            "| 题组 | 题数 | " + d + " | " + e + " | 差值 | 95% 区间 |", "|---|---:|---|---|---:|---|"]
+    groups = [("主表（不含低区分度）", lambda q: q not in low), ("低区分度（单列）", lambda q: q in low),
+              ("合计（含低区分度）", lambda q: True)]
+    for name, keep in groups:
+        se, sd = [r for r in e_sc if keep(r["qid"])], [r for r in d_sc if keep(r["qid"])]
+        diff, lo, hi = paired_bootstrap(se, sd)
+        out.append(f"| {name} | {len({r['qid'] for r in se})} | {pct(correct(sd), len(sd))} | {pct(correct(se), len(se))} "
+                   f"| {100 * diff:+.1f} 点 | [{100 * lo:+.1f}, {100 * hi:+.1f}] |")
+    se, sd = [r for r in e_sc if r["qid"] not in low], [r for r in d_sc if r["qid"] not in low]
+    a3e, nqe = all_three(se)
+    a3d, nqd = all_three(sd)
+    out += ["", f"首次即对率（主表）：{d} {pct(sum(r['first'] == 'correct' for r in sd), len(sd))}，"
+            f"{e} {pct(sum(r['first'] == 'correct' for r in se), len(se))}；三次全对率（按题）：{d} {pct(a3d, nqd)}，{e} {pct(a3e, nqe)}"]
+
+    out += ["", "### 四种结果（judge 题不计；条数）", "", "| 单元 | 题组 | 作答 | 正确 | 错答 | 执行失败 | 拒答 |",
+            "|---|---|---:|---:|---:|---:|---:|"]
+    for c, rs in ((d, d_sc), (e, e_sc)):
+        for name, keep in groups:
+            s = [r for r in rs if keep(r["qid"])]
+            out.append(f"| {c} | {name} | {len(s)} | " + " | ".join(str(sum(r['final']['outcome'] == o for r in s)) for o in FOUR) + " |")
+
+    out += ["", "### 逐题变化（主表；每题 3 次里答对几次）", "",
+            "| 题数 | 探查答对更多 | 相同 | 探查答对更少 | 净变化（答对次数） |", "|---:|---:|---:|---:|---:|"]
+    ce = Counter(r["qid"] for r in se if r["final"]["outcome"] == "correct")
+    cd = Counter(r["qid"] for r in sd if r["final"]["outcome"] == "correct")
+    ids = {r["qid"] for r in se} & {r["qid"] for r in sd}
+    up, dn = sum(ce[q] > cd[q] for q in ids), sum(ce[q] < cd[q] for q in ids)
+    out.append(f"| {len(ids)} | {up} | {len(ids) - up - dn} | {dn} | {sum(ce[q] - cd[q] for q in ids):+d} |")
+
+    out += ["", f"### 按 JSON-L2 覆盖拆分（`{COVERAGE_PATH}` @ `{cov_commit}`；judge 题不计，含低区分度）", "",
+            "覆盖表把每题分成 JSON-L2 能用已公开成员答的（covered）和其余（a / c / d 类，b 类 0 题）。", "",
+            "| 题组 | 题数 | " + d + " | " + e + " | 差值 | 95% 区间 |", "|---|---:|---|---|---:|---|"]
+    for name, keep in (("能答（covered）", lambda q: cov.get(q) == "covered"),
+                       ("其余（a / b / c / d）", lambda q: cov.get(q) != "covered")):
+        s_e, s_d = [r for r in e_sc if keep(r["qid"])], [r for r in d_sc if keep(r["qid"])]
+        diff, lo, hi = paired_bootstrap(s_e, s_d)
+        out.append(f"| {name} | {len({r['qid'] for r in s_e})} | {pct(correct(s_d), len(s_d))} | {pct(correct(s_e), len(s_e))} "
+                   f"| {100 * diff:+.1f} 点 | [{100 * lo:+.1f}, {100 * hi:+.1f}] |")
+    missing = sorted(e_ids - set(cov))
+    out += [""] + ([f"覆盖表里没有的题：{missing}（算作「其余」）", ""] if missing else []) + [
+        "能答的题：" + "、".join(sorted((q for q in e_ids if cov.get(q) == "covered"), key=lambda q: int(q[1:])))]
+
+    out += ["", "### 步数与工具调用（全部作答）", "",
+            "步数 = 发出 `run_sql` 的模型调用次数（不含交卷与修正那一两次调用；全部模型调用见 agent 税表）。", "",
+            "| 步数 | " + " | ".join(str(k) for k in range(1, 11)) + " | 更多 |", "|---|" + "---:|" * 11]
+    steps = Counter(r["n_steps"] for r in e_all)
+    out.append(f"| {e} 条数 | " + " | ".join(str(steps[k]) for k in range(1, 11))
+               + f" | {sum(v for k, v in steps.items() if k > 10)} |")
+    b = Counter(bucket(r["n_tool_calls"]) for r in e_all)
+    out += ["", "| 单元 | 作答 | " + " | ".join(f"run_sql {k}" for k in BUCKETS) + " | 平均 run_sql | 用满 8 次 | 发了「次数已用完」 |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+            f"| {e} | {len(e_all)} | " + " | ".join(str(b[k]) for k in BUCKETS)
+            + f" | {mean([r['n_tool_calls'] for r in e_all]):.2f} | {sum(bool(r.get('hit_tool_limit')) for r in e_all)} "
+            f"| {sum(bool(r.get('limit_message_sent')) for r in e_all)} |"]
+    calls = [c for r in e_all for s in r["steps"] for c in s["tool_calls"]]
+    ex = [c for c in calls if c["status"] == "executed"]
+    cls = Counter(c["exec"].get("error_class") for c in ex if c["exec"]["status"] == "error")
+    out += ["", f"`run_sql` 执行 {len(ex)} 次，其中报错 {sum(cls.values())} 次：{dict(cls.most_common())}。"]
+
+    out += ["", "### agent 税（每条作答平均；全部作答；错峰价）", "",
+            "| 单元 | 模型调用 | 输入 token | 输出 token | 总耗时（秒） | 费用（元） | 单元合计（元） |", "|---|---:|---:|---:|---:|---:|---:|"]
+    for c, rs in ((d, [r for r in d_all if r["qid"] in e_ids]), (e, e_all)):
+        out.append(f"| {c} | {mean([r['n_calls'] for r in rs]):.2f} | {mean([r['usage']['prompt_tokens'] for r in rs]):,.0f} "
+                   f"| {mean([r['usage']['completion_tokens'] for r in rs]):,.0f} | {mean([r.get('wall_s', r['latency_s']) for r in rs]):.1f} "
+                   f"| {mean([cost(r) for r in rs]):.4f} | {sum(cost(r) for r in rs):.2f} |")
+    rd = [r for r in d_all if r["qid"] in e_ids]
+    out.append(f"| **{e} ÷ {d}** | {mean([r['n_calls'] for r in e_all]) / mean([r['n_calls'] for r in rd]):.1f}× "
+               f"| {mean([r['usage']['prompt_tokens'] for r in e_all]) / mean([r['usage']['prompt_tokens'] for r in rd]):.1f}× "
+               f"| {mean([r['usage']['completion_tokens'] for r in e_all]) / mean([r['usage']['completion_tokens'] for r in rd]):.1f}× "
+               f"| {mean([r.get('wall_s', r['latency_s']) for r in e_all]) / mean([r['latency_s'] for r in rd]):.1f}× "
+               f"| {mean([cost(r) for r in e_all]) / mean([cost(r) for r in rd]):.1f}× | |")
+    out += ["", "（直答只取探查也答的题，即同样不含 judge；费用按日志里的 token 用量重算。）"]
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True, help="explorer run-id under runs/")
     ap.add_argument("--direct-run", required=True, help="direct run-id the -E cells are compared with")
+    ap.add_argument("--l2e-run", action="append", default=[],
+                    help="SQL-L2-E run-id (repeatable, in order: a later run's line replaces an earlier one for the same (question, rep))")
+    ap.add_argument("--l2-direct-run", help="SQL-L2 direct run-id the SQL-L2-E cell is compared with")
+    ap.add_argument("--json-coverage-commit", default="381ed1d", help=f"commit of the frozen {COVERAGE_PATH}")
     ap.add_argument("--eval-tag", default="eval-v1.2")
     ap.add_argument("--verdicts", default="运行时 `harness-v1` 评分器的当场判定（**暂定**）。"
                     "最终数字以 `harness-v1.1` 离线重评为准",
@@ -114,7 +260,10 @@ def main() -> int:
            f"- 指纹（四个单元的全部调用）：{dict(fps)}",
            "- 生成：`SEMDEBT_EVAL_DIR=$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2 uv run python scripts/explorer_report.py "
            f"--run {args.run} --direct-run {args.direct_run} --eval-tag {args.eval_tag}{' --final' if args.final else ''}"
-           "`（另带 `--verdicts`、`--banner` 的文字，见本页）",
+           + "".join(f" --l2e-run {r}" for r in args.l2e_run)
+           + (f" --l2-direct-run {args.l2_direct_run} --json-coverage-commit {args.json_coverage_commit}"
+              if args.l2_direct_run else "")
+           + "`（另带 `--verdicts`、`--banner` 的文字，见本页）",
            f"- **判定来源**：{args.verdicts}",
            f"- 打分超时（`score_timeout`，不是判定，不进任何分母，逐条见文末）："
            f"{sum(len(v) for v in timeout.values())} 条", ""]
@@ -228,6 +377,9 @@ def main() -> int:
                    f"| {mean([r['usage']['completion_tokens'] for r in re_]) / mean([r['usage']['completion_tokens'] for r in rd]):.1f}× "
                    f"| {mean([r['latency_s'] for r in re_]) / mean([r['latency_s'] for r in rd]):.1f}× | "
                    f"| {mean([cost(r) for r in re_]) / mean([cost(r) for r in rd]):.1f}× | |")
+
+    if args.l2e_run and args.l2_direct_run:
+        out += l2_section(args.l2e_run, args.l2_direct_run, args.json_coverage_commit, judge, low)
 
     out += ["", "## 打分超时（`score_timeout`）", "", "行集在 runs-raw，`harness-v1.1` 合并后离线重评；最终报告里不能剩下。", "",
             "| 单元 | 题 | 次 |", "|---|---|---:|"]

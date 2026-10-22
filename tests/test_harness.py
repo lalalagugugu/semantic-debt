@@ -35,6 +35,20 @@ needs_chdb = pytest.mark.skipif(not CHDB.exists(), reason="chDB data directory n
 # prompt
 
 
+@pytest.mark.parametrize("path", ["harness/prompt.py", "harness/scorer.py"])
+@pytest.mark.parametrize("baseline", [
+    "84f5e045dc9d3456c11c4453515c746047a69c74",  # experiment baseline, including PR #100
+    "88fd81c9d743ef93d1e00f65c7f5f8faa95d72ec",  # main at PR preparation, including T15
+    "89ce1b31b22e009b726448ff23fe0f55d5a26a80",  # main at interface-audit delivery
+])
+def test_t16_frozen_files_match_main_byte_for_byte(path, baseline):
+    import subprocess
+
+    expected = subprocess.check_output(["git", "show", f"{baseline}:{path}"], cwd=REPO)
+    actual = (REPO / path).read_bytes()
+    assert actual == expected, f"{path} differs from experiment main {baseline}"
+
+
 def test_prompt_order_and_stable_prefix():
     system = P.system_message("CTX-BODY", "SYNTAX-BODY")
     assert system.index(P.SYSTEM_PROMPT) < system.index("CTX-BODY") < system.index("SYNTAX-BODY")
@@ -224,6 +238,84 @@ def _scripted(*answers):
         calls.append(messages)
         return answers.pop(0)
     return respond, calls
+
+
+@pytest.mark.parametrize("fingerprints", [("unexpected",), (None,), ("expected", "unexpected")])
+def test_t16_stops_on_each_call_fingerprint(tmp_path, monkeypatch, fingerprints):
+    monkeypatch.setattr(R, "is_peak", lambda *a: False)
+    client = MockClient(lambda m: "```sql\nSELECT bad\n```", fingerprint=fingerprints[0])
+    calls = []
+
+    def respond(messages):
+        client.fingerprint = fingerprints[len(calls)]
+        calls.append(messages)
+        return "```sql\nSELECT bad\n```"
+
+    client.respond = respond
+    ex = FakeExecutor({})
+    ctx = _ctx(tmp_path, client, ex)
+    ctx.boundary = R.CallBoundary("expected")
+    rec = R.run_attempt(ctx, Q, 1)
+    assert rec["status"] == "stopped" and ctx.boundary.stopped.is_set()
+    assert len(calls) == len(fingerprints) and len(ex.seen) == len(fingerprints) - 1
+    assert rec["turns"][-1]["exec"]["status"] == "not_executed"
+    raw = ctx.raw_dir / f"{Q.qid}_r1_t{len(calls) - 1}.json"
+    assert R.sha256(raw.read_bytes()) == rec["turns"][-1]["raw_sha256"]
+    R.run_attempt(ctx, Q, 2)
+    assert len(calls) == len(fingerprints)
+
+
+def test_t16_peak_boundary_blocks_fix_call(tmp_path, monkeypatch):
+    peak = [False]
+    monkeypatch.setattr(R, "is_peak", lambda *a: peak[0])
+    calls = []
+
+    def respond(messages):
+        calls.append(messages)
+        peak[0] = True
+        return "```sql\nSELECT bad\n```"
+
+    ctx = _ctx(tmp_path, MockClient(respond), FakeExecutor({}))
+    ctx.boundary = R.CallBoundary("fp_mock")
+    rec = R.run_attempt(ctx, Q, 1)
+    assert rec["status"] == "stopped" and len(calls) == 1
+    assert ctx.boundary.stopped.is_set() and len(rec["turns"]) == 1
+
+
+def test_t16_both_cube_factories_and_json_flow(tmp_path):
+    from harness.executors import CubeSqlExecutor, CubeJsonExecutor
+    assert isinstance(R.make_executor(CELLS["SQL-L2"], 7), CubeSqlExecutor)
+    assert isinstance(R.make_executor(CELLS["JSON-L2"], 7), CubeJsonExecutor)
+    query = '{"measures": ["sales.sales_amount"]}'
+    ex = FakeExecutor({query: ExecResult(rows=[[42]], columns=["sales.sales_amount"])})
+    ctx = _ctx(tmp_path, MockClient(lambda m: f"```json\n{query}\n```"), ex, "JSON-L2")
+    rec = R.run_attempt(ctx, Q, 1)
+    assert ex.seen == [query] and rec["final"]["outcome"] == "correct"
+    assert json.loads((ctx.raw_dir / f"{Q.qid}_r1_t0.exec.json").read_text())["rows"] == [[42]]
+
+
+def test_t16_request_boundary_also_checks_transport_retries(monkeypatch):
+    from harness import client as C
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "offline-test-placeholder")
+    monkeypatch.setattr(C.time, "sleep", lambda _: None)
+    requests = []
+
+    def fail(*a, **kw):
+        requests.append(1)
+        raise OSError("offline")
+
+    monkeypatch.setattr(C.urllib.request, "urlopen", fail)
+    checks = []
+
+    def boundary():
+        checks.append(1)
+        if len(checks) == 2:
+            raise R.RunStopped("peak hours")
+
+    client = C.DeepSeekClient("deepseek-flash", before_request=boundary)
+    with pytest.raises(R.RunStopped, match="peak hours"):
+        client.chat([])
+    assert len(checks) == 2 and len(requests) == 1
 
 
 def test_correct_first_try(tmp_path):
@@ -427,14 +519,14 @@ def test_dry_run_matches_board_unit_list(tmp_path):
     assert "| SQL 直答 | L1 调优 | T14 |" in board
     assert "| 英文锚点 | R-EN、L1c-EN" in board
     expected = {"SQL-L0", "SQL-R", "SQL-L1", "SQL-L1c", "SQL-L1.5W", "SQL-L1.5S", "SQL-L1-tuned", "SQL-L2",
-                "SQL-R-EN", "SQL-L1c-EN"}
+                "SQL-R-EN", "SQL-L1c-EN", "JSON-L2"}
     assert set(CELLS) == expected
     rows, total = R.dry_run(list(CELLS.values()), {"zh": 122, "en": 99}, 3, "deepseek-flash", fix_rate=0.1,
                             output_tokens=3000, hit_ratio=0.95, question_tokens=60, runs_root=tmp_path)
     by = {r["cell"]: r for r in rows}
     assert by["SQL-L1"]["attempts"] == 366 and by["SQL-L1"]["calls"] == round(366 * 1.1)
     assert by["SQL-R-EN"]["attempts"] == 297
-    assert sum(r["attempts"] for r in rows) == 8 * 366 + 2 * 297
+    assert sum(r["attempts"] for r in rows) == 9 * 366 + 2 * 297
     assert total > 0
 
 
@@ -1132,6 +1224,28 @@ def test_run_scoring_uses_scorer_v2_in_process_and_in_the_child():
         assert R.score_question([[2008, 5]], YEAR, score_timeout_s=timeout)["outcome"] == "correct"
 
 
+def test_rescore_restores_cube_numbers_without_coercing_string_dimensions(tmp_path):
+    from decimal import Decimal
+    from harness import rescore as RS
+
+    payload = {"columns": [{"name": "cube.code", "type": "string"},
+                           {"name": "cube.value", "type": "number"}],
+               "rows": [["001", "12345678901234567890.125"], ["002", None], ["003", 7]],
+               "error": None}
+    data = json.dumps(payload).encode()
+    path = tmp_path / "Q001_r1_t0.exec.json"
+    path.write_bytes(data)
+    turn = {"turn": 0, "exec": {"status": "ok", "exec_raw_sha256": R.sha256(data)}}
+    candidate = RS.candidate_of(turn, tmp_path, "Q001", 1)
+    assert candidate == [["001", Decimal("12345678901234567890.125")], ["002", None], ["003", 7]]
+    assert path.read_bytes() == data
+    payload["columns"][1]["type"] = "string"
+    data = json.dumps(payload).encode()
+    path.write_bytes(data)
+    turn["exec"]["exec_raw_sha256"] = R.sha256(data)
+    assert RS.candidate_of(turn, tmp_path, "Q001", 1)[0][1] == "12345678901234567890.125"
+
+
 def test_rescore_uses_scorer_v2(tmp_path):
     from harness import rescore as RS
     respond, _ = _scripted("```sql\nSELECT 2009, 5\n```")
@@ -1204,3 +1318,75 @@ def test_the_bank_of_the_run_passes_scorer_v2_validation():
     if tag != "eval-v1.2":
         pytest.skip(f"bank checkout is {tag or 'untagged'}, not eval-v1.2")
     assert R.invalid_rules(load_questions(EVAL)) == []
+
+
+# ---------------------------------------------------------------------------
+# C13: syntax-note teaching ladder (decisions/2026-10-19-phase1-replan.md §三)
+
+
+def test_ladder_cells_change_only_the_syntax_note_and_nest():
+    from harness.cells import CELLS, LADDER_CELLS, syntax_path
+    l1 = CELLS["SQL-L1"]
+    notes = [syntax_path(l1.syntax).read_text(encoding="utf-8")]
+    for name in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4"):
+        c = LADDER_CELLS[name]
+        assert (c.stack, c.allowed, c.context, c.lang) == (l1.stack, l1.allowed, l1.context, l1.lang)
+        assert c.skip_judge and c.card == "C13" and name not in CELLS        # never in --cell all
+        text = syntax_path(c.syntax).read_text(encoding="utf-8")
+        assert text.startswith(notes[-1].rstrip("\n")) and len(text) > len(notes[-1])   # each level adds to the last
+        notes.append(text)
+    assert [LADDER_CELLS[n].split for n in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4")] == ["all", "all", "heldout"]
+    if (REPO / "build" / "contexts" / "SQL-L1.yaml").exists():
+        base, t2 = R.system_for(l1), R.system_for(LADDER_CELLS["SQL-L1-T2"])
+        assert base.replace(notes[0].strip(), notes[1].strip()) == t2                  # same prompt and context
+
+
+def test_questions_for_skips_judge_and_keeps_the_cells_split():
+    from harness.cells import CELLS, LADDER_CELLS
+    qs = [Question(f"Q{i:03d}", QTEXT, refs=[[[1]]], rules=Q.rules, scoring=s, meta={"split": sp})
+          for i, (s, sp) in enumerate([("deterministic", "tuning"), ("deterministic", "heldout"),
+                                       ("judge", "tuning"), ("judge", "heldout")])]
+    ids = lambda cell, **kw: [q.qid for q in R.questions_for(cell, qs, **kw)]   # noqa: E731
+    assert ids(CELLS["SQL-L1"]) == ["Q000", "Q001", "Q002", "Q003"]
+    assert ids(CELLS["SQL-L1"], skip_judge=True) == ["Q000", "Q001"]
+    assert ids(LADDER_CELLS["SQL-L1-T2"]) == ids(LADDER_CELLS["SQL-L1-T3"]) == ["Q000", "Q001"]
+    assert ids(LADDER_CELLS["SQL-L1-T4"]) == ["Q001"]                           # held-out only, no judge
+
+
+def test_dry_run_counts_each_cells_own_questions():
+    from harness.cells import LADDER_CELLS
+    cells = [LADDER_CELLS["SQL-L1-T2"], LADDER_CELLS["SQL-L1-T4"]]
+    rows, _ = R.dry_run(cells, {"SQL-L1-T2": 109, "SQL-L1-T4": 55, "zh": 122}, 3, "deepseek-flash", fix_rate=0.0,
+                        output_tokens=1000, hit_ratio=0.9, question_tokens=60, use_measured=False)
+    assert [(r["cell"], r["questions"], r["attempts"]) for r in rows] == [("SQL-L1-T2", 109, 327), ("SQL-L1-T4", 55, 165)]
+
+
+@needs_eval
+def test_ladder_level4_examples_are_tuning_questions_only():
+    """Level 4's few-shot questions are tuning-split, deterministic, single-reference questions, picked
+    by the stated rule (per Q level, the two at the median reference-SQL length); never held-out."""
+    import yaml
+    from harness.cells import LADDER_CELLS, syntax_path
+    from harness.questions import question_files
+    recs = []
+    for f in question_files(EVAL):
+        d = yaml.safe_load(f.read_text(encoding="utf-8"))
+        recs += d["questions"] if isinstance(d, dict) else d
+    by_text = {r["text_zh"].strip(): r for r in recs}
+    text = syntax_path(LADDER_CELLS["SQL-L1-T4"].syntax).read_text(encoding="utf-8")
+    asked = [line[2:].strip() for line in text.splitlines() if line.startswith("问：")]
+    assert len(asked) == 6
+    picked = [by_text[a] for a in asked]
+    assert all(r["split"] == "tuning" and r["scoring"] == "deterministic" and len(r["refs"]) == 1 for r in picked)
+    pool = [r for r in recs if r.get("split") == "tuning" and r["scoring"] == "deterministic"
+            and len(r["refs"]) == 1 and not r["refs"][0].get("postprocess")]
+    rule = []
+    for lv in ("Q1", "Q2", "Q3"):
+        level = sorted((r for r in pool if (r.get("labels") or {}).get("q_level") == lv),
+                       key=lambda r: (len(r["refs"][0]["sql"]), r["id"]))
+        n = len(level)
+        assert n % 2 == 0                      # the two middle positions; every level has an even count
+        rule += [level[n // 2 - 1]["id"], level[n // 2]["id"]]
+    assert [r["id"] for r in picked] == rule
+    for r in picked:
+        assert r["refs"][0]["sql"].strip() in text

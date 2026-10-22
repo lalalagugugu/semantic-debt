@@ -55,7 +55,7 @@ from harness import run_agent as AG  # noqa: E402
 from harness import run_direct as R  # noqa: E402
 from harness.cells import (  # noqa: E402
     CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER, PLAN_CELLS,
-    PRICES_OFFPEAK, REPO, SYNTAX, Cell,
+    PRICES_OFFPEAK, REPO, SYNTAX, Cell, syntax_path,
 )
 from harness.client import APIError, Reply  # noqa: E402
 from harness.executors import DEFAULT_MAX_MEMORY_BYTES, DEFAULT_MAX_RESULT_ROWS, ExecResult  # noqa: E402
@@ -69,7 +69,7 @@ MAX_MODEL_CALLS = PP.MAX_TOOL_CALLS + PP.MAX_PLANS + 3
 
 
 def plan_system_for(cell: Cell) -> str:
-    return PP.plan_system_message(R.context_text(cell), (SYNTAX / cell.syntax).read_text(encoding="utf-8"))
+    return PP.plan_system_message(R.context_text(cell), syntax_path(cell.syntax).read_text(encoding="utf-8"))
 
 
 def plan_settings() -> dict:

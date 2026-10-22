@@ -41,7 +41,10 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from render.common import BUILD, DAX_TYPES, l0_map, logical_type, metric_callables, metrics_file, physical_schema, source  # noqa: E402
+from render.common import (  # noqa: E402
+    BUILD, DAX_TYPES, l0_map, logical_type, metric_callables, metrics_file, physical_schema, source, variant_callables,
+    variant_key,
+)
 from render.measures import DAX_CALCULATED_COLUMNS, dax_measures  # noqa: E402
 
 OUT_DIR = BUILD / "pbip"
@@ -256,6 +259,9 @@ class Project:
                 line += " " + " ".join(m["note"].split())
             if self.tier == "L2":
                 line += " 度量值：" + "、".join(f"{dax}（{ds}）" for ds, dax, _ in metric_callables(l2[m["name"]]))
+                variants = variant_callables(l2[m["name"]])
+                if variants:
+                    line += " 变体：" + "、".join(f"{dax}（{ds}，{vid}：{scope}）" for vid, ds, dax, _, scope in variants)
             out.append(line)
         if self.tier != "L2":
             out += ["", "## 指标的业务说法", ""]
@@ -287,6 +293,9 @@ class Project:
                 for ds, dax, _ in metric_callables(m):
                     home, expr = impl[(m["name"], ds)]
                     measures.setdefault(home, []).append((dax[1:-1], expr, m["definition"]))
+                for vid, ds, dax, _, scope in variant_callables(m):
+                    home, expr = impl[(variant_key(m["name"], vid), ds)]
+                    measures.setdefault(home, []).append((dax[1:-1], expr, f"{m['definition']} 本度量值：{scope}。"))
 
         tables = []
         for ds in source()["datasets"]:
