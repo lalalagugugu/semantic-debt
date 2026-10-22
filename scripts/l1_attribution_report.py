@@ -107,7 +107,10 @@ def main() -> int:
           "3. **在 T13 的 clone 里开分支**：卡片负责方是 T13 会话，T19b 当时未列入 cards.yaml。"
           "Codex 在自己的 clone（分支 `T19b-codex`）里标注，那个 clone 里也有 Flash 的日志；"
           "交接时已要求它不得读，Codex 自述未读取。",
-          "4. **用户抽检尚未做**：第 7 节列出待抽检的分歧条目，抽检结果由用户填写。", ""]
+          "4. **归类材料缺了作答要求和语法说明**（用户抽检时发现，`decisions/open-questions.md` T19b-2）："
+          "给 Flash 的材料只有 L1 上下文，没有系统提示的作答要求（如「每组一行」「比率给基数」）和 ClickHouse 语法说明。"
+          "编码手册的根因 1–3 也只针对 L1 文档。呈现类和方言类错误因此只能往「题面歧义」「评分可疑」上归，"
+          "这能解释 Flash 根因 5 偏高的一部分。Codex 能读仓库，可能看过这些材料。", ""]
 
     # key points, all computed
     ok0 = [r for r in rows if r["f_root"] is not None]
@@ -202,11 +205,29 @@ def main() -> int:
     dis = [r for r in ok if r["f_root"] != r["c_root"]]
     step = max(1, len(dis) // SPOT)
     pick = dis[::step][:SPOT]
-    md += ["## 7. 用户抽检（待填）", "",
-           f"根因不一致的条目共 {len(dis)} 条。按清单顺序等距抽 {len(pick)} 条，由用户判定哪家对，或给出第三种判定。", "",
-           "| 题 | 次 | Flash 类别 / 根因 | Codex 类别 / 根因 | 用户判定 | 说明 |", "|---|---:|---|---|---|---|"]
+    spot_path = REPO / "reports" / "attribution" / "spotcheck.csv"
+    spot = {(s["question_id"], int(s["round"])): s for s in csv.DictReader(spot_path.open(encoding="utf-8"))} \
+        if spot_path.exists() else {}
+    if spot and set(spot) != {(r["qid"], r["round"]) for r in pick}:
+        raise ValueError("spotcheck.csv does not cover exactly the sampled items")
+    md += ["## 7. 用户抽检", "",
+           f"根因不一致的条目共 {len(dis)} 条。按清单顺序等距抽 {len(pick)} 条，用户看过题面、参考、作答和两家理由后判定根因"
+           "（材料在 `$SEMDEBT_DATA_DIR/t19b-spotcheck/`，含题面，不入库）。结果在 `reports/attribution/spotcheck.csv`。", "",
+           "| 题 | 次 | Flash 类别 / 根因 | Codex 类别 / 根因 | 用户根因 | 同意 | 说明 |", "|---|---:|---|---|---:|---|---|"]
+    tally: Counter = Counter()
     for r in pick:
-        md.append(f"| {r['qid']} | {r['round']} | {r['f_cat']} / {r['f_root']} | {r['c_cat']} / {r['c_root']} |  |  |")
+        s = spot.get((r["qid"], r["round"]))
+        if s is None:
+            md.append(f"| {r['qid']} | {r['round']} | {r['f_cat']} / {r['f_root']} | {r['c_cat']} / {r['c_root']} |  |  |  |")
+            continue
+        u = int(s["user_root"])
+        side = "两家都不" if u not in (r["f_root"], r["c_root"]) else ("Flash" if u == r["f_root"] else "Codex")
+        tally[side] += 1
+        md.append(f"| {r['qid']} | {r['round']} | {r['f_cat']} / {r['f_root']} | {r['c_cat']} / {r['c_root']} | {u} | {side} | {s['note']} |")
+    if spot:
+        md += ["", f"用户同意 Codex {tally['Codex']} 条、同意 Flash {tally['Flash']} 条、两家都不同意 {tally['两家都不']} 条。"
+               "样本只有 10 条，只作参照，不用来替换任何一家的标签；根因 3 的报告口径仍是第 3 节的区间。"
+               "抽检中发现的两个问题记在 `decisions/open-questions.md` 的 T19b-1、T19b-2。"]
     md.append("")
 
     OUT.write_text("\n".join(md), encoding="utf-8")
