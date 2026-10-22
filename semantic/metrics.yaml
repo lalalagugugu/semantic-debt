@@ -455,6 +455,17 @@ metrics:
     alternate_dataset: FactOnlineSales
     alternate_dax_measure: "[Online Sales Amount MoM %]"
     alternate_cube_member: "online_sales.sales_amount_mom_pct"
+    variants:   # L1：「期的长度由问题的粒度决定（月、季）」；主调用名在 Cube 上固定为月
+      - id: "按季"
+        scope: "期的长度为季：本季与上一季比"
+        dataset: FactSales
+        dax_measure: "[Sales Amount QoQ %]"
+        cube_member: "sales.sales_amount_qoq_pct"
+      - id: "按季"
+        scope: "期的长度为季：本季与上一季比"
+        dataset: FactOnlineSales
+        dax_measure: "[Online Sales Amount QoQ %]"
+        cube_member: "online_sales.sales_amount_qoq_pct"
 
   - name: "销售额占比"
     definition: "某一组的销售额 ÷ 对应范围内的销售额合计。分母的范围由问题决定（全公司、某渠道、某品类内）。"
@@ -467,6 +478,22 @@ metrics:
     alternate_dataset: FactOnlineSales
     alternate_dax_measure: "[Online Sales Amount Share]"
     alternate_cube_member: "online_sales.sales_amount_share"
+    variants:   # L1：「分母的范围由问题决定（全公司、某渠道、某品类内）」；主调用名是全公司（查询筛选后的全部）
+      - id: "渠道内"
+        scope: "分母为同一渠道内的销售额合计：去掉门店这一层，其余分组与筛选不变"
+        dataset: FactSales
+        dax_measure: "[Sales Amount Share In Channel]"
+        cube_member: "sales.sales_amount_share_in_channel"
+      - id: "品类内"
+        scope: "分母为同一品类内的销售额合计：去掉产品、子类这两层，其余分组与筛选不变"
+        dataset: FactSales
+        dax_measure: "[Sales Amount Share In Category]"
+        cube_member: "sales.sales_amount_share_in_category"
+      - id: "品类内"
+        scope: "分母为同一品类内的销售额合计：去掉产品、子类这两层，其余分组与筛选不变"
+        dataset: FactOnlineSales
+        dax_measure: "[Online Sales Amount Share In Category]"
+        cube_member: "online_sales.sales_amount_share_in_category"
 
   - name: "同店销售额"
     definition: "只统计两个对比年份都有销售的门店的销售额（约定 15）。按约定 2 走全渠道销售。"
@@ -476,6 +503,12 @@ metrics:
     unit: "USD"
     numerator: "销售额，筛 门店在两个对比年份都有销售"
     dataset: FactSales
+    variants:   # L1：「只统计两个对比年份都有销售的门店」；主调用名的对比年份是本年与上一年
+      - id: "作基年"
+        scope: "本年作为基期、与下一年比较：只统计本年和下一年都有销售的门店（与「同店销售额增长率」的基期是同一门店集合）"
+        dataset: FactSales
+        dax_measure: "[Same Store Sales As Base Year]"
+        cube_member: "sales.same_store_sales_as_base_year"
 
   - name: "同店销售额增长率"
     definition: "（同店本年销售额 − 同店去年销售额）÷ 同店去年销售额（约定 15）。"
@@ -626,6 +659,12 @@ metrics:
     default_filters:
       - "ScenarioName = Budget（约定 12：正式目标看预算场景）"
     dataset: FactSalesQuota
+    variants:   # L1：「默认取预算场景」；主调用名固定为预算场景
+      - id: "按查询场景"
+        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组"
+        dataset: FactSalesQuota
+        dax_measure: "[Sales Amount Quota By Scenario]"
+        cube_member: "sales_quota.sales_amount_quota_by_scenario"
 
   - name: "目标销量"
     definition: "销售目标表的目标销量合计，默认取预算场景（约定 12）。"
@@ -636,6 +675,12 @@ metrics:
     default_filters:
       - "ScenarioName = Budget"
     dataset: FactSalesQuota
+    variants:   # L1：「默认取预算场景」；主调用名固定为预算场景
+      - id: "按查询场景"
+        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组"
+        dataset: FactSalesQuota
+        dax_measure: "[Sales Quantity Quota By Scenario]"
+        cube_member: "sales_quota.sales_quantity_quota_by_scenario"
 
   - name: "目标毛利"
     definition: "销售目标表的目标毛利合计，默认取预算场景。"
@@ -646,6 +691,12 @@ metrics:
     default_filters:
       - "ScenarioName = Budget"
     dataset: FactSalesQuota
+    variants:   # L1：「默认取预算场景」；主调用名固定为预算场景
+      - id: "按查询场景"
+        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组"
+        dataset: FactSalesQuota
+        dax_measure: "[Gross Margin Quota By Scenario]"
+        cube_member: "sales_quota.gross_margin_quota_by_scenario"
 
   - name: "目标达成率"
     definition: "全渠道实际销售额 ÷ 预算场景的目标销售额（约定 12）。"
@@ -689,6 +740,12 @@ metrics:
     default_filters:
       - "AccountName = Sale Revenue；ScenarioName = Budget"
     dataset: FactStrategyPlan
+    variants:   # L1：「默认取预算场景」；主调用名固定为预算场景
+      - id: "按查询场景"
+        scope: "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）"
+        dataset: FactStrategyPlan
+        dax_measure: "[Plan Revenue By Scenario]"
+        cube_member: "strategy_plan.plan_revenue_by_scenario"
 
   - name: "IT 成本"
     definition: "门店 IT 设备的成本金额合计。"

@@ -36,8 +36,8 @@ class Cell:
 
     @property
     def runnable_here(self) -> bool:
-        """T11 implements chDB only; other stacks reuse this harness with their own executor."""
-        return self.stack == "chdb"
+        """Executors available to the direct-answer runner on this host."""
+        return self.stack in {"chdb", "cube_sql", "cube_json"}
 
 
 CELLS: dict[str, Cell] = {c.name: c for c in [
@@ -49,6 +49,7 @@ CELLS: dict[str, Cell] = {c.name: c for c in [
     Cell("SQL-L1.5S", "chdb", ("ads",), "build:SQL-L1.5S.yaml", "clickhouse_sql.md"),
     Cell("SQL-L1-tuned", "chdb", ("retail",), "build:SQL-L1-tuned.yaml", "clickhouse_sql.md", card="T14"),
     Cell("SQL-L2", "cube_sql", (), "build:SQL-L2.yaml", "cube_sql.md", card="T16"),
+    Cell("JSON-L2", "cube_json", (), "build:JSON-L2.yaml", "cube_json.md", card="T16"),
     Cell("SQL-R-EN", "chdb", ("retail",), "external:r-en", "clickhouse_sql.md", lang="en"),
     Cell("SQL-L1c-EN", "chdb", ("retail",), "external:l1c-en", "clickhouse_sql.md", lang="en"),
 ]}

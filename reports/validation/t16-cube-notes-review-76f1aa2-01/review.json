@@ -1,0 +1,2504 @@
+{
+  "notes_commit": "76f1aa2477b31c87953b7c4090696f50d58bdf1a",
+  "model_calls": 0,
+  "probe_count": 229,
+  "new_probes": 49,
+  "versions": {
+    "cube": "1.8.6",
+    "clickhouse": "25.8.20.4"
+  },
+  "report_script_sha256": "150280c29c3c5c313e1ce647232c7e436a62df9d142751ff5eb30be019acbfd8",
+  "manifest_reproduced_by_final_script": true,
+  "error_text_redacted": false,
+  "statement_count": 88,
+  "counts": {
+    "条件不符": 4,
+    "成立": 78,
+    "不成立": 6
+  },
+  "items": [
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 3,
+      "sentence": 1,
+      "text": "下面只写经实测成立的写法，并写明成立的条件；「不要这样写」里的写法，有的会报错，有的能执行但算出错误的数。",
+      "status": "条件不符",
+      "evidence": [
+        "S01",
+        "S34_inner",
+        "R_chain_flat"
+      ],
+      "reason": "整体范围声明尚未满足：下列条目存在反例，不能整体签收。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 7,
+      "sentence": 1,
+      "text": "- 只写一条 SELECT 查询（可以带 `WITH`），不写任何修改数据的语句。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "S30"
+      ],
+      "reason": "只读约束；没有执行任何修改数据的语句。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 8,
+      "sentence": 1,
+      "text": "- 查询对象是 cube：在 `FROM` 里把 cube 名当作表名，把它的成员（维度和指标）当作列。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "S02"
+      ],
+      "reason": "当前模型中已有 cube/成员；未把任意物理表当 cube。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 8,
+      "sentence": 2,
+      "text": "成员写成「cube名.成员名」。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "S02"
+      ],
+      "reason": "当前模型中已有 cube/成员；未把任意物理表当 cube。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 9,
+      "sentence": 1,
+      "text": "- 调用指标必须写 `MEASURE(cube名.指标名)`，不要对指标再套 `SUM`、`COUNT`；指标由引擎按定义计算。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "S03",
+        "R_count_measure",
+        "R_missing_group"
+      ],
+      "reason": "MEASURE 直接聚合正确；SUM/COUNT 嵌套及遗漏GROUP BY反例均报错。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 9,
+      "sentence": 2,
+      "text": "其余选出的维度列都要写进 `GROUP BY`。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "S03",
+        "R_count_measure",
+        "R_missing_group"
+      ],
+      "reason": "MEASURE 直接聚合正确；SUM/COUNT 嵌套及遗漏GROUP BY反例均报错。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 10,
+      "sentence": 1,
+      "text": "- 成员名里有大写字母时用双引号，例如 `cube名.\"OrderDate\"`。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "F24"
+      ],
+      "reason": "只选一种标识符写法是安全规范；混写反例报错，不宣称所有无引号写法都不能执行。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 10,
+      "sentence": 2,
+      "text": "同一个成员在一条查询里只写一种写法，不要加引号和不加引号混用。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "F24"
+      ],
+      "reason": "只选一种标识符写法是安全规范；混写反例报错，不宣称所有无引号写法都不能执行。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 11,
+      "sentence": 1,
+      "text": "- 字符串用单引号，日期字面量写 `DATE '2020-06-30'`。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "S40"
+      ],
+      "reason": "字符串/DATE 字面量成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 12,
+      "sentence": 1,
+      "text": "- 输出列的别名可以用英文，也可以用双引号括起来的中文（例如 `AS \"金额\"`）；例外见下文「排名」一条：输出里有窗口函数的结果时只用英文别名。",
+      "status": "成立",
+      "evidence": [
+        "T03",
+        "T04",
+        "T05",
+        "R_cumulative_unicode"
+      ],
+      "reason": "普通英文/中文投影成立；窗口输出中文别名的例外实际报错。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 16,
+      "sentence": 1,
+      "text": "- 写 `CROSS JOIN`，不写 `ON` 条件：连接路径由数据模型预先定义，引擎自动套用。",
+      "status": "成立",
+      "evidence": [
+        "F33",
+        "F34",
+        "R_chain_flat"
+      ],
+      "reason": "有预定义连接路径；原始cube普通ON被拒。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 17,
+      "sentence": 1,
+      "text": "- 连接的写法和顺序会影响引擎能不能找到路径：",
+      "status": "成立",
+      "evidence": [
+        "S50_sales_store_channel",
+        "F32"
+      ],
+      "reason": "连接树和顺序确实影响路径。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 18,
+      "sentence": 1,
+      "text": "  - 一个事实 cube 加一个维度 cube：`事实 CROSS JOIN 维度`。",
+      "status": "成立",
+      "evidence": [
+        "S20_like",
+        "R_one_dim_indirect"
+      ],
+      "reason": "已有路径；中间节点可以由引擎自动补齐。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 19,
+      "sentence": 1,
+      "text": "  - 一个事实 cube 加两个维度 cube：把事实 cube 放在两个维度中间，`维度甲 CROSS JOIN 事实 CROSS JOIN 维度乙`。",
+      "status": "成立",
+      "evidence": [
+        "S50_store_sales_channel",
+        "S50_channel_sales_store",
+        "R_two_dims_middle"
+      ],
+      "reason": "这是已证实可用的充分写法，不是必要条件；链式图的事实放一端也有成功例。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 20,
+      "sentence": 1,
+      "text": "  - 一个事实 cube 加三个维度 cube：用括号向右嵌套，事实 cube 放在最里层，`维度甲 CROSS JOIN (维度乙 CROSS JOIN (事实 CROSS JOIN 维度丙))`。",
+      "status": "成立",
+      "evidence": [
+        "R_star_right_store_channel_calendar",
+        "R_chain_right",
+        "R_chain_flat"
+      ],
+      "reason": "右嵌套正例成立；同一行关于平铺的断言另列为不成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 20,
+      "sentence": 2,
+      "text": "平铺的写法都找不到路径。",
+      "status": "不成立",
+      "evidence": [
+        "R_star_right_store_channel_calendar",
+        "R_chain_right",
+        "R_chain_flat"
+      ],
+      "reason": "链式三维图R_chain_flat平铺成功且数值正确；断言平铺都失败超出星形探针条件。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 21,
+      "sentence": 1,
+      "text": "- 同一个事实 cube 的多个指标可以放在同一层，例如同时选出 `MEASURE(甲.指标一)` 和 `MEASURE(甲.指标二)`。",
+      "status": "成立",
+      "evidence": [
+        "F01",
+        "R_ratio_True"
+      ],
+      "reason": "同一事实的两个不同指标同层，数值核验。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 22,
+      "sentence": 1,
+      "text": "- 两个事实 cube 的指标不能放在同一层查询里。",
+      "status": "成立",
+      "evidence": [
+        "S52_sales_calendar_online_sales",
+        "S53",
+        "B01",
+        "B02"
+      ],
+      "reason": "部署中两销售事实的直接同层查询失败；分开聚合后按共有键JOIN/FULL JOIN值正确。仅作已验图形的说明，不是所有自定义模型的不可能性定理。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 22,
+      "sentence": 2,
+      "text": "先各写一个 CTE、分别按同一个键聚合，再在外层用普通 `JOIN … ON` 或 `FULL OUTER JOIN … ON` 把两个 CTE 按键连起来。",
+      "status": "成立",
+      "evidence": [
+        "S52_sales_calendar_online_sales",
+        "S53",
+        "B01",
+        "B02"
+      ],
+      "reason": "部署中两销售事实的直接同层查询失败；分开聚合后按共有键JOIN/FULL JOIN值正确。仅作已验图形的说明，不是所有自定义模型的不可能性定理。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 23,
+      "sentence": 1,
+      "text": "- 需要维度的属性（名称等）时，在含 `MEASURE()` 的那一层用 `CROSS JOIN` 把维度 cube 带进来，直接选出属性。",
+      "status": "成立",
+      "evidence": [
+        "J03",
+        "S50_store_sales_channel",
+        "R_chain_flat"
+      ],
+      "reason": "维度属性在MEASURE层带入，符合已验证的连接条件。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 27,
+      "sentence": 1,
+      "text": "- 按时间粒度分组用 `DATE_TRUNC('month', 时间维度)`，粒度可选 day、week、month、quarter、year，可以和 `MEASURE()` 一起分组。",
+      "status": "成立",
+      "evidence": [
+        "S100",
+        "S101",
+        "S102",
+        "S103",
+        "S104"
+      ],
+      "reason": "五种时间分桶已复跑。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 28,
+      "sentence": 1,
+      "text": "- 要按年份数字分组时，二选一：",
+      "status": "成立",
+      "evidence": [
+        "F22",
+        "F23",
+        "R_period_case_year_calendar",
+        "R_period_case_year_outer_extract"
+      ],
+      "reason": "两种年份来源直接用到完整比较中核验。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 29,
+      "sentence": 1,
+      "text": "  - 在含 `MEASURE()` 的那一层用日期维度 cube 里的年份成员分组；",
+      "status": "成立",
+      "evidence": [
+        "F23",
+        "R_period_case_year_calendar"
+      ],
+      "reason": "年份维度与MEASURE同层成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 30,
+      "sentence": 1,
+      "text": "  - 或者先在一个 CTE 里按 `DATE_TRUNC('year', 时间维度)` 分组，到外层再 `EXTRACT(YEAR FROM …)`。",
+      "status": "成立",
+      "evidence": [
+        "F22",
+        "R_period_case_year_outer_extract"
+      ],
+      "reason": "先按年桶聚合再外层EXTRACT，并完成两年比较，数值一致。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 34,
+      "sentence": 1,
+      "text": "- 按时间区间筛选写在 `WHERE` 里，例如 `时间维度 >= DATE '…' AND 时间维度 < DATE '…'`。",
+      "status": "成立",
+      "evidence": [
+        "S01",
+        "R_period_join_month_JOIN"
+      ],
+      "reason": ">=起点、<下一起点的过滤值独立核验。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 35,
+      "sentence": 1,
+      "text": "- 维度筛选写在 `WHERE` 里，可以用 `=`、`<>`、`IN (…)`、`BETWEEN … AND …`、`LIKE`、`IS NULL`，多个条件用 `AND`、`OR` 组合。",
+      "status": "成立",
+      "evidence": [
+        "S20_eq",
+        "S20_ne",
+        "S20_in",
+        "S20_between",
+        "S20_like",
+        "S20_null",
+        "S20_and_or"
+      ],
+      "reason": "列举的谓词与布尔组合复跑。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 36,
+      "sentence": 1,
+      "text": "- 按指标筛选写在 `HAVING MEASURE(…) > 值` 里。",
+      "status": "成立",
+      "evidence": [
+        "S21"
+      ],
+      "reason": "HAVING MEASURE正例。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 37,
+      "sentence": 1,
+      "text": "- 排序用 `ORDER BY`，可以按指标的别名排；取前 N 行用 `ORDER BY … LIMIT N`。",
+      "status": "成立",
+      "evidence": [
+        "S21"
+      ],
+      "reason": "别名排序、LIMIT与独立行序一致。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 38,
+      "sentence": 1,
+      "text": "- 每组取前 N 行：在外层用 `RANK()` 或 `ROW_NUMBER()` 加 `OVER (PARTITION BY 分组列 ORDER BY 值 DESC)` 算出组内名次，再在更外一层 `WHERE 名次 <= N` 筛选（名次列要输出时按下面「排名」一条转 `BIGINT`）。",
+      "status": "成立",
+      "evidence": [
+        "R_per_group_ROW_NUMBER_True",
+        "R_per_group_ROW_NUMBER_False",
+        "R_per_group_RANK_True",
+        "R_per_group_RANK_False"
+      ],
+      "reason": "真实多行分组，外层名次筛选；含仅筛选/返回BIGINT两个变体，独立逐组排序核验。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 42,
+      "sentence": 1,
+      "text": "把含 `MEASURE()` 的查询写成子查询或 CTE（`WITH 名 AS (…)`），在外层继续计算。",
+      "status": "成立",
+      "evidence": [
+        "S30",
+        "S31",
+        "S32_cte",
+        "S32_subquery"
+      ],
+      "reason": "适用后续所列有限形态；不宣称任意普通SQL均可。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 42,
+      "sentence": 2,
+      "text": "下列写法成立：",
+      "status": "成立",
+      "evidence": [
+        "S30",
+        "S31",
+        "S32_cte",
+        "S32_subquery"
+      ],
+      "reason": "适用后续所列有限形态；不宣称任意普通SQL均可。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 44,
+      "sentence": 1,
+      "text": "- 算术、`CASE WHEN … THEN … ELSE … END`、`ROUND(值, 位数)`（百分比要自己乘 100）。",
+      "status": "成立",
+      "evidence": [
+        "S38",
+        "F20_round",
+        "F20_pct"
+      ],
+      "reason": "算术、CASE、ROUND百分比正例。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 45,
+      "sentence": 1,
+      "text": "- 比率：把分子、分母放在同一个 CTE 的两列里（同一事实 cube 的两个指标可在同一层选出），到外层相除，除法规则见下文。",
+      "status": "成立",
+      "evidence": [
+        "R_ratio_True",
+        "R_ratio_False"
+      ],
+      "reason": "补齐直接组合：两个不同指标在一个CTE，再相除；分组及全局均核验。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 46,
+      "sentence": 1,
+      "text": "- 外层再聚合：`SUM`、`AVG`、`MIN`、`MAX`、`COUNT`，也可以按 `CASE` 表达式重新分组，或写成 `SUM(CASE WHEN … THEN 值 ELSE 0 END)`。",
+      "status": "成立",
+      "evidence": [
+        "S32_cte",
+        "S33_cte",
+        "B24",
+        "B27",
+        "R_period_case_year_calendar"
+      ],
+      "reason": "SUM/AVG/MIN/MAX/COUNT、CASE重分组、条件聚合均有正例。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 47,
+      "sentence": 1,
+      "text": "- 累计：`SUM(值) OVER (ORDER BY … ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)`。",
+      "status": "成立",
+      "evidence": [
+        "S37"
+      ],
+      "reason": "累计窗口有数值正确的正例；无需转BIGINT。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 48,
+      "sentence": 1,
+      "text": "- 排名：`ROW_NUMBER()`、`RANK()` 作为输出列时，必须写成 `CAST(ROW_NUMBER() OVER (…) AS BIGINT)`；在内层 CTE 里算、到外层才选出（包括外层改名）也一样要转。",
+      "status": "成立",
+      "evidence": [
+        "S35_ROW_NUMBER_native",
+        "S35_ROW_NUMBER_bigint",
+        "S35_RANK_native",
+        "S35_RANK_bigint",
+        "B11",
+        "B12",
+        "R_per_group_ROW_NUMBER_True",
+        "R_per_group_RANK_True",
+        "R_cumulative_unicode"
+      ],
+      "reason": "排名需BIGINT输出，纯筛选可不转；有无PARTITION与外层改名均直接核验，英文别名条件成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 48,
+      "sentence": 2,
+      "text": "只用来筛选（例如 `WHERE n <= 3`）、不输出时，可以不转换。",
+      "status": "成立",
+      "evidence": [
+        "S35_ROW_NUMBER_native",
+        "S35_ROW_NUMBER_bigint",
+        "S35_RANK_native",
+        "S35_RANK_bigint",
+        "B11",
+        "B12",
+        "R_per_group_ROW_NUMBER_True",
+        "R_per_group_RANK_True",
+        "R_cumulative_unicode"
+      ],
+      "reason": "排名需BIGINT输出，纯筛选可不转；有无PARTITION与外层改名均直接核验，英文别名条件成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 48,
+      "sentence": 3,
+      "text": "带不带 `PARTITION BY` 都适用这条。",
+      "status": "成立",
+      "evidence": [
+        "S35_ROW_NUMBER_native",
+        "S35_ROW_NUMBER_bigint",
+        "S35_RANK_native",
+        "S35_RANK_bigint",
+        "B11",
+        "B12",
+        "R_per_group_ROW_NUMBER_True",
+        "R_per_group_RANK_True",
+        "R_cumulative_unicode"
+      ],
+      "reason": "排名需BIGINT输出，纯筛选可不转；有无PARTITION与外层改名均直接核验，英文别名条件成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 48,
+      "sentence": 4,
+      "text": "输出里有窗口函数的结果时，输出列的别名只用英文字母、数字和下划线。",
+      "status": "成立",
+      "evidence": [
+        "S35_ROW_NUMBER_native",
+        "S35_ROW_NUMBER_bigint",
+        "S35_RANK_native",
+        "S35_RANK_bigint",
+        "B11",
+        "B12",
+        "R_per_group_ROW_NUMBER_True",
+        "R_per_group_RANK_True",
+        "R_cumulative_unicode"
+      ],
+      "reason": "排名需BIGINT输出，纯筛选可不转；有无PARTITION与外层改名均直接核验，英文别名条件成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 49,
+      "sentence": 1,
+      "text": "- 两个含 `MEASURE()` 的 CTE 按键互连：两个 CTE 的输出列名要彼此不同（不要两边都叫同一个名字），外层选出时也用不同的别名。",
+      "status": "成立",
+      "evidence": [
+        "F02_distinct_alias",
+        "R_period_join_year_JOIN"
+      ],
+      "reason": "两边及外层列名不同是足够安全的规范；不是必要条件，不能据此说所有同名都一定错。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 50,
+      "sentence": 1,
+      "text": "- 按另一个 CTE 的结果筛选时，写成 `WHERE 键 IN (SELECT 键 FROM 另一个CTE)`。",
+      "status": "成立",
+      "evidence": [
+        "F06"
+      ],
+      "reason": "IN半连接保留组内汇总值。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 51,
+      "sentence": 1,
+      "text": "- 两个时期对比（同比、环比）：二选一，都要遵守上面「两个 CTE 互连」的列名规则。",
+      "status": "成立",
+      "evidence": [
+        "R_period_case_year_calendar",
+        "R_period_case_month_month_bucket",
+        "R_period_join_year_JOIN",
+        "R_period_join_month_JOIN"
+      ],
+      "reason": "二种组合均完成年、月真实时期比较，遵守独立列名。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 52,
+      "sentence": 1,
+      "text": "  - 先按「时间」一节的写法得到带期间列的 CTE，在外层用 `SUM(CASE WHEN 期间 = … THEN 值 ELSE 0 END)` 把两个时期拆成两列，再相除；",
+      "status": "成立",
+      "evidence": [
+        "R_period_case_year_calendar",
+        "R_period_case_year_outer_extract",
+        "R_period_case_month_month_bucket"
+      ],
+      "reason": "直接完整条件聚合拆列、再相除，两个值及比值/增长率均对独立事实表。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 53,
+      "sentence": 1,
+      "text": "  - 或者写两个 CTE、各自在 `WHERE` 里筛一个时期并按同一个键聚合，外层用 `JOIN … ON 键` 连起来。",
+      "status": "成立",
+      "evidence": [
+        "R_period_join_year_JOIN",
+        "R_period_join_month_JOIN",
+        "R_period_join_year_FULL_OUTER_JOIN"
+      ],
+      "reason": "两个CTE各取不同期间，按相同含义但不同列名键连接；两列、比值及增长率正确。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 54,
+      "sentence": 1,
+      "text": "- 除法：整数相除会截断，需要小数时先 `CAST(… AS DOUBLE PRECISION)`；防止除以零用 `NULLIF(分母, 0)`。",
+      "status": "成立",
+      "evidence": [
+        "S40",
+        "R_ratio_True"
+      ],
+      "reason": "整数截断、DOUBLE、NULLIF零保护与组合除法成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 55,
+      "sentence": 1,
+      "text": "- 空值补零写 `COALESCE(值, 0)`，或者 `CASE WHEN 值 IS NULL THEN 0 ELSE 值 END`。",
+      "status": "成立",
+      "evidence": [
+        "R_coalesce_actual_null",
+        "R_case_actual_null"
+      ],
+      "reason": "不是只测非NULL输入，实际NULL分支填0正确。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 56,
+      "sentence": 1,
+      "text": "- 类型转换：`CAST(值 AS BIGINT | INTEGER | NUMERIC | DECIMAL(p, s) | DOUBLE PRECISION | TEXT)`。",
+      "status": "成立",
+      "evidence": [
+        "S42_bigint",
+        "S42_integer",
+        "S42_numeric",
+        "S42_decimal",
+        "S42_double",
+        "S42_text"
+      ],
+      "reason": "所列转换类型的标量形态均可用；不覆盖已明示禁忌的interval转换。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 60,
+      "sentence": 1,
+      "text": "- 能执行但算出错误的数（不报错，要特别避开）：",
+      "status": "条件不符",
+      "evidence": [
+        "S34_inner",
+        "F05"
+      ],
+      "reason": "该分组的两条禁忌都省略必要条件，有正反例，不可当作无条件断言。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 61,
+      "sentence": 1,
+      "text": "  - 两个含 `MEASURE()` 的 CTE 用同一个输出列名（例如都叫 `v`），外层再用 `JOIN … ON` 或 `LEFT JOIN … ON` 连起来同时选出这两列：第二列会变成第一列的值。",
+      "status": "不成立",
+      "evidence": [
+        "S34_inner",
+        "S34_left",
+        "R_same_cte_alias_JOIN",
+        "R_same_cte_alias_LEFT_JOIN"
+      ],
+      "reason": "内层同名但外层给不同别名时两列都正确；原句没有这个条件，断言第二列必变成第一列不成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 62,
+      "sentence": 1,
+      "text": "  - 一个聚合 CTE，和由它派生出来的 CTE（例如从它取出的键集合）`JOIN` 之后再 `SUM` / `GROUP BY`：每组得到的是全部的合计，不是本组的值。",
+      "status": "不成立",
+      "evidence": [
+        "F05",
+        "F06",
+        "R_derived_key_renamed"
+      ],
+      "reason": "派生键不改名时确有错值，但只把派生键改名后JOIN再SUM可正确；原文无条件归纳不成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 62,
+      "sentence": 2,
+      "text": "要这样筛选时改用上面的 `IN (SELECT …)`。",
+      "status": "成立",
+      "evidence": [
+        "F05",
+        "F06",
+        "R_derived_key_renamed"
+      ],
+      "reason": "IN写法成立，但为避免删除前句后留下无所指代的句子，删项补丁删除整条，不改写。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 63,
+      "sentence": 1,
+      "text": "- 会报错：",
+      "status": "条件不符",
+      "evidence": [
+        "S03",
+        "R_chain_flat",
+        "S37"
+      ],
+      "reason": "分组中的部分“会报错”断言过宽，须逐条看下列结论。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 64,
+      "sentence": 1,
+      "text": "  - 对指标再套聚合，例如 `SUM(MEASURE(…))`。",
+      "status": "成立",
+      "evidence": [
+        "S03",
+        "R_count_measure"
+      ],
+      "reason": "SUM和COUNT包MEASURE均实际报错。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 65,
+      "sentence": 1,
+      "text": "  - cube 之间写 `JOIN … ON` 条件；或者把一个已聚合的 CTE 和原始 cube 用 `JOIN … ON` 连起来。",
+      "status": "成立",
+      "evidence": [
+        "F33",
+        "F34"
+      ],
+      "reason": "原始cube的普通ON与聚合CTE接原始cube都报错。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 66,
+      "sentence": 1,
+      "text": "  - 三个维度 cube 平铺 `CROSS JOIN`（任何顺序都不行）；两个维度 cube 时把它们写在相邻位置、事实 cube 放在一端。",
+      "status": "不成立",
+      "evidence": [
+        "R_chain_flat",
+        "R_two_dims_end",
+        "F30_sales_store_channel_calendar"
+      ],
+      "reason": "三维链式图平铺可成功；两维链式图事实放一端也可成功。星形图失败不可外推全部图形。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 67,
+      "sentence": 1,
+      "text": "  - 两个事实 cube 的指标放在同一层查询里（任何连接顺序都不行）。",
+      "status": "成立",
+      "evidence": [
+        "S52_sales_online_sales_calendar",
+        "S52_sales_calendar_online_sales",
+        "S52_online_sales_sales_calendar",
+        "S52_online_sales_calendar_sales",
+        "S52_calendar_sales_online_sales",
+        "S52_calendar_online_sales_sales",
+        "S53",
+        "B03"
+      ],
+      "reason": "当前两销售事实直接同层的所有已列顺序/嵌套均失败；不外推未部署模型。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 68,
+      "sentence": 1,
+      "text": "  - `EXTRACT(…)` 和 `MEASURE()` 在同一层一起分组。",
+      "status": "成立",
+      "evidence": [
+        "S11",
+        "F22"
+      ],
+      "reason": "同层EXTRACT+MEASURE失败，外层EXTRACT正例成立。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 69,
+      "sentence": 1,
+      "text": "  - 窗口函数的结果不转 `BIGINT` 就作为输出列；输出里有窗口函数结果时用中文别名。",
+      "status": "不成立",
+      "evidence": [
+        "S37",
+        "S35_ROW_NUMBER_native",
+        "S35_RANK_native",
+        "T05",
+        "R_cumulative_unicode"
+      ],
+      "reason": "前半句泛称窗口函数需BIGINT，SUM累计窗口无需转且正确；后半句中文窗口别名禁忌成立，分开记录。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 70,
+      "sentence": 1,
+      "text": "  - `COALESCE(NULL, 值)`、`COALESCE(CAST(NULL AS …), 值)` 这种第一个参数是空值常量的写法。",
+      "status": "成立",
+      "evidence": [
+        "F20_coalesce",
+        "F20_coalesce_cast",
+        "B22"
+      ],
+      "reason": "NULL常量第一参数反例持续报错。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 71,
+      "sentence": 1,
+      "text": "  - `PERCENTILE_CONT(…) WITHIN GROUP (…)`：引擎没有实现。",
+      "status": "成立",
+      "evidence": [
+        "S61",
+        "F41"
+      ],
+      "reason": "Float64纯SQL控制仍明确execution未实现。"
+    },
+    {
+      "file": "render/syntax/cube_sql.md",
+      "line": 72,
+      "sentence": 1,
+      "text": "  - 对两个时间戳之差求 `AVG`，或把它转成 `DOUBLE PRECISION`：引擎不支持这种类型。",
+      "status": "成立",
+      "evidence": [
+        "T01",
+        "T02"
+      ],
+      "reason": "时间戳之差AVG与CAST到Float64均直接失败。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 3,
+      "sentence": 1,
+      "text": "下面的写法都经过实测。",
+      "status": "条件不符",
+      "evidence": [
+        "J01",
+        "R_json_extra_offset"
+      ],
+      "reason": "全局实测承诺未满足，存在额外键断言反例。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 5,
+      "sentence": 1,
+      "text": "- 输出一个 JSON 对象，发给 Cube 的 `/load` 接口。",
+      "status": "成立",
+      "evidence": [
+        "J01",
+        "J02",
+        "J30",
+        "J31",
+        "R_json_skeleton_literal"
+      ],
+      "reason": "这是成员各部分的命名及模型存在性规则，点号是cube/member分隔符；占位骨架须替换名字。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 5,
+      "sentence": 2,
+      "text": "只能引用数据模型里已定义的成员，写成「cube名.成员名」，照数据模型里的写法原样抄写；不存在的成员会报错。",
+      "status": "成立",
+      "evidence": [
+        "J01",
+        "J02",
+        "J30",
+        "J31",
+        "R_json_skeleton_literal"
+      ],
+      "reason": "这是成员各部分的命名及模型存在性规则，点号是cube/member分隔符；占位骨架须替换名字。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 5,
+      "sentence": 3,
+      "text": "成员名只能由英文字母、数字和下划线组成，不能写表达式、函数或空格（会被拒绝）。",
+      "status": "成立",
+      "evidence": [
+        "J01",
+        "J02",
+        "J30",
+        "J31",
+        "R_json_skeleton_literal"
+      ],
+      "reason": "这是成员各部分的命名及模型存在性规则，点号是cube/member分隔符；占位骨架须替换名字。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 6,
+      "sentence": 1,
+      "text": "- 键：`\"measures\"`（指标数组）、`\"dimensions\"`（分组维度数组）、`\"timeDimensions\"`（时间维度数组）、`\"filters\"`（筛选数组）、`\"order\"`（排序）、`\"limit\"`（行数上限，整数）。",
+      "status": "成立",
+      "evidence": [
+        "J01",
+        "R_json_limit_float",
+        "R_json_limit_string",
+        "R_json_extra_offset",
+        "R_json_extra_timezone",
+        "R_json_extra_join",
+        "R_json_extra_expression"
+      ],
+      "reason": "列举键及limit整数规则成立；关于所有其他键的第二句单列为不成立。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 6,
+      "sentence": 2,
+      "text": "其他键（例如 `\"join\"`、`\"expression\"`）会被拒绝。",
+      "status": "不成立",
+      "evidence": [
+        "J01",
+        "R_json_limit_float",
+        "R_json_limit_string",
+        "R_json_extra_offset",
+        "R_json_extra_timezone",
+        "R_json_extra_join",
+        "R_json_extra_expression"
+      ],
+      "reason": "offset和timezone都是未列出的键，但实际被接受；join/expression被拒不等于所有其他键都被拒。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 7,
+      "sentence": 1,
+      "text": "- 例：`{\"measures\": [\"甲.指标\"], \"dimensions\": [\"乙.维度\"], \"filters\": [{\"member\": \"乙.维度\", \"operator\": \"equals\", \"values\": [\"某值\"]}], \"order\": {\"甲.指标\": \"desc\"}, \"limit\": 10}`。",
+      "status": "成立",
+      "evidence": [
+        "R_json_skeleton",
+        "R_json_skeleton_literal"
+      ],
+      "reason": "原文骨架可JSON解析，替换占位名称及占位值后原结构原样通过且值正确；文字占位本身不是模型成员，预期报错不否定格式定义。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 8,
+      "sentence": 1,
+      "text": "- `\"measures\"`、`\"dimensions\"` 的元素是成员名字符串；`\"filters\"` 的每个元素写成 `{\"member\": 成员名, \"operator\": 运算符, \"values\": [字符串, …]}`。",
+      "status": "成立",
+      "evidence": [
+        "J01",
+        "J21_or",
+        "J21_and",
+        "R_json_alias_member"
+      ],
+      "reason": "普通过滤元素结构成立；or/and容器由后文单列，不能把本句泛化成禁止那些容器。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 9,
+      "sentence": 1,
+      "text": "- 没有列别名：结果的每一列就以成员名命名，不能改名。",
+      "status": "成立",
+      "evidence": [
+        "R_json_extra_aliases",
+        "R_json_alias_member",
+        "R_json_skeleton"
+      ],
+      "reason": "额外aliases键/成员别名对象被拒；返回以注解成员名命名。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 10,
+      "sentence": 1,
+      "text": "- 结果按 `dimensions` 和时间粒度分组，每组返回一行，指标由引擎按定义计算。",
+      "status": "成立",
+      "evidence": [
+        "J01",
+        "J10_day",
+        "J10_month"
+      ],
+      "reason": "维度及时间桶分组正例。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 11,
+      "sentence": 1,
+      "text": "- 多个 cube 的成员可以放在同一个查询里，前提是数据模型里有连接路径：一个事实 cube 的指标配多个维度 cube 的维度可以；两个事实 cube 的指标也可以放在一起，按它们共同连接的维度分组。",
+      "status": "成立",
+      "evidence": [
+        "J03",
+        "J04",
+        "J05"
+      ],
+      "reason": "以模型已有连接路径为前提，双事实共享维度及多维正例成立；任意join键被拒。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 11,
+      "sentence": 2,
+      "text": "连接条件不需要也不能写。",
+      "status": "成立",
+      "evidence": [
+        "J03",
+        "J04",
+        "J05"
+      ],
+      "reason": "以模型已有连接路径为前提，双事实共享维度及多维正例成立；任意join键被拒。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 12,
+      "sentence": 1,
+      "text": "- 时间维度：`{\"dimension\": \"甲.时间\", \"granularity\": \"month\", \"dateRange\": [\"2020-01-01\", \"2020-06-30\"]}`；粒度可选 day、week、month、quarter、year；不写粒度就只按区间筛选、不分组。",
+      "status": "成立",
+      "evidence": [
+        "J10_day",
+        "J10_week",
+        "J10_month",
+        "J10_quarter",
+        "J10_year",
+        "J10_None"
+      ],
+      "reason": "复跑五粒度与无粒度；部分桶用旧独立日级基线核验，结果起点可越出筛选区间但值只来自区间。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 12,
+      "sentence": 2,
+      "text": "区间两端落在半个周、季、年里时，那一组仍按所在周、季、年的起点标注，但只计入 `dateRange` 以内的数据。",
+      "status": "成立",
+      "evidence": [
+        "J10_day",
+        "J10_week",
+        "J10_month",
+        "J10_quarter",
+        "J10_year",
+        "J10_None"
+      ],
+      "reason": "复跑五粒度与无粒度；部分桶用旧独立日级基线核验，结果起点可越出筛选区间但值只来自区间。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 13,
+      "sentence": 1,
+      "text": "- 筛选运算符：`equals`、`notEquals`、`contains`、`notContains`、`gt`、`gte`、`lt`、`lte`、`set`、`notSet`、`inDateRange`、`beforeDate`、`afterDate`。",
+      "status": "成立",
+      "evidence": [
+        "J20_equals",
+        "J20_notEquals",
+        "J20_contains",
+        "J20_notContains",
+        "J20_gt",
+        "J20_gte",
+        "J20_lt",
+        "J20_lte",
+        "J20_set",
+        "J20_notSet",
+        "J20_inDateRange",
+        "J20_beforeDate",
+        "J20_afterDate",
+        "R_json_compiled_beforeDate",
+        "R_json_compiled_afterDate",
+        "R_json_compiled_inDateRange"
+      ],
+      "reason": "13种运算；大小写例、字符串/空数组为安全客户端规范。编译SQL日期参数证明包含区间两端，before/after排除整天（UTC）；服务端也允许set非空数组，不影响此安全规范。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 13,
+      "sentence": 2,
+      "text": "`values` 一律写成字符串数组（`set`、`notSet` 写空数组）。",
+      "status": "成立",
+      "evidence": [
+        "J20_equals",
+        "J20_notEquals",
+        "J20_contains",
+        "J20_notContains",
+        "J20_gt",
+        "J20_gte",
+        "J20_lt",
+        "J20_lte",
+        "J20_set",
+        "J20_notSet",
+        "J20_inDateRange",
+        "J20_beforeDate",
+        "J20_afterDate",
+        "R_json_compiled_beforeDate",
+        "R_json_compiled_afterDate",
+        "R_json_compiled_inDateRange"
+      ],
+      "reason": "13种运算；大小写例、字符串/空数组为安全客户端规范。编译SQL日期参数证明包含区间两端，before/after排除整天（UTC）；服务端也允许set非空数组，不影响此安全规范。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 13,
+      "sentence": 3,
+      "text": "`contains`、`notContains` 不区分大小写。",
+      "status": "成立",
+      "evidence": [
+        "J20_equals",
+        "J20_notEquals",
+        "J20_contains",
+        "J20_notContains",
+        "J20_gt",
+        "J20_gte",
+        "J20_lt",
+        "J20_lte",
+        "J20_set",
+        "J20_notSet",
+        "J20_inDateRange",
+        "J20_beforeDate",
+        "J20_afterDate",
+        "R_json_compiled_beforeDate",
+        "R_json_compiled_afterDate",
+        "R_json_compiled_inDateRange"
+      ],
+      "reason": "13种运算；大小写例、字符串/空数组为安全客户端规范。编译SQL日期参数证明包含区间两端，before/after排除整天（UTC）；服务端也允许set非空数组，不影响此安全规范。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 13,
+      "sentence": 4,
+      "text": "`inDateRange` 两端都包含；`beforeDate`、`afterDate` 不包含所给的那一天。",
+      "status": "成立",
+      "evidence": [
+        "J20_equals",
+        "J20_notEquals",
+        "J20_contains",
+        "J20_notContains",
+        "J20_gt",
+        "J20_gte",
+        "J20_lt",
+        "J20_lte",
+        "J20_set",
+        "J20_notSet",
+        "J20_inDateRange",
+        "J20_beforeDate",
+        "J20_afterDate",
+        "R_json_compiled_beforeDate",
+        "R_json_compiled_afterDate",
+        "R_json_compiled_inDateRange"
+      ],
+      "reason": "13种运算；大小写例、字符串/空数组为安全客户端规范。编译SQL日期参数证明包含区间两端，before/after排除整天（UTC）；服务端也允许set非空数组，不影响此安全规范。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 14,
+      "sentence": 1,
+      "text": "- 多个条件默认同时成立；需要「或」时写 `{\"or\": [条件1, 条件2]}`，「且」写 `{\"and\": […]}`。",
+      "status": "成立",
+      "evidence": [
+        "J21_or",
+        "J21_and",
+        "J21_default"
+      ],
+      "reason": "默认AND、显式AND/OR的返回与谓词一致。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 15,
+      "sentence": 1,
+      "text": "- 按指标筛选（相当于分组后的 HAVING）也写在 `filters` 里，`member` 填指标名。",
+      "status": "成立",
+      "evidence": [
+        "J22"
+      ],
+      "reason": "指标filters正例。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 16,
+      "sentence": 1,
+      "text": "- 排序 `order` 可以是对象 `{\"成员\": \"asc\"}`，也可以是数组 `[[\"成员\", \"desc\"], …]`，按顺序生效。",
+      "status": "成立",
+      "evidence": [
+        "J01",
+        "J23"
+      ],
+      "reason": "对象及有序数组的行序正例。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 17,
+      "sentence": 1,
+      "text": "- 取前 N 行：按指标写 `order`，再写 `\"limit\": N`。",
+      "status": "成立",
+      "evidence": [
+        "R_json_limit_group",
+        "R_json_limit_per_group"
+      ],
+      "reason": "实际多分组数据只返回全局2行；limitPerGroup被拒，不能用普通limit表达逐组N。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 17,
+      "sentence": 2,
+      "text": "`limit` 作用于整个结果，不能「每组各取前 N」。",
+      "status": "成立",
+      "evidence": [
+        "R_json_limit_group",
+        "R_json_limit_per_group"
+      ],
+      "reason": "实际多分组数据只返回全局2行；limitPerGroup被拒，不能用普通limit表达逐组N。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 18,
+      "sentence": 1,
+      "text": "- 空值：要筛出某个维度有值或为空的行，用 `set`、`notSet`。",
+      "status": "成立",
+      "evidence": [
+        "J20_set",
+        "J20_notSet"
+      ],
+      "reason": "有值/无值筛选正例；当前字段非NULL，notSet为空符合基线。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 19,
+      "sentence": 1,
+      "text": "- 不能写任意表达式：不能在指标结果上再做加减乘除、排名、累计，也不能对维度临时做计算（这样写会被拒绝）。",
+      "status": "成立",
+      "evidence": [
+        "J30",
+        "J31",
+        "J32",
+        "J33"
+      ],
+      "reason": "临时指标、维度、expression键拒绝，预定义计算指标接受。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 19,
+      "sentence": 2,
+      "text": "这些计算只能由模型里已定义的指标完成。",
+      "status": "成立",
+      "evidence": [
+        "J30",
+        "J31",
+        "J32",
+        "J33"
+      ],
+      "reason": "临时指标、维度、expression键拒绝，预定义计算指标接受。"
+    },
+    {
+      "file": "render/syntax/cube_json.md",
+      "line": 20,
+      "sentence": 1,
+      "text": "- 因此比率、占比、同比、环比、除法、空值补零、组内排名：数据模型里有对应的指标时直接调用它；没有时，这个接口在一条查询里表达不了。",
+      "status": "成立",
+      "evidence": [
+        "J30",
+        "J31",
+        "J32",
+        "J33",
+        "R_json_limit_per_group"
+      ],
+      "reason": "只允许调用已定义成员；这里不是创造缺失的排名指标。表达能力结论限于一条既定成员JSON对象。"
+    }
+  ],
+  "numeric_checks": {
+    "R_period_case_year_calendar": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2783180890.195907,
+          2228460305.5978765,
+          0.8006882748612922,
+          -0.19931172513870773
+        ],
+        [
+          2,
+          789379825.2129184,
+          937069110.9298035,
+          1.1870953386439147,
+          0.18709533864391462
+        ],
+        [
+          3,
+          418176088.5070995,
+          345528219.4896976,
+          0.8262744546758833,
+          -0.17372554532411666
+        ],
+        [
+          4,
+          571204151.104702,
+          600175898.6667062,
+          1.0507204779691695,
+          0.05072047796916951
+        ]
+      ],
+      "basis": "independent physical year aggregates; both values, ratio and growth"
+    },
+    "R_period_case_year_outer_extract": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2783180890.195907,
+          2228460305.5978765,
+          0.8006882748612922,
+          -0.19931172513870773
+        ],
+        [
+          2,
+          789379825.2129184,
+          937069110.9298035,
+          1.1870953386439147,
+          0.18709533864391462
+        ],
+        [
+          3,
+          418176088.5070995,
+          345528219.4896976,
+          0.8262744546758833,
+          -0.17372554532411666
+        ],
+        [
+          4,
+          571204151.104702,
+          600175898.6667062,
+          1.0507204779691695,
+          0.05072047796916951
+        ]
+      ],
+      "basis": "independent physical year aggregates; both values, ratio and growth"
+    },
+    "R_period_join_year_JOIN": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2783180890.195907,
+          2228460305.5978765,
+          0.8006882748612922,
+          -0.19931172513870773
+        ],
+        [
+          2,
+          789379825.2129184,
+          937069110.9298035,
+          1.1870953386439147,
+          0.18709533864391462
+        ],
+        [
+          3,
+          418176088.5070995,
+          345528219.4896976,
+          0.8262744546758833,
+          -0.17372554532411666
+        ],
+        [
+          4,
+          571204151.104702,
+          600175898.6667062,
+          1.0507204779691695,
+          0.05072047796916951
+        ]
+      ],
+      "basis": "independent physical year aggregates; both values, ratio and growth"
+    },
+    "R_period_join_year_FULL_OUTER_JOIN": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2783180890.195907,
+          2228460305.5978765,
+          0.8006882748612922,
+          -0.19931172513870773
+        ],
+        [
+          2,
+          789379825.2129184,
+          937069110.9298035,
+          1.1870953386439147,
+          0.18709533864391462
+        ],
+        [
+          3,
+          418176088.5070995,
+          345528219.4896976,
+          0.8262744546758833,
+          -0.17372554532411666
+        ],
+        [
+          4,
+          571204151.104702,
+          600175898.6667062,
+          1.0507204779691695,
+          0.05072047796916951
+        ]
+      ],
+      "basis": "independent physical year aggregates; both values, ratio and growth"
+    },
+    "R_period_case_month_month_bucket": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          177329743.5724954,
+          1.0903417245558744,
+          0.09034172455587441
+        ],
+        [
+          2,
+          53212337.09040005,
+          57154153.064999975,
+          1.0740771067413062,
+          0.07407710674130613
+        ],
+        [
+          3,
+          42739462.42910003,
+          22947192.41160005,
+          0.5369087748744352,
+          -0.4630912251255648
+        ],
+        [
+          4,
+          39627318.76870023,
+          43055837.852400064,
+          1.0865190780055467,
+          0.08651907800554663
+        ]
+      ],
+      "basis": "independent physical month aggregates; both values, ratio and growth"
+    },
+    "R_period_join_month_JOIN": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          177329743.5724954,
+          1.0903417245558744,
+          0.09034172455587441
+        ],
+        [
+          2,
+          53212337.09040005,
+          57154153.064999975,
+          1.0740771067413062,
+          0.07407710674130613
+        ],
+        [
+          3,
+          42739462.42910003,
+          22947192.41160005,
+          0.5369087748744352,
+          -0.4630912251255648
+        ],
+        [
+          4,
+          39627318.76870023,
+          43055837.852400064,
+          1.0865190780055467,
+          0.08651907800554663
+        ]
+      ],
+      "basis": "independent physical month aggregates; both values, ratio and growth"
+    },
+    "R_period_join_month_FULL_OUTER_JOIN": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          177329743.5724954,
+          1.0903417245558744,
+          0.09034172455587441
+        ],
+        [
+          2,
+          53212337.09040005,
+          57154153.064999975,
+          1.0740771067413062,
+          0.07407710674130613
+        ],
+        [
+          3,
+          42739462.42910003,
+          22947192.41160005,
+          0.5369087748744352,
+          -0.4630912251255648
+        ],
+        [
+          4,
+          39627318.76870023,
+          43055837.852400064,
+          1.0865190780055467,
+          0.08651907800554663
+        ]
+      ],
+      "basis": "independent physical month aggregates; both values, ratio and growth"
+    },
+    "R_ratio_True": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409,
+          252.77366350423398
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217,
+          249.56892316466346
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426,
+          280.3948304692115
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174,
+          262.13051694537575
+        ]
+      ],
+      "basis": "two distinct physical aggregates, grouped division"
+    },
+    "R_ratio_False": {
+      "ok": true,
+      "expected": [
+        [
+          298215968.349796,
+          1160226,
+          257.03265428442046
+        ]
+      ],
+      "basis": "global ratio of separate totals, not average of per-group ratios"
+    },
+    "R_star_right_store_channel_calendar": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          "Store",
+          2007,
+          2163
+        ],
+        [
+          2,
+          "Store",
+          2007,
+          1686
+        ],
+        [
+          3,
+          "Store",
+          2007,
+          1683
+        ],
+        [
+          4,
+          "Store",
+          2007,
+          1919
+        ]
+      ],
+      "basis": "independent physical star, generic quantity metric"
+    },
+    "R_star_right_store_calendar_channel": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          "Store",
+          2007,
+          2163
+        ],
+        [
+          2,
+          "Store",
+          2007,
+          1686
+        ],
+        [
+          3,
+          "Store",
+          2007,
+          1683
+        ],
+        [
+          4,
+          "Store",
+          2007,
+          1919
+        ]
+      ],
+      "basis": "independent physical star, generic quantity metric"
+    },
+    "R_star_right_channel_store_calendar": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          "Store",
+          2007,
+          2163
+        ],
+        [
+          2,
+          "Store",
+          2007,
+          1686
+        ],
+        [
+          3,
+          "Store",
+          2007,
+          1683
+        ],
+        [
+          4,
+          "Store",
+          2007,
+          1919
+        ]
+      ],
+      "basis": "independent physical star, generic quantity metric"
+    },
+    "R_star_right_channel_calendar_store": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          "Store",
+          2007,
+          2163
+        ],
+        [
+          2,
+          "Store",
+          2007,
+          1686
+        ],
+        [
+          3,
+          "Store",
+          2007,
+          1683
+        ],
+        [
+          4,
+          "Store",
+          2007,
+          1919
+        ]
+      ],
+      "basis": "independent physical star, generic quantity metric"
+    },
+    "R_star_right_calendar_store_channel": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          "Store",
+          2007,
+          2163
+        ],
+        [
+          2,
+          "Store",
+          2007,
+          1686
+        ],
+        [
+          3,
+          "Store",
+          2007,
+          1683
+        ],
+        [
+          4,
+          "Store",
+          2007,
+          1919
+        ]
+      ],
+      "basis": "independent physical star, generic quantity metric"
+    },
+    "R_star_right_calendar_channel_store": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          "Store",
+          2007,
+          2163
+        ],
+        [
+          2,
+          "Store",
+          2007,
+          1686
+        ],
+        [
+          3,
+          "Store",
+          2007,
+          1683
+        ],
+        [
+          4,
+          "Store",
+          2007,
+          1919
+        ]
+      ],
+      "basis": "independent physical star, generic quantity metric"
+    },
+    "R_chain_flat": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          1,
+          1,
+          392
+        ],
+        [
+          2,
+          1,
+          1,
+          470
+        ],
+        [
+          3,
+          1,
+          1,
+          414
+        ],
+        [
+          4,
+          1,
+          1,
+          544
+        ]
+      ],
+      "basis": "independent physical chain"
+    },
+    "R_chain_right": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          1,
+          1,
+          392
+        ],
+        [
+          2,
+          1,
+          1,
+          470
+        ],
+        [
+          3,
+          1,
+          1,
+          414
+        ],
+        [
+          4,
+          1,
+          1,
+          544
+        ]
+      ],
+      "basis": "independent physical chain"
+    },
+    "R_two_dims_end": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          1,
+          392
+        ],
+        [
+          2,
+          1,
+          470
+        ],
+        [
+          3,
+          1,
+          414
+        ],
+        [
+          4,
+          1,
+          544
+        ]
+      ],
+      "basis": "same chain with final dimension omitted"
+    },
+    "R_two_dims_middle": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          1,
+          392
+        ],
+        [
+          2,
+          1,
+          470
+        ],
+        [
+          3,
+          1,
+          414
+        ],
+        [
+          4,
+          1,
+          544
+        ]
+      ],
+      "basis": "same chain with final dimension omitted"
+    },
+    "R_same_cte_alias_JOIN": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "inner duplicate names with distinct outer output names"
+    },
+    "R_same_cte_alias_LEFT_JOIN": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568,
+          643409
+        ],
+        [
+          2,
+          53212337.09040005,
+          213217
+        ],
+        [
+          3,
+          42739462.42910004,
+          152426
+        ],
+        [
+          4,
+          39627318.768700235,
+          151174
+        ]
+      ],
+      "basis": "inner duplicate names with distinct outer output names"
+    },
+    "R_derived_key_renamed": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          162636850.06159568
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "renamed derived key preserves grouped sum"
+    },
+    "R_coalesce_actual_null": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "actual NULL branch filled with zero"
+    },
+    "R_case_actual_null": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          53212337.09040005
+        ],
+        [
+          3,
+          42739462.42910004
+        ],
+        [
+          4,
+          39627318.768700235
+        ]
+      ],
+      "basis": "actual NULL branch filled with zero"
+    },
+    "R_per_group_ROW_NUMBER_True": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2,
+          393301,
+          1
+        ],
+        [
+          1,
+          8,
+          182898,
+          2
+        ],
+        [
+          2,
+          8,
+          88018,
+          1
+        ],
+        [
+          2,
+          2,
+          68543,
+          2
+        ],
+        [
+          3,
+          2,
+          152426,
+          1
+        ],
+        [
+          4,
+          8,
+          63756,
+          1
+        ],
+        [
+          4,
+          2,
+          48582,
+          2
+        ]
+      ],
+      "basis": "independent groups with unique ordering keys, actual top2 + returned rank"
+    },
+    "R_per_group_ROW_NUMBER_False": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2,
+          393301
+        ],
+        [
+          1,
+          8,
+          182898
+        ],
+        [
+          2,
+          8,
+          88018
+        ],
+        [
+          2,
+          2,
+          68543
+        ],
+        [
+          3,
+          2,
+          152426
+        ],
+        [
+          4,
+          8,
+          63756
+        ],
+        [
+          4,
+          2,
+          48582
+        ]
+      ],
+      "basis": "same top2 with native rank only used as filter"
+    },
+    "R_per_group_RANK_True": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2,
+          393301,
+          1
+        ],
+        [
+          1,
+          8,
+          182898,
+          2
+        ],
+        [
+          2,
+          8,
+          88018,
+          1
+        ],
+        [
+          2,
+          2,
+          68543,
+          2
+        ],
+        [
+          3,
+          2,
+          152426,
+          1
+        ],
+        [
+          4,
+          8,
+          63756,
+          1
+        ],
+        [
+          4,
+          2,
+          48582,
+          2
+        ]
+      ],
+      "basis": "independent groups with unique ordering keys, actual top2 + returned rank"
+    },
+    "R_per_group_RANK_False": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          2,
+          393301
+        ],
+        [
+          1,
+          8,
+          182898
+        ],
+        [
+          2,
+          8,
+          88018
+        ],
+        [
+          2,
+          2,
+          68543
+        ],
+        [
+          3,
+          2,
+          152426
+        ],
+        [
+          4,
+          8,
+          63756
+        ],
+        [
+          4,
+          2,
+          48582
+        ]
+      ],
+      "basis": "same top2 with native rank only used as filter"
+    },
+    "R_json_skeleton": {
+      "ok": true,
+      "expected": [
+        [
+          "Store",
+          6942853195.144026
+        ]
+      ],
+      "basis": "literal skeleton parsed; only placeholder names substituted"
+    },
+    "R_json_limit_group": {
+      "ok": true,
+      "expected": [
+        [
+          1,
+          1,
+          9822545
+        ],
+        [
+          1,
+          3,
+          1760853
+        ]
+      ],
+      "basis": "two global rows, not two for each channel"
+    },
+    "R_json_compiled_beforeDate": {
+      "ok": true,
+      "parameters": [
+        "2007-02-02T00:00:00.000Z"
+      ],
+      "basis": "compiled UTC boundary parameters, preserved SQL in raw result"
+    },
+    "R_json_compiled_afterDate": {
+      "ok": true,
+      "parameters": [
+        "2007-02-02T23:59:59.999Z"
+      ],
+      "basis": "compiled UTC boundary parameters, preserved SQL in raw result"
+    },
+    "R_json_compiled_inDateRange": {
+      "ok": true,
+      "parameters": [
+        "2007-02-01T00:00:00.000Z",
+        "2007-02-02T23:59:59.999Z"
+      ],
+      "basis": "compiled UTC boundary parameters, preserved SQL in raw result"
+    },
+    "repeat_S01": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S30": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S31": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F06": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_B23": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S02": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S32_cte": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S32_subquery": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S33_cte": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S33_subquery": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S34_inner": {
+      "ok": false,
+      "expected_bad": true,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S34_left": {
+      "ok": false,
+      "expected_bad": true,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S34_cross_filter": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F01": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F02_same_alias": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F02_distinct_alias": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F03": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F04": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F05": {
+      "ok": false,
+      "expected_bad": true,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S35_ROW_NUMBER_bigint": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S35_RANK_bigint": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F10_ROW_NUMBER": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F11_ROW_NUMBER": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F10_RANK": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F11_RANK": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S40": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S20_eq": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S20_ne": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S20_in": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S20_between": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S20_null": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S20_and_or": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S21": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S37": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_S38": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F20_round": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F20_pct": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F22": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F23": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_F32": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_T03": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_T04": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_T06": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_T07": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_B01": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_B02": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_B25": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_B26": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_B27": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J01": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J04": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J20_gt": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J20_gte": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J20_lt": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J20_lte": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J21_or": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J21_and": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J21_default": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J22": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J23": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    },
+    "repeat_J20_inDateRange": {
+      "ok": true,
+      "expected_bad": false,
+      "basis": "repeat persisted independent baseline expectation"
+    }
+  },
+  "required_combinations": [
+    "R_period_case_year_calendar",
+    "R_period_case_year_outer_extract",
+    "R_period_join_year_JOIN",
+    "R_period_join_year_FULL_OUTER_JOIN",
+    "R_period_case_month_month_bucket",
+    "R_period_join_month_JOIN",
+    "R_period_join_month_FULL_OUTER_JOIN",
+    "R_ratio_True",
+    "R_ratio_False"
+  ],
+  "deletion_candidates": {
+    "render/syntax/cube_sql.md": [
+      "平铺的写法都找不到路径。",
+      "- 能执行但算出错误的数（不报错，要特别避开）：\n  - 两个含 `MEASURE()` 的 CTE 用同一个输出列名（例如都叫 `v`），外层再用 `JOIN … ON` 或 `LEFT JOIN … ON` 连起来同时选出这两列：第二列会变成第一列的值。\n  - 一个聚合 CTE，和由它派生出来的 CTE（例如从它取出的键集合）`JOIN` 之后再 `SUM` / `GROUP BY`：每组得到的是全部的合计，不是本组的值。要这样筛选时改用上面的 `IN (SELECT …)`。\n",
+      "  - 三个维度 cube 平铺 `CROSS JOIN`（任何顺序都不行）；两个维度 cube 时把它们写在相邻位置、事实 cube 放在一端。\n",
+      "窗口函数的结果不转 `BIGINT` 就作为输出列；"
+    ],
+    "render/syntax/cube_json.md": [
+      "其他键（例如 `\"join\"`、`\"expression\"`）会被拒绝。"
+    ]
+  },
+  "review_passed": false,
+  "pending": "The immutable reviewed revision still contains unsupported statements; apply deletion-only patch on T12 branch and recheck latest before semantic-v1.3.",
+  "results_sha256": "5d14e4d3e4d5d6517e9e9f6b50a6f926d5d7599ccfdccb182935a0b5d3413958"
+}

@@ -1,0 +1,501 @@
+{
+  "run_id": "20261019-T16-full-v14-sql-old-01",
+  "at": "2026-10-20T02:11:06.349316+08:00",
+  "denominator": 327,
+  "completed": 327,
+  "final_exec_errors": 98,
+  "final_exec_error_rate": 0.2996941896024465,
+  "same_signature_clusters_three_or_more_questions": [
+    {
+      "signature": "generated_sql_empty_identifier",
+      "distinct_qids": 18,
+      "qids": [
+        "Q05",
+        "Q07",
+        "Q10",
+        "Q109",
+        "Q11",
+        "Q110",
+        "Q111",
+        "Q116",
+        "Q22",
+        "Q37",
+        "Q60",
+        "Q61",
+        "Q73",
+        "Q76",
+        "Q78",
+        "Q80",
+        "Q82",
+        "Q92"
+      ],
+      "attempts": 19,
+      "cases": [
+        {
+          "qid": "Q05",
+          "rep": 2,
+          "exec_raw_sha256": "63aa6ebe9c791d007f8c889e70df9d917a141146acf9be9436fcf1f626ab2e63"
+        },
+        {
+          "qid": "Q07",
+          "rep": 2,
+          "exec_raw_sha256": "8dfef8b426ed2c9161637f5f79b9e1bab055e522ec8b60c6d4adfc66dfa828d2"
+        },
+        {
+          "qid": "Q10",
+          "rep": 1,
+          "exec_raw_sha256": "3ae271b048b773cf01cfc13726af0f071ed7d62f74302e31fcf0116451800864"
+        },
+        {
+          "qid": "Q109",
+          "rep": 3,
+          "exec_raw_sha256": "25df37b29a2667458e6833f13a34d55dc8421d5702d3e968e4ef5d1cedf6b3be"
+        },
+        {
+          "qid": "Q11",
+          "rep": 2,
+          "exec_raw_sha256": "233771b8b8a8e5885a2efd10c2c4e10d0dda2dd8b69439b923f9085fe4543da0"
+        },
+        {
+          "qid": "Q110",
+          "rep": 1,
+          "exec_raw_sha256": "66d9b7c116355b45831b4c25cffe0eadead9ec1757e5e7bd978784f3cacdd8fe"
+        },
+        {
+          "qid": "Q111",
+          "rep": 1,
+          "exec_raw_sha256": "beaac67586ea76b66c632837176231e7e972233aa3752e08e7682f639a27a31c"
+        },
+        {
+          "qid": "Q116",
+          "rep": 1,
+          "exec_raw_sha256": "badc539a9174cfc8e9a2962e5c8c427863eaf629beb75e9d6c95903bc64e4867"
+        },
+        {
+          "qid": "Q22",
+          "rep": 2,
+          "exec_raw_sha256": "ec7658d4af299ea3f4f5ac870204b18a1656f625137e6cf76d40990f0f09fde6"
+        },
+        {
+          "qid": "Q37",
+          "rep": 2,
+          "exec_raw_sha256": "7dd5ba7ea5dbf82d05b316c72a4f3e0b033fbbafdf2670e336b5c29b26a13b3d"
+        },
+        {
+          "qid": "Q60",
+          "rep": 2,
+          "exec_raw_sha256": "85d9d12f5bc2ec0433618ab81b391f2244bb3bca85595402d10d5d10ded745f0"
+        },
+        {
+          "qid": "Q61",
+          "rep": 2,
+          "exec_raw_sha256": "a50ddf6b2fd932c3a1a863dae9ed1096f2815fbcc6ff60dba8a3dceb4800a477"
+        },
+        {
+          "qid": "Q73",
+          "rep": 1,
+          "exec_raw_sha256": "0081c6b3ee499cdd645a51f5524afd0e0f15c2511affbc0a39b20802b8d21b41"
+        },
+        {
+          "qid": "Q76",
+          "rep": 1,
+          "exec_raw_sha256": "f9cdd9875005bb4f80070821b770809b1f9de96f06592b0a0eb57c09b04b95f0"
+        },
+        {
+          "qid": "Q76",
+          "rep": 3,
+          "exec_raw_sha256": "d6227b845617f963233ebbafa3f18fc5737bf58d3981c18af636744cf36f6bce"
+        },
+        {
+          "qid": "Q78",
+          "rep": 2,
+          "exec_raw_sha256": "30b9aaa9b492d94774ec26baed30cd077f03ef8f38e9a8c7d9724107e5765381"
+        },
+        {
+          "qid": "Q80",
+          "rep": 2,
+          "exec_raw_sha256": "0565e3d5508b4817e2d6d2c333142562bd14242826fc3bd2ee75f99402a9d799"
+        },
+        {
+          "qid": "Q82",
+          "rep": 1,
+          "exec_raw_sha256": "feccc622203d0ceaa7d3a87b2136382fce69781b5c9a0b2f6ed0b1245223b0f0"
+        },
+        {
+          "qid": "Q92",
+          "rep": 3,
+          "exec_raw_sha256": "07df28598a3cbb67374e61fd753b24e3e1a6e32f112a93b734eb28f1b62f73e0"
+        }
+      ]
+    },
+    {
+      "signature": "Rewrite Error: Can't detect Cube query and it may be not supported yet. Please check logs for additional information",
+      "distinct_qids": 15,
+      "qids": [
+        "Q104",
+        "Q110",
+        "Q112",
+        "Q113",
+        "Q114",
+        "Q117",
+        "Q32",
+        "Q49",
+        "Q50",
+        "Q75",
+        "Q83",
+        "Q89",
+        "Q90",
+        "Q94",
+        "Q99"
+      ],
+      "attempts": 18,
+      "cases": [
+        {
+          "qid": "Q104",
+          "rep": 1,
+          "exec_raw_sha256": "3ab0266a88264508fda693a81b9e9147f9117d77f946adb345b98383f1a38637"
+        },
+        {
+          "qid": "Q110",
+          "rep": 3,
+          "exec_raw_sha256": "03ab478c5267a249c4dd62ed68123792e36fb9d7d01cb6c29462ba9474907a31"
+        },
+        {
+          "qid": "Q112",
+          "rep": 2,
+          "exec_raw_sha256": "8ddf193d166cf94c149d166a9cbc3f6bbf8a5901bd442e262ad998f38ea31724"
+        },
+        {
+          "qid": "Q113",
+          "rep": 2,
+          "exec_raw_sha256": "cc50c77f82cb33a8c864eed6ea9bdb86e9965ebfd945fb0562863d444ae48cee"
+        },
+        {
+          "qid": "Q113",
+          "rep": 1,
+          "exec_raw_sha256": "57718d292762bbfd25c395de3f2a3c9669b0d712cce60b5ac48756f44cf88aaf"
+        },
+        {
+          "qid": "Q114",
+          "rep": 3,
+          "exec_raw_sha256": "e19bb827e784da9e17123e6f4f652ba58b857ac4088969df2917aaabfe2a88ec"
+        },
+        {
+          "qid": "Q117",
+          "rep": 1,
+          "exec_raw_sha256": "30315f1154fafc3d3432f2ca4e84e77e09a6d710870676fed38810302fa4d36d"
+        },
+        {
+          "qid": "Q32",
+          "rep": 2,
+          "exec_raw_sha256": "c5fb05d170ec881da1132f13bf4e58aaf35c6a2946f43aebe95a41cacbf5587b"
+        },
+        {
+          "qid": "Q50",
+          "rep": 1,
+          "exec_raw_sha256": "5715164253bb3c0ea3f19bbb9ec0ae59f2e47bcd8eb7e953efbdc4a87ecbd5c2"
+        },
+        {
+          "qid": "Q49",
+          "rep": 3,
+          "exec_raw_sha256": "54a89857f5b1355071d966cf0c59c73be92c4fd9521cb3fe6e52ff1fd58172d2"
+        },
+        {
+          "qid": "Q50",
+          "rep": 2,
+          "exec_raw_sha256": "c375f1df87b953d63d2122f720aad7fa07626c301ca6953ac26faf5446a8c133"
+        },
+        {
+          "qid": "Q75",
+          "rep": 3,
+          "exec_raw_sha256": "d1cd353f10c0b867b4652055df4a96947ff601a3eee12ed2ca1ba4b02eb727f0"
+        },
+        {
+          "qid": "Q83",
+          "rep": 1,
+          "exec_raw_sha256": "9b04e01fdf1058182b202496b8aa5ab8af007951de62da860c1de4075c317a16"
+        },
+        {
+          "qid": "Q83",
+          "rep": 2,
+          "exec_raw_sha256": "5ce95c1212f8540ff9d328b0e05007944d1a5672babae7594a7ffd6eaf504504"
+        },
+        {
+          "qid": "Q89",
+          "rep": 3,
+          "exec_raw_sha256": "fabe8218053675839cda36ebbe3362f25f5c4b06a654a8d80d04a7263f952df1"
+        },
+        {
+          "qid": "Q90",
+          "rep": 3,
+          "exec_raw_sha256": "a2ed2fe4297200d137921119b7131bdc1221d42877ea3c5fe2d9c42a2209aae2"
+        },
+        {
+          "qid": "Q94",
+          "rep": 1,
+          "exec_raw_sha256": "2203825be0213ee4f0cfe0ca8db2589efdeed409de9327ba6cc3d3c4c55fd40a"
+        },
+        {
+          "qid": "Q99",
+          "rep": 3,
+          "exec_raw_sha256": "77881a981f7f1a4dc4d099dd030567de9d899852d3e5c233f95afead42a547da"
+        }
+      ]
+    },
+    {
+      "signature": "Post-Processing Error: Execution error: Database Execution Error: Query failed: Error: Column 'fk_aggregate.onlinesaleskey' is not under aggregate function and not in GROUP BY keys. In query cte_10 AS (SELECT fk_aggregate.onlinesaleskey AS onlinesaleskey, fk_aggregate.datekey AS datekey, fk_aggregate.storekey AS storekey, fk_aggregate.productkey AS productkey, fk_aggregate.promotionkey AS promotionkey, fk_aggregate.currencykey AS currencykey, fk_aggregate.customerkey AS customerkey, fk_aggregate",
+      "distinct_qids": 4,
+      "qids": [
+        "Q104",
+        "Q75",
+        "Q88",
+        "Q99"
+      ],
+      "attempts": 4,
+      "cases": [
+        {
+          "qid": "Q104",
+          "rep": 3,
+          "exec_raw_sha256": "85dc56ba179ae68f121f1f1b9e09735b0f784414606c73567f1a724bc2fd464d"
+        },
+        {
+          "qid": "Q75",
+          "rep": 1,
+          "exec_raw_sha256": "082a9a8e8c01df3dc3fa92746b78de016b469855e6305679fa026365ce8c24c1"
+        },
+        {
+          "qid": "Q88",
+          "rep": 1,
+          "exec_raw_sha256": "fe17f8e1ed636341f7651f0503938a04b209cecb89646d219873b43e284907a0"
+        },
+        {
+          "qid": "Q99",
+          "rep": 2,
+          "exec_raw_sha256": "3a67b713647e465a0331980a655d0438d96da5b8b563270ea4bae657cff3e810"
+        }
+      ]
+    },
+    {
+      "signature": "Rewrite Error: Use __cubeJoinField to join Cubes. Please check logs for additional information",
+      "distinct_qids": 9,
+      "qids": [
+        "Q110",
+        "Q111",
+        "Q117",
+        "Q119",
+        "Q49",
+        "Q75",
+        "Q82",
+        "Q94",
+        "Q99"
+      ],
+      "attempts": 9,
+      "cases": [
+        {
+          "qid": "Q110",
+          "rep": 2,
+          "exec_raw_sha256": "f652f6af5edb0564a6cf6a150ac915739d7a516ed013a69419b74341b5f86abd"
+        },
+        {
+          "qid": "Q111",
+          "rep": 3,
+          "exec_raw_sha256": "07a900d3b8c235d72a8416346d0da430378062bfe3dd6548c49f1bba35e6a2e3"
+        },
+        {
+          "qid": "Q117",
+          "rep": 2,
+          "exec_raw_sha256": "fa24691ddda50e4d34d0392ee1e2a78b059aea51aca70f5428ce0f8010631e0f"
+        },
+        {
+          "qid": "Q119",
+          "rep": 2,
+          "exec_raw_sha256": "fd692cca9f58a3cdc513b19ccf69802c8cb7e009c7c11a6daf04ecd4d9a0a864"
+        },
+        {
+          "qid": "Q49",
+          "rep": 1,
+          "exec_raw_sha256": "6923fb855b0155db9d6051d460aeeaa9dc8d2caefa47344fcf437f16ba02bfd8"
+        },
+        {
+          "qid": "Q75",
+          "rep": 2,
+          "exec_raw_sha256": "04fa654745397bc5aa90d798a0de16a3f22366aa257694268ff0f0888fc8f320"
+        },
+        {
+          "qid": "Q82",
+          "rep": 3,
+          "exec_raw_sha256": "83c2c7627b775633d4c2c381445f74495599ec28112e1689e517df95a1a0b3ec"
+        },
+        {
+          "qid": "Q94",
+          "rep": 3,
+          "exec_raw_sha256": "05d8dfc82a2ba309cedd98672b879ac7942248ea699a421517dc7e9209abb615"
+        },
+        {
+          "qid": "Q99",
+          "rep": 1,
+          "exec_raw_sha256": "9b0363d21e1a544822c4bc0abae12beb81f533dd777c4a58ece42672aff9450e"
+        }
+      ]
+    },
+    {
+      "signature": "Database Execution Error: Type UInt64 is not supported in response transformation from Cube",
+      "distinct_qids": 9,
+      "qids": [
+        "Q119",
+        "Q22",
+        "Q27",
+        "Q49",
+        "Q65",
+        "Q67",
+        "Q74",
+        "Q85",
+        "Q88"
+      ],
+      "attempts": 11,
+      "cases": [
+        {
+          "qid": "Q119",
+          "rep": 3,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q22",
+          "rep": 3,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q27",
+          "rep": 1,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q27",
+          "rep": 3,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q49",
+          "rep": 2,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q65",
+          "rep": 1,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q67",
+          "rep": 3,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q74",
+          "rep": 2,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q74",
+          "rep": 3,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q85",
+          "rep": 1,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        },
+        {
+          "qid": "Q88",
+          "rep": 2,
+          "exec_raw_sha256": "d42635545ff65a18faf162a7779ddb09c38984bcc78c20b92ed9dc1aa65aab9d"
+        }
+      ]
+    }
+  ],
+  "gate_1": true,
+  "gate_2": false,
+  "gate_3": true,
+  "decision": "hold JSON pending coordinator confirmation",
+  "next_model_calls": 0,
+  "pilot_baseline_all_existing": [
+    {
+      "run_id": "20261019-T16-pilot-01",
+      "cell": "SQL-L2",
+      "all_turn_error_families": {
+        "cube_planning": 2,
+        "interface_limitation": 1,
+        "cube_join_path": 4,
+        "cube_rewrite": 5,
+        "cube_generated_group_by": 2,
+        "cube_generated_clickhouse_syntax": 2,
+        "cube_response_type": 2
+      }
+    },
+    {
+      "run_id": "20261019-T16-pilot-v13-02",
+      "cell": "SQL-L2",
+      "all_turn_error_families": {
+        "cube_rewrite": 3,
+        "cube_generated_clickhouse_syntax": 7,
+        "cube_planning": 1
+      }
+    },
+    {
+      "run_id": "20261019-T16-pilot-v13-02",
+      "cell": "JSON-L2",
+      "all_turn_error_families": {
+        "engine_error": 1,
+        "cube_join_path": 2
+      }
+    }
+  ],
+  "new_families_relative_to_all_pilots": {
+    "backend_function_not_supported": {
+      "attempts_any_turn": 7,
+      "rate_per_completed_answer": 0.021406727828746176
+    },
+    "cube_generated_query_size": {
+      "attempts_any_turn": 1,
+      "rate_per_completed_answer": 0.0030581039755351682
+    },
+    "cube_postprocessing_type": {
+      "attempts_any_turn": 5,
+      "rate_per_completed_answer": 0.01529051987767584
+    },
+    "cube_sql_generation": {
+      "attempts_any_turn": 1,
+      "rate_per_completed_answer": 0.0030581039755351682
+    },
+    "cube_member_expression": {
+      "attempts_any_turn": 2,
+      "rate_per_completed_answer": 0.0061162079510703364
+    }
+  },
+  "gate_2_denominator_note": "按327个完成作答计；含修正前轮次，同类在同一作答中去重；用全部既有冒烟判定是否新类别",
+  "refined_final_error_families": {
+    "cube_generated_clickhouse_syntax": 19,
+    "backend_function_not_supported": 5,
+    "cube_join_path": 15,
+    "cube_rewrite": 28,
+    "cube_generated_query_size": 1,
+    "cube_generated_group_by": 6,
+    "cube_planning": 6,
+    "cube_postprocessing_type": 4,
+    "cube_response_type": 12,
+    "cube_member_expression": 2
+  },
+  "refined_all_turn_error_families": {
+    "cube_generated_clickhouse_syntax": 60,
+    "cube_join_path": 50,
+    "cube_planning": 21,
+    "backend_function_not_supported": 7,
+    "cube_rewrite": 66,
+    "cube_generated_query_size": 1,
+    "cube_generated_group_by": 14,
+    "cube_postprocessing_type": 5,
+    "cube_sql_generation": 1,
+    "cube_response_type": 23,
+    "engine_error": 4,
+    "cube_member_expression": 2
+  }
+}

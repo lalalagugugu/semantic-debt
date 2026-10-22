@@ -1,6 +1,6 @@
 # C13 写法说明的教学阶梯（ClickHouse SQL，档位 L1）
 
-- 状态：单元与写法说明已备好，待用户批准预算后错峰运行（本卡尚未调用模型）
+- 状态：已运行（`20261019-C13-ladder-02`，2026-10-19 23:25–23:49 错峰，7.17 元）；结果见 `reports/results/C13-ladder.md`
 - 负责：Claude Code
 - 模式：普通
 - 依据：`decisions/2026-10-19-phase1-replan.md` 第三节；教学深度的定义见 `decisions/2026-10-19-self-built-p-and-cube-notes.md` 第五节
@@ -70,3 +70,15 @@ uv run python -m harness.run_direct --cell SQL-L1-T2 --cell SQL-L1-T3 --cell SQL
   - `reports/validation/syntax-syllabus.md` 的阶梯一节；
   - 测试 `test_ladder_*`、`test_questions_for_*`、`test_dry_run_counts_each_cells_own_questions`。
 - 偏离与理由：说明放在 `harness/syntax_ladder/`，原因见「单元」一节。
+
+## 运行记录（2026-10-19）
+
+- 依赖按协调会话的指示改为 `semantic-v1.4`（234ad68）、`harness-ladder-v1`、`harness-v1.1`、`eval-v1.2`。第 1 级沿用 T13 已重评的 SQL-L1：它的系统消息 sha256 与 semantic-v1.4 下的相同（8df43ae0…）。
+- 预算：协调会话转达用户批准，上限 15 元；实花 7.17 元，844 次调用（每次作答 1.03 次）。
+- chDB：T13 同时在默认目录上跑 L1.5S，所以本卡用从 Parquet 另建的 `chdb-c13`，由 `scripts/c13_run_on_chdb_copy.py` 指定，harness 不改。
+- 偏离：第一次启动（`20261019-C13-ladder-01`）包装脚本缺 `__main__` 保护，评分子进程又启动了一次运行，在 `chdb-c13` 上撞锁。约 1 分钟后停下，6 次调用约 0.014 元，日志原样保留、不计入结果；修好后用新 run-id 重跑。详见 `runs/INDEX.md`。
+- 结果：
+  - 2 级把首轮执行报错从 32% 降到 3%，语法错几乎全部消失；
+  - 正确率相对第 1 级：+4.0 个百分点（全部题），95% 区间 [−0.9, +9.2]；
+  - 3 级、4 级没有再提高；
+  - 各级差距都在抽样误差之内。

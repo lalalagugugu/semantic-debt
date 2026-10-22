@@ -23,14 +23,14 @@ ClickHouse SQL：每个 cube 的 `sql` 与每个指标的聚合表达式（含 f
 | `sales.store_count` | 全量 | 306 | 306 | 0.00e+00 | 门店数.note | 通过 |
 | `sales.average_daily_sales_amount` | 2009 平日 | 1.02609e+07 | 1.02609e+07 | 2.58e-10 | 日均销售额.note（2009 平日） | 通过 |
 | `inventory.current_on_hand_quantity` | 全量 | 1.18977e+07 | 1.18977e+07 | 0.00e+00 | 当前在手库存数量.note | 通过 |
-| `inventory.current_on_hand_value` | 全量 | 1.2913e+09 | 1.2913e+09 | 1.85e-16 | 当前在手库存金额.note | 通过 |
+| `inventory.current_on_hand_value` | 全量 | 1.2913e+09 | 1.2913e+09 | 3.69e-16 | 当前在手库存金额.note | 通过 |
 | `inventory.current_on_order_quantity` | 全量 | 494,285 | 494,285 | 0.00e+00 | 当前在订库存数量.note | 通过 |
 | `inventory.below_safety_stock_count` | 全量 | 89,591 | 89,591 | 0.00e+00 | 低于安全库存的门店产品数.note | 通过 |
 | `inventory.store_product_pair_count` | 全量 | 600,241 | 600,241 | 0.00e+00 | 门店产品组合数.note | 通过 |
-| `sales_quota.sales_amount_quota` | 全量 | 1.06675e+10 | 1.06675e+10 | 7.49e-14 | 目标销售额.note | 通过 |
+| `sales_quota.sales_amount_quota` | 全量 | 1.06675e+10 | 1.06675e+10 | 7.47e-14 | 目标销售额.note | 通过 |
 | `sales_quota.sales_quantity_quota` | 全量 | 4.43001e+07 | 4.43001e+07 | 0.00e+00 | 目标销量.note | 通过 |
 | `sales_quota.quota_attainment_pct` | 2009 | 1.21256 | 1.21256 | 2.11e-12 | 目标达成率.note（2009） | 通过 |
-| `strategy_plan.plan_revenue` | 全量 | 1.15487e+10 | 1.15487e+10 | 6.94e-14 | 计划收入.note | 通过 |
+| `strategy_plan.plan_revenue` | 全量 | 1.15487e+10 | 1.15487e+10 | 6.92e-14 | 计划收入.note | 通过 |
 | `it_machine.it_cost` | 全量 | 2.40766e+08 | 2.40766e+08 | 0.00e+00 | IT 成本.note | 通过 |
 | `it_sla.down_time` | 全量 | 396,699 | 396,699 | 0.00e+00 | 停机时长.note | 通过 |
 | `it_sla.outage_count` | 全量 | 4,925 | 4,925 | 0.00e+00 | 故障次数.note | 通过 |
@@ -47,28 +47,40 @@ ClickHouse SQL：每个 cube 的 `sql` 与每个指标的聚合表达式（含 f
 | `sales_quota.gross_margin_quota` | `SELECT sum(GrossMarginQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Budget')` | 5,788,481,063 | 5,788,481,063 | 通过 |
 | `inventory.inventory_turnover` | `SELECT (SELECT sum(TotalCost) FROM retail.FactSales) / (SELECT sum(OnHandQuantity * UnitCost) / uniqExact(DateKey) FROM retail.FactInventory)` | 55.37199955 | 55.37199955 | 通过 |
 | `sales.same_store_sales_amount` | `SELECT sum(SalesAmount) FROM retail.FactSales AS f WHERE (StoreKey, toYear(DateKey) - 1) IN (SELECT DISTINCT StoreKey, toYear(DateKey) FROM retail.FactSales)` | 7,830,394,634 | 7,830,394,634 | 通过 |
+| `sales.same_store_sales_as_base_year` | `SELECT sum(SalesAmount) FROM retail.FactSales AS f WHERE (StoreKey, toYear(DateKey) + 1) IN (SELECT DISTINCT StoreKey, toYear(DateKey) FROM retail.FactSales)` | 8,671,940,155 | 8,671,940,155 | 通过 |
+| `sales_quota.sales_amount_quota_by_scenario` | `SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota` | 3.599841768e+10 | 3.599841768e+10 | 通过 |
 | `online_sales.new_customer_count` | `SELECT uniqExactIf(CustomerKey, first >= toDate('2009-12-31') - 89) FROM (SELECT CustomerKey, min(DateKey) AS first FROM retail.FactOnlineSales GROUP BY CustomerKey)` | 1 | 1 | 通过 |
 
 ## 三、全部指标能否执行
 
 每个非多阶段指标都编译成一条全量查询执行一次，不报错即通过。
 
-执行 88 个，报错 0 个。
+执行 93 个，报错 0 个。
 
-多阶段指标（time_shift / group_by，由 Cube 规划，这里不核对，留给 T16）：14 个
+多阶段指标（time_shift / group_by，由 Cube 规划，这里不核对，留给 T16）：24 个
 
 - `online_sales.sales_amount_yoy_pct`
 - `online_sales.sales_amount_prior_year`
 - `online_sales.sales_amount_mom_pct`
 - `online_sales.sales_amount_prior_month`
+- `online_sales.sales_amount_qoq_pct`
+- `online_sales.sales_amount_prior_quarter`
 - `online_sales.sales_amount_share`
 - `online_sales.sales_amount_in_scope`
+- `online_sales.sales_amount_share_in_category`
+- `online_sales.sales_amount_in_category`
 - `sales.sales_amount_yoy_pct`
 - `sales.sales_amount_prior_year`
 - `sales.sales_amount_mom_pct`
 - `sales.sales_amount_prior_month`
+- `sales.sales_amount_qoq_pct`
+- `sales.sales_amount_prior_quarter`
 - `sales.sales_amount_share`
 - `sales.sales_amount_in_scope`
+- `sales.sales_amount_share_in_channel`
+- `sales.sales_amount_in_channel`
+- `sales.sales_amount_share_in_category`
+- `sales.sales_amount_in_category`
 - `sales.same_store_sales_growth_pct`
 - `sales.same_store_base_prior_year`
 
