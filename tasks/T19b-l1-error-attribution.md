@@ -1,6 +1,6 @@
 # T19b SQL-L1 失败归类（中期报告用）
 
-- 状态：进行中：第 1–4 步完成；Flash 初判已跑（`runs/20261020-T19b-attrib-01`，117 条全部解析，4.42 元，高峰时段经用户批准）；待 Codex 独立复核（第 5 步，材料：`reports/attribution/codebook.md`、`reports/attribution/items.csv`）
+- 状态：进行中：第 1–6 步完成（Flash 初判、Codex 独立复核 `06f4b43`、报告 `reports/results/l1-error-attribution.md`）；待用户抽检第 7 节的 10 条分歧条目，根因 5 清单待交题库负责方
 - 负责：Claude Code（T13 会话）初判；Codex 独立全量复核；用户抽检
 - 模式：普通
 - 依据：`decisions/2026-10-20-l1-error-attribution.md`
@@ -40,7 +40,7 @@ SQL-L1 最终判定里所有非 `correct` 的作答（错答、执行失败、�
 
 ## 记录（完成后填写）
 
-- 产出：`reports/attribution/codebook.md`（编码手册）、`reports/attribution/prompt.md`（固定提示词）、`harness/attribute_l1.py`（`--dry-run` / `--budget`、指纹闸、不给思考内容、`unparsed` 不重试）、`tests/test_attribute_l1.py`；`reports/attribution/items.csv`（交 Codex 的条目清单：题号、次数，不含 Flash 结果）；`tasks/cards.yaml` 补登 T19b。
+- 产出：`reports/attribution/codebook.md`（编码手册）、`reports/attribution/prompt.md`（固定提示词）、`harness/attribute_l1.py`（`--dry-run` / `--budget`、指纹闸、不给思考内容、`unparsed` 不重试）、`tests/test_attribute_l1.py`；`reports/attribution/items.csv`（交 Codex 的条目清单：题号、次数，不含 Flash 结果）；`reports/attribution/codex.csv`（Codex 独立复核）；`scripts/l1_attribution_report.py` → `reports/results/l1-error-attribution.md`；`tasks/cards.yaml` 补登 T19b。
 - 偏离与理由：
   - 在 T13 的 clone 里开分支，没有新建 clone（卡片负责方就是 T13 会话，T19b 未列入 cards.yaml），先例是 T13-l15s-analysis 和 C13。
   - 第 4 步在高峰时段运行（2026-10-22 16:29–16:36），没有等错峰：用户明确批准，预算上限由 3 元提到 5 元；实际 4.42 元（高峰价）。
