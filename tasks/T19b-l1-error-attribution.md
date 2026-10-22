@@ -1,6 +1,6 @@
 # T19b SQL-L1 失败归类（中期报告用）
 
-- 状态：未开始
+- 状态：进行中：第 1–3 步完成（编码手册、固定提示词、脚本）；dry-run 117 条、117 次调用、预计 1.90 元（错峰），待用户批准后运行
 - 负责：Claude Code（T13 会话）初判；Codex 独立全量复核；用户抽检
 - 模式：普通
 - 依据：`decisions/2026-10-20-l1-error-attribution.md`
@@ -40,6 +40,8 @@ SQL-L1 最终判定里所有非 `correct` 的作答（错答、执行失败、�
 
 ## 记录（完成后填写）
 
-- 产出：
+- 产出：`reports/attribution/codebook.md`（编码手册）、`reports/attribution/prompt.md`（固定提示词）、`harness/attribute_l1.py`（`--dry-run` / `--budget`、指纹闸、不给思考内容、`unparsed` 不重试）、`tests/test_attribute_l1.py`；`tasks/cards.yaml` 补登 T19b。
 - 偏离与理由：
+  - 在 T13 的 clone 里开分支，没有新建 clone（卡片负责方就是 T13 会话，T19b 未列入 cards.yaml），先例是 T13-l15s-analysis 和 C13。
+  - 提交的日志只记标签（类别、已声明假设、根因、文档证据位置），`note` 是自由文本，只留在 runs-raw，避免复述题面进库。
 - 工时：
