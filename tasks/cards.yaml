@@ -52,3 +52,4 @@ cards:
   - {id: T19c, owner: claude, mode: open,          repo: main, card: tasks/T19c-abstention-signals.md, after: G3, note: "自评把握的校准；不重跑作答，追问一轮；判定规则先写死"}
   - {id: T20,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T20-independent-recheck.md}
   - {id: T21,  owner: claude, mode: open,          repo: main, card: tasks/T21-planning-agent.md, after: G3, note: "自写 -P（规划 + Python + 按需检索），对照 T15 全量"}
+  - {id: T22,  owner: claude, mode: blind,         repo: main, card: tasks/T22-l1plus-l3a.md, after: G3, note: "L1+ 盲写（第 1–3 步）；渲染与运行另开普通模式会话"}
