@@ -291,7 +291,8 @@ def test_probe_expected_file_covers_every_tier_and_group():
     groups = {}
     for c in spec["checks"]:
         groups.setdefault(c["group"], []).append(c)
-        assert isinstance(c["expected"], (int, float)) and not math.isnan(c["expected"]), c["id"]
+        if c["group"] != "alignment":                 # alignment: blank (None) and tables are expected too
+            assert isinstance(c["expected"], (int, float)) and not math.isnan(c["expected"]), c["id"]
     assert len(groups["rows"]) == 25 and all(set(c["dax"]) == {"L0", "L1", "L2"} for c in groups["rows"])
     assert len([c for c in groups["orphans"] if c["id"].endswith("by_value")]) == 5
     assert len(groups["variants"]) == 10 and all(set(c["dax"]) == {"L2"} for c in groups["variants"])
@@ -410,3 +411,83 @@ def test_ambiguous_paths():
 
     assert ambiguous_paths([("F", "A"), ("A", "G"), ("F", "B"), ("B", "G")]) == ["F → G：2 条路径"]
     assert ambiguous_paths([("F", "A"), ("A", "G"), ("F", "B")]) == []
+
+
+# ---------------------------------------------------------------------------
+# alignment acceptance (checklist item 2, Codex T16's list)
+
+
+def _table_rows(expected: dict) -> list[list]:
+    return [[None if part == "" else part for part in key.split("|")] + [v] for key, v in expected.items()]
+
+
+def test_judge_check_kinds():
+    tol = 0.005
+    scalar = {"kind": "scalar", "expected": 2.0, "alternatives": {"other": 3.0}}
+    assert DP.judge_check(scalar, E.ExecResult(rows=[[2.001]]), tol)[0]
+    assert DP.judge_check(scalar, E.ExecResult(rows=[[3.0]]), tol)[:2] == (False, "other")
+    blank = {"kind": "scalar", "expected": None}
+    assert DP.judge_check(blank, E.ExecResult(rows=[[None]]), tol)[0]
+    assert not DP.judge_check(blank, E.ExecResult(rows=[[0.0]]), tol)[0]      # blank ≠ 0 here
+    zero = {"kind": "scalar", "expected": 0.0, "abs_tol": 1e-9}
+    assert DP.judge_check(zero, E.ExecResult(rows=[[None]]), tol)[0]
+    table = {"kind": "table", "expected": {"2009|Store": 0.5, "2009|Online": 0.5},
+             "alternatives": {"global": {"2009|Store": 0.25, "2009|Online": 0.25}}}
+    assert DP.judge_check(table, E.ExecResult(rows=[[2009, "Store", 0.5], [2009.0, "Online", 0.5]]), tol)[0]
+    assert DP.judge_check(table, E.ExecResult(rows=[[2009, "Store", 0.25], [2009, "Online", 0.25]]), tol)[1] == "global"
+    ok, alt, shown = DP.judge_check(table, E.ExecResult(rows=[[2009, "Store", 0.5]]), tol)
+    assert not ok and alt is None and "2009|Online" in shown
+    assert DP.judge_check({"kind": "table", "expected": {"1|": 1.0}}, E.ExecResult(rows=[[1, None, 1.0]]), tol)[0]
+
+
+def test_alignment_checks_cover_every_row_of_the_list():
+    spec = json.loads(DP.EXPECTED_JSON.read_text(encoding="utf-8"))
+    align = [c for c in spec["checks"] if c["group"] == "alignment"]
+    assert {c["row"] for c in align} == set(DP.ALIGN_ROWS)
+    assert len({c["id"] for c in align}) == len(align)
+    for c in align:
+        assert set(c["dax"]) == {"L2"} and E.dax_static_check(c["dax"]["L2"]) is None, c["id"]
+        for label, alt in c["alternatives"].items():          # an alternative must be distinguishable
+            assert alt != c["expected"], (c["id"], label)
+
+
+def test_probe_l2_against_a_fake_engine(rendered, tmp_path):
+    """L2 with every check answered by its reference reading → 0 failures; one alignment check answered
+    with its alternative reading → reported as 不符 and attributed to that reading."""
+    from render.check_pbip import load_model
+
+    spec = json.loads(DP.EXPECTED_JSON.read_text(encoding="utf-8"))
+    answers = {}
+    for c in spec["checks"]:
+        if "L2" not in c["dax"]:
+            continue
+        exp = c["expected"]
+        answers[c["dax"]["L2"]] = _table_rows(exp) if c.get("kind") == "table" else [[exp]]
+    sig, model = rendered["L2"], load_model("L2")
+    meta = _dmv_answer(sig)
+    written = {k: v for t in model["tables"].values() for k, v in t["expressions"].items()}
+
+    def answer(q):
+        if "TMSCHEMA_TABLES" in q and "Description" in q:
+            return [], [[t, "d"] for t in sig["tables"]]
+        if "TMSCHEMA_COLUMNS" in q and "Description" in q:
+            return [], [[c, "d", 1] for t in sig["tables"] for c in sig["tables"][t]]
+        if "LINGUISTIC" in q:
+            return [], [['{"State": "Authored"}']]
+        if "RELATIONSHIPS" in q:
+            return [], [[r["active"]] for r in model["relationships"]]
+        if "TMSCHEMA_MEASURES" in q and "Expression" in q:
+            return [], [[0, k, v] for k, v in written.items()]
+        if q in answers:
+            return [{"name": "v"}], answers[q]
+        return meta(q)
+
+    ex = E.DaxExecutor("L2", session=FakeSession(answer))
+    code, text = DP.probe("L2", tmp_path, executor=ex)
+    assert code == 0, text
+    assert "对齐清单验收" in text and "[C-同店]" in text
+    c = next(c for c in spec["checks"] if c["id"] == "align.B-目标.04")
+    label, alt = next(iter(c["alternatives"].items()))
+    answers[c["dax"]["L2"]] = _table_rows(alt)
+    code, text = DP.probe("L2", tmp_path, executor=ex)
+    assert code == 1 and f"与「{label}」一致" in text

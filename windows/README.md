@@ -79,6 +79,7 @@ powershell -ExecutionPolicy Bypass -File windows\t17.ps1 probe -Tier L1
 | 度量值 | 35 项：`source.yaml` 记录的全量值与 Cube 交叉核对的同一口径 | L2 |
 | v1.4 变体 | 10 个变体度量值各在一个切片上（渠道内、品类内占比，按季环比，同店作基年，按查询场景） | L2 |
 | 写法说明 2 级条目 | `render/syntax/dax.md` 里没在真实引擎上验证过的写法，各一条查询看引擎是否如说明所说（`reports/validation/dax-syntax-t2.md`）；外加执行器拒绝 `INFO.` | L1 |
+| 对齐清单验收 | 检查清单第 2 项（Codex T16 #156）每一行的通用探针，69 项；不符时报告与哪种其他读法一致（`reports/validation/t17-dax-alignment-acceptance.md`） | L2 |
 | 度量值表达式 | Desktop 载入的表达式与渲染器写的是否逐个相同 | L2 |
 
 对照数字在仓库里：`reports/validation/dax_probe_expected.json`，由 Mac 上 `uv run python harness/dax_probe.py expected` 用 chDB 直接读同一批 Parquet 算出。容差 0.5%。

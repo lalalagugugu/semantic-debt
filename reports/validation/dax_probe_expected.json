@@ -363,7 +363,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[SalesAmount] ) )"
    },
    "sql": "SELECT sum(SalesAmount) FROM retail.FactSales",
-   "expected": 12413657608.887634,
+   "expected": 12413657608.88764,
    "origin": "chDB / Parquet"
   },
   {
@@ -389,7 +389,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[TotalCost] ) )"
    },
    "sql": "SELECT sum(TotalCost) FROM retail.FactSales",
-   "expected": 5364896601.780004,
+   "expected": 5364896601.780003,
    "origin": "chDB / Parquet"
   },
   {
@@ -402,7 +402,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[ReturnAmount] ) )"
    },
    "sql": "SELECT sum(ReturnAmount) FROM retail.FactSales",
-   "expected": 156839375.86799982,
+   "expected": 156839375.86799985,
    "origin": "chDB / Parquet"
   },
   {
@@ -415,7 +415,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[DiscountAmount] ) )"
    },
    "sql": "SELECT sum(DiscountAmount) FROM retail.FactSales",
-   "expected": 204157104.0844003,
+   "expected": 204157104.08440027,
    "origin": "chDB / Parquet"
   },
   {
@@ -441,7 +441,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[SalesAmount] ) )"
    },
    "sql": "SELECT sum(SalesAmount) FROM retail.FactOnlineSales",
-   "expected": 2718202629.8081827,
+   "expected": 2718202629.808183,
    "origin": "chDB / Parquet"
   },
   {
@@ -467,7 +467,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[TotalCost] ) )"
    },
    "sql": "SELECT sum(TotalCost) FROM retail.FactOnlineSales",
-   "expected": 1344254907.720007,
+   "expected": 1344254907.7200074,
    "origin": "chDB / Parquet"
   },
   {
@@ -480,7 +480,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[ReturnAmount] ) )"
    },
    "sql": "SELECT sum(ReturnAmount) FROM retail.FactOnlineSales",
-   "expected": 29244318.20479999,
+   "expected": 29244318.204799995,
    "origin": "chDB / Parquet"
   },
   {
@@ -571,7 +571,7 @@
     "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactStrategyPlan'[Amount] ) )"
    },
    "sql": "SELECT sum(Amount) FROM retail.FactStrategyPlan",
-   "expected": 65893562614.54291,
+   "expected": 65893562614.5429,
    "origin": "chDB / Parquet"
   },
   {
@@ -1047,7 +1047,7 @@
     "L2": "EVALUATE ROW ( \"v\", [Snapshot On Hand Value] )"
    },
    "sql": "SELECT sum(OnHandQuantity * UnitCost) FROM retail.FactInventory",
-   "expected": 15114568313.510002,
+   "expected": 15114568313.509998,
    "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
   },
   {
@@ -1069,7 +1069,7 @@
     "L2": "EVALUATE ROW ( \"v\", [Gross Margin Quota] )"
    },
    "sql": "SELECT sum(GrossMarginQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Budget')",
-   "expected": 5788481063.327001,
+   "expected": 5788481063.327003,
    "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
   },
   {
@@ -1080,7 +1080,7 @@
     "L2": "EVALUATE ROW ( \"v\", [Inventory Turnover] )"
    },
    "sql": "SELECT (SELECT sum(TotalCost) FROM retail.FactSales) / (SELECT sum(OnHandQuantity * UnitCost) / uniqExact(DateKey) FROM retail.FactInventory)",
-   "expected": 55.3719995515588,
+   "expected": 55.37199955155881,
    "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
   },
   {
@@ -1091,7 +1091,7 @@
     "L2": "EVALUATE ROW ( \"v\", [Same Store Sales Amount] )"
    },
    "sql": "SELECT sum(SalesAmount) FROM retail.FactSales AS f WHERE (StoreKey, toYear(DateKey) - 1) IN (SELECT DISTINCT StoreKey, toYear(DateKey) FROM retail.FactSales)",
-   "expected": 7830394633.919919,
+   "expected": 7830394633.919918,
    "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
   },
   {
@@ -1113,7 +1113,7 @@
     "L2": "EVALUATE ROW ( \"v\", [Sales Amount Quota By Scenario] )"
    },
    "sql": "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota",
-   "expected": 35998417680.753296,
+   "expected": 35998417680.75331,
    "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
   },
   {
@@ -1148,7 +1148,7 @@
     "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount QoQ %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 4, 1 ), DATE ( 2009, 6, 30 ) ) ) )"
    },
    "sql": "SELECT sumIf(SalesAmount, toStartOfQuarter(DateKey) = '2009-04-01') / sumIf(SalesAmount, toStartOfQuarter(DateKey) = '2009-01-01') - 1 FROM retail.FactOnlineSales",
-   "expected": 0.3123265481712769,
+   "expected": 0.3123265481712767,
    "origin": "chDB / Parquet"
   },
   {
@@ -1160,7 +1160,7 @@
     "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Channel], 'DimStore'[StoreKey] = 1 ) )"
    },
    "sql": "SELECT (SELECT sum(SalesAmount) FROM retail.FactSales WHERE StoreKey = 1) / (SELECT sum(SalesAmount) FROM retail.FactSales WHERE channelKey = (SELECT any(channelKey) FROM retail.FactSales WHERE StoreKey = 1))",
-   "expected": 0.003312028142202851,
+   "expected": 0.0033120281422028513,
    "origin": "chDB / Parquet"
   },
   {
@@ -1172,7 +1172,7 @@
     "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Category], 'DimProductSubcategory'[ProductSubcategoryKey] = 1 ) )"
    },
    "sql": "SELECT (SELECT sum(SalesAmount) FROM retail.FactSales WHERE ProductKey IN (SELECT ProductKey FROM retail.DimProduct WHERE toInt64(ProductSubcategoryKey) = 1)) / (SELECT sum(SalesAmount) FROM retail.FactSales WHERE ProductKey IN (SELECT ProductKey FROM retail.DimProduct WHERE toInt64(ProductSubcategoryKey) IN (SELECT ProductSubcategoryKey FROM retail.DimProductSubcategory WHERE ProductCategoryKey = (SELECT ProductCategoryKey FROM retail.DimProductSubcategory WHERE ProductSubcategoryKey = 1))))",
-   "expected": 0.42997651767823475,
+   "expected": 0.4299765176782347,
    "origin": "chDB / Parquet"
   },
   {
@@ -1196,7 +1196,7 @@
     "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Same Store Sales As Base Year], 'DimDate'[CalendarYear] = 2008 ) )"
    },
    "sql": "SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey) = 2008 AND StoreKey IN (SELECT DISTINCT StoreKey FROM retail.FactSales WHERE toYear(DateKey) = 2009)",
-   "expected": 4111233534.684102,
+   "expected": 4111233534.6841016,
    "origin": "chDB / Parquet"
   },
   {
@@ -1208,7 +1208,7 @@
     "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Quota By Scenario], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
    },
    "sql": "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Actual')",
-   "expected": 12413657608.887617,
+   "expected": 12413657608.88762,
    "origin": "chDB / Parquet"
   },
   {
@@ -1232,7 +1232,7 @@
     "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Gross Margin Quota By Scenario], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
    },
    "sql": "SELECT sum(GrossMarginQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Actual')",
-   "expected": 6891921631.2396,
+   "expected": 6891921631.239602,
    "origin": "chDB / Parquet"
   },
   {
@@ -1244,7 +1244,1198 @@
     "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Plan Revenue By Scenario], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
    },
    "sql": "SELECT sum(Amount) FROM retail.FactStrategyPlan WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Actual') AND AccountKey IN (SELECT AccountKey FROM retail.DimAccount WHERE AccountName = 'Sale Revenue')",
-   "expected": 12413657608.887596,
+   "expected": 12413657608.8876,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.01",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount MoM %] 月窗口 2009-03",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 3, 1 ), DATE ( 2009, 3, 31 ) ) ) )"
+   },
+   "expected": 0.01792193154248367,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.02",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount MoM %] 跨年月 2009-01",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 1, 31 ) ) ) )"
+   },
+   "expected": -0.32352131702497244,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.03",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount MoM %] 跨年完整季 2009Q1（原成员）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 3, 31 ) ) ) )"
+   },
+   "expected": -0.2721429231263778,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.04",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount QoQ %] 跨年完整季 2009Q1（按季变体）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount QoQ %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 3, 31 ) ) ) )"
+   },
+   "expected": -0.272142923126378,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.05",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount MoM %] 完整年 2009（原成员）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 12, 31 ) ) ) )"
+   },
+   "expected": -0.09017984806117085,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.06",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount MoM %] 缺基期 2007-01（基期无数据）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 1, 1 ), DATE ( 2007, 1, 31 ) ) ) )"
+   },
+   "expected": null,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.07",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount QoQ %] 缺基期 2007Q1（按季变体）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount QoQ %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 1, 1 ), DATE ( 2007, 3, 31 ) ) ) )"
+   },
+   "expected": null,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.08",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount MoM %] 非完整期间 2009-03-01～15（原成员应为空）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 3, 1 ), DATE ( 2009, 3, 15 ) ) ) )"
+   },
+   "expected": null,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.09",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Sales Amount MoM %] 日期维的列筛选 年=2009、月=3（与日期函数窗口相容）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount MoM %], 'DimDate'[CalendarYear] = 2009, 'DimDate'[MonthNumber] = 3 ) )"
+   },
+   "expected": 0.01792193154248345,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.10",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount MoM %] 月窗口 2009-03",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 3, 1 ), DATE ( 2009, 3, 31 ) ) ) )"
+   },
+   "expected": 0.015295501614984719,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.11",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount MoM %] 跨年月 2009-01",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 1, 31 ) ) ) )"
+   },
+   "expected": -0.20219597835776193,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.12",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount MoM %] 跨年完整季 2009Q1（原成员）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 3, 31 ) ) ) )"
+   },
+   "expected": -0.15416533124337706,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.13",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount QoQ %] 跨年完整季 2009Q1（按季变体）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount QoQ %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 3, 31 ) ) ) )"
+   },
+   "expected": -0.15416533124337706,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.14",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount MoM %] 完整年 2009（原成员）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 1, 1 ), DATE ( 2009, 12, 31 ) ) ) )"
+   },
+   "expected": 0.009482289018897028,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.15",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount MoM %] 缺基期 2007-01（基期无数据）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 1, 1 ), DATE ( 2007, 1, 31 ) ) ) )"
+   },
+   "expected": null,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.16",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount QoQ %] 缺基期 2007Q1（按季变体）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount QoQ %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 1, 1 ), DATE ( 2007, 3, 31 ) ) ) )"
+   },
+   "expected": null,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.17",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount MoM %] 非完整期间 2009-03-01～15（原成员应为空）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount MoM %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 3, 1 ), DATE ( 2009, 3, 15 ) ) ) )"
+   },
+   "expected": null,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-环比.18",
+   "group": "alignment",
+   "row": "B-环比",
+   "title": "[Online Sales Amount MoM %] 日期维的列筛选 年=2009、月=3（与日期函数窗口相容）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount MoM %], 'DimDate'[CalendarYear] = 2009, 'DimDate'[MonthNumber] = 3 ) )"
+   },
+   "expected": 0.015295501614984941,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.01",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Count] 截止 2007-01-31（窗口 2007-01）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Count], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 1, 1 ), DATE ( 2007, 1, 31 ) ) ) )"
+   },
+   "expected": 13140.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.02",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Count] 截止 2007-02-28（窗口 2007-02）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Count], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 2, 1 ), DATE ( 2007, 2, 28 ) ) ) )"
+   },
+   "expected": 15910.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.03",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Count] 截止 2007-03-31（窗口 2007-03）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Count], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 3, 1 ), DATE ( 2007, 3, 31 ) ) ) )"
+   },
+   "expected": 18015.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.04",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Count] 截止 2007-04-30（窗口 2007-04）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Count], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 4, 1 ), DATE ( 2007, 4, 30 ) ) ) )"
+   },
+   "expected": 5894.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.05",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Count] 截止 2009-12-31（窗口 2009-12）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Count], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 12, 1 ), DATE ( 2009, 12, 31 ) ) ) )"
+   },
+   "expected": 1.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.06",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Sales Amount] 销售窗口 2007-04-01～2007-04-30（认定窗口为截止前 90 天）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Sales Amount], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 4, 1 ), DATE ( 2007, 4, 30 ) ) ) )"
+   },
+   "expected": 23970847.358000018,
+   "alternatives": {
+    "把 90 天认定窗口当成销售窗口": 52157332.4245
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.07",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Sales Share] 销售窗口 2007-04-01～2007-04-30",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Sales Share], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 4, 1 ), DATE ( 2007, 4, 30 ) ) ) )"
+   },
+   "expected": 0.26468529399700935,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.08",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Sales Amount] 销售窗口 2007-04-01～2007-05-31（认定窗口为截止前 90 天）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Sales Amount], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 4, 1 ), DATE ( 2007, 5, 31 ) ) ) )"
+   },
+   "expected": 27888909.440000016,
+   "alternatives": {
+    "把 90 天认定窗口当成销售窗口": 32293069.36900001
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.09",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Sales Share] 销售窗口 2007-04-01～2007-05-31",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Sales Share], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 4, 1 ), DATE ( 2007, 5, 31 ) ) ) )"
+   },
+   "expected": 0.14925869126232516,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.10",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Count] 用事实表日期列筛 2007-04（不经日期维）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Count], 'FactOnlineSales'[DateKey] >= DATE ( 2007, 4, 1 ) && 'FactOnlineSales'[DateKey] <= DATE ( 2007, 4, 30 ) ) )"
+   },
+   "expected": 5894.0,
+   "alternatives": {
+    "截止日取 2009-12-31、首购只在筛选窗口内认定": 0.0
+   },
+   "record_only": false,
+   "note": "参考读法：截止日 = 窗口最后一天，首购按全部历史认定",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-新客.11",
+   "group": "alignment",
+   "row": "B-新客",
+   "title": "[New Customer Count] 截止 2007-04-30，业务切片：品类 1",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [New Customer Count], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2007, 4, 1 ), DATE ( 2007, 4, 30 ) ), 'DimProductCategory'[ProductCategoryKey] = 1 ) )"
+   },
+   "expected": 2295.0,
+   "alternatives": {
+    "首购只在切片内认定（品类内首购）": 8873.0,
+    "首购全历史认定、切片内任何时候买过": 5894.0
+   },
+   "record_only": true,
+   "note": "清单要求切片下仍是「有史以来首次购买」；切片内计哪些客户（窗口内买过切片 / 任何时候买过）清单没定，先记录引擎读法",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.01",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Amount Quota] 不筛场景 = Budget",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Sales Amount Quota] )"
+   },
+   "expected": 10667465363.670467,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.02",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Amount Quota] 显式筛 Forecast 覆盖默认",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Quota], 'DimScenario'[ScenarioName] = \"Forecast\" ) )"
+   },
+   "expected": 12917294708.19505,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.03",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Amount Quota] 按场景维分组",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimScenario'[ScenarioName], \"v\", [Sales Amount Quota] )"
+   },
+   "expected": {
+    "Forecast": 12917294708.19505,
+    "Budget": 10667465363.670467,
+    "Actual": 12413657608.885778
+   },
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.04",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Amount Quota] 按事实表场景键分组（ISFILTERED 不触发）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'FactSalesQuota'[ScenarioKey], \"v\", [Sales Amount Quota] )"
+   },
+   "expected": {
+    "3": 12917294708.19505,
+    "2": 10667465363.670467,
+    "1": 12413657608.885778
+   },
+   "alternatives": {
+    "只剩 Budget 一行（默认预算残留）": {
+     "2": 10667465363.670467
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.05",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Quantity Quota] 不筛场景 = Budget",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Sales Quantity Quota] )"
+   },
+   "expected": 44300085.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.06",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Quantity Quota] 显式筛 Forecast 覆盖默认",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Quantity Quota], 'DimScenario'[ScenarioName] = \"Forecast\" ) )"
+   },
+   "expected": 53875174.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.07",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Quantity Quota] 按场景维分组",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimScenario'[ScenarioName], \"v\", [Sales Quantity Quota] )"
+   },
+   "expected": {
+    "Forecast": 53875174.0,
+    "Budget": 44300085.0,
+    "Actual": 53320454.0
+   },
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.08",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Sales Quantity Quota] 按事实表场景键分组（ISFILTERED 不触发）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'FactSalesQuota'[ScenarioKey], \"v\", [Sales Quantity Quota] )"
+   },
+   "expected": {
+    "3": 53875174.0,
+    "2": 44300085.0,
+    "1": 53320454.0
+   },
+   "alternatives": {
+    "只剩 Budget 一行（默认预算残留）": {
+     "2": 44300085.0
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.09",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Gross Margin Quota] 不筛场景 = Budget",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Gross Margin Quota] )"
+   },
+   "expected": 5788481063.327108,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.10",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Gross Margin Quota] 显式筛 Forecast 覆盖默认",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Gross Margin Quota], 'DimScenario'[ScenarioName] = \"Forecast\" ) )"
+   },
+   "expected": 7330767600.038939,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.11",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Gross Margin Quota] 按场景维分组",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimScenario'[ScenarioName], \"v\", [Gross Margin Quota] )"
+   },
+   "expected": {
+    "Forecast": 7330767600.038939,
+    "Budget": 5788481063.327108,
+    "Actual": 6891921631.239433
+   },
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-目标.12",
+   "group": "alignment",
+   "row": "B-目标",
+   "title": "[Gross Margin Quota] 按事实表场景键分组（ISFILTERED 不触发）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'FactSalesQuota'[ScenarioKey], \"v\", [Gross Margin Quota] )"
+   },
+   "expected": {
+    "3": 7330767600.038939,
+    "2": 5788481063.327108,
+    "1": 6891921631.239433
+   },
+   "alternatives": {
+    "只剩 Budget 一行（默认预算残留）": {
+     "2": 5788481063.327108
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-计划.01",
+   "group": "alignment",
+   "row": "B-计划",
+   "title": "[Plan Revenue] 不筛场景 = Budget",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Plan Revenue] )"
+   },
+   "expected": 11548720849.890812,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-计划.02",
+   "group": "alignment",
+   "row": "B-计划",
+   "title": "[Plan Revenue] 显式筛 Actual，不残留预算",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Plan Revenue], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
+   },
+   "expected": 12413657608.887587,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-计划.03",
+   "group": "alignment",
+   "row": "B-计划",
+   "title": "[Plan Revenue] 按场景维分组",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimScenario'[ScenarioName], \"v\", [Plan Revenue] )"
+   },
+   "expected": {
+    "Forecast": 12318305704.56761,
+    "Budget": 11548720849.890812,
+    "Actual": 12413657608.887587
+   },
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.B-计划.04",
+   "group": "alignment",
+   "row": "B-计划",
+   "title": "[Plan Revenue] 按事实表场景键分组（ISFILTERED 不触发）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'FactStrategyPlan'[ScenarioKey], \"v\", [Plan Revenue] )"
+   },
+   "expected": {
+    "3": 12318305704.56761,
+    "2": 11548720849.890812,
+    "1": 12413657608.887587
+   },
+   "alternatives": {
+    "只剩 Budget 一行（默认预算残留）": {
+     "2": 11548720849.890812
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-占比.01",
+   "group": "alignment",
+   "row": "C-占比",
+   "title": "[Sales Amount Share] 按渠道、筛 2009 年（期间保留在分母里）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimChannel'[ChannelName], TREATAS ( { 2009 }, 'DimDate'[CalendarYear] ), \"s\", [Sales Amount Share] )"
+   },
+   "expected": {
+    "Reseller": 0.14538704342277056,
+    "Catalog": 0.08402744490893707,
+    "Online": 0.25428536064079804,
+    "Store": 0.5163001510274944
+   },
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-占比.02",
+   "group": "alignment",
+   "row": "C-占比",
+   "title": "[Sales Amount Share] 按年 × 渠道分组（父组：年）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimDate'[CalendarYear], 'DimChannel'[ChannelName], \"s\", [Sales Amount Share] )"
+   },
+   "expected": {
+    "2007|Store": 0.6100870041145902,
+    "2008|Store": 0.5420417708694392,
+    "2008|Online": 0.2279289422564401,
+    "2007|Catalog": 0.09166626500214071,
+    "2007|Reseller": 0.12521077250593957,
+    "2008|Reseller": 0.145984384881893,
+    "2008|Catalog": 0.08404490199222778,
+    "2007|Online": 0.17303595837732974,
+    "2009|Store": 0.5163001510274937,
+    "2009|Reseller": 0.14538704342277067,
+    "2009|Catalog": 0.0840274449089371,
+    "2009|Online": 0.25428536064079865
+   },
+   "alternatives": {
+    "分母是全部年份（父组没保留）": {
+     "2007|Store": 0.22420312996259048,
+     "2008|Store": 0.1795168173482218,
+     "2008|Online": 0.07548694675281473,
+     "2007|Catalog": 0.03368677481548196,
+     "2007|Reseller": 0.04601416996516246,
+     "2008|Reseller": 0.04834803065914944,
+     "2008|Catalog": 0.027834521490451805,
+     "2007|Online": 0.0635896244349226,
+     "2009|Store": 0.15557155354171515,
+     "2009|Reseller": 0.04380802168100235,
+     "2009|Catalog": 0.025319148403518694,
+     "2009|Online": 0.07662126094496871
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-占比.03",
+   "group": "alignment",
+   "row": "C-占比",
+   "title": "[Sales Amount Share] 只选渠道 1、2（分母应在子项筛选前确定）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimChannel'[ChannelName], TREATAS ( { 1, 2 }, 'DimChannel'[ChannelKey] ), \"s\", [Sales Amount Share] )"
+   },
+   "expected": {
+    "Online": 0.2156978321327327,
+    "Store": 0.5592915008524773
+   },
+   "alternatives": {
+    "分母只含选中的子项": {
+     "Online": 0.27832361421269924,
+     "Store": 0.7216763857873009
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-占比.04",
+   "group": "alignment",
+   "row": "C-占比",
+   "title": "[Sales Amount Share] 门店 1、2 × 品类（父组：门店；孤儿产品是空白组）",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimStore'[StoreKey], 'DimProductSubcategory'[ProductCategoryKey], TREATAS ( { 1, 2 }, 'DimStore'[StoreKey] ), \"s\", [Sales Amount Share] )"
+   },
+   "expected": {
+    "2|3": 0.2436770133659514,
+    "1|5": 0.07343698777240765,
+    "1|6": 0.014236642262885799,
+    "2|6": 0.015027085558332617,
+    "1|3": 0.2170751114955047,
+    "2|5": 0.0697328358778721,
+    "2|1": 0.009889985320599181,
+    "1|7": 0.0024981904518739124,
+    "1|4": 0.230417356262056,
+    "1|8": 0.2871986530862715,
+    "2|2": 0.11976986738466455,
+    "2|4": 0.21657594241252281,
+    "1|2": 0.11594651895351103,
+    "2|8": 0.27345329327074047,
+    "1|1": 0.013838072429218478,
+    "2|7": 0.002876205536825839,
+    "1|": 0.045352467286270876,
+    "2|": 0.04899777127249109
+   },
+   "alternatives": {
+    "分母是两家门店合计": {
+     "2|3": 0.12096800359879697,
+     "1|5": 0.036980837565920015,
+     "1|6": 0.007169179605235746,
+     "2|6": 0.007459860553895839,
+     "1|3": 0.10931302714509541,
+     "2|5": 0.03461730683952737,
+     "2|1": 0.004909662028964518,
+     "1|7": 0.0012580196725360952,
+     "1|4": 0.11603181288840128,
+     "1|8": 0.14462530478306154,
+     "2|2": 0.0594570720835992,
+     "2|4": 0.10751428302277286,
+     "1|2": 0.05838746269171876,
+     "2|8": 0.135749771829319,
+     "1|1": 0.006968470851723051,
+     "2|7": 0.0014278279141870156,
+     "1|": 0.022838249182075603,
+     "2|": 0.024323847743169712
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-变体.01",
+   "group": "alignment",
+   "row": "C-变体",
+   "title": "[Sales Amount Share In Category] 子类 1 + 外部子层筛选 颜色=Black",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Category], 'DimProductSubcategory'[ProductSubcategoryKey] = 1, 'DimProduct'[ColorName] = \"Black\" ) )"
+   },
+   "expected": 0.41869953453706377,
+   "alternatives": {
+    "分母去掉了外部颜色筛选（REMOVEFILTERS 删子层外部筛选）": 0.09704322791756896
+   },
+   "record_only": true,
+   "note": "清单：有外部子层筛选时两端读法不同，应保留哪些过滤待定，先拿引擎证据",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-变体.02",
+   "group": "alignment",
+   "row": "C-变体",
+   "title": "[Sales Amount Share In Category] 子类 1，2009 年、门店 1（父组与期间保留）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Category], 'DimProductSubcategory'[ProductSubcategoryKey] = 1, 'DimDate'[CalendarYear] = 2009, 'DimStore'[StoreKey] = 1 ) )"
+   },
+   "expected": 0.3883607428684902,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-变体.03",
+   "group": "alignment",
+   "row": "C-变体",
+   "title": "[Sales Amount Share In Category] 没有销售的子类 2（应为空）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Category], 'DimProductSubcategory'[ProductSubcategoryKey] = 2 ) )"
+   },
+   "expected": null,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-变体.04",
+   "group": "alignment",
+   "row": "C-变体",
+   "title": "[Sales Amount Share In Channel] 按维度键分组 门店 1、2",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'DimStore'[StoreKey], TREATAS ( { 1, 2 }, 'DimStore'[StoreKey] ), \"s\", [Sales Amount Share In Channel] )"
+   },
+   "expected": {
+    "2": 0.0032650367970992527,
+    "1": 0.0033120281422033423
+   },
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-变体.05",
+   "group": "alignment",
+   "row": "C-变体",
+   "title": "[Sales Amount Share In Channel] 按事实表键分组 门店 1、2",
+   "kind": "table",
+   "dax": {
+    "L2": "EVALUATE SUMMARIZECOLUMNS ( 'FactSales'[StoreKey], TREATAS ( { 1, 2 }, 'FactSales'[StoreKey] ), \"s\", [Sales Amount Share In Channel] )"
+   },
+   "expected": {
+    "2": 0.0032650367970992527,
+    "1": 0.0033120281422033423
+   },
+   "alternatives": {
+    "每行都是 1（事实键筛选没去掉）": {
+     "2": 1.0,
+     "1": 1.0
+    }
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-变体.06",
+   "group": "alignment",
+   "row": "C-变体",
+   "title": "[Sales Amount Share In Channel] 门店 1、2009 年（期间保留在分母里）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Channel], 'DimStore'[StoreKey] = 1, 'DimDate'[CalendarYear] = 2009 ) )"
+   },
+   "expected": 0.003052282317003626,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-同店.01",
+   "group": "alignment",
+   "row": "C-同店",
+   "title": "[Same Store Sales Amount] 2009",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Same Store Sales Amount], 'DimDate'[CalendarYear] = 2009 ) )"
+   },
+   "expected": 3719161099.2357984,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-同店.02",
+   "group": "alignment",
+   "row": "C-同店",
+   "title": "[Same Store Sales Growth %] 2009（与金额、作基年同一门店集合）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Same Store Sales Growth %], 'DimDate'[CalendarYear] = 2009 ) )"
+   },
+   "expected": -0.09536613090465795,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-同店.03",
+   "group": "alignment",
+   "row": "C-同店",
+   "title": "闭合：增长率 = 同店 2009 ÷ 作基年 2008 − 1",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", VAR _g = CALCULATE ( [Same Store Sales Growth %], 'DimDate'[CalendarYear] = 2009 ) VAR _r = DIVIDE ( CALCULATE ( [Same Store Sales Amount], 'DimDate'[CalendarYear] = 2009 ), CALCULATE ( [Same Store Sales As Base Year], 'DimDate'[CalendarYear] = 2008 ) ) - 1 RETURN _g - _r )"
+   },
+   "expected": 0.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "相差为 0 即闭合（按绝对差判）",
+   "origin": "chDB / Parquet",
+   "abs_tol": 1e-09
+  },
+  {
+   "id": "align.C-同店.04",
+   "group": "alignment",
+   "row": "C-同店",
+   "title": "[Same Store Sales Amount] 2009，下钻子类 15",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Same Store Sales Amount], 'DimDate'[CalendarYear] = 2009, 'DimProductSubcategory'[ProductSubcategoryKey] = 15 ) )"
+   },
+   "expected": 460936891.76750004,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-同店.05",
+   "group": "alignment",
+   "row": "C-同店",
+   "title": "[Same Store Sales Growth %] 2009，下钻子类 15",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Same Store Sales Growth %], 'DimDate'[CalendarYear] = 2009, 'DimProductSubcategory'[ProductSubcategoryKey] = 15 ) )"
+   },
+   "expected": 0.7420795769949193,
+   "alternatives": {
+    "按子类重新认定同店": 0.752029787636058
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.C-同店.06",
+   "group": "alignment",
+   "row": "C-同店",
+   "title": "[Same Store Sales As Base Year] 2008，下钻子类 15",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Same Store Sales As Base Year], 'DimDate'[CalendarYear] = 2008, 'DimProductSubcategory'[ProductSubcategoryKey] = 15 ) )"
+   },
+   "expected": 264590032.42699993,
+   "alternatives": {
+    "按子类重新认定同店": 263087360.16949996
+   },
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.01",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[Average On Hand Value] 门店 1、2008（有记录的快照日平均）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Average On Hand Value], 'DimStore'[StoreKey] = 1, 'DimDate'[CalendarYear] = 2008 ) )"
+   },
+   "expected": 318488.67365384614,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.02",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[Inventory Turnover] 门店 1、2008（分子分母同窗）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Inventory Turnover], 'DimStore'[StoreKey] = 1, 'DimDate'[CalendarYear] = 2008 ) )"
+   },
+   "expected": 9.818209213300348,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.03",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[Current On Hand Quantity] 门店 1（每店产品全历史最新快照）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Current On Hand Quantity], 'DimStore'[StoreKey] = 1 ) )"
+   },
+   "expected": 41633.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.04",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[Current On Hand Quantity] 门店 1、筛 2008 年（当前成员不随期间变）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Current On Hand Quantity], 'DimStore'[StoreKey] = 1, 'DimDate'[CalendarYear] = 2008 ) )"
+   },
+   "expected": 41633.0,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.05",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[Average Daily Sales Amount] 门店 1、2008（有销售天数作分母）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Average Daily Sales Amount], 'DimStore'[StoreKey] = 1, 'DimDate'[CalendarYear] = 2008 ) )"
+   },
+   "expected": 19858.108775956287,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.06",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[Product List Price] 品类 1（产品平均，不是 MAX）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Product List Price], 'DimProductCategory'[ProductCategoryKey] = 1 ) )"
+   },
+   "expected": 135.87904347826085,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.07",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[All Channel Discount Rate] 门店 1、2008",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [All Channel Discount Rate], 'DimStore'[StoreKey] = 1, 'DimDate'[CalendarYear] = 2008 ) )"
+   },
+   "expected": 0.02099327048004024,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "align.D-复核.08",
+   "group": "alignment",
+   "row": "D-复核",
+   "title": "[Quota Attainment %] 门店 1、2009（预算基数）",
+   "kind": "scalar",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Quota Attainment %], 'DimStore'[StoreKey] = 1, 'DimDate'[CalendarYear] = 2009 ) )"
+   },
+   "expected": 1.2182994132683125,
+   "alternatives": {},
+   "record_only": false,
+   "note": "",
    "origin": "chDB / Parquet"
   }
  ]

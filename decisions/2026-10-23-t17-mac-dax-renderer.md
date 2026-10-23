@@ -34,4 +34,4 @@
 
 - 用户：审 PR；决定是否在合并后打 `semantic-v1.5`。
 - Windows 探测（`windows/README.md`）：三档模型的数据核对、孤儿行、L2 度量值与 10 个变体、L1 的 2 级条目；结果贴回 Mac。
-- 检查清单第 2 项（DAX 对齐清单，Codex T16，PR #156）：等用户转交后落进探测的验收。
+- 检查清单第 2 项（DAX 对齐清单，Codex T16，PR #156）：已落成 69 项探针（`reports/validation/t17-dax-alignment-acceptance.md`）；度量值改不改等 Windows 结果，见 `decisions/open-questions.md` T17-1。
