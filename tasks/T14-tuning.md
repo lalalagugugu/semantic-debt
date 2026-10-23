@@ -1,6 +1,6 @@
 # T14 调优（SQL-L1 调优；DAX-L2 调优用同一流程）
 
-- 状态：未开始
+- 状态：进行中（2026-10-23：SQL-L1-tuned 第 1 轮调优包已导出，等 B 角）
 - 负责：Claude Code，两个**互不相通**的会话
   - A 角：普通模式（`scripts/start-card.sh T14`），可读题库，负责导出调优包、合并补充、跑结果。
   - B 角：调优包模式（`scripts/start-card.sh T14-B <调优包目录>`，例如 `$SEMDEBT_CARDS_DIR/T14/build/tuning-packet/sql-l1`），工作目录里只有调优包和 `semantic/` 的副本，不是 git clone，看不到题库、`runs/` 和数据目录。
@@ -43,5 +43,9 @@
 ## 记录（完成后填写）
 
 - 产出：
-- 偏离与理由：
+  - SQL-L1-tuned 第 1 轮调优包：`uv run python -m harness.tuning_packet --packet sql-l1 --eval-tag eval-v1.2`（`SEMDEBT_EVAL_DIR` 指向只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2`），导出到 `build/tuning-packet/sql-l1/`（不入库）：23 题、51 次答错的作答。清单与逐题核对见 `reports/tuning/packet-sql-l1-manifest.json`、`reports/tuning/packet-sql-l1-check.md`（只含题号）：没有留出题、没有 judge 题、没有答对的作答，也没有漏掉的错答。
+- 偏离与理由（口径说明，2026-10-23 协调会话认可）：
+  - **「答错的题」按单次作答算**：调优题（非 judge）3 次里至少有 1 次不是 correct 就进包，只放不是 correct 的那几次，对应「用户对每个错答点踩」；同一题答对的那几次不进包。
+  - **不放参考 SQL**：只放核实后的正确结果（口径加前 20 行），对应卡片「正确的参考结果（相当于分析师核实后的答案）」。也不放模型的思考内容。
+  - 合并时，B 写的每条示例查询都要在 chDB 上执行，结果与包内参考核对；执行不通或结果不符的退回给 B，A 不自行修改。
 - 工时：
