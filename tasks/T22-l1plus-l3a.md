@@ -34,4 +34,5 @@
 
 - 产出：
 - 偏离与理由：
+  - **隔离缺口（2026-10-23，第 1–2 步会话发现并报告）**：盲模式设置（`templates/claude-settings.blind.json` 生成的 `.claude/settings.local.json`）对 `$SEMDEBT_DATA_DIR` 只禁读了 `runs-raw/`，数据目录其余部分可读。本会话为确认 profiling 之外有无可用数据，运行过一次 `ls "$SEMDEBT_DATA_DIR"`（只列顶层、未递归），由此看到了这些目录 / 文件**名**：`eval-ro-41ab616`、`eval-ro-4b6c098`、`eval-ro-56ade6c`、`eval-ro-56c10e9`、`eval-ro-6234d29`、`eval-ro-926acdf`、`eval-ro-bf8e095`、`eval-ro-e3aaed6`、`eval-ro-eval-v1`、`eval-ro-eval-v1.1`、`eval-ro-eval-v1.2`、`handoff-claude`、`handoff-codex`、`handoff-compare`、`scorer-corpus`、`t05-finalize`、`t12-final`、`t19b-spotcheck`、`rules-backfill`、`interface-probes`、`dry-runs`、`anchor-refs`，以及 `t13-*.out`、`t13-L0-*.json/yaml`、`t13-rescore-*.out`、`c13-ladder-*.out`、`t21-pilot-01.out`、`t21-pr-body.md` 等文件名。**没有读取、列出或打开其中任何一个的内容**（没有对任何子目录执行 ls，没有 cat / Read / grep / chDB 查询）。看到这份清单后立即停止使用数据目录，此后本会话未再访问 `$SEMDEBT_DATA_DIR` 的任何路径；第 1–2 步的全部依据只有 `semantic/source.yaml`、`semantic/conventions.md`、`semantic/profiling/out/`、`semantic/summary/requirements.md`、`docs/design-v5-public.md`、`render/context.py` 和本卡、裁决文件。已报告用户与协调会话（sem-debt）；协调会话要求在修复合并、设置重新生成之前不再访问数据目录，因此 A33（科目树）所需的数据查询推迟到修复之后。
 - 工时：
