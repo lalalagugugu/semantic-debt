@@ -1,13 +1,18 @@
 {
   "permissions": {
     "additionalDirectories": [
-      "${SEMDEBT_DATA_DIR}"
+      "${SEMDEBT_DATA_DIR}/raw",
+      "${SEMDEBT_DATA_DIR}/parquet",
+      "${SEMDEBT_DATA_DIR}/chdb"
     ],
     "deny": [
       "WebSearch",
       "WebFetch",
       "Read(/${SEMDEBT_EVAL_DIR}/**)",
       "Read(/${SEMDEBT_DATA_DIR}/runs-raw/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/eval-ro-*/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/handoff-*/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/scorer-corpus/**)",
       "Read(/${SEMDEBT_MAIN_DIR}/runs/**)",
       "mcp__dashscope-websearch",
       "mcp__chrome-devtools",

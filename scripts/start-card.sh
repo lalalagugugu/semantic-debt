@@ -221,6 +221,10 @@ mode_claude_clone() {
   local dest="$CARDS_DIR/$id"
   if clone_repo "$MAIN_DIR" "$dest" "$id-work"; then
     write_settings "$dest" "$template"
+  elif [ "${SEMDEBT_REFRESH_SETTINGS:-}" = 1 ]; then
+    # 模板改过（如 2026-10-23 盲模式收窄数据目录）：只重写已有 clone 的设置，不动代码和分支
+    step "按当前模板重写 $dest/.claude/settings.local.json"
+    write_settings "$dest" "$template"
   fi
   printf '  卡片：%s/%s\n' "$dest" "$card"
   banner "cd \"$dest\" && claude $(mcp_flag "$strict_mcp")\"执行任务卡 $id\""
