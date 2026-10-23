@@ -1,6 +1,6 @@
 # T22 L1+（内容补全与歧义澄清）与 L3a（同内容的形式化 ontology）
 
-- 状态：未开始
+- 状态：进行中（2026-10-23：第 1 步歧义自查 `semantic/l1plus-audit.md`、第 2 步概念清单 `semantic/l1plus-concepts.md` 已交，待用户审定清单后写第 3 步）
 - 负责：Claude Code（第 1–3 步盲模式；第 4–6 步普通模式，可由另一个会话做）；Codex 复核
 - 模式：盲（写内容）→ 普通（渲染、运行）
 - 依据：`decisions/2026-10-23-l1plus-l3a.md`
