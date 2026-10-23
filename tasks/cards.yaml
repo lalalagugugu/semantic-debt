@@ -44,9 +44,11 @@ cards:
   - {id: T15,  owner: claude, mode: open,          repo: main, card: tasks/T15-explorer-agent.md, after: G3}
   - {id: T16,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T16-metric-layer.md, after: G1, note: "G1 后可搭建与核对数据；跑单元要等 G3 且 T13 跑完"}
   - {id: T17,  owner: claude, mode: windows,       repo: main, card: tasks/T17-powerbi-dax.md, after: G1}
+  - {id: T17-mac, owner: claude, mode: open,       repo: main, card: tasks/T17-powerbi-dax.md, after: G3, note: "Mac 侧准备：DAX 执行器、探测模式、windows/README、检查清单第 1、3 项（Windows 上没有 Claude Code，见卡「开工前」第 3 条）"}
   - {id: T18,  owner: claude, mode: windows,       repo: main, card: tasks/T18-dax-full-and-tuning.md, after: G3}
   - {id: T19,  owner: claude, mode: open,          repo: main, card: tasks/T19-report.md}
   - {id: T19a, owner: claude, mode: open,          repo: main, card: tasks/T19a-midterm-report.md, after: G3, note: "SQL 线中期报告；可在云端会话做"}
   - {id: T19b, owner: claude, mode: open,          repo: main, card: tasks/T19b-l1-error-attribution.md, after: G3, note: "Flash 初判在 T13 的 clone 里做；Codex 独立复核"}
+  - {id: T19c, owner: claude, mode: open,          repo: main, card: tasks/T19c-abstention-signals.md, after: G3, note: "只用现有日志，不调模型；判定规则先写死"}
   - {id: T20,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T20-independent-recheck.md}
   - {id: T21,  owner: claude, mode: open,          repo: main, card: tasks/T21-planning-agent.md, after: G3, note: "自写 -P（规划 + Python + 按需检索），对照 T15 全量"}
