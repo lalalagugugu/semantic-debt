@@ -5,7 +5,7 @@
   - A 角：普通模式（`scripts/start-card.sh T14`），可读题库，负责导出调优包、合并补充、跑结果。
   - B 角：调优包模式（`scripts/start-card.sh T14-B <调优包目录>`，例如 `$SEMDEBT_CARDS_DIR/T14/build/tuning-packet/sql-l1`），工作目录里只有调优包和 `semantic/` 的副本，不是 git clone，看不到题库、`runs/` 和数据目录。
 - 依赖：T13（SQL-L1 第一次运行的结果）；DAX 部分依赖 T18 的 DAX-L2 第一次运行结果
-- 预算：Flash 15 元 / Pro 50 元（只含跑调优后单元的费用）
+- 预算：Flash 20 元 / Pro 50 元（只含跑调优后单元的费用；2026-10-23 由 15 元上调，见 `decisions/2026-10-23-tuning-instructions.md`）
 
 ## 目标
 
@@ -17,6 +17,12 @@
 2. **B 写补充**：可以补充或改写约定、字段描述、同义词，可以写不超过 15 条「问题 → 查询」示例。补充写进工作目录里的 `semantic/tuning/<cell>.yaml`，不得改动其他文件。
 3. **A 合并与跑**：把 B 的 `semantic/tuning/<cell>.yaml` 复制回仓库，由渲染器叠加到原档位上；跑调优后的单元（SQL-L1 调优；DAX-L2 调优在 T18 跑），全部题目每题 3 次；分析时只看留出题。
 4. 最多迭代两轮：第二轮的调优包由 A 用第一轮补充后的结果重新导出，仍然只含调优题；B 用一个新会话。
+
+## 两个单元（2026-10-23 裁决，`decisions/2026-10-23-tuning-instructions.md`）
+
+- **SQL-L1-tuned（只调语义层）**：上面的流程。
+- **SQL-L1-tuned-instr（语义层 + 指令）**：在 SQL-L1-tuned 定稿的语义层补充之上，由**新的 B 角会话**读同一份调优包，只写指令补丁 `semantic/tuning/<cell>.instructions.yaml`：可改写或追加作答要求条目和 ClickHouse 写法说明条目；不得改语义层补充，不得写对应具体题的条文；示例与上一单元合计不超过 15 条。A 角合并、渲染，打 `harness-tuned-v1`（只覆盖调优单元），日志记系统消息 sha256。
+- 两单元都跳过 judge 题，各最多两轮；分析只看留出题；`reports/results/tuning.md` 另列两单元之差（指令调优的增益），并与 C13 的 2 级说明对照。
 
 ## 交付物
 
