@@ -225,6 +225,27 @@ def test_template_renders_to_valid_json(name: str) -> None:
     json.loads(rendered)
 
 
+def test_packet_settings_render_to_valid_json(tmp_path: Path) -> None:
+    """packet 模式去掉数据目录放行后，写出的 settings.local.json 仍是合法 JSON、且不放行数据目录。"""
+    import subprocess
+
+    packet = tmp_path / "packet"
+    packet.mkdir()
+    env = {**_script_env(), "SEMDEBT_CARDS_DIR": str(tmp_path / "cards"),
+           "SEMDEBT_DATA_DIR": "/abs/data", "SEMDEBT_EVAL_DIR": "/abs/eval"}
+    out = subprocess.run(["bash", str(START_CARD), "T14-B", str(packet), "--dry-run"],
+                         capture_output=True, text=True, env=env, check=True).stdout
+    preview = out.split("内容预览：", 1)[1].splitlines()[1:]
+    body = []
+    for line in preview:
+        if not line.startswith("    "):
+            break
+        body.append(line[4:])
+    cfg = json.loads("\n".join(body))
+    assert "additionalDirectories" not in cfg["permissions"]
+    assert "/abs/eval" in cfg["sandbox"]["filesystem"]["denyRead"]
+
+
 def test_blind_template_denies_eval_and_web() -> None:
     raw = (REPO / "templates" / "claude-settings.blind.json").read_text(encoding="utf-8")
     cfg = json.loads(

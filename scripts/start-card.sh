@@ -196,8 +196,9 @@ render_settings() {
   local body
   body=$(cat "$template")
   if [ -n "$no_data" ]; then
-    # packet 模式：去掉数据目录的放行
-    body=$(printf '%s\n' "$body" | sed '/"additionalDirectories"/d')
+    # packet 模式：去掉数据目录的放行。模板里它是多行数组，要连同数组内容和 `],` 一起删，
+    # 只删键那一行会留下坏 JSON（T14-B 首次启动时 Claude Code 报 settings.local.json 格式错）
+    body=$(printf '%s\n' "$body" | sed '/"additionalDirectories"/,/\]/d')
   fi
   printf '%s\n' "$body" \
     | sed -e "s|\${SEMDEBT_DATA_DIR}|$DATA_DIR|g" \
