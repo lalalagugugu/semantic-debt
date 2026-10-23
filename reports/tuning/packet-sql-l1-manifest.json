@@ -1,0 +1,207 @@
+{
+  "packet": "sql-l1",
+  "cell": "SQL-L1",
+  "tuning_file": "semantic/tuning/SQL-L1.yaml",
+  "questions": [
+    {
+      "qid": "Q12",
+      "reps": [
+        1,
+        3
+      ]
+    },
+    {
+      "qid": "Q17",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q24",
+      "reps": [
+        2
+      ]
+    },
+    {
+      "qid": "Q27",
+      "reps": [
+        3
+      ]
+    },
+    {
+      "qid": "Q38",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q47",
+      "reps": [
+        2
+      ]
+    },
+    {
+      "qid": "Q49",
+      "reps": [
+        1,
+        3
+      ]
+    },
+    {
+      "qid": "Q56",
+      "reps": [
+        2
+      ]
+    },
+    {
+      "qid": "Q58",
+      "reps": [
+        1,
+        3
+      ]
+    },
+    {
+      "qid": "Q69",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q72",
+      "reps": [
+        2
+      ]
+    },
+    {
+      "qid": "Q74",
+      "reps": [
+        1
+      ]
+    },
+    {
+      "qid": "Q75",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q76",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q81",
+      "reps": [
+        2
+      ]
+    },
+    {
+      "qid": "Q98",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q99",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q109",
+      "reps": [
+        1,
+        3
+      ]
+    },
+    {
+      "qid": "Q112",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q116",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q117",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q121",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "qid": "Q122",
+      "reps": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "n_questions": 23,
+  "n_attempts": 51,
+  "files": {
+    "cases/Q12.md": "ce314a2f990417d2a93fd3d5953e8be625bf06e5c4b7a84ac9565dad60b1fee5",
+    "cases/Q17.md": "122a73662bc9f9bc649dd6e8039d37c57cf2aa956e73f9e50f9c234e14804ec7",
+    "cases/Q24.md": "d74890efd05a8afb3f7669a0a477f7541abf79fb862d4bded8ab69b5518f18a9",
+    "cases/Q27.md": "605b5636e5b4dc27175c97927dc26a64843e07a5a9de1b967a7e4d661bb00449",
+    "cases/Q38.md": "8e39efc08dcdb00b2a1434910e9aee2ebe07fa2e572f8ff1053e3efb84992daa",
+    "cases/Q47.md": "7b7b124312df767b403746a5137663f25689c34f6e80e3bd6204f4e078cd5250",
+    "cases/Q49.md": "ebec5a66cb15d89b3c93c6850704081cd1509620bc52ba009a82126b48b212e2",
+    "cases/Q56.md": "5acbd33575ffe6563b2308501ec3b6d99cac8303fe74864b572cc9c4f27fc033",
+    "cases/Q58.md": "4cd9189c3fe8c11dcd8dfb3972d833eceaaa792a2125b1ab0c49267e175ab14a",
+    "cases/Q69.md": "64fa5db29a1c39fd2cbfda8da7874269899ff32c04ecb7e94691b392f1bc8a37",
+    "cases/Q72.md": "eb171aa096a153bdc43f2c97d5ef8938900e76dcc72b8c3ac1b8753c9799d75b",
+    "cases/Q74.md": "d65e1d4ece803c3308c9612df855ea6ca20e69a475848735c6d578e7f1d1ef77",
+    "cases/Q75.md": "162905adcdbb33fd3bb3bee3cb4349cd1c99a0601e53a4a26c6376b0b34fcf11",
+    "cases/Q76.md": "fb0e873a1ed60c2beab88c8c4f6b0a81c794d390b9282988923f29426518c8a3",
+    "cases/Q81.md": "a8936360b0a3f3bb1f6b0a73c12f7a4bbf4a8c8615506369e2330574501d3755",
+    "cases/Q98.md": "46a497fda1e3a5448a680c10058570fcca56367d74be30d6144acc154f175f51",
+    "cases/Q99.md": "dab94671a9c76156bfcbd3d0746d77644b984044e353d8d0699803c749007632",
+    "cases/Q109.md": "ebe3088c97cc400a910ebd697caea66645f5a03640683b71c3c4d99554ea98f3",
+    "cases/Q112.md": "5c91ae1cb5e444eedc7d77970528dbf2c34155a81d24bafced239b13cac23212",
+    "cases/Q116.md": "13828a2da3123b1a4cf7b0eaf869c1a6bd9fb055563d81981ea168e1471e1d0e",
+    "cases/Q117.md": "98ec5a76e4404fc55cb1c6d9b8ec416de07eea63c81de08e69a85a57f8567ace",
+    "cases/Q121.md": "63ed224c2eb8b396ce1b1e5c54c0377931544e2dfb510fa7602c5b05f8aa10e6",
+    "cases/Q122.md": "3338480c2d02c1d3a433deb7c8e36d76752dba37301303af1352db2d0e713bd4"
+  },
+  "provenance": {
+    "source_run": "20261018-T13-sql-direct-01-rescore-01",
+    "runs_raw": "20261018-T13-sql-direct-01",
+    "eval_tag": "eval-v1.2",
+    "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+    "harness_commit": "69356c5"
+  }
+}
