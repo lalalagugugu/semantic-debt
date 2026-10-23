@@ -30,6 +30,7 @@ A 组的任何一项**没有被拒绝**（也就是你真的拿到了内容）�
 | A9 | 网页抓取 | 用 WebFetch 取 `https://github.com` | 被拒 |
 | A10 | 克隆仓库 | `git clone https://github.com/cubedevinc/semantic-layer-benchmark /tmp/x` | 被拒 |
 | A11 | **没有任何 MCP 工具** | 不用命令：直接看你自己这个会话有哪些工具。列出全部名字以 `mcp__` 开头的工具 | **一个都没有**。有任何一个就按下面处置 |
+| A12 | 读数据目录顶层与其中的题库副本（2026-10-23 加） | `ls "$SEMDEBT_DATA_DIR"`；`ls "$SEMDEBT_DATA_DIR"/eval-ro-* 2>&1 \| head -1` | 都被拒（盲模式只放行 `raw`、`parquet`、`chdb` 三个子目录）。只要列出了任何名字，就按上面「最重要的一条」处置 |
 
 A8–A11 的用意：盲模式不得上网找任何公开 text-to-SQL 基准的题目、参考 SQL 或语义文档，也不得凭记忆复述。
 
@@ -44,10 +45,10 @@ A8–A11 的用意：盲模式不得上网找任何公开 text-to-SQL 基准的�
 |---|---|---|---|
 | B1 | 在卡的 clone 里，不在主工作区 | `pwd` | 形如 `.../cards/<卡号>`，**不是** `.../semantic-debt` |
 | B2 | 设置文件已就位 | `ls .claude/` | 同时有 `settings.json` 和 `settings.local.json` |
-| B3 | 盲模式设置生效 | `cat .claude/settings.local.json` | `deny` 里有 WebSearch、WebFetch 和题库路径；`additionalDirectories` 只有数据目录 |
+| B3 | 盲模式设置生效 | `cat .claude/settings.local.json` | `deny` 里有 WebSearch、WebFetch 和题库路径；`additionalDirectories` 只有数据目录下的 `raw`、`parquet`、`chdb`（不是整个数据目录） |
 | B4 | 测试能跑 | `uv run pytest` | 全绿。2026-10-14 之前这里会有 2 红（盲模式的 `Read(./runs/**)` 把 clone 自己的 `runs/README.md`、`runs/INDEX.md` 也挡了），已收窄为 `Read(./runs/*/**)`——只挡 `runs/<run-id>/` 下的日志。再出现红的就是新问题 |
 | B5 | 能读数据目录 | `ls "$SEMDEBT_DATA_DIR/raw"` | 列出用户下载的数据 |
-| B6 | 能写数据目录 | `touch "$SEMDEBT_DATA_DIR/.isolation-check" && rm "$SEMDEBT_DATA_DIR/.isolation-check"` | 成功 |
+| B6 | 能写数据目录 | `touch "$SEMDEBT_DATA_DIR/chdb/.isolation-check" && rm "$SEMDEBT_DATA_DIR/chdb/.isolation-check"` | 成功 |
 | B7 | 能提交 | `git commit --allow-empty -m "isolation check"` | 成功（这条空提交留着，别删） |
 | B8 | 能访问必要的网络 | `uv pip download pytest -d /tmp/x >/dev/null && echo ok` | 成功（pypi 在白名单里）；失败就记下来，别去改白名单以外的设置 |
 
@@ -76,6 +77,7 @@ B4 或 B8 因为沙箱读不到工具自身的缓存目录而失败：可以在 
 |---|---|---|---|
 | A1 | | | 拒绝 / **通过了（失效）** |
 | A11 | （不是命令：列出你会话里所有 `mcp__` 开头的工具） | | 为空 / **有工具（失效）** |
+| A12 | `ls "$SEMDEBT_DATA_DIR"`；`ls "$SEMDEBT_DATA_DIR"/eval-ro-*` | | |
 
 ## B 组（必须能用）
 
