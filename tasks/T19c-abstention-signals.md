@@ -4,7 +4,7 @@
 - 负责：Claude Code（本地普通模式，需要 `$SEMDEBT_DATA_DIR/runs-raw/` 与只读题库 `eval-v1.2`）
 - 模式：普通
 - 依赖：`harness-v1.1`、`eval-v1.2`；T13 SQL-L1 最终重评 `20261018-T13-sql-direct-01-rescore-01`
-- 预算：第一部分 0；第二部分 ≤ 2 元（`deepseek-flash`，先 dry-run、用户批准、错峰）
+- 预算：第一部分 0；第二部分 ≤ 5 元（2026-10-23 由 2 元上调，见 `decisions/2026-10-23-l1plus-l3a.md` 第四节；`deepseek-flash`，先 dry-run、用户批准、错峰）
 - 依据：`decisions/2026-10-23-orphan-rows-and-confidence.md` 第二节（2026-10-23 改写；原 H1、H2 不采用）
 
 ## 目标

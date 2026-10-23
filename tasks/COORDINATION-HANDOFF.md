@@ -90,3 +90,5 @@ eval-v1.2（题库 90e13b3）、harness-agent-v1 / v1.1、harness-v1.1（评分�
 **待用户决定**：L1+ 与 L3（ontology）。思路：L1+ 把派生概念、实例词表、类层次用文字补进 L1；L3a 同样内容写成形式化 ontology 放进上下文、仍写 SQL；L3b 再加「ontology 查询 → 编译成 SQL」的执行路径。补的内容必须盲写（新的盲模式会话或 Codex 先出常用概念清单、用户审定），不得从答错的题反推。工作量与能否提前见云端会话的最后一条回复。
 
 **报告要求新增**：孤儿行这一数据质量问题及其对结论的影响必须披露（`decisions/2026-10-23-orphan-rows-and-confidence.md` 第一节）。
+
+**补充（2026-10-23 16:10）**：#158 已合并：T22（L1+ 盲写、L3a 形式化）已裁决并开卡，T19c 预算上限 5 元。#156（T16 的 DAX 对齐清单 `reports/validation/t16_dax_reference_alignment.md`）已合并，交 T17-mac 实现。主工作区已切回 main（此前停在 `T19b-error-attribution`，没有未提交改动，该分支已在 main 里）。
