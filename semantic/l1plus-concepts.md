@@ -1,6 +1,11 @@
 # L1+ 常用业务概念清单（T22 第 2 步）
 
-状态：**待用户审定**。审定前不写 `semantic/l1plus.yaml` 的正文（第 3 步）。
+状态：**用户已审定（2026-10-23）**：⚑ 六项全部按建议；其余条目不删不补。正文已写入 `semantic/l1plus.yaml`。
+
+审定后第 3 步核数据时改了两处事实（不是改设计）：
+
+- **D32**：原拟「利润取科目 Profit and Loss before / after tax 的记录值」。实测战略计划表只有 17 个叶子科目的行，利润类科目没有任何行，所以改为由叶子科目算出（收入 − 费用 = 税前利润；税前利润 − 税 = 税后利润），见 `l1plus.yaml` D32、H07。
+- **E04**：国家 / 地区是 34 个，不是 35 个。
 
 ## 这份清单是怎么来的
 
@@ -95,7 +100,7 @@
 | E01 | 渠道 | 门店 / 实体店 / 线下 / 自营 → Store；线上 / 电商 / 网店 / 官网 → Online；目录 / 邮购 → Catalog；经销 / 分销 / 代理 → Reseller |
 | E02 | 线上店 | 北美 / 欧洲 / 亚洲线上店 → StoreKey 199 / 306 / 307 |
 | E03 | 大洲 | 北美 / 北美洲 → North America；欧洲 → Europe；亚洲 → Asia |
-| E04 | 国家 ⚑ | 35 个国家 / 地区的中文名 → `RegionCountryName`（美国 → United States，英国 → United Kingdom，荷兰 → the Netherlands……）。⚑「中国」：**建议**只映到 `China`，与数据自身把 China、Taiwan 分开的做法一致；要合并时问题会说「大中华区」 |
+| E04 | 国家 ⚑ | 34 个国家 / 地区的中文名 → `RegionCountryName`（美国 → United States，英国 → United Kingdom，荷兰 → the Netherlands……）。⚑「中国」：**建议**只映到 `China`，与数据自身把 China、Taiwan 分开的做法一致；要合并时问题会说「大中华区」 |
 | E05 | 品类、子类 | 8 个品类、30 个有产品的子类的中文名 → 英文取值（L1 已有中文释义，这里反过来写成映射） |
 | E06 | 品牌 | 自有品牌 → Contoso；其余品牌用英文原名 |
 | E07 | 颜色 | 中文颜色 → `ColorName`（蓝 → Blue 与 blue，银灰 → Silver Grey，与银、灰分开；见 A36） |

@@ -36,7 +36,7 @@
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
 | T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 第一期暂停，第二期再做（2026-10-19 用户裁决，与 judge-v1 一起）；小样本保留（`20261019-T21-pilot-01`，1.18 元，L0-P 50.0%、L1-P 58.3%，Python 0/48） |
-| T22 | L1+（内容补全与歧义澄清，盲写）与 L3a（同内容的 OWL + SHACL）（`tasks/T22-l1plus-l3a.md`） | Claude Code（盲 → 普通）+ Codex 复核 | 盲 / 普通 | `semantic-v1.4`；`harness-v1.1` | 10 元（Flash） | 进行中：第 1–2 步已交，待用户审定概念清单（2026-10-23） |
+| T22 | L1+（内容补全与歧义澄清，盲写）与 L3a（同内容的 OWL + SHACL）（`tasks/T22-l1plus-l3a.md`） | Claude Code（盲 → 普通）+ Codex 复核 | 盲 / 普通 | `semantic-v1.4`；`harness-v1.1` | 10 元（Flash） | 进行中：第 1–3 步已交（`semantic/l1plus.yaml`，2026-10-23），待 Codex 复核 |
 | C13 | 写法说明教学阶梯（ClickHouse SQL，档位 L1；`tasks/C13-syntax-ladder.md`） | Claude Code（T12） | 普通 | `harness-ladder-v1`；`semantic-v1.4` | 15 元 | **完成**（`20261019-C13-ladder-02`，7.17 元，#147）：首轮执行报错 32% → 3%（2 级），正确率 64.2% → 68.2%（+4.0 [−0.9, +9.2]）；3 级、4 级没有再提高（`reports/results/C13-ladder.md`） |
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
 | T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **完成**（#153，2026-10-23）：117 条，Flash 4.42 元；类别 κ 0.70、根因 κ 0.37；根因 3（模型没理解）11%–46%；两家都判根因 5 的 26 条 / 15 题待题库负责方核对（`reports/results/l1-error-attribution.md`） |

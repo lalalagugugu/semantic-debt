@@ -1,0 +1,1127 @@
+# L1+ 叠加内容（T22 第 3 步）
+#
+# 叠加在 semantic/source.yaml（semantic-v1.4，L1）之上，生成 SQL-L1plus 的上下文；
+# 同一份内容生成 Turtle（OWL + SHACL），放进 SQL-L3a（第 4 步）。本文件不改 L1 的任何条文。
+#
+# 写法约定（给后面读这个文件的人和脚本）：
+#   - 四节：clarifications（歧义澄清，A..）、concepts（派生概念，D..）、aliases（实例别名，E..）、
+#     hierarchies（类层次，H..）。编号与 semantic/l1plus-audit.md、semantic/l1plus-concepts.md 一致，
+#     Codex 复核与之后的修改都按编号。
+#   - 每条只有一种读法；不写「视情况」「按需要」。适用条件写在 applies_when，例外写在 exceptions。
+#   - clarifications 的 refs 指 source.yaml 的节与条目（不写行号，行号会随文件变化）。
+#   - concepts 的 sql 是 ClickHouse SQL 的写法示例，表名、列名与 L1 相同；
+#     示例里的日期、N 是占位，按问题替换。示例只演示口径，不是唯一允许的写法。
+#   - 本文件里引用的数据事实（取值、行数、金额）都由第 3 步会话对 $SEMDEBT_DATA_DIR/parquet
+#     实测过；写这份文件的会话是盲模式，没有看过题库、参考答案、运行结果。
+#   - 冲突时的优先级：本文件 > source.yaml 的同一主题。本文件没有提到的，照 source.yaml。
+
+version: 1
+base: "semantic/source.yaml（semantic-v1.4）"
+title: "L1+：歧义澄清与常用业务概念"
+as_of_date: "2009-12-31"
+
+# ---------------------------------------------------------------------------
+# 一、歧义澄清：L1 条文里条件没写全、允许两种以上读法的地方，各定一种读法。
+# ---------------------------------------------------------------------------
+clarifications:
+
+  # ========== 渠道、门店与选表 ==========
+  - id: A01
+    topic: "「门店」的范围：实体店还是全部 306 家"
+    refs: ["conventions[2]", "datasets.FactSales.columns.StoreKey", "datasets.DimStore.description", "metrics.门店数", "metrics.同店销售额"]
+    rule: >-
+      「门店」指实体店：DimStore.StoreType = 'Store'，299 家。以单个门店为对象的问题
+      ——门店列表与排名、门店数、店均销售额、坪效、门店人均销售额、同店、门店经理、
+      按门店所在地做的地理分析——都只算这 299 家。
+    applies_when: "问题的对象是门店，且没有点名虚拟门店、没有说全渠道或各渠道。"
+    exceptions:
+      - "问题说「全渠道」「各渠道」或做渠道对比：306 家都算（虚拟门店是线上、目录、经销渠道的记账单元）。"
+      - "问题点名「线上店」「经销店」「目录店」或某一家虚拟门店：按点名的范围。"
+    sql: "... FROM FactSales s JOIN DimStore st ON s.StoreKey = st.StoreKey WHERE st.StoreType = 'Store'"
+
+  - id: A02
+    topic: "明说「线上」时用哪张表"
+    refs: ["conventions[1]", "data_quality.online-sales-mismatch", "datasets.FactSales.columns.channelKey"]
+    rule: >-
+      明说「线上」的销售、订单、退货、折扣、成本、毛利，用 FactOnlineSales（与没说渠道时相同）。
+    exceptions:
+      - "线上与其他渠道放在同一个结果里比较（渠道对比、各渠道拆分、线上占全渠道的比例）：用 FactSales，线上 = channelKey = 2。"
+      - "线上的目标达成率：分子用 FactSales 的 channelKey = 2（约定 12 规定分子是全渠道销售表）。"
+
+  - id: A03
+    topic: "约定 1 管哪些指标；指标的 dataset 字段不是默认落点"
+    refs: ["conventions[1]", "conventions[2]", "metrics.销售额同比增长率", "metrics.销售额环比增长率", "metrics.销售额占比", "metrics.有销售天数", "metrics.日均销售额", "metrics.日均销售数量", "metrics.产品数"]
+    rule: >-
+      所有落在销售事实上的指标（销售额、销量、成本、毛利、退货、折扣、订单、同比、环比、占比、
+      日均、有销售天数、产品数……）都按同一条规则选表：没触发约定 2 → FactOnlineSales；
+      触发约定 2（以门店为对象、门店经理、同店、渠道对比、全渠道）→ FactSales。
+      指标上写的 dataset: FactSales 是触发约定 2 时的落点，不是默认。
+    exceptions:
+      - "库存周转率、目标达成率、目标差异的分子固定用 FactSales（L1 的指标定义如此）。"
+      - "本文件 D21、D29 与库存对照的销售量固定用 FactSales（见各自条目）。"
+
+  - id: A04
+    topic: "约定 2 与约定 5 同时触发时的地理口径"
+    refs: ["conventions[5]", "multi_path_defaults"]
+    rule: >-
+      问题触发约定 2 时，按国家、州、城市、大洲的分析一律按门店所在地
+      （FactSales → DimStore.GeographyKey → DimGeography），不需要问题明说「门店所在地」。
+      没触发约定 2 时，按客户所在地（FactOnlineSales → DimCustomer.GeographyKey → DimGeography）。
+
+  - id: A05
+    topic: "线上业务按大洲分：客户所在大洲"
+    refs: ["relationships: FactOnlineSales.StoreKey → DimStore.StoreKey", "conventions[5]"]
+    rule: "线上销售按大洲（或国家）分时，按客户所在地（约定 5）。"
+    exceptions:
+      - "问题点名「线上店」或某一家线上店（北美 / 欧洲 / 亚洲线上店）：按 FactOnlineSales.StoreKey（199 / 306 / 307，见 E02）。"
+
+  # ========== 时间 ==========
+  - id: A06
+    topic: "没说时间时的默认范围"
+    refs: ["conventions[3]"]
+    rule: "问题没有任何时间条件时，用全部数据：2007-01-01 ~ 2009-12-31，不默认缩到 2009 年。"
+    exceptions:
+      - "「当前库存」及其衍生（缺货、零库存、可售天数）：按 A22 取 2009-12-31 及以前的最近一次快照。"
+      - "客户分层（活跃 / 流失）：参照日 2009-12-31（约定 13、A27）。"
+      - "新客：截止日 2009-12-31（约定 14、A28）。"
+      - "同比、环比没说本期：按 A08。"
+
+  - id: A07
+    topic: "相对时间词的范围"
+    refs: ["conventions[3]"]
+    rule: >-
+      以 2009-12-31 为今天，今天所在的月、季、年都算已完成的最近一期（与约定 3 把「上季度」定为
+      2009 年第四季度同一逻辑）。逐词：
+      本月、上月、最近一个月 = 2009-12；
+      本季度、上季度 = 2009 年第四季度；
+      今年、本年、近一年、过去 12 个月 = 2009-01-01 ~ 2009-12-31；
+      去年 = 2008 年；前年 = 2007 年；
+      近 N 天 = [2009-12-31 − (N−1) 天, 2009-12-31]，含 12-31；
+      近 N 个月 = 截至 2009-12 的 N 个自然月（近 3 个月 = 2009-10 ~ 2009-12）；
+      本周、上周、最近一周 = 近 7 天（2009-12-25 ~ 2009-12-31）；
+      截至目前、累计 = 截至 2009-12-31。
+    sql: "近 90 天：WHERE DateKey BETWEEN toDate('2009-12-31') - 89 AND toDate('2009-12-31')"
+
+  - id: A08
+    topic: "同比、环比的本期与对比期"
+    refs: ["metrics.销售额同比增长率", "metrics.销售额环比增长率"]
+    rule: >-
+      同比：本期 = 问题指定的期；没指定 = 2009 全年，对比期 = 2008 全年。本期是某月 / 某季 →
+      对比期是上一年的同月 / 同季。问题要「逐月 / 逐季同比」时，每个月 / 季各算一个。
+      环比：对比期 = 紧挨着本期之前、长度相同的一期（2009-01 的上一期是 2008-12；
+      2009 Q1 的上一期是 2008 Q4）。年粒度的环比就是上一年。
+      增长率 = (本期 − 对比期) ÷ 对比期；分组时每组各自算本期与对比期，再算比率。
+
+  - id: A09
+    topic: "日均的分母"
+    refs: ["conventions[4]", "metrics.日均销售额", "metrics.有销售天数", "data_quality.date-dim-wider-than-facts"]
+    rule: >-
+      日均 = 先按天汇总，再对得到的天求平均 = 合计 ÷ 范围内有销售的天数
+      （筛选后的子集——某产品、某门店、某促销——就是该子集有销售的天数）。
+      日期范围限定在事实表的区间内，不用日期维度补出没有销售的天。
+    exceptions:
+      - "D29 库存可售天数按日历天数 90 算日均销量（概念自身的定义，见 D29）。"
+    sql: "SELECT sum(SalesAmount) / uniqExact(DateKey) FROM FactOnlineSales WHERE ..."
+
+  - id: A10
+    topic: "「季节」用哪一套字段"
+    refs: ["conventions[4]", "datasets.DimDate.cautions"]
+    rule: >-
+      问题点名大洲 → 用该大洲的季节字段（北美 NorthAmericaSeason、欧洲 EuropeSeason、亚洲 AsiaSeason）。
+      不点名 → 每一行用它所属大洲的季节字段，结果按「大洲 × 季节」分组，不把三套季节名混成一列。
+      一行所属的大洲按 A04：线上销售按客户所在大洲，全渠道销售按门店所在大洲。
+    sql: >-
+      multiIf(g.ContinentName = 'North America', d.NorthAmericaSeason,
+              g.ContinentName = 'Europe', d.EuropeSeason, d.AsiaSeason) AS Season
+
+  # ========== 口径 ==========
+  - id: A11
+    topic: "总成本（因而毛利）含线上退货行的成本"
+    refs: ["metrics.总成本", "metrics.毛利", "datasets.FactOnlineSales.columns.TotalCost"]
+    rule: >-
+      总成本 = 筛选范围内全部行的 sum(TotalCost)，含线上的退货行（SalesQuantity = 0、TotalCost > 0）。
+      毛利、毛利率照此计算。metrics.总成本 定义里的「销售行」指销售事实表的行。
+
+  - id: A12
+    topic: "订单数、客单价、客户数计入只有退货行的订单 / 客户"
+    refs: ["conventions[8]", "metrics.订单数", "metrics.客单价", "metrics.客户数"]
+    rule: >-
+      订单数 = 筛选范围内全部行的 uniqExact(SalesOrderNumber)；客户数 = 全部行的 uniqExact(CustomerKey)；
+      都不排除只有退货行的订单或客户。客单价的分母同订单数。
+    exceptions:
+      - "D05 复购客户、D06 复购率只算有销售行（SalesQuantity > 0）的订单（用户 2026-10-23 审定）。"
+
+  - id: A13
+    topic: "「利润率」：毛利率还是产品利润率；产品利润率怎么上卷"
+    refs: ["synonyms: 毛利率 / 利润率", "conventions[9]", "metrics.产品利润率"]
+    rule: >-
+      问题说「产品利润率」，或对象是产品本身（单个产品、产品清单、「利润率最高的产品」）且没有
+      销售范围（时间、渠道、销售额）→ 产品利润率（DimProduct 的标价与成本）。其余「利润率」→ 毛利率。
+      产品利润率上卷到组（子类、品类、品牌）= Σ(UnitPrice − UnitCost) ÷ Σ UnitPrice，对组内
+      DimProduct 的每个产品计一次，不按销量加权，不限有没有销售、是否在售（问题限定时按限定）。
+    sql: "SELECT ProductCategoryName, sum(p.UnitPrice - p.UnitCost) / sum(p.UnitPrice) FROM DimProduct p JOIN DimProductSubcategory s ON ... JOIN DimProductCategory c ON ... GROUP BY 1"
+
+  - id: A14
+    topic: "「收入」「成本」「利润」：销售事实还是战略计划科目"
+    refs: ["synonyms: 销售额 / 收入", "synonyms: 成本", "synonyms: 毛利 / 利润", "conventions[12]", "datasets.FactStrategyPlan.when_to_use"]
+    rule: >-
+      问题带计划类语境——计划、预算、预测、科目、损益、费用、税、税前 / 税后利润、实际 vs 预算的科目对比——
+      → 战略计划表的科目（收入 = Sale Revenue，成本 = Cost of Goods Sold，利润按 D32 计算）。
+      不带计划类语境 → 同义词表的落点（销售额、总成本、毛利）。
+      「产品成本」「单位成本」→ DimProduct.UnitCost，不受本条影响。
+    exceptions:
+      - "「预算」一词同时可能指向销售目标表，分界见 A15。"
+
+  - id: A15
+    topic: "「预算」：销售目标表还是战略计划表"
+    refs: ["synonyms: 计划 / 预算金额", "metrics.目标差异", "datasets.FactSalesQuota.when_to_use", "datasets.FactStrategyPlan.when_to_use"]
+    rule: >-
+      「预算」与以下任一词同现 → 销售目标表（FactSalesQuota）的 Budget 场景：销售目标、目标销售额、
+      目标销量、目标、配额、达成率、完成率、预算差异（与实际销售额比较）。
+      「预算」与以下任一词同现 → 战略计划表（FactStrategyPlan）的 Budget 场景：收入、科目、费用、
+      成本、利润、损益、执行率。
+      只说「预算」、两组词都没有 → 战略计划表，科目 = Sale Revenue。
+
+  - id: A16
+    topic: "「均价 / 单价」：成交均价还是产品标价"
+    refs: ["synonyms: 平均单价", "synonyms: 标价", "conventions[9]"]
+    rule: >-
+      「标价、吊牌价、零售价、产品单价、最贵 / 最便宜的产品」→ DimProduct.UnitPrice；对一组产品求平均 =
+      组内产品 UnitPrice 的简单平均（每个产品计一次）。
+      其余「均价、单价、平均价格、成交价、平均售价」→ 成交均价 = 销售额 ÷ 销售数量。
+
+  - id: A17
+    topic: "折扣率的分母也只算打折交易"
+    refs: ["metrics.折扣率", "conventions[10]"]
+    rule: >-
+      折扣率 = 打折交易的折扣金额 ÷ 打折交易的折扣前原价，分子分母都只算 PromotionKey != 1 的行。
+    exceptions:
+      - "问题明确问「折扣金额占全部销售（或全部原价）的比例」：分母按字面取全部交易。"
+
+  - id: A18
+    topic: "「促销效果」怎么算"
+    refs: ["conventions[10]"]
+    rule: >-
+      没有指定指标的「促销效果 / 各促销表现」= 按促销名（A19）分组的销售额、销售数量、折扣金额、
+      折扣率（A17），排除 PromotionKey = 1。
+    exceptions:
+      - "问题明确要与无折扣 / 无促销交易对比：PromotionKey = 1 作为对照组保留，单独成一组。"
+
+  - id: A19
+    topic: "按促销分组：促销名；分年份按交易日期"
+    refs: ["datasets.DimPromotion.description"]
+    rule: >-
+      「各促销活动」按 DimPromotion.PromotionName 分组（10 个名字，含 No Discount），不按 28 个促销键。
+      要分年份时，年份取交易的日期（DateKey 所在的年），不按促销键推年份——同一个促销键的交易可以
+      跨两个日历年（实测：键 2–10 的交易落在 2007、2008 年，键 11–19 落在 2008、2009 年，键 20–28 落在 2009 年）。
+
+  - id: A20
+    topic: "按产品属性分组时缺失产品怎么处理"
+    refs: ["data_quality.missing-products", "relationships: 事实表 → DimProduct"]
+    rule: >-
+      事实表一律左连接 DimProduct。按产品属性（品类、子类、品牌、颜色、档位……）分组、排名、列表时，
+      只列已知取值，不列 NULL（未登记产品）组，也不让它参加排名。不按产品属性分组的合计
+      （总销售额、各门店、各月……）含全部行。按产品属性筛选时，未登记产品自然不满足条件。
+    exceptions:
+      - "占比的分母含未登记产品的行（A21）。"
+
+  - id: A21
+    topic: "占比的分母范围"
+    refs: ["metrics.销售额占比"]
+    rule: >-
+      占比的分母 = 与分子相同的筛选条件（时间、渠道、地区……）下、去掉正在拆分的那个维度之后的合计，
+      含未登记产品的行。所以按产品属性拆的各组占比之和可以不到 100%。
+      问题说「占某品类 / 某渠道的比例」时，分母就是那个品类 / 渠道。
+    sql: "SELECT c.ProductCategoryName, sum(f.SalesAmount) / (SELECT sum(SalesAmount) FROM FactOnlineSales WHERE <同样的筛选>) ..."
+
+  - id: A22
+    topic: "某日、某期间的库存与期末库存"
+    refs: ["conventions[11]", "metrics.快照日在手库存数量", "metrics.平均在手库存金额"]
+    rule: >-
+      期末库存（某日、某期间末）= 每个门店 × 产品取 DateKey ≤ 期末日的最近一次快照，再求和。
+      「当前库存」是期末日 = 2009-12-31 的特例。
+      「某期间的库存」没说「平均」→ 期末库存；说「平均库存」→ 期间内各快照日先汇总、再对快照日求平均。
+      指定日不是快照日（快照都在周六）→ 按第一句取该日之前最近的快照。
+    sql: >-
+      SELECT sum(OnHandQuantity) FROM (SELECT StoreKey, ProductKey,
+        argMax(OnHandQuantity, DateKey) AS OnHandQuantity FROM FactInventory
+        WHERE DateKey <= toDate('2008-12-31') GROUP BY StoreKey, ProductKey)
+
+  - id: A23
+    topic: "库存周转率的时间窗口与范围"
+    refs: ["metrics.库存周转率"]
+    rule: >-
+      窗口 = 问题的时间窗口；没说时按 A06（全部数据）。分子 = 窗口内 FactSales 的 sum(TotalCost)；
+      分母 = 窗口内各快照日在手库存金额（sum(OnHandQuantity * UnitCost)）的平均。
+      按门店、产品、品类拆时，分子分母都在同一组内各自汇总再相除。
+
+  - id: A24
+    topic: "「缺货」与「零库存」"
+    refs: ["synonyms: 缺货 / 低于安全库存 / 补货预警"]
+    rule: >-
+      「缺货、低于安全库存、补货预警」= 在手数量 < 安全库存（OnHandQuantity < SafetyStockQuantity）。
+      「断货、零库存、无库存」= 在手数量 = 0。都按当前库存（A22）判断，问题指定日期时按该日的期末库存。
+
+  - id: A25
+    topic: "L1 / L1+ 不使用宽表视图"
+    refs: ["datasets.FactInventory.when_to_use", "data_quality.inventory-weekly"]
+    rule: >-
+      当前库存直接从 FactInventory 按约定 11 / A22 计算。不引用 dwd 库的任何视图
+      （FactInventory 的 when_to_use 提到的 wide_current_inventory 不在本单元的上下文里）。
+
+  - id: A26
+    topic: "目标达成率按渠道 / 门店 / 产品 / 时间拆"
+    refs: ["conventions[12]", "metrics.目标达成率"]
+    rule: >-
+      分子永远是 FactSales.SalesAmount，分母是 FactSalesQuota 的 Budget 场景 SalesAmountQuota。
+      按渠道拆：分子按 FactSales.channelKey、分母按 FactSalesQuota.ChannelKey 对齐。
+      按门店、产品拆：两边按同一个键汇总；按产品属性拆：两边都左连接 DimProduct，未登记产品不进组（A20）。
+      时间：分子先汇总到月（toStartOfMonth(DateKey)），与目标月对齐；窗口按问题，没说按 A06。
+      先在窗口内把分子分母各自合计，再相除；不是各月达成率求平均。
+
+  # ========== 客户 ==========
+  - id: A27
+    topic: "客户分层的参照日与筛选范围"
+    refs: ["conventions[13]", "metrics.客户最近购买月数"]
+    rule: >-
+      参照日：问题指定了截止日（「2008 年底的活跃客户」）→ 用那一天替换 2009-12-31，并只看该日及以前的行；
+      没指定 → 2009-12-31。
+      客户属性（性别、学历、职业、客户所在地……）筛客户；交易属性（产品、品类、促销、线上店）筛
+      计算最近购买日所用的行。月数 = dateDiff('month', 最近购买日, 参照日)。
+
+  - id: A28
+    topic: "新客：年窗口的读法与新客销售额的窗口"
+    refs: ["conventions[14]", "metrics.新客数", "metrics.新客销售额"]
+    rule: >-
+      截止日 = 问题时间窗口的最后一天（「2009 年的新客」截止日 = 2009-12-31）；新客 = 首购日落在
+      [截止日 − 89 天, 截止日] 的客户（首购日按 D01，取客户有史以来全部行）。按约定 14 原文，不改成
+      「首购在该年内」。
+      新客销售额 = 这些客户在问题时间窗口内的销售额；问题没说窗口时，截止日取 2009-12-31，
+      销售额取这些客户截至 2009-12-31 的全部销售额。
+
+  - id: A29
+    topic: "同店：对比期与门店范围"
+    refs: ["conventions[15]", "metrics.同店销售额"]
+    rule: >-
+      同店 = 在两个对比期（按 A08 定的本期与对比期，例如 2009 Q4 对 2008 Q4 就看这两个季度）都有销售的
+      实体店（A01）。「有销售」按门店的全部产品判定，不随问题的商品筛选变化；判定出同店之后，
+      再按问题的商品筛选计算这些门店的销售额。
+
+  # ========== 门店属性类比率 ==========
+  - id: A30
+    topic: "坪效、门店人均销售额"
+    refs: ["metrics.坪效", "metrics.门店人均销售额", "datasets.DimStore.description"]
+    rule: >-
+      分子分母都只算实体店（A01）。面积（SellingAreaSize）、员工数（EmployeeCount）每家门店计一次，
+      不在连接事实表之后求和。一组门店的坪效 = 组内销售额合计 ÷ 组内面积合计（不是各店坪效的平均）；
+      门店人均销售额同理。不剔除离群值（A36）。
+    sql: >-
+      SELECT sum(s.amt) / sum(st.SellingAreaSize) FROM (SELECT StoreKey, sum(SalesAmount) AS amt
+        FROM FactSales WHERE ... GROUP BY StoreKey) s JOIN DimStore st ON s.StoreKey = st.StoreKey
+        WHERE st.StoreType = 'Store'
+
+  - id: A31
+    topic: "门店数、产品数、在售产品"
+    refs: ["metrics.门店数", "metrics.产品数", "datasets.DimProduct.columns.Status", "datasets.DimStore.columns.Status"]
+    rule: >-
+      「在售产品」= DimProduct.Status = 'On'（1,938 个）；「停售产品」= Status = 'Off'。
+      「有销售的 / 卖出的产品数」= 范围内销售事实的 uniqExact(ProductKey)。
+      「有多少家门店」没有销售范围 → DimStore 的实体店数（A01），不分营业状态；说「营业中」再加 Status = 'On'。
+      有销售范围（「2009 年有销售的门店」）→ 销售事实的 uniqExact(StoreKey)，门店范围仍按 A01。
+
+  # ========== 计划、科目与运维 ==========
+  - id: A32
+    topic: "战略计划按地理上卷"
+    refs: ["relationships: FactStrategyPlan.EntityKey → DimEntity.EntityKey", "datasets.DimEntity"]
+    rule: >-
+      按州、国家、大洲看战略计划 → FactStrategyPlan.EntityKey → DimStore.EntityKey，再经
+      DimStore.GeographyKey → DimGeography（门店所在地，与 A04 的全渠道销售同一套地理名字）。
+    exceptions:
+      - "问题说「实体」「组织」「组织树」：沿 DimEntity 的 ParentEntityKey 上卷（H05）。"
+
+  - id: A33
+    topic: "科目树与科目合计"
+    refs: ["datasets.DimAccount", "datasets.FactStrategyPlan.cautions"]
+    rule: >-
+      科目树见 H07。战略计划表只有 17 个叶子科目的行（4、5、7–12、15–23），父科目（1、2、3、6、13、14、24）
+      没有任何行。「某科目合计」= 该科目在 H07 中的全部叶子科目之和；问的是叶子科目就取它本身。
+      收入、费用、税、利润按 D32 计算，不按 AccountType 求和。
+    sql: "营销费用：WHERE AccountKey IN (15, 16, 17, 18, 20, 21, 22, 23)"
+
+  - id: A34
+    topic: "「IT 成本」「设备购置费」「维护费」"
+    refs: ["synonyms: IT 成本 / 设备成本 / 运维成本", "datasets.FactITMachine.columns.CostType", "datasets.DimAccount"]
+    rule: >-
+      「IT 成本、设备成本、运维成本」= FactITMachine 全部成本类型的 sum(CostAmount)。
+      「设备购置费、购置成本」= CostType = 'Equipment Costs'；「年度维护费、维护费」= CostType = 'Annual Maintenance Cost'。
+    exceptions:
+      - "带计划类语境（A14）的「IT 成本」→ 战略计划表的科目 IT Cost（AccountKey = 8）。"
+
+  - id: A35
+    topic: "故障归属门店"
+    refs: ["datasets.FactITSLA.columns.StoreKey", "relationships: FactITSLA → DimStore / DimMachine", "datasets.DimMachine.columns.StoreKey"]
+    rule: "故障按门店分时用 FactITSLA.StoreKey，不经 DimMachine.StoreKey。"
+
+  # ========== 数据处理 ==========
+  - id: A36
+    topic: "离群值与脏枚举"
+    refs: ["data_quality.outlier-values", "data_quality.dirty-enum-values", "datasets.DimProduct.columns.ColorName"]
+    rule: >-
+      平均值一律是全部行的算术平均，不剔除离群值、不改用中位数；问题要中位数时才用中位数。
+      颜色按颜色筛选与分组都不区分大小写（blue 并入 Blue，即按 lower(ColorName) 或 E07 的映射）；
+      Silver Grey 单独一组，不并入 Silver 或 Grey。其余脏取值（部门名、促销名的拼写）原样保留，不合并。
+
+  - id: A37
+    topic: "「每周」的划分"
+    refs: ["datasets.DimDate.columns.CalendarWeekLabel"]
+    rule: "按周分组用 DimDate.CalendarYear + DimDate.CalendarWeekLabel，不用数据库的周函数。"
+
+  - id: A38
+    topic: "门店经理以上员工的业绩"
+    refs: ["datasets.DimEmployee.description"]
+    rule: >-
+      门店经理的业绩 = DimStore.EmployeeKey 等于他的那些门店的全渠道销售额。
+      州经理、大区经理、销售总监 = 沿 ParentEmployeeKey 向下找到的全部门店经理所管门店的合计（H06）。
+
+  - id: A39
+    topic: "「区域 / 大区」"
+    refs: ["synonyms: 国家 / 地区"]
+    rule: "「区域、大区」= 大洲（DimGeography.ContinentName）；「地区」按同义词表 = 国家 / 地区（RegionCountryName）。"
+
+  # ========== 第 3 步核数据时新发现的 L1 事实错误 ==========
+  - id: A40
+    topic: "子类 Projectors & Screens 属于 Computers"
+    refs: ["datasets.DimProductSubcategory.columns.ProductSubcategoryName"]
+    rule: >-
+      L1 把 Projectors & Screens 的释义写成「投影与幕布（TV and Video）」，数据里它挂在 Computers 品类下
+      （ProductSubcategoryKey = 19，103 个产品）。以数据为准：按品类分组时它属于 Computers，
+      即照 DimProductSubcategory.ProductCategoryKey 连接，不按 L1 释义里的括注。
+
+  - id: A41
+    topic: "科目树顶层的父子环"
+    refs: ["datasets.DimAccount"]
+    rule: >-
+      DimAccount 里 Profit and Loss after tax（1）的父科目是 24，Profit and Loss before tax（24）的父科目
+      是 1，构成环。按损益关系读作：税后利润（1）是根，下挂税前利润（24）与税（19）；税前利润下挂
+      收入（2）与费用（3）。沿 ParentAccountKey 递归上卷时在 1 停止，不要无限递归（H07）。
+
+# ---------------------------------------------------------------------------
+# 二、派生概念：L1 没有定义、常规经营分析会用到的概念（用户 2026-10-23 审定清单）。
+# 「购买」与约定 13、14 一致：客户在 FactOnlineSales 里的任何一行，含只有退货的行，除非条目另写。
+# ---------------------------------------------------------------------------
+concepts:
+
+  # ========== 客户 ==========
+  - id: D01
+    name: "首购日"
+    aliases: ["首次购买日", "首单日期"]
+    definition: "客户在 FactOnlineSales 里全部行的最小 DateKey（与约定 14 相同）。"
+    sql: "SELECT CustomerKey, min(DateKey) AS FirstPurchaseDate FROM FactOnlineSales GROUP BY CustomerKey"
+    applies_when: "任何用到「首次购买」的问题。"
+    exceptions: ["问题限定了交易范围（某品类的首购）：只在该范围的行里取最小日期。"]
+
+  - id: D02
+    name: "末购日"
+    aliases: ["最近一次购买日", "最后购买日"]
+    definition: "客户在参照日及以前的 FactOnlineSales 全部行的最大 DateKey（参照日按 A27，默认 2009-12-31）。"
+    sql: "SELECT CustomerKey, max(DateKey) AS LastPurchaseDate FROM FactOnlineSales WHERE DateKey <= toDate('2009-12-31') GROUP BY CustomerKey"
+
+  - id: D03
+    name: "首购队列"
+    aliases: ["客户队列", "cohort", "同期群"]
+    definition: >-
+      客户按首购日（D01）所在的期归入一个队列；期的粒度按问题（月、季、年），没说按月。
+      队列规模 = 该队列的客户数。
+    sql: "SELECT toStartOfMonth(FirstPurchaseDate) AS Cohort, count() AS CohortSize FROM (<D01>) GROUP BY Cohort"
+
+  - id: D04
+    name: "队列留存率"
+    aliases: ["留存率", "cohort 留存"]
+    definition: >-
+      某队列在首购期之后第 k 期仍有购买的客户数 ÷ 队列规模。期的长度与队列粒度相同；第 0 期是首购期本身
+      （留存率恒为 100%）。「仍有购买」= 该客户在第 k 期内有任何一行。
+    sql: >-
+      SELECT c.Cohort, dateDiff('month', c.Cohort, toStartOfMonth(f.DateKey)) AS k,
+             uniqExact(f.CustomerKey) / any(c.CohortSize) AS RetentionRate
+      FROM FactOnlineSales f JOIN (<每个客户的 Cohort 与 CohortSize>) c ON f.CustomerKey = c.CustomerKey
+      GROUP BY c.Cohort, k
+    exceptions: ["本库 18,868 个客户的首购都在 2007 年，按月以外的粒度做队列几乎只有一个队列；仍按定义计算。"]
+
+  - id: D05
+    name: "复购客户"
+    aliases: ["回头客", "重复购买客户"]
+    definition: >-
+      窗口内有 ≥ 2 个不同订单号、且这些订单都含销售行（SalesQuantity > 0）的客户。只有退货行的订单不算一次购买
+      （用户 2026-10-23 审定）。窗口按问题，没说按 A06。
+    sql: >-
+      SELECT CustomerKey FROM FactOnlineSales WHERE SalesQuantity > 0 AND <窗口>
+      GROUP BY CustomerKey HAVING uniqExact(SalesOrderNumber) >= 2
+
+  - id: D06
+    name: "复购率"
+    aliases: ["回购率", "重复购买率"]
+    definition: >-
+      窗口内复购客户数（D05）÷ 窗口内至少有 1 个含销售行订单的客户数。分子分母都只看 SalesQuantity > 0 的行，
+      所以分母不同于 A12 的客户数。
+    sql: >-
+      SELECT countIf(n >= 2) / count() FROM (SELECT CustomerKey, uniqExact(SalesOrderNumber) AS n
+        FROM FactOnlineSales WHERE SalesQuantity > 0 AND <窗口> GROUP BY CustomerKey)
+
+  - id: D07
+    name: "购买频次"
+    aliases: ["购买次数", "下单次数"]
+    definition: "每个客户窗口内的订单数（uniqExact(SalesOrderNumber)，全部行，A12）。对客户求平均即 L1 的「客均订单数」。"
+
+  - id: D08
+    name: "客户累计消费"
+    aliases: ["客户终身价值", "累计消费额", "LTV"]
+    definition: "客户从首购到窗口末（默认 2009-12-31）的销售额合计 sum(SalesAmount)；排名按 D18。"
+
+  - id: D09
+    name: "客户活跃率 / 流失率 / 流失风险率"
+    aliases: ["活跃率", "流失率"]
+    definition: >-
+      活跃（或有流失风险、已流失）客户数 ÷ 客户总数。分层按约定 13，参照日与筛选范围按 A27；
+      客户总数 = 参照日及以前有过任何购买的客户数（三层之和，三层互斥且覆盖全部）。
+
+  - id: D10
+    name: "客户年龄与年龄段"
+    aliases: ["年龄", "年龄段", "年龄层"]
+    definition: >-
+      年龄 = 2009 − 出生年（toYear(toDate(BirthDate))），以 2009-12-31 为今天，任何生日都已过。
+      年龄段（用户 2026-10-23 审定）：30 岁以下、30–39、40–49、50–59、60 岁及以上。
+    sql: >-
+      multiIf(2009 - toYear(toDate(BirthDate)) < 30, '30 岁以下',
+              2009 - toYear(toDate(BirthDate)) < 40, '30–39',
+              2009 - toYear(toDate(BirthDate)) < 50, '40–49',
+              2009 - toYear(toDate(BirthDate)) < 60, '50–59', '60 岁及以上') AS AgeBand
+
+  - id: D11
+    name: "收入档"
+    aliases: ["收入水平", "收入段"]
+    definition: >-
+      按 DimCustomer.YearlyIncome 分四档（用户 2026-10-23 审定）：< 40,000、40,000–79,999、80,000–129,999、≥ 130,000。
+      10,000,000 那一档（385 人）落在最高档。
+    sql: "multiIf(YearlyIncome < 40000, '<40k', YearlyIncome < 80000, '40k–80k', YearlyIncome < 130000, '80k–130k', '≥130k')"
+
+  # ========== 销售与时间 ==========
+  - id: D12
+    name: "月均销售额"
+    aliases: ["每月平均销售额"]
+    definition: "先按月汇总销售额，再对范围内有销售的月数求平均（约定 4、A09 的月版本）。选表按 A03。"
+    sql: "SELECT avg(m) FROM (SELECT toStartOfMonth(DateKey) AS mon, sum(SalesAmount) AS m FROM FactOnlineSales WHERE ... GROUP BY mon)"
+
+  - id: D13
+    name: "年初至今累计"
+    aliases: ["YTD", "本年累计", "截至某月累计"]
+    definition: "期末日所在年的 1 月 1 日到期末日的合计。没说期末日 → 2009-12-31，即 2009 全年。"
+
+  - id: D14
+    name: "同比增长额、环比增长额"
+    aliases: ["同比增加多少", "环比增加多少"]
+    definition: "本期 − 对比期，本期与对比期按 A08。"
+
+  - id: D15
+    name: "年复合增长率"
+    aliases: ["CAGR", "复合增长率"]
+    definition: >-
+      (末年 ÷ 首年)^(1 ÷ (末年 − 首年)) − 1，按日历年的全年值。没说首尾年 → 2007 到 2009，指数 1/2。
+    sql: "pow(v2009 / v2007, 1 / 2) - 1"
+
+  - id: D16
+    name: "连带率"
+    aliases: ["每单件数", "UPT", "客单件数"]
+    definition: "销售数量 ÷ 订单数，只在 FactOnlineSales 上算（只有线上有订单）；订单数按 A12。"
+    sql: "SELECT sum(SalesQuantity) / uniqExact(SalesOrderNumber) FROM FactOnlineSales WHERE ..."
+
+  - id: D17
+    name: "退货金额率"
+    aliases: ["金额退货率", "退款率"]
+    definition: "退货金额 ÷ 销售额，同表同范围。「退货率」不是这个，仍按约定 7 = 退货数量 ÷ 销售数量。"
+
+  - id: D18
+    name: "排名与前 N 名"
+    aliases: ["排行", "TOP N", "前几名", "最高", "最低"]
+    definition: >-
+      按指标降序（「最低」「后 N 名」升序）取前 N 行；并列时按名称（门店名、产品名、品类名……）升序，
+      结果恰好 N 行。「最高的」不带 N 时 N = 1。排名的对象范围按 A01、A20。
+    sql: "ORDER BY metric DESC, name ASC LIMIT N"
+
+  - id: D19
+    name: "ABC 分类"
+    aliases: ["帕累托分析", "ABC 分析", "二八分析"]
+    definition: >-
+      对象（默认产品，问题可指定子类、品牌等）按销售额降序排列，累计占比 = 截至本对象（含）的销售额合计 ÷ 分母。
+      A 类 = 累计占比 ≤ 80%；B 类 = 80% < 累计占比 ≤ 95%；C 类 = 其余（用户 2026-10-23 审定）。
+      分母按 A21：同筛选下的全部销售额，含未登记产品；对象只列已知产品（A20）。并列按 D18 的次序。选表按 A03。
+    sql: >-
+      SELECT ProductKey, amt, sum(amt) OVER (ORDER BY amt DESC, ProductName ASC
+        ROWS UNBOUNDED PRECEDING) / <分母> AS cum,
+        multiIf(cum <= 0.8, 'A', cum <= 0.95, 'B', 'C') AS Class FROM (...)
+
+  - id: D20
+    name: "动销产品与动销率"
+    aliases: ["动销", "动销率", "有动销的产品"]
+    definition: >-
+      动销产品 = 在售产品（A31）中、窗口内销售数量 > 0 的产品；动销率 = 动销产品数 ÷ 在售产品数。
+      窗口按问题，没说按 A06；选表按 A03。
+
+  - id: D21
+    name: "滞销产品"
+    aliases: ["滞销", "不动销", "积压产品"]
+    definition: >-
+      在售（A31）、当前在手数量合计 > 0（A22，全部门店求和），且窗口内 FactSales 销售数量合计为 0 的产品。
+      窗口没说 → 近 90 天 = [2009-10-03, 2009-12-31]（用户 2026-10-23 审定）。
+      销售量用 FactSales（全渠道），因为库存在各类门店都有，与库存对照要用同一组门店（A03 的例外）。
+
+  # ========== 门店 ==========
+  - id: D22
+    name: "新开门店"
+    aliases: ["新店", "新开店"]
+    definition: "实体店（A01）中 toDate(OpenDate) 落在问题期间内的门店；没说期间 → 2009 年（「今年」）。"
+    exceptions: ["新开门店不等于同店的反面；同店按 A29 判定。"]
+
+  - id: D23
+    name: "关店门店"
+    aliases: ["已关店", "关闭的门店"]
+    definition: >-
+      DimStore.Status = 'Off' 的门店（12 家，全是实体店）。按关店时间筛选用 toDate(CloseDate)，
+      并排除哨兵值 2090-12-31。
+
+  - id: D24
+    name: "单店日均销售额"
+    aliases: ["门店日均销售"]
+    definition: "某实体店窗口内 FactSales 销售额 ÷ 该店窗口内有销售的天数（A09）。"
+
+  # ========== 库存 ==========
+  - id: D25
+    name: "期末库存"
+    aliases: ["月末库存", "年末库存", "期末在手"]
+    definition: "按 A22：每个门店 × 产品取期末日及以前最近一次快照，再求和；期末日按问题（「2008 年末」= 2008-12-31）。"
+
+  - id: D26
+    name: "缺货率"
+    aliases: ["缺货占比", "低于安全库存比例"]
+    definition: >-
+      当前（或指定日）低于安全库存的门店 × 产品组合数 ÷ 同一时点的门店 × 产品组合数；
+      两者都在 A22 的「每个组合取最近一次快照」结果上计。
+    sql: >-
+      SELECT countIf(oh < ss) / count() FROM (SELECT StoreKey, ProductKey,
+        argMax(OnHandQuantity, DateKey) AS oh, argMax(SafetyStockQuantity, DateKey) AS ss
+        FROM FactInventory WHERE DateKey <= toDate('2009-12-31') GROUP BY StoreKey, ProductKey)
+
+  - id: D27
+    name: "零库存组合"
+    aliases: ["断货", "零库存", "无库存"]
+    definition: "当前（或指定日）在手数量 = 0 的门店 × 产品组合（A22、A24）。"
+
+  - id: D28
+    name: "库存周转天数"
+    aliases: ["周转天数", "DIO"]
+    definition: >-
+      窗口的日历天数 ÷ 库存周转率（A23）。窗口没说 → A06 的全部数据，日历天数 = 1,096。
+      窗口天数含首尾两天。
+
+  - id: D29
+    name: "库存可售天数"
+    aliases: ["可售天数", "库存覆盖天数"]
+    definition: >-
+      某门店 × 产品（或其合计）的当前在手数量 ÷ 近 90 天日均销售数量；日均销售数量 =
+      FactSales 在 [2009-10-03, 2009-12-31] 的销售数量合计 ÷ 90（按日历天数，本概念的定义，
+      不同于 A09）。日均销售数量为 0 时结果为 NULL（无法计算），不当作无穷大。范围是同一组门店 × 产品。
+
+  # ========== 目标与计划 ==========
+  - id: D30
+    name: "预算执行率"
+    aliases: ["预算执行情况", "执行率"]
+    definition: >-
+      战略计划表同一科目、同一范围的 Actual 金额 ÷ Budget 金额。没说科目 → Sale Revenue。
+      「达成率、完成率」不是这个，按 A15 落在销售目标表。
+
+  - id: D31
+    name: "预测偏差"
+    aliases: ["预测误差", "预测准确度"]
+    definition: >-
+      (Forecast − Actual) ÷ Actual，同一表、同一范围。问题说目标销售额、目标、配额 → 销售目标表的
+      SalesAmountQuota；否则 → 战略计划表，没说科目 → Sale Revenue。
+
+  - id: D32
+    name: "收入、费用、税、税前利润、税后利润（损益）"
+    aliases: ["损益", "利润总额", "净利润", "费用合计", "总费用"]
+    definition: >-
+      都在战略计划表上、同一场景（没说场景 → Actual）、同一范围内计算。
+      收入 = Sale Revenue（4）；
+      费用 = Expense（3）下的全部叶子：5、7、8、9、10、11、12、15、16、17、18、20、21、22、23；
+      税前利润 = 收入 − 费用；税 = Taxation（19）；税后利润（净利润）= 税前利润 − 税。
+      战略计划表里没有父科目（1、2、3、24）的行，利润只能这样算出来，不能直接按科目名筛。
+    sql: >-
+      sumIf(Amount, AccountKey = 4)
+        - sumIf(Amount, AccountKey IN (5,7,8,9,10,11,12,15,16,17,18,20,21,22,23)) AS ProfitBeforeTax
+
+  - id: D33
+    name: "费用率"
+    aliases: ["费用占收入比"]
+    definition: "某费用科目（或其子树，A33）金额 ÷ Sale Revenue 金额，同一场景、同一范围。"
+
+# ---------------------------------------------------------------------------
+# 三、实例别名：中文说法 → 数据里的取值。L1 在 values 的 meaning 里写了中文释义的，
+# 这里反过来写成映射，并补上常用说法。每个说法只映到一个落点。
+# ---------------------------------------------------------------------------
+aliases:
+
+  - id: E01
+    entity: "渠道"
+    column: "DimChannel.ChannelName（FactSales.channelKey）"
+    map:
+      - { terms: ["门店", "实体店", "线下", "自营", "门店渠道"], value: "Store", key: 1 }
+      - { terms: ["线上", "电商", "网店", "官网", "线上渠道"], value: "Online", key: 2 }
+      - { terms: ["目录", "邮购", "目录邮购"], value: "Catalog", key: 3 }
+      - { terms: ["经销", "分销", "代理", "经销商"], value: "Reseller", key: 4 }
+
+  - id: E02
+    entity: "线上店"
+    column: "DimStore.StoreKey（FactOnlineSales.StoreKey）"
+    map:
+      - { terms: ["北美线上店"], value: 199 }
+      - { terms: ["欧洲线上店"], value: 306 }
+      - { terms: ["亚洲线上店"], value: 307 }
+
+  - id: E03
+    entity: "大洲"
+    column: "DimGeography.ContinentName"
+    map:
+      - { terms: ["北美", "北美洲"], value: "North America" }
+      - { terms: ["欧洲"], value: "Europe" }
+      - { terms: ["亚洲"], value: "Asia" }
+
+  - id: E04
+    entity: "国家 / 地区"
+    column: "DimGeography.RegionCountryName"
+    note: "34 个取值。「中国」只映 China（用户 2026-10-23 审定）；「大中华区」= China 与 Taiwan 两个取值。"
+    map:
+      - { terms: ["美国"], value: "United States" }
+      - { terms: ["加拿大"], value: "Canada" }
+      - { terms: ["法国"], value: "France" }
+      - { terms: ["德国"], value: "Germany" }
+      - { terms: ["英国"], value: "United Kingdom" }
+      - { terms: ["意大利"], value: "Italy" }
+      - { terms: ["俄罗斯"], value: "Russia" }
+      - { terms: ["荷兰"], value: "the Netherlands" }
+      - { terms: ["丹麦"], value: "Denmark" }
+      - { terms: ["希腊"], value: "Greece" }
+      - { terms: ["爱尔兰"], value: "Ireland" }
+      - { terms: ["马耳他"], value: "Malta" }
+      - { terms: ["波兰"], value: "Poland" }
+      - { terms: ["葡萄牙"], value: "Portugal" }
+      - { terms: ["罗马尼亚"], value: "Romania" }
+      - { terms: ["斯洛文尼亚"], value: "Slovenia" }
+      - { terms: ["西班牙"], value: "Spain" }
+      - { terms: ["瑞典"], value: "Sweden" }
+      - { terms: ["瑞士"], value: "Switzerland" }
+      - { terms: ["中国", "中国大陆"], value: "China" }
+      - { terms: ["台湾", "中国台湾"], value: "Taiwan" }
+      - { terms: ["日本"], value: "Japan" }
+      - { terms: ["韩国", "南韩"], value: "South Korea" }
+      - { terms: ["印度"], value: "India" }
+      - { terms: ["澳大利亚", "澳洲"], value: "Australia" }
+      - { terms: ["新加坡"], value: "Singapore" }
+      - { terms: ["泰国"], value: "Thailand" }
+      - { terms: ["巴基斯坦"], value: "Pakistan" }
+      - { terms: ["伊朗"], value: "Iran" }
+      - { terms: ["叙利亚"], value: "Syria" }
+      - { terms: ["亚美尼亚"], value: "Armenia" }
+      - { terms: ["不丹"], value: "Bhutan" }
+      - { terms: ["吉尔吉斯斯坦"], value: "Kyrgyzstan" }
+      - { terms: ["土库曼斯坦"], value: "Turkmenistan" }
+      - { terms: ["大中华区"], value: ["China", "Taiwan"] }
+
+  - id: E05
+    entity: "品类、子类"
+    column: "DimProductCategory.ProductCategoryName；DimProductSubcategory.ProductSubcategoryName"
+    note: >-
+      说法与 L1 的中文释义一一对应。「电视」= 子类 Televisions；品类 TV and Video 叫「电视与影音」「影音」。
+      「相机」= 品类 Cameras and camcorders；「数码相机」= 子类 Digital Cameras。「手机」= 品类 Cell phones。
+      子类所属品类以数据为准（A40）。
+    map:
+      - { terms: ["音频", "音频产品"], value: "Audio", level: "品类" }
+      - { terms: ["电视与影音", "影音"], value: "TV and Video", level: "品类" }
+      - { terms: ["电脑", "计算机"], value: "Computers", level: "品类" }
+      - { terms: ["相机", "相机与摄像机"], value: "Cameras and camcorders", level: "品类" }
+      - { terms: ["手机"], value: "Cell phones", level: "品类" }
+      - { terms: ["音乐、影片与有声书", "音像制品"], value: "Music, Movies and Audio Books", level: "品类" }
+      - { terms: ["游戏与玩具", "游戏"], value: "Games and Toys", level: "品类" }
+      - { terms: ["家电"], value: "Home Appliances", level: "品类" }
+      - { terms: ["电视"], value: "Televisions", level: "子类" }
+      - { terms: ["VCD 与 DVD 播放机", "DVD 播放机"], value: "VCD & DVD", level: "子类" }
+      - { terms: ["家庭影院"], value: "Home Theater System", level: "子类" }
+      - { terms: ["车载影音"], value: "Car Video", level: "子类" }
+      - { terms: ["投影与幕布", "投影仪"], value: "Projectors & Screens", level: "子类" }
+      - { terms: ["MP3", "MP4", "MP3 / MP4 播放器"], value: "MP4&MP3", level: "子类" }
+      - { terms: ["耳机"], value: "Headphones", level: "子类" }
+      - { terms: ["蓝牙耳机"], value: "Bluetooth Headphones", level: "子类" }
+      - { terms: ["音箱"], value: "Speakers", level: "子类" }
+      - { terms: ["录音笔"], value: "Recording Pen", level: "子类" }
+      - { terms: ["笔记本电脑", "笔记本"], value: "Laptops", level: "子类" }
+      - { terms: ["台式机", "台式电脑"], value: "Desktops", level: "子类" }
+      - { terms: ["上网本"], value: "Netbooks", level: "子类" }
+      - { terms: ["显示器"], value: "Monitors", level: "子类" }
+      - { terms: ["打印、扫描与传真", "打印机"], value: "Printers, Scanners & Fax", level: "子类" }
+      - { terms: ["数码相机"], value: "Digital Cameras", level: "子类" }
+      - { terms: ["数码单反", "单反"], value: "Digital SLR Cameras", level: "子类" }
+      - { terms: ["摄像机"], value: "Camcorders", level: "子类" }
+      - { terms: ["触屏手机"], value: "Touch Screen Phones", level: "子类" }
+      - { terms: ["智能手机", "智能手机与 PDA"], value: "Smart phones & PDAs", level: "子类" }
+      - { terms: ["家用与办公电话", "座机"], value: "Home & Office Phones", level: "子类" }
+      - { terms: ["影片 DVD", "电影 DVD"], value: "Movie DVD", level: "子类" }
+      - { terms: ["音乐 CD"], value: "Music CD", level: "子类" }
+      - { terms: ["下载版游戏"], value: "Download Games", level: "子类" }
+      - { terms: ["冰箱"], value: "Refrigerators", level: "子类" }
+      - { terms: ["洗衣机与干衣机", "洗衣机"], value: "Washers & Dryers", level: "子类" }
+      - { terms: ["微波炉"], value: "Microwaves", level: "子类" }
+      - { terms: ["咖啡机"], value: "Coffee Machines", level: "子类" }
+      - { terms: ["空调"], value: "Air Conditioners", level: "子类" }
+      - { terms: ["热水器"], value: "Water Heaters", level: "子类" }
+      - { terms: ["风扇"], value: "Fans", level: "子类" }
+      - { terms: ["灯具"], value: "Lamps", level: "子类" }
+
+  - id: E06
+    entity: "品牌"
+    column: "DimProduct.BrandName"
+    map:
+      - { terms: ["自有品牌", "Contoso"], value: "Contoso" }
+    note: "其余品牌用英文原名，不翻译。"
+
+  - id: E07
+    entity: "颜色"
+    column: "DimProduct.ColorName"
+    note: "比较不区分大小写（A36）：「蓝」= Blue 与 blue。「银灰」只映 Silver Grey，不含 Silver、Grey。"
+    map:
+      - { terms: ["黑", "黑色"], value: "Black" }
+      - { terms: ["白", "白色"], value: "White" }
+      - { terms: ["银", "银色"], value: "Silver" }
+      - { terms: ["灰", "灰色"], value: "Grey" }
+      - { terms: ["蓝", "蓝色"], value: ["Blue", "blue"] }
+      - { terms: ["红", "红色"], value: "Red" }
+      - { terms: ["绿", "绿色"], value: "Green" }
+      - { terms: ["棕", "棕色", "咖啡色"], value: "Brown" }
+      - { terms: ["粉", "粉色", "粉红"], value: "Pink" }
+      - { terms: ["橙", "橙色"], value: "Orange" }
+      - { terms: ["金", "金色"], value: "Gold" }
+      - { terms: ["黄", "黄色"], value: "Yellow" }
+      - { terms: ["天蓝", "天蓝色"], value: "Azure" }
+      - { terms: ["银灰", "银灰色"], value: "Silver Grey" }
+      - { terms: ["紫", "紫色"], value: "Purple" }
+      - { terms: ["透明"], value: "Transparent" }
+
+  - id: E08
+    entity: "产品档位、备货档位"
+    column: "DimProduct.ClassName；DimProduct.StockTypeName"
+    map:
+      - { terms: ["经济档", "经济型", "低端"], value: "Economy", column: "ClassName" }
+      - { terms: ["标准档", "标准型", "中端"], value: "Regular", column: "ClassName" }
+      - { terms: ["高档", "豪华型", "高端"], value: "Deluxe", column: "ClassName" }
+      - { terms: ["高备货"], value: "High", column: "StockTypeName" }
+      - { terms: ["中备货"], value: "Mid", column: "StockTypeName" }
+      - { terms: ["低备货"], value: "Low", column: "StockTypeName" }
+
+  - id: E09
+    entity: "促销"
+    column: "DimPromotion.PromotionKey / PromotionName"
+    note: "不带大洲的「春促」「假日促」= 各大洲同名季节的促销合在一起；分年份按 A19。"
+    map:
+      - { terms: ["无折扣", "无促销", "原价", "不打折"], value: "PromotionKey = 1" }
+      - { terms: ["有促销", "打折", "促销交易"], value: "PromotionKey != 1" }
+      - { terms: ["北美春促"], value: "North America Spring Promotion" }
+      - { terms: ["北美返校促"], value: "North America Back-to-School Promotion" }
+      - { terms: ["北美假日促"], value: "North America Holiday Promotion" }
+      - { terms: ["欧洲春促"], value: "European Spring Promotion" }
+      - { terms: ["欧洲返校促"], value: "European Back-to-Scholl Promotion" }
+      - { terms: ["欧洲假日促"], value: "European Holiday Promotion" }
+      - { terms: ["亚洲春促"], value: "Asian Spring Promotion" }
+      - { terms: ["亚洲夏促"], value: "Asian Summer Promotion" }
+      - { terms: ["亚洲假日促"], value: "Asian Holiday Promotion" }
+      - { terms: ["春促", "春季促销"], value: ["North America Spring Promotion", "European Spring Promotion", "Asian Spring Promotion"] }
+      - { terms: ["返校促", "返校季促销"], value: ["North America Back-to-School Promotion", "European Back-to-Scholl Promotion"] }
+      - { terms: ["假日促", "假日季促销"], value: ["North America Holiday Promotion", "European Holiday Promotion", "Asian Holiday Promotion"] }
+
+  - id: E10
+    entity: "季节"
+    column: "DimDate.NorthAmericaSeason / EuropeSeason / AsiaSeason（选字段按 A10）"
+    map:
+      - { terms: ["假日季", "节日季"], value: { NorthAmericaSeason: "Holiday", EuropeSeason: "Holiday", AsiaSeason: "Holiday" } }
+      - { terms: ["返校季"], value: { NorthAmericaSeason: "Back to School", EuropeSeason: "Back to School", AsiaSeason: "Spring/Back to School" } }
+      - { terms: ["春季", "商务季", "返工季"], value: { NorthAmericaSeason: "Spring/Back to Business", EuropeSeason: "Spring/Business", AsiaSeason: "Spring/Back to School" } }
+      - { terms: ["报税季", "夏季"], value: { AsiaSeason: "Tax Time/Summer" } }
+      - { terms: ["平季", "淡季", "非季节"], value: { NorthAmericaSeason: "No Season", EuropeSeason: "No Season", AsiaSeason: "No Season" } }
+    note: "北美、欧洲没有报税季 / 夏季：问这两个大洲的夏季，结果为空。亚洲的春季与返校季是同一个取值。"
+
+  - id: E11
+    entity: "场景"
+    column: "DimScenario.ScenarioName"
+    map:
+      - { terms: ["实际", "实际值", "实绩"], value: "Actual" }
+      - { terms: ["预算", "正式目标", "计划值"], value: "Budget" }
+      - { terms: ["预测", "预测值"], value: "Forecast" }
+
+  - id: E12
+    entity: "科目"
+    column: "DimAccount.AccountKey / AccountName"
+    note: "父科目按 A33 取其叶子之和；利润类按 D32 计算。"
+    map:
+      - { terms: ["销售收入", "收入（计划）", "营业收入"], value: "Sale Revenue", key: 4 }
+      - { terms: ["销货成本", "销售成本"], value: "Cost of Goods Sold", key: 5 }
+      - { terms: ["销售及管理费用", "SG&A"], value: "Selling, General & Administrative Expenses", key: 6 }
+      - { terms: ["管理费用", "行政费用"], value: "Administration Expense", key: 7 }
+      - { terms: ["IT 成本（计划）", "IT 费用"], value: "IT Cost", key: 8 }
+      - { terms: ["人力成本", "人工成本", "人力资本"], value: "Human Capital", key: 9 }
+      - { terms: ["水电通信费"], value: "Light, Heat, Communication Cost", key: 10 }
+      - { terms: ["物业成本", "物业费", "房租物业"], value: "Property Costs", key: 11 }
+      - { terms: ["其他费用"], value: "Other Expenses", key: 12 }
+      - { terms: ["营销费用", "营销成本", "市场费用", "广告费"], value: "Marketing Cost", key: 13 }
+      - { terms: ["假日季广告费"], value: "Holiday Ad Cost", key: 14 }
+      - { terms: ["春季广告费"], value: "Spring Ad Cost", key: 15 }
+      - { terms: ["返校季广告费"], value: "Back-to-School Ad Cost", key: 16 }
+      - { terms: ["商务广告费"], value: "Business Ad Cost", key: 17 }
+      - { terms: ["报税季 / 夏季广告费", "夏季广告费"], value: "Tax Time / Summer Ad Cost", key: 18 }
+      - { terms: ["税", "税费", "所得税"], value: "Taxation", key: 19 }
+      - { terms: ["广播电视投放"], value: "Radio & TV", key: 20 }
+      - { terms: ["平面投放", "印刷广告"], value: "Print", key: 21 }
+      - { terms: ["互联网投放", "网络广告"], value: "Internet", key: 22 }
+      - { terms: ["其他投放"], value: "Other", key: 23 }
+      - { terms: ["税前利润", "利润总额"], value: "Profit and Loss before tax", key: 24 }
+      - { terms: ["税后利润", "净利润"], value: "Profit and Loss after tax", key: 1 }
+      - { terms: ["收入（父科目）"], value: "Income", key: 2 }
+      - { terms: ["费用", "总费用", "费用合计"], value: "Expense", key: 3 }
+
+  - id: E13
+    entity: "客户属性"
+    column: "DimCustomer.Gender / MaritalStatus / Education / Occupation / HouseOwnerFlag"
+    map:
+      - { terms: ["男", "男性"], value: "M", column: "Gender" }
+      - { terms: ["女", "女性"], value: "F", column: "Gender" }
+      - { terms: ["已婚"], value: "M", column: "MaritalStatus" }
+      - { terms: ["单身", "未婚"], value: "S", column: "MaritalStatus" }
+      - { terms: ["本科", "学士"], value: "Bachelors", column: "Education" }
+      - { terms: ["大学未毕业", "大学肄业"], value: "Partial College", column: "Education" }
+      - { terms: ["高中"], value: "High School", column: "Education" }
+      - { terms: ["研究生及以上", "研究生", "硕士", "博士"], value: "Graduate Degree", column: "Education" }
+      - { terms: ["高中未毕业", "高中肄业"], value: "Partial High School", column: "Education" }
+      - { terms: ["专业人士"], value: "Professional", column: "Occupation" }
+      - { terms: ["技术工人"], value: "Skilled Manual", column: "Occupation" }
+      - { terms: ["管理者", "管理人员"], value: "Management", column: "Occupation" }
+      - { terms: ["文职", "职员"], value: "Clerical", column: "Occupation" }
+      - { terms: ["普通体力工作", "体力劳动者"], value: "Manual", column: "Occupation" }
+      - { terms: ["有房"], value: 1, column: "HouseOwnerFlag" }
+      - { terms: ["无房"], value: 0, column: "HouseOwnerFlag" }
+
+  - id: E14
+    entity: "日期标签"
+    column: "DimDate"
+    map:
+      - { terms: ["一月 ~ 十二月", "1 月 ~ 12 月"], value: "MonthNumber = 1 ~ 12" }
+      - { terms: ["周一 ~ 周日", "星期一 ~ 星期日"], value: "CalendarDayOfWeekLabel = Monday ~ Sunday" }
+      - { terms: ["周末"], value: "IsWorkDay = 'WeekEnd'" }
+      - { terms: ["工作日", "平日"], value: "IsWorkDay = 'WorkDay'" }
+      - { terms: ["节假日"], value: "IsHoliday = 'Yes'" }
+      - { terms: ["上半年", "下半年"], value: "CalendarHalfYearLabel = 'H1' / 'H2'" }
+      - { terms: ["一季度 ~ 四季度", "Q1 ~ Q4"], value: "CalendarQuarterLabel = 'Q1' ~ 'Q4'" }
+
+  - id: E15
+    entity: "门店状态"
+    column: "DimStore.Status"
+    map:
+      - { terms: ["营业中", "在营", "开业中"], value: "On" }
+      - { terms: ["已关店", "关闭", "已关闭"], value: "Off" }
+
+  - id: E16
+    entity: "IT 设备类型"
+    column: "DimMachine.MachineType"
+    map:
+      - { terms: ["POS", "POS 机", "收银机"], value: ["POS01", "POS02", "POS03", "POS04"] }
+      - { terms: ["服务器"], value: ["WSR01", "WSR02", "MSR01"] }
+      - { terms: ["Web 服务器"], value: ["WSR01", "WSR02"] }
+      - { terms: ["邮件服务器"], value: ["MSR01"] }
+      - { terms: ["集线器", "USB 集线器"], value: ["HUB01"] }
+      - { terms: ["路由器"], value: ["RUT01"] }
+
+  - id: E17
+    entity: "职级"
+    column: "DimEmployee.Title"
+    map:
+      - { terms: ["门店经理", "店长"], value: "Sales Store Manager" }
+      - { terms: ["州经理", "省经理"], value: "Sales State Manager" }
+      - { terms: ["大区经理", "区域经理"], value: "Sales Region Manager" }
+      - { terms: ["销售总监"], value: "Sales Group Manager" }
+
+# ---------------------------------------------------------------------------
+# 四、类层次：把 L1 散在各处的层级与划分集中写成类与子类。
+# membership 是成员判定（SQL 条件）；disjoint = 子类互斥；covering = 子类覆盖父类。
+# ---------------------------------------------------------------------------
+hierarchies:
+
+  - id: H01
+    name: "销售记录"
+    classes:
+      - { class: "销售记录", parent: null }
+      - { class: "线上订单行", parent: "销售记录", membership: "FactOnlineSales 的一行" }
+      - { class: "线上销售行", parent: "线上订单行", membership: "SalesQuantity > 0" }
+      - { class: "线上退货行", parent: "线上订单行", membership: "SalesQuantity = 0（退货单独成行）" }
+      - { class: "全渠道汇总行", parent: "销售记录", membership: "FactSales 的一行（天 × 门店 × 产品 × 促销）" }
+    constraints:
+      - "线上订单行与全渠道汇总行互斥；两者的线上部分口径不同（差 1.5%），不得相加（A02）。"
+      - "线上销售行与线上退货行互斥且覆盖线上订单行。"
+
+  - id: H02
+    name: "门店"
+    classes:
+      - { class: "门店（DimStore 的一行）", parent: null }
+      - { class: "实体店", parent: "门店（DimStore 的一行）", membership: "StoreType = 'Store'（299 家）" }
+      - { class: "虚拟门店", parent: "门店（DimStore 的一行）", membership: "StoreType != 'Store'（7 家）" }
+      - { class: "线上店", parent: "虚拟门店", membership: "StoreType = 'Online'（3 家：199、306、307）" }
+      - { class: "经销店", parent: "虚拟门店", membership: "StoreType = 'Reseller'（3 家）" }
+      - { class: "目录店", parent: "虚拟门店", membership: "StoreType = 'Catalog'（1 家）" }
+      - { class: "营业中门店", parent: "门店（DimStore 的一行）", membership: "Status = 'On'（294 家）" }
+      - { class: "已关店门店", parent: "门店（DimStore 的一行）", membership: "Status = 'Off'（12 家，全是实体店）" }
+    constraints:
+      - "实体店与虚拟门店互斥且覆盖；营业中与已关店互斥且覆盖；两种划分正交。"
+      - "门店类型 ↔ 渠道一一对应：Store ↔ 1、Online ↔ 2、Catalog ↔ 3、Reseller ↔ 4。"
+      - "「门店」默认指实体店（A01）。"
+
+  - id: H03
+    name: "产品"
+    classes:
+      - { class: "品类", parent: null, membership: "DimProductCategory，8 个" }
+      - { class: "子类", parent: "品类", membership: "DimProductSubcategory，44 个，其中 30 个有产品；按 ProductCategoryKey 归属（A40）" }
+      - { class: "产品", parent: "子类", membership: "DimProduct，2,233 个；按 ProductSubcategoryKey 归属" }
+      - { class: "在售产品", parent: "产品", membership: "Status = 'On'（1,938 个）" }
+      - { class: "停售产品", parent: "产品", membership: "Status = 'Off'（295 个）" }
+      - { class: "未登记产品", parent: null, membership: "事实表引用、DimProduct 里没有的 ProductKey（284 个）；不属于任何品类（A20）" }
+    constraints:
+      - "在售与停售互斥且覆盖产品。"
+      - "未登记产品不是产品的子类：没有品类、子类、品牌等属性。"
+
+  - id: H04
+    name: "地理"
+    classes:
+      - { class: "大洲", parent: null, membership: "ContinentName，3 个" }
+      - { class: "国家 / 地区", parent: "大洲", membership: "RegionCountryName，34 个" }
+      - { class: "省 / 州", parent: "国家 / 地区", membership: "StateProvinceName" }
+      - { class: "城市", parent: "省 / 州", membership: "CityName" }
+    constraints:
+      - "「位于」有两种：客户所在地（DimCustomer.GeographyKey）与门店所在地（DimStore.GeographyKey），选哪种按 A04。"
+
+  - id: H05
+    name: "计划实体（组织树）"
+    classes:
+      - { class: "集团级实体", parent: null, membership: "DimEntity 顶层，3 个" }
+      - { class: "国家 / 地区级实体", parent: "集团级实体", membership: "33 个" }
+      - { class: "州级实体", parent: "国家 / 地区级实体", membership: "79 个" }
+      - { class: "门店实体", parent: "州级实体", membership: "EntityType = 'Store'，306 个，与 DimStore.EntityKey 一一对应" }
+    constraints:
+      - "只有门店实体有战略计划行。"
+      - "线上店、目录店的门店实体直接挂在国家 / 地区级实体下，不经过州。"
+      - "按地理看计划默认不走组织树，走门店所在地（A32）。"
+
+  - id: H06
+    name: "员工"
+    classes:
+      - { class: "销售总监", parent: null, membership: "Title = 'Sales Group Manager'（1 人）" }
+      - { class: "大区经理", parent: "销售总监", membership: "Title = 'Sales Region Manager'（5 人）" }
+      - { class: "州经理", parent: "大区经理", membership: "Title = 'Sales State Manager'（23 人）" }
+      - { class: "门店经理", parent: "州经理", membership: "Title = 'Sales Store Manager'（264 人）" }
+    constraints:
+      - "上下级沿 DimEmployee.ParentEmployeeKey；门店经理管的门店 = DimStore.EmployeeKey（A38）。"
+
+  - id: H07
+    name: "科目树"
+    classes:
+      - { class: "Profit and Loss after tax（1）", parent: null, note: "根；数据里它的父科目写成 24，是环（A41）" }
+      - { class: "Profit and Loss before tax（24）", parent: "Profit and Loss after tax（1）" }
+      - { class: "Taxation（19）", parent: "Profit and Loss after tax（1）", leaf: true }
+      - { class: "Income（2）", parent: "Profit and Loss before tax（24）" }
+      - { class: "Expense（3）", parent: "Profit and Loss before tax（24）" }
+      - { class: "Sale Revenue（4）", parent: "Income（2）", leaf: true }
+      - { class: "Cost of Goods Sold（5）", parent: "Expense（3）", leaf: true }
+      - { class: "Selling, General & Administrative Expenses（6）", parent: "Expense（3）" }
+      - { class: "Administration Expense（7）", parent: "Selling, General & Administrative Expenses（6）", leaf: true }
+      - { class: "IT Cost（8）", parent: "Selling, General & Administrative Expenses（6）", leaf: true }
+      - { class: "Human Capital（9）", parent: "Selling, General & Administrative Expenses（6）", leaf: true }
+      - { class: "Light, Heat, Communication Cost（10）", parent: "Selling, General & Administrative Expenses（6）", leaf: true }
+      - { class: "Property Costs（11）", parent: "Selling, General & Administrative Expenses（6）", leaf: true }
+      - { class: "Other Expenses（12）", parent: "Selling, General & Administrative Expenses（6）", leaf: true }
+      - { class: "Marketing Cost（13）", parent: "Selling, General & Administrative Expenses（6）" }
+      - { class: "Holiday Ad Cost（14）", parent: "Marketing Cost（13）" }
+      - { class: "Spring Ad Cost（15）", parent: "Marketing Cost（13）", leaf: true }
+      - { class: "Back-to-School Ad Cost（16）", parent: "Marketing Cost（13）", leaf: true }
+      - { class: "Business Ad Cost（17）", parent: "Marketing Cost（13）", leaf: true }
+      - { class: "Tax Time / Summer Ad Cost（18）", parent: "Marketing Cost（13）", leaf: true }
+      - { class: "Radio & TV（20）", parent: "Holiday Ad Cost（14）", leaf: true }
+      - { class: "Print（21）", parent: "Holiday Ad Cost（14）", leaf: true }
+      - { class: "Internet（22）", parent: "Holiday Ad Cost（14）", leaf: true }
+      - { class: "Other（23）", parent: "Holiday Ad Cost（14）", leaf: true }
+    constraints:
+      - "战略计划表只有 17 个叶子科目的行；父科目 = 其下全部叶子之和（A33）。"
+      - "子树的叶子：Income = {4}；Expense = {5, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 20, 21, 22, 23}；SG&A = {7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 20, 21, 22, 23}；Marketing Cost = {15, 16, 17, 18, 20, 21, 22, 23}；Holiday Ad Cost = {20, 21, 22, 23}。"
+
+  - id: H08
+    name: "客户"
+    classes:
+      - { class: "客户", parent: null, membership: "DimCustomer，18,869 人，全部有线上购买" }
+      - { class: "活跃客户", parent: "客户", membership: "最近购买距参照日 ≤ 6 个月（约定 13）" }
+      - { class: "有流失风险客户", parent: "客户", membership: "7–12 个月" }
+      - { class: "已流失客户", parent: "客户", membership: "> 12 个月" }
+      - { class: "新客", parent: "客户", membership: "约定 14、A28" }
+      - { class: "复购客户", parent: "客户", membership: "D05" }
+    constraints:
+      - "活跃、有流失风险、已流失三者互斥且覆盖客户。"
+      - "新客、复购客户是另外两个子集，与分层正交。"
+
+  - id: H09
+    name: "交易的促销状态"
+    classes:
+      - { class: "交易", parent: null }
+      - { class: "无折扣交易", parent: "交易", membership: "PromotionKey = 1" }
+      - { class: "打折交易", parent: "交易", membership: "PromotionKey != 1（27 个季节性促销键）" }
+    constraints:
+      - "两者互斥且覆盖。判定按促销键，不按折扣金额（约定 10）。"
+      - "27 个促销键是 9 个促销名各 3 期；按促销名分组，分年份按交易日期（A19）。"
+
+  - id: H10
+    name: "场景"
+    classes:
+      - { class: "Actual", parent: null, membership: "ScenarioKey = 1" }
+      - { class: "Budget", parent: null, membership: "ScenarioKey = 2；正式目标与正式预算" }
+      - { class: "Forecast", parent: null, membership: "ScenarioKey = 3" }
+    constraints:
+      - "三个场景互斥；任何计划、目标的合计都必须先选定一个场景。"
+
+  - id: H11
+    name: "日子类型"
+    classes:
+      - { class: "工作日", parent: null, membership: "IsWorkDay = 'WorkDay'（周一至周五）" }
+      - { class: "周末", parent: null, membership: "IsWorkDay = 'WeekEnd'；本库与 IsHoliday = 'Yes' 是同一批日子" }
+    constraints:
+      - "工作日与周末互斥且覆盖。季节按大洲各一套（A10、E10）。"
+
+  - id: H12
+    name: "库存状态"
+    classes:
+      - { class: "门店产品组合", parent: null, membership: "每个门店 × 产品取最近一次快照（A22）" }
+      - { class: "低于安全库存组合", parent: "门店产品组合", membership: "OnHandQuantity < SafetyStockQuantity" }
+      - { class: "零库存组合", parent: "低于安全库存组合", membership: "OnHandQuantity = 0" }
+    constraints:
+      - "零库存组合 ⊂ 低于安全库存组合：安全库存的最小值是 3，所以在手为 0 一定低于安全库存。"
+
+  - id: H13
+    name: "IT 设备与成本"
+    classes:
+      - { class: "IT 设备", parent: null, membership: "DimMachine" }
+      - { class: "POS", parent: "IT 设备", membership: "MachineType IN ('POS01','POS02','POS03','POS04')" }
+      - { class: "服务器", parent: "IT 设备", membership: "MachineType IN ('WSR01','WSR02','MSR01')" }
+      - { class: "集线器", parent: "IT 设备", membership: "MachineType = 'HUB01'" }
+      - { class: "路由器", parent: "IT 设备", membership: "MachineType = 'RUT01'" }
+      - { class: "IT 成本", parent: null, membership: "FactITMachine" }
+      - { class: "设备购置费", parent: "IT 成本", membership: "CostType = 'Equipment Costs'" }
+      - { class: "年度维护费", parent: "IT 成本", membership: "CostType = 'Annual Maintenance Cost'" }
+    constraints:
+      - "设备的四个子类互斥且覆盖；成本的两个子类互斥且覆盖（A34）。"
