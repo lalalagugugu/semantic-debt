@@ -377,6 +377,10 @@ def part2(recs: list[dict], run_id: str) -> list[str]:
     wrong_a = sorted({k[0] for k, r in src.items() if not r["low"] and k in by and by[k]["tier"] == "A" and not r["correct"]},
                      key=lambda q: int(q[1:]))
     out += ["", f"主表中自评 A 却不对的作答涉及的题（{len(wrong_a)} 题）：{', '.join(wrong_a) or '无'}"]
+    out += ["", "## 结论与下一步", "",
+            f"- 自评把握（判定）：{v}。" + ("" if v.startswith(("证实", "证伪")) else
+              "按卡片规则不列入第二期候选单元，也不下「模型不知道自己会不会」的结论。"),
+            "- 隐含信号（参照，见第一部分）：AUC ≥ 0.70 的信号只记为「有用的隐含信号」，按卡片规则不单独触发新单元。"]
     return out
 
 
