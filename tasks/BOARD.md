@@ -31,7 +31,7 @@
 | T14 | 调优（SQL-L1 调优；DAX-L2 调优同法） | Claude Code（A 普通，B 调优包） | 普通 / 调优包 | T13 | 15 / 50 元 | 未开始 |
 | T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | **完成**（第一期范围）：L0-E 39.8%、L1-E 68.4%（对直答各 +0.7 点）；**SQL-L2-E**（`semantic-v1.4`，`20261020-T15-explorer-l2e-02` + `-03`，合计 5.87 元，#148、#150）主表 66.0%，对 SQL-L2 直答 65.3% 差 +0.7 [−5.1, +6.5]；执行失败 14 → 1，多出的 13 个答案 2 对 11 错（`reports/results/explorer.md` L2-E 一节） |
 | T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | **完成**（2026-10-20，#114 已合并；Cube 已停、自动重启已关）：`semantic-v1.4` 全量 109 题 × 3，主表 SQL-L2 新说明 65.3%、旧说明 51.4%、JSON-L2 31.0%，费用 13.33 元。JSON 未拒答的 173 次配对：SQL 71.7%（错答 46）vs JSON 52.6%（错答 81）；静态能答 117 次中 JSON 错 32 次，30 次是成员集合不同（`reports/validation/t16-v14-full-results/README.md`）。待办：指标层补足覆盖需新增多少指标的统计（用户定为之后再做） |
-| T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | **Mac 侧准备开工**（2026-10-23，`start-card.sh T17-mac`，本地普通模式）：DAX 执行器、探测模式、`windows/README.md`、检查清单第 1、3 项；第 2 项（DAX 对齐清单）由 Codex T16 给；Windows 电脑由用户准备 |
+| T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | **Mac 侧准备完成**（2026-10-23，T17-mac）：DAX 执行器、探测模式、`windows/README.md` 与 `t17.ps1`、检查清单第 1、3 项（渲染器修正两处 DAX 交付缺陷，待用户决定是否打 `semantic-v1.5`，`decisions/2026-10-23-t17-mac-dax-renderer.md`）；第 2 项（DAX 对齐清单，Codex T16 PR #156）待用户转交；Windows 上探测、冒烟待做 |
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |

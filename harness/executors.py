@@ -1,7 +1,7 @@
 """Query executors: ``execute(query) -> ExecResult``.
 
-Every stack gets the same interface. chDB (T11) and Cube SQL / JSON (T16) are
-implemented here; DAX is reserved for T17.
+Every stack gets the same interface. chDB (T11), Cube SQL / JSON (T16) and DAX
+on Power BI Desktop (T17) are implemented here.
 
 The chDB executor enforces a per-cell *database scope* before execution
 (T11 card, carried-forward requirement 1): a query that names a table in a
@@ -591,18 +591,339 @@ class CubeJsonExecutor:
         return rows, [{"name": name, "type": kind} for name, kind in members]
 
 
-# Reserved for T17.
+# ---------------------------------------------------------------------------
+# DAX on Power BI Desktop's local Analysis Services engine (T17)
+#
+# Desktop starts a private engine for the open model and writes its port to
+# <workspace>/Data/msmdsrv.port.txt. One model at a time: the executor finds the
+# single live workspace, connects with ADOMD.NET (pyadomd + pythonnet, Windows only)
+# and checks, before a run, that the open model is the tier the cell expects.
+#
+# Static checks before execution (T10 handoff, task card T17 §一): the DAX-L0 model
+# renames the Parquet columns in Power Query, so its partitions' M expressions
+# contain the original names. ``INFO.*`` metadata functions (and the ``$SYSTEM``
+# DMVs) would read them, so a query that uses one is rejected, never executed, and
+# counted apart as ``metadata_function``.
+
+METADATA_FUNCTION = "metadata_function"
+METADATA_MESSAGE = "该查询使用了不允许的元数据函数或系统视图（INFO. 系列、$SYSTEM）；只能查询语义上下文里的表、列和度量值。"
+DAX_STATEMENT_MESSAGE = "只允许一条 DAX 查询：以 EVALUATE 或 DEFINE 开头，只含一个 EVALUATE。"
+
+_DAX_MASK = re.compile(r"//[^\n]*|--[^\n]*|/\*.*?\*/|\"(?:\"\"|[^\"])*\"|'(?:''|[^'])*'|\[[^\]]*\]", re.DOTALL)
+_INFO_FUNCTION = re.compile(r"(?<![\w.])INFO\s*\.\s*[A-Z_]", re.IGNORECASE)
+_DMV = re.compile(r"\$SYSTEM\b", re.IGNORECASE)
+_EVALUATE = re.compile(r"\bEVALUATE\b", re.IGNORECASE)
 
 
-class _Reserved:
-    card = "?"
-
-    def __init__(self, *args, **kwargs) -> None:
-        self.name = type(self).__name__
-
-    def execute(self, query: str) -> ExecResult:  # pragma: no cover - placeholder
-        raise NotImplementedError(f"{self.name} is implemented in {self.card}")
+def mask_dax(query: str) -> str:
+    """Blank out comments, strings, quoted table names and [bracketed] names, keeping offsets."""
+    return _DAX_MASK.sub(lambda m: " " * len(m.group()), query)
 
 
-class DaxExecutor(_Reserved):
-    card = "T17"
+def dax_static_check(query: str) -> tuple[str, str, str] | None:
+    """(error_class, message for the model, detail) when the query must not run, else None."""
+    masked = mask_dax(query)
+    hit = _INFO_FUNCTION.search(masked) or _DMV.search(masked)
+    if hit:
+        return METADATA_FUNCTION, METADATA_MESSAGE, f"rejected before execution: {query[hit.start():hit.start() + 40]!r}"
+    words = masked.split()
+    if not words or words[0].upper() not in {"EVALUATE", "DEFINE"}:
+        return FORBIDDEN_STATEMENT, DAX_STATEMENT_MESSAGE, f"first token {words[0] if words else ''!r}"
+    if len(_EVALUATE.findall(masked)) != 1:
+        return FORBIDDEN_STATEMENT, DAX_STATEMENT_MESSAGE, f"{len(_EVALUATE.findall(masked))} EVALUATE statements"
+    return None
+
+
+class DaxConnectionError(RuntimeError):
+    """No (or more than one) live Power BI Desktop engine, or ADOMD.NET cannot be loaded."""
+
+
+class DaxModelMismatch(RuntimeError):
+    """The model open in Desktop is not the one the cell expects."""
+
+
+def pbi_workspace_roots() -> list[Path]:
+    """Where Desktop keeps its engine workspaces: the installer and the Microsoft Store versions."""
+    if env := os.environ.get("SEMDEBT_PBI_WORKSPACES"):
+        return [Path(p) for p in env.split(os.pathsep) if p]
+    roots = []
+    if local := os.environ.get("LOCALAPPDATA"):
+        roots.append(Path(local) / "Microsoft" / "Power BI Desktop" / "AnalysisServicesWorkspaces")
+    if home := os.environ.get("USERPROFILE"):
+        roots.append(Path(home) / "Microsoft" / "Power BI Desktop Store App" / "AnalysisServicesWorkspaces")
+    return roots
+
+
+def read_port_file(path: Path) -> int:
+    """msmdsrv.port.txt is UTF-16 LE (sometimes without BOM) or plain ASCII."""
+    raw = path.read_bytes()
+    text = raw.decode("utf-16") if raw.startswith((b"\xff\xfe", b"\xfe\xff")) or b"\x00" in raw else raw.decode("ascii")
+    return int(text.strip().strip("\x00"))
+
+
+def _port_alive(port: int) -> bool:
+    import socket
+
+    try:
+        with socket.create_connection(("localhost", port), timeout=1):
+            return True
+    except OSError:
+        return False
+
+
+def discover_port(roots: list[Path] | None = None, alive=_port_alive) -> tuple[int, Path | None]:
+    """(port, port file) of the one live Desktop engine. ``SEMDEBT_PBI_PORT`` overrides discovery.
+
+    Workspaces of a crashed Desktop can stay behind, so only ports that accept a connection count;
+    more than one live engine means more than one model is open, which a run must not guess between.
+    """
+    if env := os.environ.get("SEMDEBT_PBI_PORT"):
+        return int(env), None
+    found = []
+    for root in roots if roots is not None else pbi_workspace_roots():
+        for f in sorted(root.glob("*/Data/msmdsrv.port.txt")):
+            try:
+                found.append((read_port_file(f), f))
+            except (OSError, ValueError, UnicodeDecodeError):
+                continue
+    live = [(p, f) for p, f in found if alive(p)]
+    if not live:
+        raise DaxConnectionError(f"没有找到正在运行的 Power BI Desktop 本地引擎（找到 {len(found)} 个端口文件，没有一个能连上）。"
+                                 "先在 Desktop 里打开对应档位的 PBIP。")
+    if len(live) > 1:
+        raise DaxConnectionError(f"同时有 {len(live)} 个 Desktop 引擎在运行（{', '.join(str(p) for p, _ in live)}）。"
+                                 "一次只开一个模型：关掉其他 Desktop 窗口。")
+    return live[0]
+
+
+def adomd_dirs() -> list[Path]:
+    """Folders that may hold Microsoft.AnalysisServices.AdomdClient.dll, best first."""
+    if env := os.environ.get("SEMDEBT_ADOMD_DIR"):
+        return [Path(env)]
+    out = []
+    for base in (os.environ.get("ProgramFiles", r"C:\Program Files"), os.environ.get("ProgramFiles(x86)", "")):
+        if not base:
+            continue
+        found = [p for p in (Path(base) / "Microsoft.NET" / "ADOMD.NET").glob("*") if p.name.isdigit()]
+        out += sorted(found, key=lambda p: int(p.name), reverse=True)
+    return out
+
+
+def _load_adomd():
+    """pyadomd for the connection; AdomdCommand directly, so timeouts and value conversion are ours."""
+    import sys
+
+    for d in adomd_dirs():
+        if (d / "Microsoft.AnalysisServices.AdomdClient.dll").exists():
+            if str(d) not in sys.path:
+                sys.path.append(str(d))
+            break
+    else:
+        raise DaxConnectionError("找不到 ADOMD.NET（Microsoft.AnalysisServices.AdomdClient.dll）。"
+                                 "安装 Analysis Services 客户端库，或用 SEMDEBT_ADOMD_DIR 指向它所在的目录。")
+    try:
+        from pyadomd import Pyadomd
+        from Microsoft.AnalysisServices.AdomdClient import AdomdCommand  # type: ignore[import-not-found]
+    except Exception as exc:  # ImportError, or a .NET load failure surfaced by pythonnet
+        raise DaxConnectionError(f"加载 pyadomd / ADOMD.NET 失败：{exc}") from exc
+    return Pyadomd, AdomdCommand
+
+
+def dax_value(value: object) -> object:
+    """A value from the ADOMD reader → Python. pythonnet converts bool, int, float and str itself;
+    System.Decimal, System.DateTime and DBNull arrive as .NET objects."""
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    kind = type(value).__name__
+    if kind == "DBNull":
+        return None
+    if kind == "Decimal":
+        try:
+            from System.Globalization import CultureInfo  # type: ignore[import-not-found]
+
+            return Decimal(value.ToString(CultureInfo.InvariantCulture))
+        except ImportError:
+            return Decimal(str(value))
+    if kind == "DateTime":
+        return datetime(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second,
+                        value.Millisecond * 1000)
+    return str(value)
+
+
+class _ResultTooLarge(Exception):
+    pass
+
+
+class AdomdSession:
+    """One ADOMD connection per query: a connection is not thread-safe, and opening one on
+    localhost is cheap next to a query. ``run`` returns (columns, rows) or raises."""
+
+    def __init__(self, port: int) -> None:
+        self.port = port
+        self.conn_str = f"Data Source=localhost:{port};"
+
+    def run(self, query: str, timeout_s: int, max_rows: int, on_command=None) -> tuple[list[dict], list[list]]:
+        Pyadomd, AdomdCommand = _load_adomd()
+        conn = Pyadomd(self.conn_str)
+        conn.open()
+        try:
+            cmd = AdomdCommand(query, conn.conn)
+            cmd.CommandTimeout = int(timeout_s)
+            if on_command:
+                on_command(cmd)
+            reader = cmd.ExecuteReader()
+            try:
+                n = reader.FieldCount
+                columns = [{"name": str(reader.GetName(i)), "type": f"dax:{reader.GetFieldType(i).Name}"} for i in range(n)]
+                rows = []
+                while reader.Read():
+                    rows.append([dax_value(reader.GetValue(i)) for i in range(n)])
+                    if len(rows) > max_rows:
+                        raise _ResultTooLarge
+            finally:
+                reader.Close()
+            return columns, rows
+        finally:
+            conn.close()
+
+
+def _dax_error_class(exc: BaseException) -> str:
+    kind, text = type(exc).__name__, str(exc).lower()
+    if "timeout" in text or "timed out" in text or "超时" in text or "cancel" in text:
+        return TIMEOUT
+    if "memory" in text or "内存" in text:
+        return RESOURCE_LIMIT
+    if "Connection" in kind or "SocketException" in kind:
+        return TRANSPORT_ERROR
+    return ENGINE_ERROR
+
+
+def _dax_message(exc: BaseException) -> str:
+    message = getattr(exc, "Message", None) or str(exc)
+    message = re.sub(r"\s*at Microsoft\.AnalysisServices\..*", "", str(message), flags=re.DOTALL)  # .NET stack trace
+    return message.strip()[:2000]
+
+
+# Hidden tables Desktop adds on its own; "auto date/time" is off in the rendered model (tmdl.py),
+# so they should not appear, and the probe reports them if they do.
+AUTO_TABLE_PREFIXES = ("LocalDateTable_", "DateTableTemplate_")
+
+
+class DaxExecutor:
+    """DAX for DAX-L0 / DAX-L1 / DAX-L2 against the one model open in Power BI Desktop."""
+
+    backstop_s = 5.0    # extra wait after CommandTimeout before the harness gives up on its own
+
+    def __init__(self, tier: str, *, timeout_s: int = 120, max_result_rows: int = DEFAULT_MAX_RESULT_ROWS,
+                 session=None, port: int | None = None) -> None:
+        if tier not in ("L0", "L1", "L2"):
+            raise ValueError(f"unknown DAX tier {tier!r}")
+        if timeout_s <= 0 or max_result_rows < 1:
+            raise ValueError("timeout_s and max_result_rows must be positive")
+        self.tier = tier
+        self.name = f"dax_{tier}"
+        self.timeout_s = timeout_s
+        self.max_result_rows = max_result_rows
+        self._session = session
+        self._port = port
+
+    @property
+    def session(self):
+        if self._session is None:
+            port = self._port if self._port is not None else discover_port()[0]
+            self._session = AdomdSession(port)
+        return self._session
+
+    def execute(self, query: str) -> ExecResult:
+        start = time.monotonic()
+        rejected = dax_static_check(query)
+        if rejected:
+            kind, message, detail = rejected
+            return ExecResult(error=message, error_class=kind, detail=detail, elapsed_s=time.monotonic() - start)
+        return self._run(query, start)
+
+    def _run(self, query: str, start: float) -> ExecResult:
+        box: dict[str, object] = {}
+
+        def work() -> None:
+            try:
+                box["result"] = self.session.run(query, self.timeout_s, self.max_result_rows,
+                                                 on_command=lambda c: box.__setitem__("cmd", c))
+            except BaseException as exc:  # noqa: BLE001 - .NET exceptions are not all Exception subclasses
+                box["error"] = exc
+
+        worker = threading.Thread(target=work, daemon=True)
+        worker.start()
+        worker.join(self.timeout_s + self.backstop_s)   # CommandTimeout should fire first
+        elapsed = lambda: time.monotonic() - start  # noqa: E731
+        if worker.is_alive():
+            try:
+                box["cmd"].Cancel()         # type: ignore[union-attr]
+            except Exception:  # noqa: BLE001
+                pass
+            return ExecResult(error="DAX query timed out.", error_class=TIMEOUT, elapsed_s=elapsed())
+        if "error" in box:
+            exc = box["error"]
+            if isinstance(exc, _ResultTooLarge):
+                return ExecResult(error="Result row limit exceeded.", error_class=RESOURCE_LIMIT, limit="result_rows",
+                                  elapsed_s=elapsed())
+            if isinstance(exc, DaxConnectionError):
+                return ExecResult(error="DAX engine connection failed.", error_class=TRANSPORT_ERROR, detail=str(exc),
+                                  elapsed_s=elapsed())
+            kind = _dax_error_class(exc)
+            message = _dax_message(exc)
+            if kind == TRANSPORT_ERROR:
+                return ExecResult(error="DAX engine connection failed.", error_class=kind, detail=message,
+                                  elapsed_s=elapsed())
+            if kind == TIMEOUT:
+                return ExecResult(error="DAX query timed out.", error_class=kind, detail=message, elapsed_s=elapsed())
+            return ExecResult(error=message, error_class=kind, detail=f"{type(exc).__name__}", elapsed_s=elapsed())
+        columns, rows = box["result"]       # type: ignore[misc]
+        return ExecResult(rows=rows, columns=columns, elapsed_s=elapsed())
+
+    # -- the model open in Desktop -------------------------------------------------
+    def dmv(self, query: str) -> list[list]:
+        """A DMV / harness-side metadata query (not subject to the static check; never model output)."""
+        return self.session.run(query, self.timeout_s, self.max_result_rows)[1]
+
+    def model_signature(self) -> dict:
+        """Tables, columns and measures of the open model, from the TMSCHEMA DMVs."""
+        tables = {row[0]: row[1] for row in self.dmv("SELECT [ID], [Name] FROM $SYSTEM.TMSCHEMA_TABLES")}
+        columns: dict[str, set[str]] = {name: set() for name in tables.values()}
+        for tid, name, ctype in self.dmv("SELECT [TableID], [ExplicitName], [Type] FROM $SYSTEM.TMSCHEMA_COLUMNS"):
+            if int(ctype) != 3:             # 3 = the engine's internal RowNumber column
+                columns[tables[tid]].add(name)
+        measures = sorted(row[1] for row in self.dmv("SELECT [TableID], [Name] FROM $SYSTEM.TMSCHEMA_MEASURES"))
+        return {"tables": columns, "measures": measures}
+
+    def verify_model(self, expected: dict) -> dict:
+        """Raise DaxModelMismatch unless the open model has the expected tables, columns and measures.
+
+        ``expected`` = ``{"tables": {name: set(columns)}, "measures": [names]}`` (see
+        ``expected_signature``). Desktop's own auto date tables are ignored here and reported by the probe.
+        """
+        got = self.model_signature()
+        tables = {t: c for t, c in got["tables"].items() if not t.startswith(AUTO_TABLE_PREFIXES)}
+        problems = []
+        if set(tables) != set(expected["tables"]):
+            problems.append(f"tables: missing {sorted(set(expected['tables']) - set(tables))}, "
+                            f"extra {sorted(set(tables) - set(expected['tables']))}")
+        for t in sorted(set(tables) & set(expected["tables"])):
+            if set(tables[t]) != set(expected["tables"][t]):
+                problems.append(f"{t}: columns missing {sorted(set(expected['tables'][t]) - set(tables[t]))}, "
+                                f"extra {sorted(set(tables[t]) - set(expected['tables'][t]))}")
+        if sorted(got["measures"]) != sorted(expected["measures"]):
+            problems.append(f"measures: missing {sorted(set(expected['measures']) - set(got['measures']))}, "
+                            f"extra {sorted(set(got['measures']) - set(expected['measures']))}")
+        if problems:
+            raise DaxModelMismatch(f"the model open in Power BI Desktop is not retail-{self.tier}: " + "; ".join(problems))
+        return got
+
+
+def expected_signature(tier: str, pbip_root: Path | None = None) -> dict:
+    """What ``verify_model`` expects, from the rendered PBIP (``build/pbip`` by default)."""
+    from render.check_pbip import PBIP, load_model
+
+    model = load_model(tier, pbip_root or PBIP)
+    return {"tables": {name: set(t["columns"]) for name, t in model["tables"].items()},
+            "measures": sorted(m for t in model["tables"].values() for m in t["measures"])}

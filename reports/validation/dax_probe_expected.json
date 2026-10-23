@@ -1,0 +1,1251 @@
+{
+ "tolerance": 0.005,
+ "parquet": {
+  "DimAccount.parquet": "ea200e6d5ab2fcb8712a8a91fdb1de8138cd4bf93023a5123d7187595f37e057",
+  "DimChannel.parquet": "40afb705727436cffa3178de7a6835d5c337fcbd3cf18b5e81e234127a9c3548",
+  "DimCurrency.parquet": "278d048a4a5e76df9eeeab575cc1d80719268a2f12735bb21f9a3cd19488271b",
+  "DimCustomer.parquet": "f87078494cd95de32a5f6ad28796275bad5b6ccf6609f388fbeff687b450f590",
+  "DimDate.parquet": "2b025d972730f6eecee61de0cd14d3a2fe496257db434a812fa46377b083bc75",
+  "DimEmployee.parquet": "b1c4bb96ff6b4a77c67a6959801a1d46d5fce1c35978cd8eefe2bd1a59039774",
+  "DimEntity.parquet": "431bb6a956070cd2ebb92397d9af688bfcfa8644faf78c73b6e9474860526571",
+  "DimGeography.parquet": "38f12485a46cfbf7292508dea60fffca6440ea9c293c956b45b96fc0492c78cf",
+  "DimMachine.parquet": "3adbc509d21eeddae86147aa5e0d6ad963c188b67c257736222261fb9ce81454",
+  "DimOutage.parquet": "fa1698d9a4b1cc3e26115345b592399e447dcbc3488fc27753c354adbd1c70ca",
+  "DimProduct.parquet": "30d761a21522376efb3b5ed2b3b41bc464bdffdc8583bbbc683fb18e3b861147",
+  "DimProductCategory.parquet": "04b0715bb9688c3b9653259c20ef742178bb523ed135c3c307ad0183f64a20ff",
+  "DimProductSubcategory.parquet": "f13cccfe26fb7d05677b38b1267d2712e36bc56c969e7a6b994ca8bac51f2762",
+  "DimPromotion.parquet": "2b3267613997a2bb396530be7d4c723b78505cdb010939a6d2d5876832ac0ad9",
+  "DimSalesTerritory.parquet": "44fd95779ece64d235addec415be062880597ad57e69db01fcbb5df624fd69f2",
+  "DimScenario.parquet": "887c2f59662585c929cfd8b66a733b9a1a70577aed56a2ea59699fdc2a4f967b",
+  "DimStore.parquet": "9f7d2c768e467f579a13ab31fd9938a181b721bb70ba9bedeb3c1b7e1ac50933",
+  "FactExchangeRate.parquet": "046b0577ba874b497b0a445d34b7e615db1ddb976924c9811445a53e25a6285c",
+  "FactITMachine.parquet": "cb2c0673f0baaa37d873570af56cb746cb2f00c844e2596f462af61d8de0b76d",
+  "FactITSLA.parquet": "1eb8a02a7b28aff20f92b72faaace562f15bf225d370fe1d59946ff97c6425f3",
+  "FactInventory.parquet": "d6efdf54bb05f7e40621e14d4316b5f418b54631efd85805d046faf099ed26bf",
+  "FactOnlineSales.parquet": "9eb47c074acb121eb9821b04d2ebd76c7fb4d764ac12dfbbd2a8e44a39b247a0",
+  "FactSales.parquet": "75e0edf8a023907e2b64abc278445794e6ebed4364237228942692e377845f4c",
+  "FactSalesQuota.parquet": "68daaba38eafa702126d5b30691d44f2d3f1fea279149f358450f0f6267e04e3",
+  "FactStrategyPlan.parquet": "2f1bb7de1360a92af0812455c4d657fd116ae7c38699ca1c5e7e68da8a26cdc9"
+ },
+ "checks": [
+  {
+   "id": "rows.FactOnlineSales",
+   "group": "rows",
+   "title": "FactOnlineSales 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_ol_sls' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactOnlineSales' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactOnlineSales' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactOnlineSales",
+   "expected": 12627608.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.FactSales",
+   "group": "rows",
+   "title": "FactSales 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_sls' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactSales' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactSales' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactSales",
+   "expected": 3406089.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.FactInventory",
+   "group": "rows",
+   "title": "FactInventory 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_inv_snp' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactInventory' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactInventory' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactInventory",
+   "expected": 8013099.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.FactSalesQuota",
+   "group": "rows",
+   "title": "FactSalesQuota 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_sls_qta' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactSalesQuota' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactSalesQuota' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactSalesQuota",
+   "expected": 7465911.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.FactStrategyPlan",
+   "group": "rows",
+   "title": "FactStrategyPlan 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_stg_pln' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactStrategyPlan' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactStrategyPlan' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactStrategyPlan",
+   "expected": 2750628.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.FactExchangeRate",
+   "group": "rows",
+   "title": "FactExchangeRate 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_fx' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactExchangeRate' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactExchangeRate' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactExchangeRate",
+   "expected": 773.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.FactITMachine",
+   "group": "rows",
+   "title": "FactITMachine 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_it_mch' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactITMachine' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactITMachine' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactITMachine",
+   "expected": 23283.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.FactITSLA",
+   "group": "rows",
+   "title": "FactITSLA 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'fct_it_sla' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactITSLA' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'FactITSLA' ) )"
+   },
+   "sql": "SELECT count() FROM retail.FactITSLA",
+   "expected": 4925.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimProduct",
+   "group": "rows",
+   "title": "DimProduct 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_prd' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimProduct' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimProduct' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimProduct",
+   "expected": 2233.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimStore",
+   "group": "rows",
+   "title": "DimStore 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_str' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimStore' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimStore' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimStore",
+   "expected": 306.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimCustomer",
+   "group": "rows",
+   "title": "DimCustomer 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_cst' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimCustomer' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimCustomer' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimCustomer",
+   "expected": 18869.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimDate",
+   "group": "rows",
+   "title": "DimDate 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_dt' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimDate' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimDate' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimDate",
+   "expected": 2556.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimGeography",
+   "group": "rows",
+   "title": "DimGeography 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_geo' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimGeography' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimGeography' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimGeography",
+   "expected": 674.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimChannel",
+   "group": "rows",
+   "title": "DimChannel 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_chn' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimChannel' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimChannel' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimChannel",
+   "expected": 4.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimPromotion",
+   "group": "rows",
+   "title": "DimPromotion 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_prm' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimPromotion' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimPromotion' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimPromotion",
+   "expected": 28.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimScenario",
+   "group": "rows",
+   "title": "DimScenario 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_scn' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimScenario' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimScenario' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimScenario",
+   "expected": 3.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimAccount",
+   "group": "rows",
+   "title": "DimAccount 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_acct' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimAccount' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimAccount' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimAccount",
+   "expected": 24.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimCurrency",
+   "group": "rows",
+   "title": "DimCurrency 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_ccy' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimCurrency' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimCurrency' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimCurrency",
+   "expected": 28.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimProductCategory",
+   "group": "rows",
+   "title": "DimProductCategory 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_prd_cat' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimProductCategory' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimProductCategory' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimProductCategory",
+   "expected": 8.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimProductSubcategory",
+   "group": "rows",
+   "title": "DimProductSubcategory 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_prd_sub' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimProductSubcategory' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimProductSubcategory' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimProductSubcategory",
+   "expected": 44.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimEmployee",
+   "group": "rows",
+   "title": "DimEmployee 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_emp' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimEmployee' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimEmployee' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimEmployee",
+   "expected": 293.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimEntity",
+   "group": "rows",
+   "title": "DimEntity 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_ent' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimEntity' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimEntity' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimEntity",
+   "expected": 421.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimSalesTerritory",
+   "group": "rows",
+   "title": "DimSalesTerritory 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_sls_ter' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimSalesTerritory' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimSalesTerritory' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimSalesTerritory",
+   "expected": 265.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimMachine",
+   "group": "rows",
+   "title": "DimMachine 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_mch' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimMachine' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimMachine' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimMachine",
+   "expected": 7816.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "rows.DimOutage",
+   "group": "rows",
+   "title": "DimOutage 行数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", COUNTROWS ( 'd_otg' ) )",
+    "L1": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimOutage' ) )",
+    "L2": "EVALUATE ROW ( \"v\", COUNTROWS ( 'DimOutage' ) )"
+   },
+   "sql": "SELECT count() FROM retail.DimOutage",
+   "expected": 303.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSales.SalesAmount.sum",
+   "group": "sums",
+   "title": "FactSales.SalesAmount 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_sls'[amt1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[SalesAmount] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[SalesAmount] ) )"
+   },
+   "sql": "SELECT sum(SalesAmount) FROM retail.FactSales",
+   "expected": 12413657608.887634,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSales.SalesQuantity.sum",
+   "group": "sums",
+   "title": "FactSales.SalesQuantity 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_sls'[qty1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[SalesQuantity] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[SalesQuantity] ) )"
+   },
+   "sql": "SELECT sum(SalesQuantity) FROM retail.FactSales",
+   "expected": 53320454.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSales.TotalCost.sum",
+   "group": "sums",
+   "title": "FactSales.TotalCost 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_sls'[amt4] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[TotalCost] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[TotalCost] ) )"
+   },
+   "sql": "SELECT sum(TotalCost) FROM retail.FactSales",
+   "expected": 5364896601.780004,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSales.ReturnAmount.sum",
+   "group": "sums",
+   "title": "FactSales.ReturnAmount 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_sls'[amt2] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[ReturnAmount] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[ReturnAmount] ) )"
+   },
+   "sql": "SELECT sum(ReturnAmount) FROM retail.FactSales",
+   "expected": 156839375.86799982,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSales.DiscountAmount.sum",
+   "group": "sums",
+   "title": "FactSales.DiscountAmount 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_sls'[amt3] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[DiscountAmount] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSales'[DiscountAmount] ) )"
+   },
+   "sql": "SELECT sum(DiscountAmount) FROM retail.FactSales",
+   "expected": 204157104.0844003,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSales.StoreKey.distinct",
+   "group": "sums",
+   "title": "FactSales.StoreKey 去重计数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'fct_sls'[stk] ) )",
+    "L1": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'FactSales'[StoreKey] ) )",
+    "L2": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'FactSales'[StoreKey] ) )"
+   },
+   "sql": "SELECT uniqExact(StoreKey) FROM retail.FactSales",
+   "expected": 306.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactOnlineSales.SalesAmount.sum",
+   "group": "sums",
+   "title": "FactOnlineSales.SalesAmount 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_ol_sls'[amt1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[SalesAmount] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[SalesAmount] ) )"
+   },
+   "sql": "SELECT sum(SalesAmount) FROM retail.FactOnlineSales",
+   "expected": 2718202629.8081827,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactOnlineSales.SalesQuantity.sum",
+   "group": "sums",
+   "title": "FactOnlineSales.SalesQuantity 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_ol_sls'[qty1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[SalesQuantity] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[SalesQuantity] ) )"
+   },
+   "sql": "SELECT sum(SalesQuantity) FROM retail.FactOnlineSales",
+   "expected": 12527442.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactOnlineSales.TotalCost.sum",
+   "group": "sums",
+   "title": "FactOnlineSales.TotalCost 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_ol_sls'[amt4] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[TotalCost] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[TotalCost] ) )"
+   },
+   "sql": "SELECT sum(TotalCost) FROM retail.FactOnlineSales",
+   "expected": 1344254907.720007,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactOnlineSales.ReturnAmount.sum",
+   "group": "sums",
+   "title": "FactOnlineSales.ReturnAmount 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_ol_sls'[amt2] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[ReturnAmount] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactOnlineSales'[ReturnAmount] ) )"
+   },
+   "sql": "SELECT sum(ReturnAmount) FROM retail.FactOnlineSales",
+   "expected": 29244318.20479999,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactOnlineSales.SalesOrderNumber.distinct",
+   "group": "sums",
+   "title": "FactOnlineSales.SalesOrderNumber 去重计数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'fct_ol_sls'[ord_no] ) )",
+    "L1": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'FactOnlineSales'[SalesOrderNumber] ) )",
+    "L2": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'FactOnlineSales'[SalesOrderNumber] ) )"
+   },
+   "sql": "SELECT uniqExact(SalesOrderNumber) FROM retail.FactOnlineSales",
+   "expected": 1674320.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactOnlineSales.CustomerKey.distinct",
+   "group": "sums",
+   "title": "FactOnlineSales.CustomerKey 去重计数",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'fct_ol_sls'[csk] ) )",
+    "L1": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'FactOnlineSales'[CustomerKey] ) )",
+    "L2": "EVALUATE ROW ( \"v\", DISTINCTCOUNT ( 'FactOnlineSales'[CustomerKey] ) )"
+   },
+   "sql": "SELECT uniqExact(CustomerKey) FROM retail.FactOnlineSales",
+   "expected": 18869.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactInventory.OnHandQuantity.sum",
+   "group": "sums",
+   "title": "FactInventory.OnHandQuantity 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_inv_snp'[qty1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactInventory'[OnHandQuantity] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactInventory'[OnHandQuantity] ) )"
+   },
+   "sql": "SELECT sum(OnHandQuantity) FROM retail.FactInventory",
+   "expected": 131294094.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactInventory.OnOrderQuantity.sum",
+   "group": "sums",
+   "title": "FactInventory.OnOrderQuantity 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_inv_snp'[qty2] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactInventory'[OnOrderQuantity] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactInventory'[OnOrderQuantity] ) )"
+   },
+   "sql": "SELECT sum(OnOrderQuantity) FROM retail.FactInventory",
+   "expected": 12768868.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSalesQuota.SalesAmountQuota.sum",
+   "group": "sums",
+   "title": "FactSalesQuota.SalesAmountQuota 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_sls_qta'[amt1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactSalesQuota'[SalesAmountQuota] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSalesQuota'[SalesAmountQuota] ) )"
+   },
+   "sql": "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota",
+   "expected": 35998417680.7533,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactSalesQuota.SalesQuantityQuota.sum",
+   "group": "sums",
+   "title": "FactSalesQuota.SalesQuantityQuota 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_sls_qta'[qty1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactSalesQuota'[SalesQuantityQuota] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactSalesQuota'[SalesQuantityQuota] ) )"
+   },
+   "sql": "SELECT sum(SalesQuantityQuota) FROM retail.FactSalesQuota",
+   "expected": 151495713.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactStrategyPlan.Amount.sum",
+   "group": "sums",
+   "title": "FactStrategyPlan.Amount 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_stg_pln'[amt1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactStrategyPlan'[Amount] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactStrategyPlan'[Amount] ) )"
+   },
+   "sql": "SELECT sum(Amount) FROM retail.FactStrategyPlan",
+   "expected": 65893562614.54291,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactITMachine.CostAmount.sum",
+   "group": "sums",
+   "title": "FactITMachine.CostAmount 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_it_mch'[amt1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactITMachine'[CostAmount] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactITMachine'[CostAmount] ) )"
+   },
+   "sql": "SELECT sum(CostAmount) FROM retail.FactITMachine",
+   "expected": 240765805.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactITSLA.DownTime.sum",
+   "group": "sums",
+   "title": "FactITSLA.DownTime 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_it_sla'[dur] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactITSLA'[DownTime] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactITSLA'[DownTime] ) )"
+   },
+   "sql": "SELECT sum(DownTime) FROM retail.FactITSLA",
+   "expected": 396699.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "sums.FactExchangeRate.AverageRate.sum",
+   "group": "sums",
+   "title": "FactExchangeRate.AverageRate 合计",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUM ( 'fct_fx'[rt1] ) )",
+    "L1": "EVALUATE ROW ( \"v\", SUM ( 'FactExchangeRate'[AverageRate] ) )",
+    "L2": "EVALUATE ROW ( \"v\", SUM ( 'FactExchangeRate'[AverageRate] ) )"
+   },
+   "sql": "SELECT sum(AverageRate) FROM retail.FactExchangeRate",
+   "expected": 346797.80799,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactOnlineSales.ProductKey.by_value",
+   "group": "orphans",
+   "title": "FactOnlineSales.ProductKey → DimProduct.ProductKey 孤儿行（按值）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'fct_ol_sls'[prk] ), NOT ISBLANK ( 'fct_ol_sls'[prk] ) && NOT ( 'fct_ol_sls'[prk] IN ALLNOBLANKROW ( 'd_prd'[prk] ) ) ), CALCULATE ( COUNTROWS ( 'fct_ol_sls' ) ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactOnlineSales'[ProductKey] ), NOT ISBLANK ( 'FactOnlineSales'[ProductKey] ) && NOT ( 'FactOnlineSales'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactOnlineSales' ) ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactOnlineSales'[ProductKey] ), NOT ISBLANK ( 'FactOnlineSales'[ProductKey] ) && NOT ( 'FactOnlineSales'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactOnlineSales' ) ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactOnlineSales",
+   "expected": 1715380.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactOnlineSales.ProductKey.blank_member",
+   "group": "orphans",
+   "title": "FactOnlineSales.ProductKey → DimProduct.ProductKey 落进空白成员的行（键为空或找不到）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'fct_ol_sls' ), ISBLANK ( 'd_prd'[prk] ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactOnlineSales' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactOnlineSales' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NULL OR ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactOnlineSales",
+   "expected": 1715380.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactSales.ProductKey.by_value",
+   "group": "orphans",
+   "title": "FactSales.ProductKey → DimProduct.ProductKey 孤儿行（按值）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'fct_sls'[prk] ), NOT ISBLANK ( 'fct_sls'[prk] ) && NOT ( 'fct_sls'[prk] IN ALLNOBLANKROW ( 'd_prd'[prk] ) ) ), CALCULATE ( COUNTROWS ( 'fct_sls' ) ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactSales'[ProductKey] ), NOT ISBLANK ( 'FactSales'[ProductKey] ) && NOT ( 'FactSales'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactSales' ) ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactSales'[ProductKey] ), NOT ISBLANK ( 'FactSales'[ProductKey] ) && NOT ( 'FactSales'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactSales' ) ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactSales",
+   "expected": 338898.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactSales.ProductKey.blank_member",
+   "group": "orphans",
+   "title": "FactSales.ProductKey → DimProduct.ProductKey 落进空白成员的行（键为空或找不到）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'fct_sls' ), ISBLANK ( 'd_prd'[prk] ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactSales' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactSales' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NULL OR ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactSales",
+   "expected": 338898.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactInventory.ProductKey.by_value",
+   "group": "orphans",
+   "title": "FactInventory.ProductKey → DimProduct.ProductKey 孤儿行（按值）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'fct_inv_snp'[prk] ), NOT ISBLANK ( 'fct_inv_snp'[prk] ) && NOT ( 'fct_inv_snp'[prk] IN ALLNOBLANKROW ( 'd_prd'[prk] ) ) ), CALCULATE ( COUNTROWS ( 'fct_inv_snp' ) ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactInventory'[ProductKey] ), NOT ISBLANK ( 'FactInventory'[ProductKey] ) && NOT ( 'FactInventory'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactInventory' ) ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactInventory'[ProductKey] ), NOT ISBLANK ( 'FactInventory'[ProductKey] ) && NOT ( 'FactInventory'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactInventory' ) ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactInventory",
+   "expected": 533358.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactInventory.ProductKey.blank_member",
+   "group": "orphans",
+   "title": "FactInventory.ProductKey → DimProduct.ProductKey 落进空白成员的行（键为空或找不到）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'fct_inv_snp' ), ISBLANK ( 'd_prd'[prk] ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactInventory' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactInventory' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NULL OR ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactInventory",
+   "expected": 533358.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactSalesQuota.ProductKey.by_value",
+   "group": "orphans",
+   "title": "FactSalesQuota.ProductKey → DimProduct.ProductKey 孤儿行（按值）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'fct_sls_qta'[prk] ), NOT ISBLANK ( 'fct_sls_qta'[prk] ) && NOT ( 'fct_sls_qta'[prk] IN ALLNOBLANKROW ( 'd_prd'[prk] ) ) ), CALCULATE ( COUNTROWS ( 'fct_sls_qta' ) ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactSalesQuota'[ProductKey] ), NOT ISBLANK ( 'FactSalesQuota'[ProductKey] ) && NOT ( 'FactSalesQuota'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactSalesQuota' ) ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'FactSalesQuota'[ProductKey] ), NOT ISBLANK ( 'FactSalesQuota'[ProductKey] ) && NOT ( 'FactSalesQuota'[ProductKey] IN ALLNOBLANKROW ( 'DimProduct'[ProductKey] ) ) ), CALCULATE ( COUNTROWS ( 'FactSalesQuota' ) ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactSalesQuota",
+   "expected": 521121.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.FactSalesQuota.ProductKey.blank_member",
+   "group": "orphans",
+   "title": "FactSalesQuota.ProductKey → DimProduct.ProductKey 落进空白成员的行（键为空或找不到）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'fct_sls_qta' ), ISBLANK ( 'd_prd'[prk] ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactSalesQuota' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'FactSalesQuota' ), ISBLANK ( 'DimProduct'[ProductKey] ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(ProductKey IS NULL OR ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct WHERE ProductKey IS NOT NULL)) FROM retail.FactSalesQuota",
+   "expected": 521121.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.DimStore.EmployeeKey.by_value",
+   "group": "orphans",
+   "title": "DimStore.EmployeeKey → DimEmployee.EmployeeKey 孤儿行（按值）",
+   "dax": {
+    "L0": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'd_str'[emk] ), NOT ISBLANK ( 'd_str'[emk] ) && NOT ( 'd_str'[emk] IN ALLNOBLANKROW ( 'd_emp'[emk] ) ) ), CALCULATE ( COUNTROWS ( 'd_str' ) ) ) + 0 )",
+    "L1": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'DimStore'[EmployeeKey] ), NOT ISBLANK ( 'DimStore'[EmployeeKey] ) && NOT ( 'DimStore'[EmployeeKey] IN ALLNOBLANKROW ( 'DimEmployee'[EmployeeKey] ) ) ), CALCULATE ( COUNTROWS ( 'DimStore' ) ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", SUMX ( FILTER ( ALL ( 'DimStore'[EmployeeKey] ), NOT ISBLANK ( 'DimStore'[EmployeeKey] ) && NOT ( 'DimStore'[EmployeeKey] IN ALLNOBLANKROW ( 'DimEmployee'[EmployeeKey] ) ) ), CALCULATE ( COUNTROWS ( 'DimStore' ) ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(EmployeeKey IS NOT NULL AND EmployeeKey NOT IN (SELECT EmployeeKey FROM retail.DimEmployee WHERE EmployeeKey IS NOT NULL)) FROM retail.DimStore",
+   "expected": 1.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "orphans.DimStore.EmployeeKey.blank_member",
+   "group": "orphans",
+   "title": "DimStore.EmployeeKey → DimEmployee.EmployeeKey 落进空白成员的行（键为空或找不到）",
+   "dax": {
+    "L1": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'DimStore' ), ISBLANK ( 'DimEmployee'[EmployeeKey] ) ) + 0 )",
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( COUNTROWS ( 'DimStore' ), ISBLANK ( 'DimEmployee'[EmployeeKey] ) ) + 0 )"
+   },
+   "sql": "SELECT countIf(EmployeeKey IS NULL OR EmployeeKey NOT IN (SELECT EmployeeKey FROM retail.DimEmployee WHERE EmployeeKey IS NOT NULL)) FROM retail.DimStore",
+   "expected": 1.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "measures.online_sales.sales_amount",
+   "group": "measures",
+   "title": "[Sales Amount]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Sales Amount] )"
+   },
+   "sql": null,
+   "expected": 2718202629.81,
+   "origin": "source.yaml FactOnlineSales.differs_from"
+  },
+  {
+   "id": "measures.sales.sales_amount",
+   "group": "measures",
+   "title": "[All Channel Sales Amount]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [All Channel Sales Amount] )"
+   },
+   "sql": null,
+   "expected": 12413657608.86,
+   "origin": "source.yaml FactSales.SalesAmount"
+  },
+  {
+   "id": "measures.online_sales.return_rate",
+   "group": "measures",
+   "title": "[Return Rate]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Return Rate] )"
+   },
+   "sql": null,
+   "expected": 0.007996,
+   "origin": "source.yaml 退货率.note"
+  },
+  {
+   "id": "measures.sales.return_rate",
+   "group": "measures",
+   "title": "[All Channel Return Rate]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [All Channel Return Rate] )"
+   },
+   "sql": null,
+   "expected": 0.009257,
+   "origin": "source.yaml 退货率.note"
+  },
+  {
+   "id": "measures.online_sales.order_count",
+   "group": "measures",
+   "title": "[Order Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Order Count] )"
+   },
+   "sql": null,
+   "expected": 1674320,
+   "origin": "source.yaml 订单数.note"
+  },
+  {
+   "id": "measures.online_sales.order_line_count",
+   "group": "measures",
+   "title": "[Order Line Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Order Line Count] )"
+   },
+   "sql": null,
+   "expected": 12627608,
+   "origin": "source.yaml FactOnlineSales.rows"
+  },
+  {
+   "id": "measures.online_sales.lines_per_order",
+   "group": "measures",
+   "title": "[Lines per Order]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Lines per Order] )"
+   },
+   "sql": null,
+   "expected": 7.542,
+   "origin": "source.yaml 每单行数.note"
+  },
+  {
+   "id": "measures.online_sales.average_order_value",
+   "group": "measures",
+   "title": "[Average Order Value]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Average Order Value] )"
+   },
+   "sql": null,
+   "expected": 1623.4666,
+   "origin": "source.yaml 客单价.note"
+  },
+  {
+   "id": "measures.online_sales.customer_count",
+   "group": "measures",
+   "title": "[Customer Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Customer Count] )"
+   },
+   "sql": null,
+   "expected": 18869,
+   "origin": "source.yaml 客户数.note"
+  },
+  {
+   "id": "measures.online_sales.active_customer_count",
+   "group": "measures",
+   "title": "[Active Customer Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Active Customer Count] )"
+   },
+   "sql": null,
+   "expected": 16890,
+   "origin": "source.yaml 活跃客户数.note"
+  },
+  {
+   "id": "measures.online_sales.at_risk_customer_count",
+   "group": "measures",
+   "title": "[At Risk Customer Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [At Risk Customer Count] )"
+   },
+   "sql": null,
+   "expected": 1841,
+   "origin": "source.yaml 有流失风险客户数.note"
+  },
+  {
+   "id": "measures.online_sales.churned_customer_count",
+   "group": "measures",
+   "title": "[Churned Customer Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Churned Customer Count] )"
+   },
+   "sql": null,
+   "expected": 138,
+   "origin": "source.yaml 已流失客户数.note"
+  },
+  {
+   "id": "measures.sales.store_count",
+   "group": "measures",
+   "title": "[Store Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Store Count] )"
+   },
+   "sql": null,
+   "expected": 306,
+   "origin": "source.yaml 门店数.note"
+  },
+  {
+   "id": "measures.sales.average_daily_sales_amount",
+   "group": "measures",
+   "title": "[Average Daily Sales Amount]（2009 平日）",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Average Daily Sales Amount], 'DimDate'[CalendarYear] = 2009, 'DimDate'[IsWorkDay] = \"WorkDay\" ) )"
+   },
+   "sql": null,
+   "expected": 10260907.86,
+   "origin": "source.yaml 日均销售额.note（2009 平日）"
+  },
+  {
+   "id": "measures.inventory.current_on_hand_quantity",
+   "group": "measures",
+   "title": "[Current On Hand Quantity]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Current On Hand Quantity] )"
+   },
+   "sql": null,
+   "expected": 11897661,
+   "origin": "source.yaml 当前在手库存数量.note"
+  },
+  {
+   "id": "measures.inventory.current_on_hand_value",
+   "group": "measures",
+   "title": "[Current On Hand Value]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Current On Hand Value] )"
+   },
+   "sql": null,
+   "expected": 1291296461.45,
+   "origin": "source.yaml 当前在手库存金额.note"
+  },
+  {
+   "id": "measures.inventory.current_on_order_quantity",
+   "group": "measures",
+   "title": "[Current On Order Quantity]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Current On Order Quantity] )"
+   },
+   "sql": null,
+   "expected": 494285,
+   "origin": "source.yaml 当前在订库存数量.note"
+  },
+  {
+   "id": "measures.inventory.below_safety_stock_count",
+   "group": "measures",
+   "title": "[Below Safety Stock Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Below Safety Stock Count] )"
+   },
+   "sql": null,
+   "expected": 89591,
+   "origin": "source.yaml 低于安全库存的门店产品数.note"
+  },
+  {
+   "id": "measures.inventory.store_product_pair_count",
+   "group": "measures",
+   "title": "[Store Product Pair Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Store Product Pair Count] )"
+   },
+   "sql": null,
+   "expected": 600241,
+   "origin": "source.yaml 门店产品组合数.note"
+  },
+  {
+   "id": "measures.sales_quota.sales_amount_quota",
+   "group": "measures",
+   "title": "[Sales Amount Quota]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Sales Amount Quota] )"
+   },
+   "sql": null,
+   "expected": 10667465363.67,
+   "origin": "source.yaml 目标销售额.note"
+  },
+  {
+   "id": "measures.sales_quota.sales_quantity_quota",
+   "group": "measures",
+   "title": "[Sales Quantity Quota]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Sales Quantity Quota] )"
+   },
+   "sql": null,
+   "expected": 44300085,
+   "origin": "source.yaml 目标销量.note"
+  },
+  {
+   "id": "measures.sales_quota.quota_attainment_pct",
+   "group": "measures",
+   "title": "[Quota Attainment %]（2009）",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Quota Attainment %], 'DimDate'[CalendarYear] = 2009 ) )"
+   },
+   "sql": null,
+   "expected": 1.2125585535736576,
+   "origin": "source.yaml 目标达成率.note（2009）"
+  },
+  {
+   "id": "measures.strategy_plan.plan_revenue",
+   "group": "measures",
+   "title": "[Plan Revenue]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Plan Revenue] )"
+   },
+   "sql": null,
+   "expected": 11548720849.89,
+   "origin": "source.yaml 计划收入.note"
+  },
+  {
+   "id": "measures.it_machine.it_cost",
+   "group": "measures",
+   "title": "[IT Cost]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [IT Cost] )"
+   },
+   "sql": null,
+   "expected": 240765805,
+   "origin": "source.yaml IT 成本.note"
+  },
+  {
+   "id": "measures.it_sla.down_time",
+   "group": "measures",
+   "title": "[Down Time]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Down Time] )"
+   },
+   "sql": null,
+   "expected": 396699,
+   "origin": "source.yaml 停机时长.note"
+  },
+  {
+   "id": "measures.it_sla.outage_count",
+   "group": "measures",
+   "title": "[Outage Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Outage Count] )"
+   },
+   "sql": null,
+   "expected": 4925,
+   "origin": "source.yaml 故障次数.note"
+  },
+  {
+   "id": "measures.inventory.snapshot_on_hand_quantity",
+   "group": "measures",
+   "title": "[Snapshot On Hand Quantity]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Snapshot On Hand Quantity] )"
+   },
+   "sql": "SELECT sum(OnHandQuantity) FROM retail.FactInventory",
+   "expected": 131294094.0,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.inventory.snapshot_on_hand_value",
+   "group": "measures",
+   "title": "[Snapshot On Hand Value]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Snapshot On Hand Value] )"
+   },
+   "sql": "SELECT sum(OnHandQuantity * UnitCost) FROM retail.FactInventory",
+   "expected": 15114568313.510002,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.inventory.snapshot_below_safety_stock_count",
+   "group": "measures",
+   "title": "[Snapshot Below Safety Stock Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Snapshot Below Safety Stock Count] )"
+   },
+   "sql": "SELECT countIf(OnHandQuantity < SafetyStockQuantity) FROM retail.FactInventory",
+   "expected": 1113941.0,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.sales_quota.gross_margin_quota",
+   "group": "measures",
+   "title": "[Gross Margin Quota]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Gross Margin Quota] )"
+   },
+   "sql": "SELECT sum(GrossMarginQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Budget')",
+   "expected": 5788481063.327001,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.inventory.inventory_turnover",
+   "group": "measures",
+   "title": "[Inventory Turnover]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Inventory Turnover] )"
+   },
+   "sql": "SELECT (SELECT sum(TotalCost) FROM retail.FactSales) / (SELECT sum(OnHandQuantity * UnitCost) / uniqExact(DateKey) FROM retail.FactInventory)",
+   "expected": 55.3719995515588,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.sales.same_store_sales_amount",
+   "group": "measures",
+   "title": "[Same Store Sales Amount]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Same Store Sales Amount] )"
+   },
+   "sql": "SELECT sum(SalesAmount) FROM retail.FactSales AS f WHERE (StoreKey, toYear(DateKey) - 1) IN (SELECT DISTINCT StoreKey, toYear(DateKey) FROM retail.FactSales)",
+   "expected": 7830394633.919919,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.sales.same_store_sales_as_base_year",
+   "group": "measures",
+   "title": "[Same Store Sales As Base Year]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Same Store Sales As Base Year] )"
+   },
+   "sql": "SELECT sum(SalesAmount) FROM retail.FactSales AS f WHERE (StoreKey, toYear(DateKey) + 1) IN (SELECT DISTINCT StoreKey, toYear(DateKey) FROM retail.FactSales)",
+   "expected": 8671940154.520327,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.sales_quota.sales_amount_quota_by_scenario",
+   "group": "measures",
+   "title": "[Sales Amount Quota By Scenario]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [Sales Amount Quota By Scenario] )"
+   },
+   "sql": "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota",
+   "expected": 35998417680.753296,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "measures.online_sales.new_customer_count",
+   "group": "measures",
+   "title": "[New Customer Count]",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", [New Customer Count] )"
+   },
+   "sql": "SELECT uniqExactIf(CustomerKey, first >= toDate('2009-12-31') - 89) FROM (SELECT CustomerKey, min(DateKey) AS first FROM retail.FactOnlineSales GROUP BY CustomerKey)",
+   "expected": 1.0,
+   "origin": "chDB / Parquet（render/verify_cube.py 的直接查询）"
+  },
+  {
+   "id": "variants.销售额环比增长率.按季.FactSales",
+   "group": "variants",
+   "title": "[Sales Amount QoQ %]（销售额环比增长率·按季，2009 年第 2 季）",
+   "scope": "期的长度为季：本季与上一季比",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount QoQ %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 4, 1 ), DATE ( 2009, 6, 30 ) ) ) )"
+   },
+   "sql": "SELECT sumIf(SalesAmount, toStartOfQuarter(DateKey) = '2009-04-01') / sumIf(SalesAmount, toStartOfQuarter(DateKey) = '2009-01-01') - 1 FROM retail.FactSales",
+   "expected": 0.2175643973578123,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.销售额环比增长率.按季.FactOnlineSales",
+   "group": "variants",
+   "title": "[Online Sales Amount QoQ %]（销售额环比增长率·按季，2009 年第 2 季）",
+   "scope": "期的长度为季：本季与上一季比",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount QoQ %], DATESBETWEEN ( 'DimDate'[DateKey], DATE ( 2009, 4, 1 ), DATE ( 2009, 6, 30 ) ) ) )"
+   },
+   "sql": "SELECT sumIf(SalesAmount, toStartOfQuarter(DateKey) = '2009-04-01') / sumIf(SalesAmount, toStartOfQuarter(DateKey) = '2009-01-01') - 1 FROM retail.FactOnlineSales",
+   "expected": 0.3123265481712769,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.销售额占比.渠道内.FactSales",
+   "group": "variants",
+   "title": "[Sales Amount Share In Channel]（销售额占比·渠道内，门店 1）",
+   "scope": "分母为同一渠道内的销售额合计：去掉门店这一层，其余分组与筛选不变",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Channel], 'DimStore'[StoreKey] = 1 ) )"
+   },
+   "sql": "SELECT (SELECT sum(SalesAmount) FROM retail.FactSales WHERE StoreKey = 1) / (SELECT sum(SalesAmount) FROM retail.FactSales WHERE channelKey = (SELECT any(channelKey) FROM retail.FactSales WHERE StoreKey = 1))",
+   "expected": 0.003312028142202851,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.销售额占比.品类内.FactSales",
+   "group": "variants",
+   "title": "[Sales Amount Share In Category]（销售额占比·品类内，子类 1）",
+   "scope": "分母为同一品类内的销售额合计：去掉产品、子类这两层，其余分组与筛选不变",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Share In Category], 'DimProductSubcategory'[ProductSubcategoryKey] = 1 ) )"
+   },
+   "sql": "SELECT (SELECT sum(SalesAmount) FROM retail.FactSales WHERE ProductKey IN (SELECT ProductKey FROM retail.DimProduct WHERE toInt64(ProductSubcategoryKey) = 1)) / (SELECT sum(SalesAmount) FROM retail.FactSales WHERE ProductKey IN (SELECT ProductKey FROM retail.DimProduct WHERE toInt64(ProductSubcategoryKey) IN (SELECT ProductSubcategoryKey FROM retail.DimProductSubcategory WHERE ProductCategoryKey = (SELECT ProductCategoryKey FROM retail.DimProductSubcategory WHERE ProductSubcategoryKey = 1))))",
+   "expected": 0.42997651767823475,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.销售额占比.品类内.FactOnlineSales",
+   "group": "variants",
+   "title": "[Online Sales Amount Share In Category]（销售额占比·品类内，子类 1）",
+   "scope": "分母为同一品类内的销售额合计：去掉产品、子类这两层，其余分组与筛选不变",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Online Sales Amount Share In Category], 'DimProductSubcategory'[ProductSubcategoryKey] = 1 ) )"
+   },
+   "sql": "SELECT (SELECT sum(SalesAmount) FROM retail.FactOnlineSales WHERE ProductKey IN (SELECT ProductKey FROM retail.DimProduct WHERE toInt64(ProductSubcategoryKey) = 1)) / (SELECT sum(SalesAmount) FROM retail.FactOnlineSales WHERE ProductKey IN (SELECT ProductKey FROM retail.DimProduct WHERE toInt64(ProductSubcategoryKey) IN (SELECT ProductSubcategoryKey FROM retail.DimProductSubcategory WHERE ProductCategoryKey = (SELECT ProductCategoryKey FROM retail.DimProductSubcategory WHERE ProductSubcategoryKey = 1))))",
+   "expected": 0.46649674686231435,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.同店销售额.作基年.FactSales",
+   "group": "variants",
+   "title": "[Same Store Sales As Base Year]（同店销售额·作基年，2008 年）",
+   "scope": "本年作为基期、与下一年比较：只统计本年和下一年都有销售的门店（与「同店销售额增长率」的基期是同一门店集合）",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Same Store Sales As Base Year], 'DimDate'[CalendarYear] = 2008 ) )"
+   },
+   "sql": "SELECT sum(SalesAmount) FROM retail.FactSales WHERE toYear(DateKey) = 2008 AND StoreKey IN (SELECT DISTINCT StoreKey FROM retail.FactSales WHERE toYear(DateKey) = 2009)",
+   "expected": 4111233534.684102,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.目标销售额.按查询场景.FactSalesQuota",
+   "group": "variants",
+   "title": "[Sales Amount Quota By Scenario]（目标销售额·按查询场景，场景 Actual）",
+   "scope": "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Amount Quota By Scenario], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
+   },
+   "sql": "SELECT sum(SalesAmountQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Actual')",
+   "expected": 12413657608.887617,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.目标销量.按查询场景.FactSalesQuota",
+   "group": "variants",
+   "title": "[Sales Quantity Quota By Scenario]（目标销量·按查询场景，场景 Actual）",
+   "scope": "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Sales Quantity Quota By Scenario], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
+   },
+   "sql": "SELECT sum(SalesQuantityQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Actual')",
+   "expected": 53320454.0,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.目标毛利.按查询场景.FactSalesQuota",
+   "group": "variants",
+   "title": "[Gross Margin Quota By Scenario]（目标毛利·按查询场景，场景 Actual）",
+   "scope": "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）；查询必须显式筛场景，筛具体场景或「场景非空」，否则会多出一个场景为空的组",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Gross Margin Quota By Scenario], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
+   },
+   "sql": "SELECT sum(GrossMarginQuota) FROM retail.FactSalesQuota WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Actual')",
+   "expected": 6891921631.2396,
+   "origin": "chDB / Parquet"
+  },
+  {
+   "id": "variants.计划收入.按查询场景.FactStrategyPlan",
+   "group": "variants",
+   "title": "[Plan Revenue By Scenario]（计划收入·按查询场景，场景 Actual）",
+   "scope": "不套默认的预算场景，场景由查询筛选（问到预测、实际等场景时用）",
+   "dax": {
+    "L2": "EVALUATE ROW ( \"v\", CALCULATE ( [Plan Revenue By Scenario], 'DimScenario'[ScenarioName] = \"Actual\" ) )"
+   },
+   "sql": "SELECT sum(Amount) FROM retail.FactStrategyPlan WHERE ScenarioKey = (SELECT ScenarioKey FROM retail.DimScenario WHERE ScenarioName = 'Actual') AND AccountKey IN (SELECT AccountKey FROM retail.DimAccount WHERE AccountName = 'Sale Revenue')",
+   "expected": 12413657608.887596,
+   "origin": "chDB / Parquet"
+  }
+ ]
+}
