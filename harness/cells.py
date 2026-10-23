@@ -7,6 +7,7 @@ the session's default database (T11 card, carried-forward requirement 1).
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -36,8 +37,8 @@ class Cell:
 
     @property
     def runnable_here(self) -> bool:
-        """Executors available to the direct-answer runner on this host."""
-        return self.stack in {"chdb", "cube_sql", "cube_json"}
+        """Executors available to the direct-answer runner on this host (DAX: Windows, T17)."""
+        return self.stack in {"chdb", "cube_sql", "cube_json"} or (self.stack == "dax" and sys.platform == "win32")
 
 
 CELLS: dict[str, Cell] = {c.name: c for c in [
@@ -70,6 +71,19 @@ LADDER_CELLS: dict[str, Cell] = {c.name: c for c in [
     Cell("SQL-L1-T4", "chdb", ("retail",), "build:SQL-L1.yaml", f"{LADDER}/clickhouse_sql_t4.md", card="C13",
          split="heldout", skip_judge=True),
 ]}
+
+# DAX direct-answer cells (T17 smoke, T18 full run): Power BI Desktop on Windows, one model open
+# at a time, so a run takes one DAX cell (run_direct refuses more). Kept apart from CELLS so that
+# ``run_direct --cell all`` never picks them up.
+DAX_CELLS: dict[str, Cell] = {c.name: c for c in [
+    Cell(f"DAX-{tier}", "dax", (), f"build:DAX-{tier}.yaml", "dax.md", card="T18") for tier in ("L0", "L1", "L2")
+]}
+
+
+def dax_tier(cell: Cell) -> str:
+    """DAX-L1 → L1 (the PBIP / model the cell runs on)."""
+    return cell.name.split("-", 1)[1]
+
 
 # Explorer agent cells (-E, T15): the direct cell's prompt, context and execution scope,
 # plus the read-only ``run_sql`` tool on the same backend. Kept apart from CELLS so that

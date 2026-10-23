@@ -33,6 +33,7 @@ if __package__ in (None, ""):
 from render.common import (  # noqa: E402
     BUILD,
     SEMANTIC,
+    dax_model_relationship,
     Namer,
     dump_yaml,
     l0_map,
@@ -122,11 +123,12 @@ def render_l0(n: Namer) -> dict:
     tables, cols = _l0_names()
     schema = physical_schema()["l0"]
     datasets = []
+    source_col = {(tables[t], l0): (t, c) for (t, c), l0 in cols.items()}
     for t in l0_map()["tables"]:
         name = t["l0"]
         datasets.append({
             "name": n.table(name, "l0"),
-            "columns": [{"name": c, "type": n.type(ty)} for c, ty in schema[name]],
+            "columns": [{"name": c, "type": n.type(ty, source_col.get((name, c)))} for c, ty in schema[name]],
         })
 
     def l0_ref(dotted: str) -> str:
@@ -181,7 +183,8 @@ def _datasets(n: Namer) -> list[dict]:
         for c in ds["columns"]:
             if c.get("technical"):
                 continue
-            cd = {"name": c["name"], "type": n.type(types[c["name"]]), "description": c["description"]}
+            cd = {"name": c["name"], "type": n.type(types[c["name"]], (ds["name"], c["name"])),
+                  "description": c["description"]}
             for k in ("unit", "role", "values", "value_semantics"):
                 _put(cd, k, c.get(k))
             cols.append(cd)
@@ -196,6 +199,8 @@ def _relationships(n: Namer) -> list[dict]:
         d = {"from": n.ref(r["from"]), "to": n.ref(r["to"])}
         for k in ("cardinality", "orphan_rows", "use", "caution"):
             _put(d, k, r.get(k))
+        if n.stack == "dax":
+            _put(d, "model_relationship", dax_model_relationship(r["from"], r["to"]))
         out.append(d)
     return out
 

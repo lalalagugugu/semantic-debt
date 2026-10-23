@@ -53,6 +53,21 @@ DAX-L0 的模型要在 Power Query 里重命名原始 Parquet 列，**所以原�
 
 ## 记录（完成后填写）
 
+### Mac 侧准备（T17-mac，2026-10-23，普通模式，未调用 DeepSeek）
+
+- 状态：Mac 侧完成，待用户审 PR、决定是否打 `semantic-v1.5`；Windows 上的探测、冒烟待做（用户准备电脑）。
 - 产出：
+  - DAX 执行器 `harness/executors.py`（`DaxExecutor`）：pyadomd 建连接、`AdomdCommand` 执行，端口从 Desktop 工作区目录自动发现（只认能连上的那一个，多于一个拒绝）；执行前静态拒绝 `INFO.` 系列与 `$SYSTEM`，归类 `metadata_function`；只允许一条以 `EVALUATE`/`DEFINE` 开头的查询；开跑前用 DMV 核对 Desktop 里打开的就是该档位的模型。`harness/cells.py` 注册 DAX-L0/L1/L2（不进 `--cell all`），`run_direct` 一次只许一个 DAX 单元。测试 `tests/test_dax_executor.py`（模拟会话与 .NET 值）。
+  - 探测模式 `harness/dax_probe.py`：逐表行数 25、合计与去重 20、孤儿行 5 条关系 × 2 种数法（单独一段）、L2 度量值 35、v1.4 变体 10、L1 的 2 级写法条目 30 条查询、度量值表达式比对；对照数字 `reports/validation/dax_probe_expected.json`，由 chDB 直接读 `$SEMDEBT_DATA_DIR/parquet/` 算出（不打开任何 chDB 数据目录，不会与 T14 冲突），孤儿行数与 `source.yaml` 逐条相等。
+  - `windows/README.md`、`windows/t17.ps1`（探测、dry-run、冒烟、全量四个命令；冒烟、全量跑完自动打包 `runs/<id>/` 与 `runs-raw/<id>/`）；`scripts/t17_windows_bundle.py` 打 Windows 压缩包（parquet、占位数据目录的 PBIP、`MANIFEST.sha256`）。`pyproject.toml`：chDB 只在非 Windows 上装，新增 `windows` 依赖组（pyadomd、pythonnet）。
+  - 检查清单第 1 项：`render/syntax/dax.md` 补到 2 级（`reports/validation/dax-syntax-t2.md`，18 条均未在真实引擎上验证，留给 Windows 探测）。第 3 项：YAML 上的三项通用检查本来就覆盖 DAX 且零缺口；新增 `render/check_pbip.py` 对照上下文与 PBIP，查出并修正两处（非激活关系与自连接看不出来、4 个外键类型），变体的 DAX 实现由探测在真实引擎上核对。见 `decisions/2026-10-23-t17-mac-dax-renderer.md`。
+  - 第 2 项（DAX 对齐清单，Codex T16 #156，用户 2026-10-23 转交）：清单每一行落成通用探针，共 69 项（L2 探测的「对齐清单验收」一段），对照数字按清单写的参考读法由 chDB 算出，并给出其他读法的数字以判断引擎走的哪一种；度量值未改。读代码预判有 5 类会走非参考读法（场景默认值遇事实键分组、新客首购受事实日期列与切片影响、占比主成员去父组、渠道内占比按事实键分组、同店集合随子类重认定），等 Windows 结果后裁决（`decisions/open-questions.md` T17-1，`reports/validation/t17-dax-alignment-acceptance.md`）。
+- 复现：`uv run python render/render_all.py`（含 `check_pbip`）；`uv run python harness/dax_probe.py expected`；`uv run pytest`；`uv run python scripts/t17_windows_bundle.py`。
 - 偏离与理由：
-- 工时：
+  - 渲染器改动（关系标记、外键类型、关掉自动日期/时间）超出「只补说明」：是第 3 项检查查出的交付缺陷，不修则 DAX 单元在门店地理问题上会静默算错；只动 DAX 产物，逐文件与系统消息哈希核对过。
+  - `tests/test_render.py::test_syntax_note_lengths` 去掉 ClickHouse 与 DAX 的 10% 等长核对：该测试的说明写明 DAX 补到 2 级时去掉（T12-4 已裁决）。
+  - 依赖：`uv.lock` 只新增 pyadomd、pythonnet 及其依赖，其余版本不变。
+- 工时：约半天。
+- 产出（Windows）：
+- 偏离与理由（Windows）：
+- 工时（Windows）：

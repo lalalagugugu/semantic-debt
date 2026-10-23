@@ -210,16 +210,15 @@ def test_syntax_note_lengths(record_property) -> None:
     Stacks may differ in length (decisions/2026-10-19-self-built-p-and-cube-notes.md §五,
     open question T12-4): the target is teaching depth 2, rules plus conditions and pitfalls.
     The two Cube notes are at depth 2 and are exempt from the old equal-length rule (T10:
-    within 10 %). ClickHouse (depth 1 in phase 1) and DAX are still held to it until DAX is
-    raised to depth 2 before it runs; then this check goes too. All four lengths are recorded
-    as test properties (``--junitxml``) and in the failure message."""
+    within 10 %). DAX was held to it against ClickHouse until it was raised to depth 2 before
+    the DAX runs (T17-mac); the check is gone with that, as planned. All four lengths are
+    recorded as test properties (``--junitxml``)."""
     files = _syntax_files()
     assert set(files) == {"clickhouse_sql.md", "cube_sql.md", "dax.md", "cube_json.md"}
     sizes = {name: len(re.sub(r"\s", "", text)) for name, text in files.items()}
     for name, n in sizes.items():
         record_property(f"syntax_chars_{name}", n)
-    a, b = sizes["clickhouse_sql.md"], sizes["dax.md"]
-    assert max(a, b) / min(a, b) <= 1.10, sizes
+    assert all(sizes.values()), sizes
 
 
 def test_syntax_notes_say_nothing_about_this_dataset() -> None:
