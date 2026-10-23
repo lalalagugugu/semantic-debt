@@ -38,7 +38,7 @@
 | T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 第一期暂停，第二期再做（2026-10-19 用户裁决，与 judge-v1 一起）；小样本保留（`20261019-T21-pilot-01`，1.18 元，L0-P 50.0%、L1-P 58.3%，Python 0/48） |
 | C13 | 写法说明教学阶梯（ClickHouse SQL，档位 L1；`tasks/C13-syntax-ladder.md`） | Claude Code（T12） | 普通 | `harness-ladder-v1`；`semantic-v1.4` | 15 元 | **完成**（`20261019-C13-ladder-02`，7.17 元，#147）：首轮执行报错 32% → 3%（2 级），正确率 64.2% → 68.2%（+4.0 [−0.9, +9.2]）；3 级、4 级没有再提高（`reports/results/C13-ladder.md`） |
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
-| T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | 裁决与任务卡在 PR #151 待合并；合并后 T13 会话写编码手册、提示词、dry-run（≤3 元），用户批准后错峰运行；之后 Codex 独立复核。L1 Pro 全量对照（约 30 元）放第二期候选 |
+| T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **基本完成**：Flash 初判、Codex 复核、报告与用户抽检完成（PR #153）；待裁决 open-questions T19b-1、T19b-2。L1 Pro 全量对照（约 30 元）放第二期候选 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
 ## 2026-10-22 刷新：第一期 SQL 线运行完成
