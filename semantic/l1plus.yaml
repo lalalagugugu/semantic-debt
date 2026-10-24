@@ -1,4 +1,4 @@
-# L1+ 叠加内容（T22 第 3 步；2026-10-24 按 Codex 复核与用户裁决 R1–R10 修订）
+# L1+ 叠加内容（T22 第 3 步；2026-10-24 按 Codex 复核、第二轮复查与用户裁决 R1–R12 修订）
 #
 # 叠加在 semantic/source.yaml（semantic-v1.4，L1）之上，生成 SQL-L1plus 的上下文；
 # 同一份内容生成 Turtle（OWL + SHACL），放进 SQL-L3a（第 4 步）。本文件不改 L1 的任何条文。
@@ -11,19 +11,22 @@
 #   - clarifications 的 refs 指 source.yaml 的节与条目（不写行号，行号会随文件变化）。
 #   - concepts 的 sql 是 ClickHouse SQL 的写法示例，表名、列名与 L1 相同；
 #     示例里的日期、N 是占位，按问题替换。示例只演示口径，不是唯一允许的写法。
-#   - rev 字段记这一条在 2026-10-24 修订的依据：R1–R10 = 用户裁决；「复核」= Codex 复核意见。
+#   - rev 字段记这一条在 2026-10-24 修订的依据：R1–R12 = 用户裁决；「复核」= Codex 复核与第二轮复查意见。
 #     rev 是给人和脚本看的，渲染进上下文时去掉。
 #   - 标「新增约定」的是 L1 没有、由 L1+ 新定的经营约定，不是从 L1 条文推出来的。
 #   - 本文件里引用的数据事实（取值、行数、金额）都由盲写会话对 $SEMDEBT_DATA_DIR/parquet
 #     实测过；写这份文件的会话是盲模式，没有看过题库、参考答案、运行结果。
 #   - 冲突时的优先级：本文件 > source.yaml 的同一主题。本文件没有提到的，照 source.yaml。
-#   - 通用规则：比率的分母为 0 或为 NULL 时，结果为 NULL（不报错、不当作 0 或无穷大）；
-#     各条目另写的不再重复。
+#   - 通用规则写在 general_rules 字段里（会渲染进上下文），各条目另写的与它一致。
 
-version: 2
+version: 3
 base: "semantic/source.yaml（semantic-v1.4）"
 title: "L1+：歧义澄清与常用业务概念"
 as_of_date: "2009-12-31"
+general_rules:
+  - id: G01
+    rev: "复核"
+    rule: "比率的分母为 0、为 NULL 或分母集合为空时，结果为 NULL（不报错、不当作 0 或无穷大）。适用于本文件与 L1 的全部比率指标。"
 
 # ---------------------------------------------------------------------------
 # 一、歧义澄清：L1 条文里条件没写全、允许两种以上读法的地方，各定一种读法。
@@ -52,6 +55,9 @@ clarifications:
       按下列顺序取第一条满足的：
       (1) 指标需要订单号或客户（订单数、客单价、连带率、客户数及一切客户类指标）→ 只能用 FactOnlineSales，
       任何情况下都不切到 FactSales（FactSales 没有订单号和客户键）。
+      线上表只覆盖线上渠道：问题要的是全渠道、全部门店或非线上渠道的订单 / 客户类指标时，本库算不出完整答案——
+      回答里说明「只有线上交易有订单号和客户，其他渠道的订单 / 客户数据不存在」；可以附上线上部分的数字，
+      但必须标明它只是线上部分，不得把它当作全渠道、全部门店的结果报出。
       (2) 明说「线上」且点名了门店：点名的是线上店（199、306、307，E02）→ FactOnlineSales 按 StoreKey 筛；
       点名的是实体店、经销店、目录店 → 这些门店没有线上销售（两张表的线上行都只落在 199、306、307），结果为空，
       并在回答中说明。
@@ -69,20 +75,26 @@ clarifications:
       订单类与客户类（订单数、客单价、连带率 D16、客户数、复购 D05–D07、新客、客户分层、客户所在地）→ 只有 FactOnlineSales；
       金额与数量类（销售额、销售数量、成本、毛利、退货、折扣、同比、环比、占比、日均、有销售天数、产品数）→
       FactOnlineSales 与 FactSales 都能算；
-      库存周转率、目标达成率、目标差异的分子 → 只用 FactSales（L1 的指标定义如此）；D21、D29 与库存对照的销售量 → 只用 FactSales。
+      库存周转率、目标达成率、目标差异的分子 → 只用 FactSales（L1 的指标定义如此）；D21 与库存对照的销售量、D29 点名的全渠道口径 → 只用 FactSales；
+      D29 的默认口径（R11）用 FactOnlineSales。
       第二步，在能用的表里选：只有一张能用 → 用它；两张都能用时，没触发约定 2 → FactOnlineSales，
       触发约定 2（以门店为对象、门店经理、同店、渠道对比、全渠道）→ FactSales。
       指标上写的 dataset: FactSales 是触发约定 2 时的落点，不是默认。
     exceptions:
       - "订单类、客户类指标遇到以门店为对象或全渠道的问题，仍只用 FactOnlineSales；需要的门店或渠道不在线上的，按 A02 (2) 说明没有数据，不改用 FactSales 的其他指标代替（D16 的选表限制同此）。"
+      - "全渠道 / 全部门店的订单类、客户类请求：FactOnlineSales 只是线上子集，不是完整答案。按 A02 (1) 说明能力边界；给出线上数字时标明「仅线上」，不称作全渠道或全部门店的结果。"
 
   - id: A04
-    topic: "约定 2 与约定 5 同时触发时的地理口径"
+    topic: "约定 2 与约定 5 同时触发时的地理口径：随实际选用的事实表"
+    rev: "复核"
     refs: ["conventions[5]", "multi_path_defaults"]
     rule: >-
-      问题触发约定 2 时，按国家、州、城市、大洲的分析一律按门店所在地
-      （FactSales → DimStore.GeographyKey → DimGeography），不需要问题明说「门店所在地」。
-      没触发约定 2 时，按客户所在地（FactOnlineSales → DimCustomer.GeographyKey → DimGeography）。
+      地理路径跟着按 A03 实际选用的事实表走：
+      (1) 问题触发约定 2 → 门店所在地：选用的事实表.StoreKey → DimStore.GeographyKey → DimGeography。
+      选的是 FactSales 就从 FactSales 走；订单类、客户类指标按 A03 只能用 FactOnlineSales 时，从 FactOnlineSales.StoreKey 走。
+      不需要问题明说「门店所在地」。
+      (2) 没触发约定 2、选用的是 FactOnlineSales → 客户所在地（FactOnlineSales → DimCustomer.GeographyKey → DimGeography，约定 5）。
+      (3) 没触发约定 2、选用的表没有客户键（FactSales、FactInventory、FactSalesQuota、FactITSLA）→ 门店所在地，路径同 (1)。
 
   - id: A05
     topic: "线上业务按大洲分：客户所在大洲"
@@ -147,7 +159,7 @@ clarifications:
       （筛选后的子集——某产品、某门店、某促销——就是该子集有交易行的天数）。
       日期范围限定在事实表的区间内，不用日期维度补出没有交易的天。选表按 A03。
     exceptions:
-      - "D29 库存可售天数用的是另一个口径「日历日均销量」（全渠道 ÷ 日历天数），两者不是同一口径，见 D29。"
+      - "D29 库存可售天数默认就用本条的交易日日均（线上，R11）；只有点名全渠道时才用另一个口径「日历日均销量」（全渠道 ÷ 日历天数），两者分别命名，见 D29。"
       - "问题明确要求按日历天数（「每个日历日平均」「含无销售日」）：分母按字面取日历天数，即 D29 的日历日均口径。"
     sql: "SELECT sum(SalesAmount) / uniqExact(DateKey) FROM FactOnlineSales WHERE ..."
 
@@ -156,7 +168,8 @@ clarifications:
     rev: "复核"
     refs: ["conventions[4]", "datasets.DimDate.cautions"]
     rule: >-
-      季节是日期维度上按大洲各一套的标签（E10）。一行所属的大洲按 A04：线上销售按客户所在大洲，全渠道销售按门店所在大洲。
+      季节是日期维度上按大洲各一套的标签（E10）。一行所属的大洲按 A04，随实际选用的事实表定：
+      用 FactOnlineSales 且没触发约定 2 → 客户所在大洲；其余（用 FactSales 等无客户键的表，或触发约定 2）→ 门店所在大洲。
       问题点名大洲 → 先按该大洲筛选（DimGeography.ContinentName = 该大洲），再用该大洲的季节字段
       （北美 NorthAmericaSeason、欧洲 EuropeSeason、亚洲 AsiaSeason）分组。
       不点名 → 每一行用它所属大洲的季节字段，分组键是「大洲 × 季节」两列（ContinentName 一定在 GROUP BY 里），
@@ -202,12 +215,12 @@ clarifications:
     rev: "复核"
     refs: ["synonyms: 销售额 / 收入", "synonyms: 成本", "synonyms: 毛利 / 利润", "conventions[12]", "datasets.FactStrategyPlan.when_to_use"]
     rule: >-
-      先按问题明确的业务对象判断，再看关键词：
-      (1) 对象是战略计划的科目（点名科目名 E12、说损益、费用、税、税前 / 税后利润、预算执行率）→ 战略计划表
-      （收入 = Sale Revenue，成本 = Cost of Goods Sold，利润按 D32 计算）。
-      (2) 对象是销售目标（销售目标、目标销售额、目标销量、配额、达成率、完成率、目标差异）→ 销售目标表（A15）。
-      (3) 对象是交易（订单、产品、门店、客户的销售）且没有计划、预算、预测、科目一类词 → 同义词表的落点（销售额、总成本、毛利）。
-      (4) 以上都定不出、但有计划、预算、预测、科目一类词 → 按 A15 的顺序定表。
+      计划类的表（战略计划表、销售目标表）与销售事实之间只用一套业务对象优先规则，就是 A15 的顺序；本条、A15、D31 共用它，
+      不另设优先级。
+      (1) 问题含下列任一类词 → 按 A15 的顺序 (1)–(5) 定表：计划、预算、预测、目标、配额、达成率、完成率、执行率、
+      科目名（E12）、损益、费用、税、税前 / 税后利润。落到战略计划表时：收入 = Sale Revenue，成本 = Cost of Goods Sold，
+      利润按 D32 计算。
+      (2) 没有这些词（对象是订单、产品、门店、客户的交易）→ 同义词表的落点（销售额、总成本、毛利）。
       「产品成本」「单位成本」→ DimProduct.UnitCost，不受本条影响。
 
   - id: A15
@@ -215,14 +228,16 @@ clarifications:
     rev: "复核"
     refs: ["synonyms: 计划 / 预算金额", "metrics.目标差异", "datasets.FactSalesQuota.when_to_use", "datasets.FactStrategyPlan.when_to_use"]
     rule: >-
-      「预算」「计划」「预测」与下列词同现时，按顺序取第一条满足的：
+      这是计划类问题唯一的选表顺序（A14 把含计划类词的问题都交到这里，D31 也用它）。按顺序取第一条满足的：
       (1) 有科目名（E12）或 费用、成本、税、损益、利润、执行率 → 战略计划表（FactStrategyPlan）。
       (2) 有 销售目标、目标、配额、达成率、完成率、目标差异、预算差异、目标销量、目标销售额，或「预算销售额」「销售额预算」
       → 销售目标表（FactSalesQuota）。
       (3) 有「收入」→ 战略计划表，科目 = Sale Revenue。
       (4) 只说「预算」，以上都没有 → 战略计划表，科目 = Sale Revenue。
-      场景：说「预算」→ Budget；说「预测」→ Forecast；只说「计划」不定场景（E11）。
-      例：「收入预算达成率」→ (2) 销售目标表；「营销费用预算」→ (1) 战略计划表；「预算收入」→ (3)。
+      (5) 只说「计划」或「预测」（含「计划金额」「预测值」「预测销售额」），以上都没有 → 战略计划表，科目 = Sale Revenue。
+      场景：说「预算」→ Budget；说「预测」→ Forecast；只说「计划」不定场景（E11：战略计划表取 Actual，销售目标表取 Budget）。
+      例：「收入预算达成率」→ (2) 销售目标表；「营销费用预算」→ (1) 战略计划表；「预算收入」→ (3)；
+      「预测销售额」→ (5) 战略计划表 Forecast；「目标销售额的预测误差」→ (2) 销售目标表。
 
   - id: A16
     topic: "「均价 / 单价」：成交均价还是产品标价"
@@ -234,9 +249,11 @@ clarifications:
 
   - id: A17
     topic: "折扣率的分母也只算打折交易"
+    rev: "复核"
     refs: ["metrics.折扣率", "conventions[10]"]
     rule: >-
       折扣率 = 打折交易的折扣金额 ÷ 打折交易的折扣前原价，分子分母都只算 PromotionKey != 1 的行。
+      范围内没有打折交易、或打折交易的折扣前原价合计为 0 → 折扣率为 NULL（G01），不当作 0。
     exceptions:
       - "问题明确问「折扣金额占全部销售（或全部原价）的比例」：分母按字面取全部交易。"
 
@@ -278,6 +295,10 @@ clarifications:
     rev: "R2、复核"
     refs: ["metrics.销售额占比"]
     rule: >-
+      先看显式总体：问题明确指定了分母的总体（「占全部销售额的比例」「占全渠道的比例」「占全公司的比例」）→
+      分母就是那个总体，按它自己的字面范围计算；问题里的候选集筛选（「在售产品中」「Contoso 品牌中」）只作用于分子
+      和候选对象，不自动施加到用户指定的总体分母上。显式总体优先于下面的默认。
+      没有显式总体时：
       占比的分母 = 与分子相同的筛选条件下、去掉正在拆分的那个维度之后的合计，含未登记产品的行（A20）。
       所以按产品属性拆的各组（含未知组）占比之和是 100%。
       会改变分母的：问题里的维度筛选（时间、渠道、地区、品牌……）和候选集筛选（「在售产品中」「Contoso 品牌中」）——
@@ -323,7 +344,10 @@ clarifications:
       判定的对象跟着问题：
       按产品问（「哪些产品缺货」「零库存的产品」）→ 先把每个产品在各门店的最近快照跨店求和
       （在手合计、安全库存合计），再用合计比较；不先判门店 × 产品再归并到产品。
-      按门店问、或按门店 × 产品问 → 在门店 × 产品组合上判定。比率与组合计数见 D26、D27，它们是组合口径，与按产品的判定分开。
+      按门店整体问（「哪些门店缺货」「零库存的门店」）→ 整店汇总：先把每个门店内各产品的最近快照求和
+      （在手合计、安全库存合计），再用合计比较，与按产品的做法对称。
+      问门店内的组合计数（「各门店有多少个产品缺货」「缺货的门店产品组合」「缺货率」）→ 在门店 × 产品组合上逐个判定再计数
+      （D26、D27）。整店汇总的判定与组合计数分开算，一个门店整店不缺货，店内仍可以有缺货组合，两者不互相推出。
 
   - id: A25
     topic: "L1 / L1+ 不使用宽表视图"
@@ -342,6 +366,9 @@ clarifications:
       不先按月把明细连起来再汇总（那样会丢掉没有销售的目标）。
       按渠道拆：分子按 FactSales.channelKey、分母按 FactSalesQuota.ChannelKey。
       按产品属性拆：两边都左连接 DimProduct，未登记产品合成未知组保留（A20）。
+      未知组的连接：属性值为 NULL 时普通等值连接对不上，双方的未知组会变成两行。两边先把连接键里的 NULL 统一成同一个值
+      （ifNull(属性, '<未知>')），或用 NULL 安全的比较（isNotDistinctFrom），再全外连接；展示的键取两边键的 coalesce，
+      未知组在结果里只有一行，展示时属性仍为 NULL（或标为未知）。
       时间：两边都按月归入展示的期（销售用 toStartOfMonth(DateKey)，目标的 DateKey 本身是月初）；窗口按问题，没说按 A06。
       某组有目标没销售 → 分子按 0；有销售没目标或目标为 0 → 达成率 NULL。不是各月达成率求平均。
 
@@ -525,9 +552,12 @@ concepts:
 
   - id: D02
     name: "末购日"
+    rev: "复核"
     aliases: ["最近一次购买日", "最后购买日"]
-    definition: "客户在参照日及以前的 FactOnlineSales 全部行的最大 DateKey（参照日按 A27，默认 2009-12-31）。"
-    sql: "SELECT CustomerKey, max(DateKey) AS LastPurchaseDate FROM FactOnlineSales WHERE DateKey <= toDate('2009-12-31') GROUP BY CustomerKey"
+    definition: >-
+      客户在参照日及以前、满足问题交易筛选（A27：产品、品类、促销、线上店等）的 FactOnlineSales 行的最大 DateKey；
+      问题没有交易筛选时就是全部行。参照日按 A27，默认 2009-12-31。
+    sql: "SELECT CustomerKey, max(DateKey) AS LastPurchaseDate FROM FactOnlineSales WHERE DateKey <= toDate('2009-12-31') AND <交易筛选> GROUP BY CustomerKey"
 
   - id: D03
     name: "首购队列"
@@ -547,12 +577,23 @@ concepts:
       第 k 期留存率（「留存率」默认指它）= 第 k 期有购买的队列客户数 ÷ 队列规模；
       连续留存率 = 第 1 至第 k 期每一期都有购买的队列客户数 ÷ 队列规模；
       任意后续期回购率 = 第 1 期至观察截止（2009-12-31 所在期）之间任一期有购买的队列客户数 ÷ 队列规模。
-      观察期不足：第 k 期的结束日晚于 2009-12-31（该期不完整或还没到）→ 该队列的第 k 期留存率、连续留存率为 NULL，不按 0 计。
+      观察截止日 = 问题明确给出的截止日，没给 → 2009-12-31；只用截止日及以前的行。
+      期骨架：每个队列列出第 0 期到截止日所在期的每一个 k，再左连接各期的购买客户数——
+      已观察到、但没有队列客户购买的期，留存率是 0（不是缺行，也不是 NULL）；
+      观察期不足：第 k 期的结束日晚于截止日（该期不完整或还没到）→ 该队列的第 k 期留存率、连续留存率为 NULL，不按 0 计。
+      任意后续期回购率只看截止日及以前已观察到的期。
     sql: >-
-      SELECT c.Cohort, dateDiff('month', c.Cohort, toStartOfMonth(f.DateKey)) AS k,
-             uniqExact(f.CustomerKey) / any(c.CohortSize) AS RetentionRate
-      FROM FactOnlineSales f JOIN (<每个客户的 Cohort 与 CohortSize>) c ON f.CustomerKey = c.CustomerKey
-      GROUP BY c.Cohort, k
+      WITH cust AS (SELECT CustomerKey, toStartOfMonth(min(DateKey)) AS Cohort FROM FactOnlineSales GROUP BY CustomerKey),
+           sz AS (SELECT Cohort, count() AS CohortSize FROM cust GROUP BY Cohort),
+           skel AS (SELECT Cohort, CohortSize,
+                    toInt64(arrayJoin(range(0, toUInt32(dateDiff('month', Cohort, toDate('2009-12-31'))) + 1))) AS k FROM sz),
+           act AS (SELECT c.Cohort AS Cohort, toInt64(dateDiff('month', c.Cohort, toStartOfMonth(f.DateKey))) AS k,
+                   uniqExact(f.CustomerKey) AS n
+                   FROM FactOnlineSales f JOIN cust c ON f.CustomerKey = c.CustomerKey
+                   WHERE f.DateKey <= toDate('2009-12-31') GROUP BY Cohort, k)
+      SELECT s.Cohort, s.k,
+             if(addMonths(s.Cohort, s.k + 1) - 1 > toDate('2009-12-31'), NULL, coalesce(a.n, 0) / s.CohortSize) AS RetentionRate
+      FROM skel s LEFT JOIN act a ON s.Cohort = a.Cohort AND s.k = a.k
     exceptions: ["本库 18,869 个客户中 18,868 个的首购在 2007 年、1 个在 2009 年，按月以外的粒度做队列几乎只有一个队列；仍按定义计算。"]
 
   - id: D05
@@ -587,18 +628,27 @@ concepts:
 
   - id: D06b
     name: "首购后 N 天回购率"
-    rev: "R4"
+    rev: "R4、复核"
     aliases: ["回购率", "N 天回购率"]
     definition: >-
-      分母 = 全局首购日（D01）F 落在问题窗口内、且 F + N ≤ 2009-12-31（观察期足够）的客户；
-      分子 = 其中在 (F, F + N] 内有另一个订单号的客户（首购日当天的其他订单不算回购）。
-      N 按问题；问题说「回购率」没给 N → N = 90。按全部交易行。
+      观察截止日 = 问题明确给出的截止日，没给 → 2009-12-31。
+      分母 = 全局首购日（D01）F 落在问题窗口内、且 F + N ≤ 观察截止日（观察期足够）的客户。
+      分子 = 其中有一行同时满足：DateKey 在 (F, F + N] 内，且 SalesOrderNumber 不是该客户首购日的任何一个订单号。
+      首购日当天的其他订单不算回购。当前数据下每个订单号只有一个日期（实测 1,674,320 个订单号无一跨日），
+      所以首购日之后的行必然是不同的订单号；条件仍按订单号写明，不依赖这一点。
+      N 按问题；问题说「回购率」没给 N → N = 90。按全部交易行（含只有退货的订单）。
+      筛选的作用范围：F 永远是全局首购日，不受交易筛选影响（D01）；问题的交易筛选（品类、产品、促销、线上店）
+      只作用于分子里的回购行（「回购了某品类」）；客户属性筛选（性别、所在地……）作用于分母的客户。
       与 D06 是两个不同的指标：D06 不看首购，只看窗口内是否有两单。
     sql: >-
-      SELECT countIf(rebuy) / count() FROM (
-        SELECT f.CustomerKey, max(f.DateKey > c.F AND f.DateKey <= c.F + 90) AS rebuy
-        FROM FactOnlineSales f JOIN (<D01，F 在窗口内且 F + 90 <= '2009-12-31'>) c ON f.CustomerKey = c.CustomerKey
-        GROUP BY f.CustomerKey)
+      WITH c AS (SELECT CustomerKey, min(DateKey) AS F FROM FactOnlineSales GROUP BY CustomerKey
+                 HAVING F BETWEEN <窗口起> AND <窗口止> AND F + 90 <= toDate('2009-12-31')),
+           fo AS (SELECT f.CustomerKey AS CustomerKey, groupUniqArray(f.SalesOrderNumber) AS FirstOrders
+                  FROM FactOnlineSales f JOIN c ON f.CustomerKey = c.CustomerKey AND f.DateKey = c.F GROUP BY f.CustomerKey),
+           r AS (SELECT DISTINCT f.CustomerKey AS CustomerKey FROM FactOnlineSales f
+                 JOIN c ON f.CustomerKey = c.CustomerKey JOIN fo ON f.CustomerKey = fo.CustomerKey
+                 WHERE f.DateKey > c.F AND f.DateKey <= c.F + 90 AND NOT has(fo.FirstOrders, f.SalesOrderNumber) AND <交易筛选>)
+      SELECT countIf(CustomerKey IN (SELECT CustomerKey FROM r)) / nullIf(count(), 0) FROM c
 
   - id: D06c
     name: "正销量复购率"
@@ -634,6 +684,7 @@ concepts:
     definition: >-
       活跃（或有流失风险、已流失）客户数 ÷ 客户集合的客户数。客户集合、参照日、筛选与「交易筛选后无末购日」的客户的处理
       全部按 A27：分母只含参照日及以前有匹配购买的客户，三层互斥且覆盖客户集合，三个率之和为 100%。
+      客户集合为空（没有任何客户满足筛选）→ 三个率都为 NULL（G01），不当作 0。
 
   - id: D10
     name: "客户年龄与年龄段"
@@ -688,7 +739,7 @@ concepts:
     aliases: ["CAGR", "复合增长率"]
     definition: >-
       CAGR = (末年指标值 ÷ 首年指标值)^(1 ÷ (末年 − 首年)) − 1，指标值是该指标在首年、末年各自的日历年全年值
-      （两端年份之比，不用中间年份）。没说首尾年 → 2007 到 2009，指数 1/2。
+      （两端年份的指标值之比，不用中间年份）。没说首尾年 → 2007 到 2009，指数 1/2。
       边界：首年值或末年值 ≤ 0、首年与末年相同、任一端年份没有数据 → NULL。
     sql: "if(v_first > 0 AND v_last > 0 AND y_last > y_first, pow(v_last / v_first, 1 / (y_last - y_first)) - 1, NULL)"
 
@@ -712,7 +763,9 @@ concepts:
       前 N 指前 N 个对象，不是前 N 行明细：先把指标汇总到对象（每个对象一行），再排序取前 N。
       对象用唯一键标识（门店 StoreKey、产品 ProductKey、客户 CustomerKey……），同名的不同对象是不同的对象，不按名称合并；
       结果里同时列出键和名称。未登记产品等未知对象按 A20 保留。
-      排序：按指标降序（「最低」「后 N 名」升序），用不经四舍五入的原值比较；并列时依次按名称升序、键升序，结果恰好 N 个对象。
+      排序：按指标降序（「最低」「后 N 名」升序），用不经四舍五入的原值比较。
+      第 N 名有并列时，可接受的策略之一是：依次按名称升序、键升序打破并列，结果恰好 N 个对象（下面的 sql 即此写法）；
+      把与第 N 名原值相同的对象一并列出、并说明并列，也是可接受的。本条不把任何一种定为唯一的并列处理方式。
       「最高的」不带 N 时 N = 1。
       分组内前 N（「每个品类销量前 3 的产品」）：在每组内各自排序取前 N（row_number() OVER (PARTITION BY 组 ORDER BY ...)）。
       嵌套对象（「前 3 个品类里各自前 5 的产品」）：先按外层对象排名定出前 N 个外层对象，再在每个外层对象内对内层对象排名。
@@ -730,6 +783,8 @@ concepts:
       所以同额的对象累计占比相同、同属一类。分母 = 对象域的销售额合计（= A21 的同筛选全部销售额）。
       A 类 = 累计占比 ≤ 80%；B 类 = 80% < 累计占比 ≤ 95%；C 类 = 其余（用户 2026-10-23 审定）。
       跨阈值：使累计占比第一次超过 80% 的那个对象（或同额组）归 B，不归 A；95% 同理归 C。选表按 A03。
+      精度：销售额用原值汇总，不先四舍五入；「同额」= 汇总后的原值完全相等；累计占比用原值相除，
+      直接与 0.8、0.95 比较，不先换算成四舍五入的百分数再比。
     sql: >-
       SELECT ProductKey, amt, sum(amt) OVER (ORDER BY amt DESC
         RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) / <分母> AS cum,
@@ -741,7 +796,12 @@ concepts:
     aliases: ["动销", "动销率", "有动销的产品"]
     definition: >-
       动销产品 = 在售产品（A31）中、窗口内销售数量 > 0 的产品；动销率 = 动销产品数 ÷ 在售产品数，在售产品数为 0 → NULL。
-      窗口按问题，没说按 A06；选表按 A03。
+      分母 = 满足问题属性筛选（品类、子类、品牌……）的全部在售产品，含窗口内没有任何交易的产品：从 DimProduct 起表，
+      左连接窗口内的销售，不从销售事实起表（那样会漏掉没有交易的在售产品）。窗口按问题，没说按 A06；选表按 A03。
+    sql: >-
+      SELECT countIf(q > 0) / nullIf(count(), 0) FROM (SELECT p.ProductKey, coalesce(s.q, 0) AS q FROM DimProduct p
+        LEFT JOIN (SELECT ProductKey, sum(SalesQuantity) AS q FROM FactOnlineSales WHERE <窗口> GROUP BY ProductKey) s
+        ON p.ProductKey = s.ProductKey WHERE p.Status = 'On' AND <属性筛选>)
 
   - id: D21
     name: "滞销产品"
@@ -815,14 +875,24 @@ concepts:
       窗口天数含首尾两天。周转率为 0 或 NULL（不可算）→ 周转天数为 NULL。
 
   - id: D29
-    name: "库存可售天数（用日历日均销量）"
-    rev: "R6"
+    name: "库存可售天数（默认交易日日均；点名全渠道时用日历日均）"
+    rev: "R6、R11"
     aliases: ["可售天数", "库存覆盖天数"]
     definition: >-
-      某门店 × 产品（或其合计）的当前在手数量 ÷ 日历日均销量。
-      日历日均销量 = FactSales（全渠道）在近 90 天 [2009-10-03, 2009-12-31] 的销售数量合计 ÷ 90（日历天数）。
-      这是与 A09「交易日日均」（默认线上、÷ 有交易日）不同的另一个口径，两者分别命名、不混用。
-      日历日均销量为 0 时结果为 NULL（无法计算），不当作无穷大。范围是同一组门店 × 产品。
+      可售天数 = 某门店 × 产品（或其合计）的当前在手数量（A22）÷ 日均销量。两个口径分别命名，不混用：
+      (1) 默认口径「交易日日均可售天数」（R11）：问题只说「可售天数」「库存覆盖天数」时用它。
+      日均销量 = FactOnlineSales（线上）在近 90 天 [2009-10-03, 2009-12-31] 内、同一组门店 × 产品的销售数量合计
+      ÷ 该子集在窗口内有交易行的天数（A09 的交易日日均）。
+      (2) 点名口径「全渠道日历日均可售天数」：只有问题点名全渠道（「全渠道销量」「按全部门店的销量」）或日历天数
+      （「按日历日均」「含无销售日」）时用它。日均销量 = FactSales（全渠道）在同一窗口、同一组门店 × 产品的销售数量合计 ÷ 90。
+      两个口径下，日均销量为 0 或窗口内没有交易行 → 结果为 NULL（G01），不当作无穷大。
+      当前数据下线上行只落在 199、306、307 三家门店（A02），所以按其他门店 × 产品算的默认口径没有线上销量，结果为 NULL；
+      照此报出，并在回答里说明是因为该门店没有线上销售，不自动改用全渠道口径。
+    sql: >-
+      默认口径：SELECT inv.oh / nullIf(s.q / nullIf(s.d, 0), 0) FROM (<A22 当前在手>) inv LEFT JOIN
+        (SELECT StoreKey, ProductKey, sum(SalesQuantity) AS q, uniqExact(DateKey) AS d FROM FactOnlineSales
+         WHERE DateKey BETWEEN toDate('2009-10-03') AND toDate('2009-12-31') GROUP BY StoreKey, ProductKey) s
+        ON inv.StoreKey = s.StoreKey AND inv.ProductKey = s.ProductKey
 
   # ========== 目标与计划 ==========
   - id: D30
@@ -835,15 +905,17 @@ concepts:
 
   - id: D31
     name: "预测偏差、预测误差、预测准确度"
-    rev: "R7"
+    rev: "R7、复核"
     aliases: ["预测偏差", "预测误差", "预测准确度"]
     definition: >-
       三个名字、三个口径（F = Forecast 金额，A = Actual 金额，同一表、同一范围，先在组内各自合计再代入）：
-      预测偏差（带符号）= (F − A) ÷ A，正数表示预测偏高；
-      预测误差（绝对值）= |F − A| ÷ A；
-      预测准确度 = 1 − |F − A| ÷ A（可以为负）。
-      A 为 0 → 三者都为 NULL。
-      表：问题说目标销售额、目标、配额 → 销售目标表的 SalesAmountQuota；否则 → 战略计划表，没说科目 → Sale Revenue。
+      预测偏差（带符号）= (F − A) ÷ |A|，正数表示预测偏高；
+      预测误差（绝对值）= |F − A| ÷ |A|；
+      预测准确度 = 1 − |F − A| ÷ |A|（可以为负）。
+      分母用实际值的绝对值 |A|：计划表与销售目标表的金额全为正数，此时 |A| = A；利润类科目（D32）的实际值可能为负，
+      用 |A| 保证偏差的符号仍表示偏高 / 偏低。A 为 0 → 三者都为 NULL。
+      表：按 A15 的顺序定（与 A14 同一套规则，本条不另设优先级）；落到销售目标表用 SalesAmountQuota，
+      落到战略计划表用 Amount，没说科目 → Sale Revenue，利润类科目先按 D32 分别算出 F 与 A。
 
   - id: D32
     name: "收入、费用、税、税前利润、税后利润（损益）"
@@ -951,20 +1023,23 @@ aliases:
 
   - id: E05
     entity: "品类、子类"
-    rev: "复核"
+    rev: "复核、R12"
     column: "DimProductCategory.ProductCategoryName；DimProductSubcategory.ProductSubcategoryName"
     note: >-
       说法与 L1 的中文释义一一对应；子类所属品类以数据为准（A40）。
       组合名的品类或子类（名字里含两种以上商品，如 Projectors & Screens、Washers & Dryers）只用完整的组合说法映射；
-      单项商品词不映到含其他商品的组合品类或子类，能用若干个子类精确表示的映到那组子类（如「相机」），
-      不能的列在 no_exact_mapping。产品名不能可靠地区分组合子类里的单项（例如 MP4&MP3 的 45 个产品只有 35 个名字含 MP3），
+      单项商品词不映到含其他商品的组合品类或子类，能用若干个子类精确表示的映到那组子类（如「游戏」），
+      不能的列在 no_exact_mapping。
+      裸「相机」默认 = 整个相机品类 Cameras and camcorders（R12，与「相机与摄像机」同一落点）；问题出现具体单品词
+      （数码相机、单反、胶片相机、摄像机……）时才按子类处理，映不到精确子类的适用 no_exact_mapping_rule。
+      产品名不能可靠地区分组合子类里的单项（例如 MP4&MP3 的 45 个产品只有 35 个名字含 MP3），
       所以也不用产品名的模糊匹配代替。
     map:
       - { terms: ["音频", "音频产品"], value: "Audio", level: "品类" }
       - { terms: ["电视与影音", "影音"], value: "TV and Video", level: "品类" }
       - { terms: ["电脑", "计算机"], value: "Computers", level: "品类" }
       - { terms: ["相机与摄像机", "相机和摄像机"], value: "Cameras and camcorders", level: "品类" }
-      - { terms: ["相机"], value: ["Digital Cameras", "Digital SLR Cameras", "Film Cameras"], level: "子类" }
+      - { terms: ["相机"], value: "Cameras and camcorders", level: "品类" }
       - { terms: ["手机"], value: "Cell phones", level: "品类" }
       - { terms: ["音乐、影片与有声书", "音像制品"], value: "Music, Movies and Audio Books", level: "品类" }
       - { terms: ["游戏与玩具"], value: "Games and Toys", level: "品类" }
@@ -987,6 +1062,7 @@ aliases:
       - { terms: ["打印、扫描与传真", "打印扫描传真设备"], value: "Printers, Scanners & Fax", level: "子类" }
       - { terms: ["数码相机"], value: "Digital Cameras", level: "子类" }
       - { terms: ["数码单反", "单反"], value: "Digital SLR Cameras", level: "子类" }
+      - { terms: ["胶片相机"], value: "Film Cameras", level: "子类" }
       - { terms: ["摄像机"], value: "Camcorders", level: "子类" }
       - { terms: ["触屏手机"], value: "Touch Screen Phones", level: "子类" }
       - { terms: ["智能手机与 PDA", "智能手机和 PDA"], value: "Smart phones & PDAs", level: "子类" }
@@ -1011,8 +1087,10 @@ aliases:
       - { terms: ["智能手机", "PDA"], within: "Smart phones & PDAs" }
       - { terms: ["玩具"], within: "Games and Toys" }
     no_exact_mapping_rule: >-
-      问题只用了上表的单项词时，本库只能区分到组合子类：回答里说明这一能力边界，并报出包含它的组合子类全名；
-      如果要给数字，给的是整个组合子类的数字，并在回答里写明它含其他商品，不把它当作该单项的数字。
+      问题只用了上表的单项词时，本库只能区分到组合子类：回答里说明这一能力边界（库里分不出该单项），并报出包含它的
+      组合子类全名；默认不返回组合子类的数字，不自行把范围扩大成上位集合。
+      只有用户明确接受扩大范围（「按整个投影与幕布子类算也行」「就用 MP4&MP3 的数」）时，才返回组合子类的数字，
+      并写明它含其他商品，不是该单项的数字。
 
   - id: E06
     entity: "品牌"
@@ -1165,8 +1243,9 @@ aliases:
     no_exact_mapping:
       - { terms: ["硕士", "博士"], within: "Graduate Degree" }
     no_exact_mapping_rule: >-
-      硕士、博士只是 Graduate Degree 的子集，库里分不出来：回答里说明这一能力边界；如果要给数字，
-      给的是 Graduate Degree 全体的数字，并写明它不等于硕士（或博士）。
+      硕士、博士只是 Graduate Degree 的子集，库里分不出来：回答里说明这一能力边界；默认不返回 Graduate Degree
+      全体的数字，不自行扩大成上位集合。只有用户明确接受扩大范围（「按研究生及以上算也行」）时，才返回 Graduate Degree
+      全体的数字，并写明它不等于硕士（或博士）。
 
   - id: E14
     entity: "日期标签"
