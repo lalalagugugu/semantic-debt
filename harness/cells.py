@@ -14,6 +14,11 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 CONTEXTS = REPO / "build" / "contexts"
 SYNTAX = REPO / "render" / "syntax"
+TUNING = REPO / "semantic" / "tuning"
+
+
+def instructions_path(name: str) -> Path:
+    return TUNING / f"{name}.instructions.yaml"
 
 
 def syntax_path(name: str) -> Path:
@@ -34,6 +39,8 @@ class Cell:
     card: str = "T13"               # card that runs it at full scale
     split: str = "all"              # which questions this cell answers: all / tuning / heldout
     skip_judge: bool = False        # never answer judge questions (phase 1 replan §二)
+    instructions: str | None = None # semantic/tuning/<name>.instructions.yaml: tuned answer requirements
+                                    # and syntax notes (decisions/2026-10-23-tuning-instructions.md)
 
     @property
     def runnable_here(self) -> bool:
@@ -49,6 +56,8 @@ CELLS: dict[str, Cell] = {c.name: c for c in [
     Cell("SQL-L1.5W", "chdb", ("dwd", "retail"), "build:SQL-L1.5W.yaml", "clickhouse_sql.md"),
     Cell("SQL-L1.5S", "chdb", ("ads",), "build:SQL-L1.5S.yaml", "clickhouse_sql.md"),
     Cell("SQL-L1-tuned", "chdb", ("retail",), "build:SQL-L1-tuned.yaml", "clickhouse_sql.md", card="T14"),
+    Cell("SQL-L1-tuned-instr", "chdb", ("retail",), "build:SQL-L1-tuned.yaml", "clickhouse_sql.md", card="T14",
+         instructions="SQL-L1"),
     Cell("SQL-L2", "cube_sql", (), "build:SQL-L2.yaml", "cube_sql.md", card="T16"),
     Cell("JSON-L2", "cube_json", (), "build:JSON-L2.yaml", "cube_json.md", card="T16"),
     Cell("SQL-R-EN", "chdb", ("retail",), "external:r-en", "clickhouse_sql.md", lang="en"),
