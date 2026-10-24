@@ -53,7 +53,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    LADDER_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, syntax_path,
+    LADDER_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -101,7 +101,12 @@ def context_text(cell: Cell) -> str:
 
 def system_for(cell: Cell) -> str:
     lang = "yaml" if cell.context.startswith("build:") else None
-    return P.system_message(context_text(cell), syntax_path(cell.syntax).read_text(encoding="utf-8"), lang)
+    syntax = syntax_path(cell.syntax).read_text(encoding="utf-8")
+    if cell.instructions is not None:     # tuned instruction patch (harness/tuned_instructions.py)
+        from harness import tuned_instructions as TI
+
+        return TI.system_message(context_text(cell), syntax, lang, TI.load(instructions_path(cell.instructions)))
+    return P.system_message(context_text(cell), syntax, lang)
 
 
 def sha256(data: bytes | str) -> str:

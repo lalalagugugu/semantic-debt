@@ -91,6 +91,45 @@ def test_system_message_for_real_cell_contains_context_and_syntax():
     assert (SYNTAX / "clickhouse_sql.md").read_text(encoding="utf-8").strip() in system
 
 
+def test_tuned_instruction_patch_extends_the_frozen_prompt(tmp_path):
+    """T14 second unit: requirements numbered on after item 15, notes after the syntax notes, why not sent."""
+    from harness import tuned_instructions as TI
+
+    path = tmp_path / "X.instructions.yaml"
+    path.write_text("answer_requirements:\n  - {id: O1, text: \"要求甲\", why: \"理由甲\"}\n"
+                    "  - {id: S5-out, text: \"要求\\n乙\"}\nsyntax_notes:\n  - {id: P1, text: \"写法丙（见 O1）\"}\n",
+                    encoding="utf-8")
+    system = TI.system_message("CTX-BODY", "SYNTAX-BODY\n", "yaml", TI.load(path))
+    plain = P.system_message("CTX-BODY", "SYNTAX-BODY\n", "yaml")
+    assert system.startswith(P.SYSTEM_PROMPT + "\n16. （O1）要求甲\n17. （S5-out）要求 乙\n\n")
+    assert system.endswith("SYNTAX-BODY\n- （P1）写法丙（见 O1）\n")
+    assert "理由甲" not in system
+    # removing the inserted lines gives the frozen message back
+    assert system.replace("\n16. （O1）要求甲\n17. （S5-out）要求 乙", "").replace("\n- （P1）写法丙（见 O1）", "") == plain
+
+
+@pytest.mark.parametrize("text", ["answer_requirements: [{id: O1}]\n", "rules: []\n",
+                                  "syntax_notes: [{id: P1, text: a, from: Q1}]\n"])
+def test_tuned_instruction_patch_rejects_other_shapes(tmp_path, text):
+    from harness import tuned_instructions as TI
+
+    path = tmp_path / "X.instructions.yaml"
+    path.write_text(text, encoding="utf-8")
+    with pytest.raises(ValueError):
+        TI.load(path)
+
+
+def test_tuned_instr_cell_shares_the_tuned_context():
+    a, b = CELLS["SQL-L1-tuned"], CELLS["SQL-L1-tuned-instr"]
+    assert (a.context, a.syntax, a.allowed, a.instructions) == (b.context, b.syntax, b.allowed, None)
+    assert b.instructions == "SQL-L1"
+    if not (REPO / "build" / "contexts" / "SQL-L1-tuned.yaml").exists():
+        pytest.skip("contexts not rendered")
+    if (REPO / "semantic" / "tuning" / "SQL-L1.instructions.yaml").exists():
+        tuned, instr = R.system_for(a), R.system_for(b)
+        assert len(instr) > len(tuned) and instr.startswith(P.SYSTEM_PROMPT + "\n16. ")
+
+
 @pytest.mark.parametrize("text,query,assumption,refused,blocks", [
     ("```sql\nSELECT 1\n```\n假设：无", "SELECT 1", "无", False, 1),
     ("思路……\n```sql\nSELECT 1\n```\n再想想\n```sql\nSELECT 2;\n```\n**假设：** 按年统计", "SELECT 2;", "** 按年统计", False, 2),
@@ -516,17 +555,17 @@ def test_api_error_lines_are_rerun_on_resume(tmp_path):
 def test_dry_run_matches_board_unit_list(tmp_path):
     board = (REPO / "tasks" / "BOARD.md").read_text(encoding="utf-8")
     assert "| SQL 直答 | L0、R、L1、L1c、L1.5W、L1.5S | T13 |" in board
-    assert "| SQL 直答 | L1 调优 | T14 |" in board
+    assert "| SQL 直答 | L1 调优、L1 调优 + 指令（2026-10-23 裁决拆成两个单元） | T14 |" in board
     assert "| 英文锚点 | R-EN、L1c-EN" in board
-    expected = {"SQL-L0", "SQL-R", "SQL-L1", "SQL-L1c", "SQL-L1.5W", "SQL-L1.5S", "SQL-L1-tuned", "SQL-L2",
-                "SQL-R-EN", "SQL-L1c-EN", "JSON-L2"}
+    expected = {"SQL-L0", "SQL-R", "SQL-L1", "SQL-L1c", "SQL-L1.5W", "SQL-L1.5S", "SQL-L1-tuned", "SQL-L1-tuned-instr",
+                "SQL-L2", "SQL-R-EN", "SQL-L1c-EN", "JSON-L2"}
     assert set(CELLS) == expected
     rows, total = R.dry_run(list(CELLS.values()), {"zh": 122, "en": 99}, 3, "deepseek-flash", fix_rate=0.1,
                             output_tokens=3000, hit_ratio=0.95, question_tokens=60, runs_root=tmp_path)
     by = {r["cell"]: r for r in rows}
     assert by["SQL-L1"]["attempts"] == 366 and by["SQL-L1"]["calls"] == round(366 * 1.1)
     assert by["SQL-R-EN"]["attempts"] == 297
-    assert sum(r["attempts"] for r in rows) == 9 * 366 + 2 * 297
+    assert sum(r["attempts"] for r in rows) == 10 * 366 + 2 * 297
     assert total > 0
 
 

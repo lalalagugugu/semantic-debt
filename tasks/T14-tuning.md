@@ -59,4 +59,8 @@
     - 其他单元：带调优文件重新渲染，除 SQL-L1-tuned 外全部上下文与不带调优文件时逐字节相同。
     - B 在清单之外多做的两处：S15 的输出列也拆成 S15-out；S19 补了品类自身降幅与占比的公式（与 E13 写法相同）。已报协调会话。
     - 预算估算（harness 的 `dry_run` 估算函数，Flash 错峰价，109 题 × 3 次，跳过 judge）：SQL-L1-tuned 约 5.58 元（按默认每次输出 3000 token 估；SQL-L1 实测 3.19 元、同样估法得 5.34 元，按实测比例约 3.4 元）。SQL-L1-tuned-instr 的系统消息再多约 1,600 token，估法相同约 5.8 元。正式运行前的版本校验要求调优文件在一个冻结 tag 里，待定 tag 名。
+  - **用户批准（2026-10-24，经协调会话）**：认可 B 清单外两处（S15-out、S19 公式）；先实现 SQL-L1-tuned-instr，两个单元一个 PR，合并后在 main 的合并提交上打 `semantic-tuned-v1` 与 `harness-tuned-v1`（由协调会话打），之后两个单元一起错峰跑第一轮；**第一轮两单元合计预算上限 12 元**。
+  - **SQL-L1-tuned-instr 的实现**：`harness/cells.py` 新增该单元（与 SQL-L1-tuned 同一份上下文、同一份写法说明、同一执行范围，另带 `instructions="SQL-L1"`）；`harness/tuned_instructions.py` 读 `semantic/tuning/SQL-L1.instructions.yaml`，把 `answer_requirements` 接着系统提示第 15 条编号（16–31），`syntax_notes` 作为条目接在「查询语言说明」之后；每条带 id（条目之间按 id 互相引用，如 P1「见 O1」），`why` 不发给模型。`harness/prompt.py` 一字未改（它受 T16 的逐字节测试保护），没有补丁的单元系统消息不变：SQL-L1 仍是 `8df43ae0`。系统消息：SQL-L1-tuned 141,157 字符（`6ce71c76`），SQL-L1-tuned-instr 143,591 字符（`03ec10aa`）。BOARD 单元清单相应改成 17 个中文单元。
+  - **两单元 dry-run**（harness 的 `dry_run` 估算函数；命令行的 `--dry-run` 要先过 `semantic-tuned-v1` 的版本校验，tag 打好后再跑一遍）：各 109 题 × 3 次、约 360 次调用；SQL-L1-tuned 5.58 元、SQL-L1-tuned-instr 5.60 元，合计 **11.18 元**（错峰，按每次输出 3000 token 的保守估法；SQL-L1 实测只有同法估算的六成），在 12 元上限内。
+  - 测试：全部通过。共用 `$SEMDEBT_DATA_DIR/chdb` 当时被别的进程占用（EmbeddedServer 初始化失败，硬规则 9），这 18 个依赖它的测试在本次全量里跳过；它们当天早些时候在同一执行器代码上全部通过。
 - 工时：
