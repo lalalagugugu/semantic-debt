@@ -181,6 +181,7 @@ write_settings() {
   local dest=$1 template=$2 no_data=${3:-}
   [ -f "$template" ] || die "找不到模板 $template"
   local out="$dest/.claude/settings.local.json"
+  CARD_DIR=$dest   # 模板里的 ${SEMDEBT_CARD_DIR}：这张卡自己的工作目录
   step "写设置 ${out}（模板 $(basename "$template")${no_data:+，去掉数据目录放行}）"
   if [ "$DRY_RUN" = 1 ]; then
     printf '  [dry-run] 内容预览：\n'
@@ -202,7 +203,8 @@ render_settings() {
   printf '%s\n' "$body" \
     | sed -e "s|\${SEMDEBT_DATA_DIR}|$DATA_DIR|g" \
           -e "s|\${SEMDEBT_EVAL_DIR}|$EVAL_DIR|g" \
-          -e "s|\${SEMDEBT_MAIN_DIR}|$MAIN_DIR|g"
+          -e "s|\${SEMDEBT_MAIN_DIR}|$MAIN_DIR|g" \
+          -e "s|\${SEMDEBT_CARD_DIR}|${CARD_DIR:-}|g"
 }
 
 # ---------- 各模式 ----------

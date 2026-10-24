@@ -14,6 +14,7 @@
       "Read(/${SEMDEBT_DATA_DIR}/handoff-*/**)",
       "Read(/${SEMDEBT_DATA_DIR}/scorer-corpus/**)",
       "Read(/${SEMDEBT_MAIN_DIR}/runs/**)",
+      "Read(/${SEMDEBT_CARD_DIR}/harness/syntax_ladder/clickhouse_sql_t4.md)",
       "mcp__dashscope-websearch",
       "mcp__chrome-devtools",
       "mcp__claude-in-chrome",
@@ -29,7 +30,8 @@
       "denyRead": [
         "${SEMDEBT_EVAL_DIR}",
         "${SEMDEBT_DATA_DIR}/runs-raw",
-        "${SEMDEBT_MAIN_DIR}/runs"
+        "${SEMDEBT_MAIN_DIR}/runs",
+        "${SEMDEBT_CARD_DIR}/harness/syntax_ladder/clickhouse_sql_t4.md"
       ]
     }
   }

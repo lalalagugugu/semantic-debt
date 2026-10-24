@@ -137,6 +137,29 @@ CUBE_TYPES = {"integer": "number", "decimal": "number", "datetime": "time", "dat
 _TABLE_WORD = re.compile(r"\b(" + "|".join(sorted(CUBE_NAMES, key=len, reverse=True)) + r")\b")
 
 
+# Power BI model relationships that differ from source.yaml (T10; recorded in render/README.md).
+# Only one active relationship may connect two tables along any path, so these two are inactive
+# (multi_path_defaults: customer geography is the default) and DAX reaches them with USERELATIONSHIP.
+# Self-referencing parent keys cannot be model relationships at all.
+DAX_INACTIVE = frozenset({("DimStore.GeographyKey", "DimGeography.GeographyKey"),
+                          ("DimMachine.StoreKey", "DimStore.StoreKey")})
+
+# Float64 foreign keys typed Int64 in Power Query so their relationships are valid; the DAX
+# contexts give the model's type (render/check_pbip.py compares the two).
+DAX_KEY_CASTS = frozenset({("DimStore", "EntityKey"), ("DimStore", "EmployeeKey"),
+                           ("DimProduct", "ProductSubcategoryKey"), ("DimSalesTerritory", "EmployeeKey")})
+
+
+def dax_model_relationship(frm: str, to: str) -> str | None:
+    """How a source.yaml relationship exists in the Power BI model: None (an active relationship),
+    ``inactive`` or ``none`` (self-referencing: not a model relationship). The DAX contexts carry
+    this as ``model_relationship`` so the model knows when USERELATIONSHIP or a key lookup is needed
+    (T17-mac, delivery check on the DAX cells)."""
+    if frm.split(".")[0] == to.split(".")[0]:
+        return "none"
+    return "inactive" if (frm, to) in DAX_INACTIVE else None
+
+
 class Namer:
     """How one stack writes physical names, types and metric calls."""
 
@@ -169,9 +192,12 @@ class Namer:
             return self.column(table, col, db)
         return self.table(dotted, db)
 
-    def type(self, ch_type: str) -> str:
+    def type(self, ch_type: str, column: tuple[str, str] | None = None) -> str:
+        """``column`` = (retail table, column), for the columns whose type the Power BI model changes."""
         if self.stack == "sql":
             return ch_type
+        if self.stack == "dax" and column in DAX_KEY_CASTS:
+            return "int64"
         lt = logical_type(ch_type)
         return DAX_TYPES[lt] if self.stack == "dax" else CUBE_TYPES[lt]
 

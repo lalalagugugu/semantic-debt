@@ -220,6 +220,7 @@ def test_template_renders_to_valid_json(name: str) -> None:
         raw.replace("${SEMDEBT_DATA_DIR}", "/abs/data")
         .replace("${SEMDEBT_EVAL_DIR}", "/abs/eval")
         .replace("${SEMDEBT_MAIN_DIR}", "/abs/main")
+        .replace("${SEMDEBT_CARD_DIR}", "/abs/card")
     )
     assert "${" not in rendered, f"{name} 里有 start-card.sh 不认识的占位符"
     json.loads(rendered)
@@ -231,6 +232,7 @@ def test_blind_template_denies_eval_and_web() -> None:
         raw.replace("${SEMDEBT_DATA_DIR}", "/abs/data")
         .replace("${SEMDEBT_EVAL_DIR}", "/abs/eval")
         .replace("${SEMDEBT_MAIN_DIR}", "/abs/main")
+        .replace("${SEMDEBT_CARD_DIR}", "/abs/card")
     )
     deny = cfg["permissions"]["deny"]
     assert "WebSearch" in deny and "WebFetch" in deny, "盲模式必须禁止上网（硬规则 1）"
@@ -250,12 +252,20 @@ def test_blind_template_grants_only_data_subdirs() -> None:
         raw.replace("${SEMDEBT_DATA_DIR}", "/abs/data")
         .replace("${SEMDEBT_EVAL_DIR}", "/abs/eval")
         .replace("${SEMDEBT_MAIN_DIR}", "/abs/main")
+        .replace("${SEMDEBT_CARD_DIR}", "/abs/card")
     )
     dirs = cfg["permissions"]["additionalDirectories"]
     assert "/abs/data" not in dirs, "盲模式不得放行整个数据目录"
     assert sorted(dirs) == ["/abs/data/chdb", "/abs/data/parquet", "/abs/data/raw"]
     deny = cfg["permissions"]["deny"]
     assert any("eval-ro-" in d for d in deny), "盲模式必须禁读题库只读副本"
+
+
+def test_blind_template_denies_ladder_level4_examples() -> None:
+    """C13 第 4 级说明含 6 道调优题的题面与参考 SQL，盲会话不得读（2026-10-24，T22 自检时测试输出带出一道题面）。"""
+    raw = (REPO / "templates" / "claude-settings.blind.json").read_text(encoding="utf-8")
+    assert "${SEMDEBT_CARD_DIR}/harness/syntax_ladder/clickhouse_sql_t4.md" in raw
+    assert "SEMDEBT_CARD_DIR" in (REPO / "scripts" / "start-card.sh").read_text(encoding="utf-8")
 
 
 def test_blind_template_blocks_mcp_servers() -> None:

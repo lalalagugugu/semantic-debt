@@ -4,13 +4,18 @@ version = "0.1.0"
 description = "语义层质量对智能问数准确率的影响：可复现实验"
 requires-python = ">=3.11"
 dependencies = [
-    "chdb>=3.0",
+    "chdb>=3.0; sys_platform != 'win32'",   # no Windows wheels; the Windows side (T17) runs DAX only
     "psycopg[binary]>=3.3.6",
     "pyyaml>=6.0",
 ]
 
 [dependency-groups]
 dev = ["pytest>=8.0"]
+# T17: DAX against Power BI Desktop's local engine (ADOMD.NET via pythonnet); Windows only
+windows = [
+    "pyadomd>=0.1.1; sys_platform == 'win32'",
+    "pythonnet>=3.0; sys_platform == 'win32'",
+]
 
 [tool.uv]
 package = false

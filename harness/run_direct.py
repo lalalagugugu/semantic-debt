@@ -53,7 +53,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    LADDER_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, syntax_path,
+    DAX_CELLS, LADDER_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -701,6 +701,11 @@ def harness_commit() -> str:
 
 
 def make_executor(cell: Cell, timeout_s: int) -> Executor:
+    if cell.stack == "dax":
+        from harness.cells import dax_tier
+        from harness.executors import DaxExecutor
+
+        return DaxExecutor(dax_tier(cell), timeout_s=timeout_s)
     if cell.stack == "cube_sql":
         return CubeSqlExecutor(timeout_s=timeout_s)
     if cell.stack == "cube_json":
@@ -805,8 +810,11 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     args = parse_args(argv)
     names = args.cell or ["all"]
-    known = {**CELLS, **LADDER_CELLS}
+    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS}
     cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
+    if not args.dry_run and sum(c.stack == "dax" for c in cells) > 1:
+        print("refusing to start: Power BI Desktop serves one model at a time; run one DAX cell per invocation")
+        return 2
     if load is None:
         try:
             eval_full = verify_eval_tag(args.eval_tag)
@@ -874,6 +882,18 @@ def main(argv: list[str] | None = None, load=None) -> int:
               "pass --allow-peak for a deliberate small run")
         return 2
 
+    dax_executors: dict[str, Executor] = {}
+    for cell in (c for c in cells if c.stack == "dax"):
+        from harness.cells import dax_tier
+        from harness.executors import DaxConnectionError, DaxModelMismatch, expected_signature
+
+        dax_executors[cell.name] = make_executor(cell, args.exec_timeout)
+        try:                                   # the model open in Desktop must be this cell's tier
+            dax_executors[cell.name].verify_model(expected_signature(dax_tier(cell)))
+        except (DaxConnectionError, DaxModelMismatch) as exc:
+            print(f"refusing to start: {exc}")
+            return 2
+
     from harness.client import DeepSeekClient
 
     boundary = CallBoundary(args.expected_fingerprint, args.allow_peak)
@@ -881,7 +901,8 @@ def main(argv: list[str] | None = None, load=None) -> int:
     commit = eval_commit()
     guard = FingerprintGuard.from_logs(log_path(args.run_id, "x").parent, args.model)
     for cell in cells:
-        ctx = RunContext(run_id=args.run_id, cell=cell, client=client, executor=make_executor(cell, args.exec_timeout),
+        executor = dax_executors.get(cell.name) or make_executor(cell, args.exec_timeout)
+        ctx = RunContext(run_id=args.run_id, cell=cell, client=client, executor=executor,
                          system=system_for(cell), eval_commit=commit, harness_commit=harness_commit(),
                          timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name,
                          limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},

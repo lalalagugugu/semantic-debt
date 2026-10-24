@@ -42,17 +42,16 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from render.common import (  # noqa: E402
-    BUILD, DAX_TYPES, l0_map, logical_type, metric_callables, metrics_file, physical_schema, source, variant_callables,
-    variant_key,
+    BUILD, DAX_INACTIVE, DAX_KEY_CASTS, DAX_TYPES, l0_map, logical_type, metric_callables, metrics_file,
+    physical_schema, source, variant_callables, variant_key,
 )
 from render.measures import DAX_CALCULATED_COLUMNS, dax_measures  # noqa: E402
 
 OUT_DIR = BUILD / "pbip"
 NS = uuid.UUID("6f1c4a52-31b7-4d5e-9a0e-5d7f0d3c2b10")
 
-INACTIVE = {("DimStore.GeographyKey", "DimGeography.GeographyKey"), ("DimMachine.StoreKey", "DimStore.StoreKey")}
-KEY_CASTS = {("DimStore", "EntityKey"), ("DimStore", "EmployeeKey"),
-             ("DimProduct", "ProductSubcategoryKey"), ("DimSalesTerritory", "EmployeeKey")}
+INACTIVE = DAX_INACTIVE
+KEY_CASTS = DAX_KEY_CASTS
 DATE_TABLE = ("DimDate", "DateKey")
 
 
@@ -306,6 +305,9 @@ class Project:
         (defn / "database.tmdl").write_text("database\n\tcompatibilityLevel: 1600\n", encoding="utf-8")
         model = ["model Model", "\tculture: zh-CN", "\tdefaultPowerBIDataSourceVersion: powerBI_V3",
                  "\tsourceQueryCulture: zh-CN", "\tdataAccessOptions", "\t\tlegacyRedirects", "\t\treturnErrorValuesAsNull",
+                 # Desktop's "auto date/time" off: it would add a hidden date table per date column, i.e.
+                 # model objects no context mentions (T17-mac; the Windows probe checks none appear)
+                 "", "\tannotation __PBI_TimeIntelligenceEnabled = 0",
                  "", *[f"ref table {q(t)}" for t in tables], "", "ref cultureInfo zh-CN", ""]
         (defn / "model.tmdl").write_text("\n".join(model), encoding="utf-8")
         (defn / "relationships.tmdl").write_text(self.relationships_file(), encoding="utf-8")
