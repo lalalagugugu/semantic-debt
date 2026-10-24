@@ -130,12 +130,49 @@ def _turn(turn: dict, raw_dir: Path, qid: str, rep: int) -> list[str]:
 OUTCOME_ZH = {"wrong": "结果与参考不一致", "exec_error": "执行失败", "refused": "拒答", "pending": "未判定"}
 
 
+def _names(cols: list[str], idx: list[int]) -> str:
+    return "、".join(f"`{cols[i]}`" for i in idx)
+
+
+def ranking_rule(rules: dict, cols: list[str]) -> list[str]:
+    """Scorer v2's row-count rule for top_n and selection questions, in words (T14-1, user ruling (a)).
+
+    The reference lists every member tied at the boundary, but an answer must return exactly N rows
+    (exactly n per group); listing all the tied members scores wrong."""
+    top, sel = rules.get("top_n"), rules.get("selection")
+    if top is not None:
+        return [f"评分规则：前 {top} 名要**恰好返回 {top} 行**（核实结果不足 {top} 行时全部返回）。"
+                f"按 {_names(cols, rules['tie_columns'])} 排名，第 {top} 名有并列时，下面的核实结果列出了并列的全部成员，"
+                f"作答从并列成员里任取几个凑足 {top} 行即可；把并列成员全部列出、行数多于 {top} 会判错。"]
+    if sel:
+        out = []
+        for k, st in enumerate(sel["stages"], 1):
+            scope = "在全部结果中" if not st["group_columns"] else f"每个 {_names(cols, st['group_columns'])} 分组内"
+            if st["parent"] is not None:
+                scope = f"在第 {st['parent'] + 1} 层选中的对象内，{scope}"
+            order = "、".join(f"{_names(cols, [o['column']])} {'从大到小' if o['descending'] else '从小到大'}"
+                              for o in st["order_by"])
+            layer = f"第 {k} 层：" if len(sel["stages"]) > 1 else ""
+            short = f"（不足 {st['n']} 个的分组全取）" if st["n"] > 1 else ""
+            out.append(f"{layer}{scope}按 {order}取前 {st['n']} 个 {_names(cols, st['object_columns'])}，"
+                       f"**恰好 {st['n']} 个**{short}。")
+        lead = "评分规则（分层选取）：" if len(out) > 1 else "评分规则："
+        return [lead + "".join(out) + "第 n 名有并列时，核实结果列出了并列的全部成员，作答从中任取凑足 n 个即可；"
+                "把并列成员全部列出、个数多于 n 会判错。"]
+    return []
+
+
 def case_text(qid: str, q: dict, attempts: list[dict], raw_dir: Path, root: Path) -> str:
-    parts = [f"# {qid}", "", "## 问题", q["text_zh"].strip(), "",
-             f"## 核实后的正确结果（共 {len(q['refs'])} 种可接受的结果，作答与任一种一致即算对）"]
+    n_refs = len(q["refs"])
+    head = (f"共 {n_refs} 种可接受的结果，作答与其中任一种一致即算对" if n_refs > 1
+            else "作答要与它一致")
+    parts = [f"# {qid}", "", "## 问题", q["text_zh"].strip(), "", f"## 核实后的正确结果（{head}）"]
     for i, ref in enumerate(q["refs"], 1):
         cols, rows = _ref_rows(root / ref["result_path"])
-        parts += ["", f"### 正确结果 {i}", f"口径：{ref['interpretation'].strip()}", _rows(cols, rows, REF_ROWS)]
+        # a reference may carry its own rules (questions.load_zh: ref_rules), else the question's
+        rules = ref.get("rules") if ref.get("rules") is not None else (q.get("rules") or {})
+        parts += ["", f"### 正确结果 {i}", f"口径：{ref['interpretation'].strip()}", *ranking_rule(rules, cols),
+                  _rows(cols, rows, REF_ROWS)]
     parts += ["", f"## 模型答错的作答（共 {len(attempts)} 次）"]
     for n, rec in enumerate(attempts, 1):
         f = rec["final"]
