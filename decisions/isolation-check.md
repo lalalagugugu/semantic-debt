@@ -242,3 +242,45 @@ deny（本意只挡 `runs/<run-id>/` 下的运行日志）被 Claude Code 翻译
 修复**从 T09 起生效**（T09 会用新模板重建 clone，届时按本清单重做一遍 A 组和 B 组）。
 
 这是用户 2026-10-15 的决定，不是 agent 自行取舍。
+
+# 隔离验证结果（第四次：T22 按 `decisions/2026-10-23-blind-data-dir.md` 用新设置重启后）
+
+- 日期：2026-10-23
+- 卡：T22（第 1–3 步，盲模式）
+- Claude Code 版本：2.1.292 (Claude Code)
+- 工作目录：`/Users/yuhuang/dev/semdebt/cards/T22`
+- 启动命令是否带 `--strict-mcp-config`：会话里没有任何 `mcp__` 工具（A11），按此判定为是
+- 主仓库提交号：`11da36f`（T22-work 合入 main `dfe6ebb`，含 #160 的修复）
+- 生效的沙箱设置：数据目录下只放行 `raw`、`parquet`、`chdb`；`settings.local.json` 的 deny 含 `eval-ro-*`、`handoff-*`、`scorer-corpus`
+- 结论：**A1、A11 通过；A2–A10、A12 的 shell 探测未能由本会话执行**（见下），待用户补测
+
+## A 组（必须被拒绝）
+
+| # | 命令原文 | 结果原文 | 判定 |
+|---|---|---|---|
+| A1 | Read 工具读 `$SEMDEBT_EVAL_DIR/README.md` | `File is in a directory that is denied by your permission settings.` | 拒绝 |
+| A2–A10、A12 | 按清单原文写成一条循环一次执行 | 整条命令被 Claude Code 自动模式分类器拦下，**没有执行**：`Permission for this action was denied by the Claude Code auto mode classifier.` | 未测。分类器要求不得换写法重试，所以本会话没有再试，留给用户在卡目录里用 `!` 前缀补测 |
+| A11 | （列出会话里所有 `mcp__` 开头的工具） | 无 | 为空 |
+
+开工自检时另有一次 `cat "$SEMDEBT_EVAL_DIR/README.md"`（即 A2）在分类器拦截之前执行过：`cat: .../semantic-debt-eval/README.md: Operation not permitted`，拒绝。
+
+## B 组（必须能用）
+
+| # | 命令原文 | 结果原文 | 判定 |
+|---|---|---|---|
+| B1 | `pwd` | `/Users/yuhuang/dev/semdebt/cards/T22` | 正常 |
+| B2 | `ls -a .claude/` | `.cc-writes settings.json settings.local.json` | 正常 |
+| B3 | `cat .claude/settings.local.json` | `additionalDirectories` 只有 `data/raw`、`data/parquet`、`data/chdb`；deny 含 WebSearch、WebFetch、题库、`runs-raw`、`eval-ro-*`、`handoff-*`、`scorer-corpus`、主工作区 `runs` | 正常 |
+| B4 | `uv run pytest -q` | 收集阶段 1 error：`tests/test_scorer_v2_shared.py` 读 `$SEMDEBT_DATA_DIR/scorer-corpus/t05b-cases.jsonl` → `PermissionError`。去掉该文件再跑：4 failed（`tests/test_harness.py` 的 `test_external_contexts`、`test_anchor_mapping_follows_the_english_text_not_the_numbering`、`test_ladder_level4_examples_are_tuning_questions_only` 等），报错都是读 `$SEMDEBT_EVAL_DIR/...`（`refs/MANIFEST.json`、`vendor/cube/fixtures/semantic_layer.md`）被拒 | 失败，但全部是**隔离按设计生效**：这些测试要读题库或 `scorer-corpus`，盲模式本该读不到。修法（盲模式下 skip）属于测试代码，不在 T22 范围 |
+| B5 | `ls "$SEMDEBT_DATA_DIR/raw"` | `archive.zip csv` | 正常 |
+| B6 | `touch .../chdb/.isolation-check && rm ...` | 成功 | 正常 |
+| B7 | 未做（不加空提交，本节随卡提交） | — | — |
+| B8 | 未能验证：沙箱里 uv 读不到 `~/.local/share/uv/python`；B4 用本地缓存跑通，不需要联网 | — | 未测 |
+
+### B4 附带的暴露（如实记录）
+
+B4 的一条失败是 `tests/test_harness.py:1379` 的 `KeyError`，pytest 的报错行把测试代码里写死的**一道题的中文原文**打到了输出里（本仓库已提交的测试文件里本来就有这串字面量）。本会话看到了这一行，此后：没有打开 `tests/test_harness.py`，没有再看测试输出，第 3 步写内容不以它为依据（它问的是一个部门的员工人数，概念清单里没有、也不会因此增加相关条目）。建议：盲模式下 `tests/` 里含题目字面量的测试应整体 skip，或把字面量移出本仓库，由协调会话定。
+
+## 设置改动
+
+无
