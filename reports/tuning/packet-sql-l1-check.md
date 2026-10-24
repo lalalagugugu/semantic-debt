@@ -1,6 +1,6 @@
 # 调优包 sql-l1：清单与题集划分逐题核对
 
-- 生成：`uv run python -m harness.tuning_packet --packet sql-l1 --eval-tag eval-v1.2`（harness `69356c5`）
+- 生成：`uv run python -m harness.tuning_packet --packet sql-l1 --eval-tag eval-v1.2`（harness `7455a97`）
 - 题库：`eval-v1.2` = `90e13b3`（只读 worktree，`verify_eval_tag` 校验通过）
 - 第一次运行：`runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1.jsonl`（harness-v1.1 最终判定），作答结果取自 `$SEMDEBT_DATA_DIR/runs-raw/20261018-T13-sql-direct-01/`（逐个核对 sha256）
 - 题库 122 题：调优题 54、留出题 55（均不含 judge），judge 13
