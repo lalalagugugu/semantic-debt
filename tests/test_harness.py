@@ -653,7 +653,16 @@ def test_rows_for_unscorable_questions_are_pending_but_errors_are_scored(tmp_pat
 # the real question bank and the external contexts
 
 EVAL = Path(os.environ.get("SEMDEBT_EVAL_DIR", "/nonexistent")).expanduser()
-needs_eval = pytest.mark.skipif(not (EVAL / "questions").is_dir(), reason="question bank not available")
+def _eval_readable() -> bool:
+    # 盲模式下题库目录能 stat 但读不了：要真去列一次，读不了就跳过，免得测试报错把题面带进输出
+    try:
+        next((EVAL / "questions").iterdir(), None)
+        return True
+    except OSError:
+        return False
+
+
+needs_eval = pytest.mark.skipif(not _eval_readable(), reason="question bank not available")
 
 
 def test_parse_value_types():

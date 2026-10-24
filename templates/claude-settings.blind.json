@@ -1,14 +1,20 @@
 {
   "permissions": {
     "additionalDirectories": [
-      "${SEMDEBT_DATA_DIR}"
+      "${SEMDEBT_DATA_DIR}/raw",
+      "${SEMDEBT_DATA_DIR}/parquet",
+      "${SEMDEBT_DATA_DIR}/chdb"
     ],
     "deny": [
       "WebSearch",
       "WebFetch",
       "Read(/${SEMDEBT_EVAL_DIR}/**)",
       "Read(/${SEMDEBT_DATA_DIR}/runs-raw/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/eval-ro-*/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/handoff-*/**)",
+      "Read(/${SEMDEBT_DATA_DIR}/scorer-corpus/**)",
       "Read(/${SEMDEBT_MAIN_DIR}/runs/**)",
+      "Read(/${SEMDEBT_CARD_DIR}/harness/syntax_ladder/clickhouse_sql_t4.md)",
       "mcp__dashscope-websearch",
       "mcp__chrome-devtools",
       "mcp__claude-in-chrome",
@@ -24,7 +30,8 @@
       "denyRead": [
         "${SEMDEBT_EVAL_DIR}",
         "${SEMDEBT_DATA_DIR}/runs-raw",
-        "${SEMDEBT_MAIN_DIR}/runs"
+        "${SEMDEBT_MAIN_DIR}/runs",
+        "${SEMDEBT_CARD_DIR}/harness/syntax_ladder/clickhouse_sql_t4.md"
       ]
     }
   }

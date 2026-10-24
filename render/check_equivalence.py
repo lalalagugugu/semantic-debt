@@ -81,10 +81,17 @@ def neutral_name(stack: str, s: str) -> str:
     return s
 
 
+# Keys only one stack has, because they describe that stack's engine, not the data. Dropped before
+# the comparison; render/check_pbip.py checks them against the Power BI model instead.
+STACK_ONLY_KEYS = {"dax": {"model_relationship"}}
+
+
 def normalise(obj, stack: str, calls: list | None = None, key: str | None = None):
     if isinstance(obj, dict):
         out = {}
         for k, v in obj.items():
+            if k in STACK_ONLY_KEYS.get(stack, ()):
+                continue
             if k == "type" and isinstance(v, str):
                 out[k] = coarse_type(stack, v)
             elif k == "callables":

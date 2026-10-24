@@ -31,7 +31,7 @@
 | T14 | 调优（SQL-L1 调优；DAX-L2 调优同法） | Claude Code（A 普通，B 调优包） | 普通 / 调优包 | T13 | 20 / 50 元 | 进行中：第 1 轮语义层补充与指令补丁已合入（B 两轮，14 条示例全部判对）；SQL-L1-tuned-instr 已实现；两单元 dry-run 11.18 元（上限 12 元），等合并后打 `semantic-tuned-v1` / `harness-tuned-v1` 再错峰运行 |
 | T15 | 探查 agent：L0-E、L1-E、L2-E | Claude Code | 普通 | G3；L2-E 另需 T16 | 80 / 280 元 | **完成**（第一期范围）：L0-E 39.8%、L1-E 68.4%（对直答各 +0.7 点）；**SQL-L2-E**（`semantic-v1.4`，`20261020-T15-explorer-l2e-02` + `-03`，合计 5.87 元，#148、#150）主表 66.0%，对 SQL-L2 直答 65.3% 差 +0.7 [−5.1, +6.5]；执行失败 14 → 1，多出的 13 个答案 2 对 11 错（`reports/results/explorer.md` L2-E 一节） |
 | T16 | 指标层（Cube Core：SQL-L2 与 JSON-L2） | Codex | 主仓库 clone | 搭建在 G1 后；跑在 G3 后 | 20 / 60 元 | **完成**（2026-10-20，#114 已合并；Cube 已停、自动重启已关）：`semantic-v1.4` 全量 109 题 × 3，主表 SQL-L2 新说明 65.3%、旧说明 51.4%、JSON-L2 31.0%，费用 13.33 元。JSON 未拒答的 173 次配对：SQL 71.7%（错答 46）vs JSON 52.6%（错答 81）；静态能答 117 次中 JSON 错 32 次，30 次是成员集合不同（`reports/validation/t16-v14-full-results/README.md`）。待办：指标层补足覆盖需新增多少指标的统计（用户定为之后再做） |
-| T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | **Mac 侧准备开工**（2026-10-23，`start-card.sh T17-mac`，本地普通模式）：DAX 执行器、探测模式、`windows/README.md`、检查清单第 1、3 项；第 2 项（DAX 对齐清单）由 Codex T16 给；Windows 电脑由用户准备 |
+| T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | **Mac 侧准备完成**（2026-10-23，T17-mac）：DAX 执行器、探测模式、`windows/README.md` 与 `t17.ps1`、检查清单第 1、3 项（渲染器修正两处 DAX 交付缺陷，待用户决定是否打 `semantic-v1.5`，`decisions/2026-10-23-t17-mac-dax-renderer.md`）；第 2 项（Codex T16 #156）已落成 69 项引擎探针，度量值改不改等 Windows 结果后裁决（open-questions T17-1）；Windows 上探测、冒烟待做 |
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
@@ -40,7 +40,7 @@
 | C13 | 写法说明教学阶梯（ClickHouse SQL，档位 L1；`tasks/C13-syntax-ladder.md`） | Claude Code（T12） | 普通 | `harness-ladder-v1`；`semantic-v1.4` | 15 元 | **完成**（`20261019-C13-ladder-02`，7.17 元，#147）：首轮执行报错 32% → 3%（2 级），正确率 64.2% → 68.2%（+4.0 [−0.9, +9.2]）；3 级、4 级没有再提高（`reports/results/C13-ladder.md`） |
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
 | T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **完成**（#153，2026-10-23）：117 条，Flash 4.42 元；类别 κ 0.70、根因 κ 0.37；根因 3（模型没理解）11%–46%；两家都判根因 5 的 26 条 / 15 题待题库负责方核对（`reports/results/l1-error-attribution.md`） |
-| T19c | 「该不该答」的信号（`tasks/T19c-abstention-signals.md`）：多次作答一致性（H1）、窄暴露面的拒答精度与召回（H2），判定规则先写死 | Claude Code | 普通 | T13、T15、T16 最终日志；T19b | 0 | 未开始 |
+| T19c | 模型知不知道自己会不会（`tasks/T19c-abstention-signals.md`，2026-10-23 改写）：隐含信号 + 自评把握的校准，判定规则先写死 | Claude Code | 普通 | T13 SQL-L1 最终日志 | 5 元（Flash；`decisions/2026-10-23-l1plus-l3a.md` 第四节） | **完成**（2026-10-23，实花 1.02 元）：思考 token AUC 0.755（参照）；自评把握判定「介于两者之间」，不建议新单元。报告 `reports/results/confidence-calibration.md`；待 PR 合并 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
 ## 2026-10-22 刷新：第一期 SQL 线运行完成

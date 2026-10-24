@@ -3,7 +3,8 @@
     uv run python render/render_all.py
 
 Runs, in order: contexts (with the L0 / R leak checks) → Cube model → PBIP →
-equivalence check → context sizes. Stops at the first failure.
+equivalence check → DAX contexts against the PBIP (check_pbip) → context sizes.
+Stops at the first failure.
 
 Two steps need the chDB data directory and are run on their own:
     uv run python render/snapshot_schema.py   # after a dwd / ads / l0 view changes
@@ -18,7 +19,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from render import check_equivalence, context, context_sizes, cube, tmdl  # noqa: E402
+from render import check_equivalence, check_pbip, context, context_sizes, cube, tmdl  # noqa: E402
 
 
 def main() -> None:
@@ -26,6 +27,8 @@ def main() -> None:
     cube.main()
     tmdl.main()
     check_equivalence.main()
+    if check_pbip.main():
+        sys.exit(1)
     context_sizes.main()
 
 
