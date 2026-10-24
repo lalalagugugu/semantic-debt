@@ -1,0 +1,640 @@
+# L1 调优补充（T14 B 角，调优包 sql-l1）—— 第 2 版（按退回清单 01 修改）
+#
+# 只含语义层补充：口径（S 条目）、改写、示例。作答要求与写法说明在 SQL-L1.instructions.yaml；
+# 出处、题 → 条目对照、工时在 SQL-L1.notes.md（不渲染）。
+# 本文件只叠加，不改 semantic/ 下其他文件；「改写」一节逐条写明取代 source.yaml 的哪一处原文。
+# 查询一律 ClickHouse SQL，物理名照 source.yaml。
+
+version: 2
+cell: SQL-L1
+packet: sql-l1
+
+# ---------------------------------------------------------------------------
+# 一、取数口径补充（source.yaml 没写或写得不够的地方）。
+# ---------------------------------------------------------------------------
+semantics:
+  - id: S1
+    topic: "缺失产品的品类归属（产品维度缺 284 个键）"
+    rule: >-
+      按品类 / 子类 / 品牌分析时，事实表 LEFT JOIN 产品 → 子类 → 品类，并在整条查询末尾加
+      `SETTINGS join_use_nulls = 1`，让缺失产品的品类取 NULL，作为单独一组**保留在结果里**。
+      不要用内连接丢掉它，也不要把它改名为「未知产品」「Unknown」或空串。
+    why: "按品类拆分的核实结果都有一行品类为 NULL（显示为 \\N）；内连接会少一行，改名会让这一行的取值对不上。"
+    note: "不加 join_use_nulls 时 ClickHouse 的左连接未命中会填空串 ''，不是 NULL。"
+  - id: S2
+    topic: "门店范围"
+    rule: >-
+      「各门店 / 每家门店 / 门店经理手下的门店」默认包含 DimStore 全部 306 家（含 3 家线上店、
+      3 家经销店、1 家目录店），不要按 StoreType = 'Store' 排除虚拟门店，除非问题明确说
+      实体店 / 自营门店。
+    why: "排除 7 家虚拟门店后，门店行数和门店经理人数都与核实结果对不上。"
+  - id: S3
+    topic: "不要自行剔除离群值"
+    rule: >-
+      问题没要求时，不排除离群或疑似哨兵值（如 DimCustomer.YearlyIncome = 10,000,000 的 385 人）。
+      可以在假设说明里点出离群值，但结果按全量计算。
+    why: "「客户的平均年收入」的核实结果 260,174.89 是全量平均；剔除 10,000,000 一档后的 57,305.78 判错。"
+  - id: S4
+    topic: "字段词照字面落到字段，不因信息量低而换字段"
+    rule: >-
+      「促销类别」→ DimPromotion.PromotionCategory，「促销类型」→ DimPromotion.PromotionType，
+      「促销 / 促销活动」才是 PromotionName。即使该字段只有 Store / No Discount 两个取值也照用。
+    why: "把「促销类别」换成 PromotionName 的作答全部判错。"
+  - id: S5
+    topic: "平均折扣比例"
+    rule: >-
+      平均折扣比例 = 折扣金额合计 ÷ 折前原价合计 × 100，折前原价 = SalesAmount + DiscountAmount
+      （按金额加权，不是对 DiscountPercent 求平均）；按约定 10 排除 PromotionKey = 1。
+  - id: S6
+    topic: "日均销售额的分母（约定 4 的落地）"
+    rule: >-
+      先按「组 × 天」汇总销售额，再在每个组内对这些天求平均（avg）；分母是该组有销售的天数，
+      不是日历天数，也不是全表有销售的天数。比较周末与工作日用 DimDate.IsWorkDay。
+      相对差 = (周末日均 − 工作日日均) ÷ 工作日日均 × 100。
+    why: "用日历天数做分母时 Games and Toys 的工作日日均是 5,522.44，核实值 5,529.50 是按该品类自己有销售的天数平均。"
+  - id: S7
+    topic: "「占多少比例」不是日均比较"
+    rule: >-
+      「周末和工作日的销售分别占多少比例」这类占比问题直接用销售额合计 ÷ 总额 × 100；
+      约定 4 的日均只用于「比较 / 高多少 / 哪类日子卖得好」。
+  - id: S8
+    topic: "默认时间范围"
+    rule: >-
+      问题没给时间 → 用数据全区间 2007-01-01 ~ 2009-12-31（不限定年份）。
+      说了「全年 / 年度」却没给年份 → 取今年 2009，并在假设里写明。
+      「按季度累计」= 从区间第一季开始一路累加到最后一季的累计值，不按年重置。
+  - id: S9
+    topic: "「一笔」销售"
+    rule: "「最大的一笔线上销售」指 FactOnlineSales 的一行（订单行），即 max(SalesAmount)，不是一个订单号的合计。"
+    why: "核实值 3,199.99 是单行最大值；按订单号合计得到的 476,068.10 判错。"
+  - id: S10
+    topic: "购买事件 = 线上销售表的全部行"
+    rule: >-
+      首购、复购、回头客、终身消费价值、购物篮（同单共现）里的「购买 / 出现在订单里」都取
+      FactOnlineSales 的全部行，包括只有退货的行；不要加 SalesQuantity > 0。
+      约定 13、14 的注释已经这样写，这里推广到所有客户与订单行为类问题。
+    why: "购物篮问题加了 SalesQuantity > 0 后提升度偏离核实值（896.05 vs 900.92）。"
+  - id: S11
+    topic: "回头客"
+    rule: >-
+      回头客 = 在整个线上历史中去重订单号（SalesOrderNumber）≥ 2 的客户（客户级，不分品类）。
+      「各品类销售额中来自回头客的比例」= 回头客在该品类的销售额 ÷ 该品类销售额 × 100，品类含 NULL 组。
+  - id: S12
+    topic: "客户首购分群"
+    rule: >-
+      首购日 = 客户在 FactOnlineSales 全部行里的 min(DateKey)。「首购次日起 7 个自然日」=
+      DateKey 在 (首购日, 首购日 + 7] 之间；「排除观察期不足 7 天」= 只留 首购日 + 7 <= 2009-12-31
+      的客户。终身消费价值 = 该客户全部 SalesAmount 之和。
+  - id: S13
+    topic: "客户增长筛选"
+    rule: >-
+      「2009 年比 2008 年增长 50% 以上的客户」：只留 2008 年消费额 > 0 的客户，
+      条件 (2009 − 2008) ÷ 2008 > 0.5。
+  - id: S14
+    topic: "销售预测 / 预测准确率"
+    rule: >-
+      「销售预测、预测与实际相比、预测准确率」用战略计划表 FactStrategyPlan：科目 AccountName =
+      'Sale Revenue'，场景 Forecast 对 Actual，按品类（ProductCategoryKey，8 个品类、没有 NULL）
+      或总体汇总。准确率 = 100 − |预测 − 实际| ÷ 实际 × 100。
+      不要用 FactSalesQuota 的 Forecast 场景（它是门店 × 产品级的目标预测，2009 Q4 只有 866,462,167.28，
+      与计划口径的 986,142,631.21 不是一回事）。
+      FactSalesQuota 只用于「销售目标 / 配额 / 达成率 / 挑战线」（正式目标 ScenarioKey = 2 Budget）。
+    why: "用销售目标表 Forecast 场景的作答全部判错；核实结果按计划表的 8 个品类给出。"
+  - id: S15
+    topic: "组织层级汇总（DimEntity 树）"
+    rule: >-
+      「按组织层级 / 按实体汇总收入」= 战略计划 Actual 场景、Sale Revenue 科目的金额，沿
+      DimEntity 父链上卷到每一个祖先实体，按 EntityKey 汇总。
+      这棵树**深度不齐、顶端有自环**（已用数据查实）：299 家实体店是 门店 → 州 → 国家 → 集团
+      四级，7 家线上 / 目录 / 经销虚拟店直接挂在国家下（少一级）；三个集团实体（EntityKey 1、2、3）
+      的 ParentEntityKey 都指回自己；父链没有空值、没有孤儿。
+      所以固定四次自连接再 UNION ALL 会把虚拟店在集团层多算一遍（多算 5,470,804,413.74，
+      恰好是三个非门店渠道的销售额）。正确做法：为每个门店实体取出 [自身, 父, 祖父, 曾祖父]
+      四个键，arrayDistinct 去重后 ARRAY JOIN，再按祖先键汇总（见示例 E04）。
+    why: "固定深度上卷得到的北美集团合计 9,999,916,765 比核实值 7,309,491,105 多出北美虚拟店收入；按实体名称分组会因 2 个重名多出或合并一行。"
+  - id: S16
+    topic: "门店经理挑战线 / 目标缺口"
+    rule: >-
+      目标按门店汇总 FactSalesQuota（ScenarioKey = 2），实际按门店汇总 FactSales，同一年份；
+      缺口 = greatest(系数 × 目标 − 实际, 0)，未达标门店数 = 缺口 > 0 的门店数；
+      按 DimStore.EmployeeKey 分组，没有未达标门店的经理也要列出（0 / 0）。
+  - id: S17
+    topic: "平均停机时长"
+    rule: "「平均停机时长」= avg(FactITSLA.DownTime)，即按故障事件平均（停机总分钟 ÷ 故障次数），不是按设备台数平均。"
+    why: "按出过故障的设备台数做分母的作答判错。"
+  - id: S18
+    topic: "变异系数"
+    rule: >-
+      月度销售额的变异系数 = stddevPop(月销售额) ÷ avg(月销售额)（总体标准差，除以 12；
+      样本标准差 stddevSamp 也可接受，但要声明）。品类含 NULL 组。
+  - id: S19
+    topic: "同店降幅与拖累品类"
+    rule: >-
+      同店 = 2008、2009 两年 FactSales 都有销售的门店（约定 15）；门店降幅 =
+      (2008 − 2009) ÷ 2008 × 100，只看下降的门店，取降幅最大的 N 家：恰好 N 家，
+      第 N 名并列时任取凑足（用 row_number() 选行，rank() 给名次）。
+      拖累最多的品类 = 该门店内 (2008 − 2009) 最大的品类，每家门店恰好 1 个，并列任取
+      （品类经左连接，NULL 也参与排名）。品类自身降幅 = 品类减少额 ÷ 该品类 2008 年销售额 × 100；
+      占比 = 品类减少额 ÷ 门店减少额 × 100。
+
+# ---------------------------------------------------------------------------
+# 二、改写：取代 source.yaml 原文的条目（原文冻结，这里覆盖其含义）。
+# ---------------------------------------------------------------------------
+rewrites:
+  - supersedes: "source.yaml › data_quality › missing-products › workaround（「需要保住总额时用左连接；缺行的产品归到一个「未知产品」组」）"
+    new_text: >-
+      需要保住总额时用左连接并加 SETTINGS join_use_nulls = 1；缺行产品的品类 / 子类 / 名称保留为 NULL，
+      作为单独一组输出，不改名为「未知产品」。见 S1。
+  - supersedes: "source.yaml › datasets › FactSales › columns › StoreKey 的最后一句（「问「门店」时按需要决定是否排除这 7 家」）"
+    new_text: "问「门店」时默认包含全部 306 家（含 7 家虚拟门店），只有问题明确说实体店 / 自营门店时才按 StoreType = 'Store' 筛。见 S2。"
+  - supersedes: "source.yaml › data_quality › outlier-values › workaround（「需要稳健结果时用中位数，或说明里点出离群值」）"
+    new_text: "默认按全量计算，不剔除、不改用中位数；只在假设说明里点出离群值。问题明确要求剔除或稳健统计时才处理。见 S3。"
+  - supersedes: "source.yaml › synonyms › terms [\"促销\", \"活动\", \"促销活动\"] → DimPromotion.PromotionName"
+    new_text: "「促销 / 活动 / 促销活动」→ PromotionName；新增「促销类别」→ DimPromotion.PromotionCategory、「促销类型」→ DimPromotion.PromotionType。见 S4。"
+  - supersedes: "source.yaml › metrics › 日均销售额 › definition（「等价于 销售额 ÷ 有销售天数」）"
+    new_text: "分组比较时，分母是每个组自己有销售的天数（先按组 × 天汇总，再组内 avg），不是日历天数。见 S6。"
+  - supersedes: "source.yaml › synonyms › terms [\"场景\", \"实际\", \"预算\", \"预测\"] 与 conventions › 12 的落地"
+    new_text: "「销售预测 / 预测准确率 / 预测与实际对比」走 FactStrategyPlan（Sale Revenue，Forecast vs Actual）；FactSalesQuota 只用于销售目标、达成率、挑战线。见 S14。"
+  - supersedes: "source.yaml › datasets › DimEntity › description（「门店 → 州 → 国家/地区 → 集团四级」）"
+    new_text: "四级只对 299 家实体店成立；7 家线上 / 目录 / 经销虚拟店直接挂在国家下，三个集团实体的 ParentEntityKey 指回自身。上卷必须对祖先键去重。见 S15。"
+
+# ---------------------------------------------------------------------------
+# 三、问题 → 查询示例（14 条，全部来自本调优包）。
+# 初版写作时未执行；执行与评分比对由 A 角在 chDB 上完成，结果与本版改动见 SQL-L1.notes.md。
+# ---------------------------------------------------------------------------
+examples:
+  - id: E01
+    question: "各产品品类的退货率是多少？"
+    shows: "品类分析保留 NULL 组（S1）；退货率按数量计算"
+    sql: |
+      SELECT
+          pc.ProductCategoryName                                  AS ProductCategoryName,
+          sum(f.ReturnQuantity)                                   AS total_returns,
+          sum(f.SalesQuantity)                                    AS total_sales,
+          sum(f.ReturnQuantity) / sum(f.SalesQuantity) * 100      AS return_rate_pct
+      FROM retail.FactOnlineSales AS f
+      LEFT JOIN retail.DimProduct AS p ON f.ProductKey = p.ProductKey
+      LEFT JOIN retail.DimProductSubcategory AS ps ON p.ProductSubcategoryKey = ps.ProductSubcategoryKey
+      LEFT JOIN retail.DimProductCategory AS pc ON ps.ProductCategoryKey = pc.ProductCategoryKey
+      GROUP BY ProductCategoryName
+      ORDER BY ProductCategoryName
+      SETTINGS join_use_nulls = 1
+
+  - id: E02
+    question: "按利润率排名，前 10 款产品是哪些？"
+    shows: "产品利润率用产品表标价与成本（约定 9）；前 10 名恰好 10 行：row_number() 选行，rank() 给名次（并列同名次）"
+    sql: |
+      SELECT ProductKey, ProductName, UnitPrice, UnitCost, margin_pct, margin_rank
+      FROM
+      (
+          SELECT
+              ProductKey,
+              ProductName,
+              UnitPrice,
+              UnitCost,
+              (UnitPrice - UnitCost) / UnitPrice * 100                                   AS margin_pct,
+              rank() OVER (ORDER BY (UnitPrice - UnitCost) / UnitPrice DESC)              AS margin_rank,
+              row_number() OVER (ORDER BY (UnitPrice - UnitCost) / UnitPrice DESC, ProductKey) AS rn
+          FROM retail.DimProduct
+      )
+      WHERE rn <= 10
+      ORDER BY rn
+
+  - id: E03
+    question: "2009 年第四季度，销售预测与实际相比有多准确？"
+    shows: "销售预测走战略计划表（S14）；准确率 = 100 − 绝对百分比误差"
+    sql: |
+      WITH plan AS (
+          SELECT
+              pc.ProductCategoryName                          AS ProductCategoryName,
+              sumIf(f.Amount, s.ScenarioName = 'Actual')      AS actual,
+              sumIf(f.Amount, s.ScenarioName = 'Forecast')    AS forecast
+          FROM retail.FactStrategyPlan AS f
+          INNER JOIN retail.DimScenario AS s ON f.ScenarioKey = s.ScenarioKey
+          INNER JOIN retail.DimAccount AS a ON f.AccountKey = a.AccountKey
+          INNER JOIN retail.DimProductCategory AS pc ON f.ProductCategoryKey = pc.ProductCategoryKey
+          WHERE a.AccountName = 'Sale Revenue'
+            AND f.DateKey >= toDate('2009-10-01')
+            AND f.DateKey < toDate('2010-01-01')
+          GROUP BY ProductCategoryName
+      )
+      SELECT
+          ProductCategoryName,
+          actual,
+          forecast,
+          forecast - actual                                   AS forecast_minus_actual,
+          100 - abs(forecast - actual) / actual * 100         AS accuracy_pct
+      FROM plan
+      ORDER BY ProductCategoryName
+    note: "总体口径（不分品类）把 GROUP BY 去掉即可：实际 979,737,005.16、预测 986,142,631.21、准确率 99.35%，两种都可接受。"
+
+  - id: E04
+    question: "按组织层级汇总销售收入。"
+    shows: "DimEntity 上卷：祖先键去重后 ARRAY JOIN，按键分组（S15）"
+    sql: |
+      WITH
+          store_rev AS (
+              SELECT f.EntityKey AS EntityKey, sum(f.Amount) AS revenue
+              FROM retail.FactStrategyPlan AS f
+              INNER JOIN retail.DimScenario AS s ON f.ScenarioKey = s.ScenarioKey
+              INNER JOIN retail.DimAccount AS a ON f.AccountKey = a.AccountKey
+              WHERE s.ScenarioName = 'Actual'
+                AND a.AccountName = 'Sale Revenue'
+              GROUP BY f.EntityKey
+          ),
+          chain AS (
+              SELECT
+                  e0.EntityKey AS StoreEntityKey,
+                  arrayDistinct([e0.EntityKey, e1.EntityKey, e2.EntityKey, e3.EntityKey]) AS ancestors
+              FROM retail.DimEntity AS e0
+              INNER JOIN retail.DimEntity AS e1 ON toInt32(e0.ParentEntityKey) = e1.EntityKey
+              INNER JOIN retail.DimEntity AS e2 ON toInt32(e1.ParentEntityKey) = e2.EntityKey
+              INNER JOIN retail.DimEntity AS e3 ON toInt32(e2.ParentEntityKey) = e3.EntityKey
+              WHERE e0.EntityType = 'Store'
+          ),
+          store_ancestor AS (
+              SELECT StoreEntityKey, ancestor_key
+              FROM chain
+              ARRAY JOIN ancestors AS ancestor_key
+          )
+      SELECT
+          e.EntityKey        AS EntityKey,
+          e.EntityName       AS EntityName,
+          e.EntityType       AS EntityType,
+          sum(r.revenue)     AS total_amount
+      FROM store_ancestor AS sa
+      INNER JOIN store_rev AS r ON sa.StoreEntityKey = r.EntityKey
+      INNER JOIN retail.DimEntity AS e ON sa.ancestor_key = e.EntityKey
+      GROUP BY EntityKey, EntityName, EntityType
+      ORDER BY EntityKey
+    note: "父链上每一级都存在（ParentEntityKey 无孤儿、无空值），所以内连接不会丢门店；顶端自环靠 arrayDistinct 去重。集团合计：北美 7,309,491,105.09、欧洲 2,403,962,517.64。"
+
+  - id: E05
+    question: "哪个促销类别带来的线上促销营收最高？其平均折扣比例是多少？"
+    shows: "「促销类别」= PromotionCategory（S4）；金额加权折扣比例（S5）"
+    sql: |
+      SELECT
+          p.PromotionCategory                                                       AS PromotionCategory,
+          sum(f.SalesAmount)                                                        AS revenue,
+          sum(f.DiscountAmount)                                                     AS total_discount,
+          sum(f.SalesAmount) + sum(f.DiscountAmount)                                AS original_sales_amount,
+          sum(f.DiscountAmount) / (sum(f.SalesAmount) + sum(f.DiscountAmount)) * 100 AS avg_discount_pct
+      FROM retail.FactOnlineSales AS f
+      INNER JOIN retail.DimPromotion AS p ON f.PromotionKey = p.PromotionKey
+      WHERE f.PromotionKey != 1
+      GROUP BY PromotionCategory
+      ORDER BY revenue DESC
+      LIMIT 1
+
+  - id: E06
+    question: "展示 2007—2009 年按季度累计的线上销售额。"
+    shows: "累计跨年不重置（S8）；年与季度取 DimDate 原值"
+    sql: |
+      SELECT
+          year,
+          quarter,
+          quarterly_sales,
+          sum(quarterly_sales) OVER (ORDER BY year, quarter ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_sales
+      FROM
+      (
+          SELECT
+              d.CalendarYear          AS year,
+              d.CalendarQuarterLabel  AS quarter,
+              sum(f.SalesAmount)      AS quarterly_sales
+          FROM retail.FactOnlineSales AS f
+          INNER JOIN retail.DimDate AS d ON f.DateKey = d.DateKey
+          WHERE d.CalendarYear BETWEEN 2007 AND 2009
+          GROUP BY year, quarter
+      )
+      ORDER BY year, quarter
+
+  - id: E07
+    question: "按门店列出 2009 年销售额排名前 3 的产品，以及各产品占该门店销售总额的比例。"
+    shows: "全部 306 家门店（S2）；每店恰好 3 个产品：组内 row_number() 选行，rank() 给名次；分母是门店全部销售（含缺名产品）"
+    sql: |
+      WITH
+          prod_sales AS (
+              SELECT StoreKey, ProductKey, sum(SalesAmount) AS product_sales
+              FROM retail.FactSales
+              WHERE DateKey >= toDate('2009-01-01') AND DateKey < toDate('2010-01-01')
+              GROUP BY StoreKey, ProductKey
+          ),
+          ranked AS (
+              SELECT
+                  StoreKey,
+                  ProductKey,
+                  product_sales,
+                  sum(product_sales) OVER (PARTITION BY StoreKey)                                   AS store_total_sales,
+                  rank() OVER (PARTITION BY StoreKey ORDER BY product_sales DESC)                   AS sales_rank,
+                  row_number() OVER (PARTITION BY StoreKey ORDER BY product_sales DESC, ProductKey) AS rn
+              FROM prod_sales
+          )
+      SELECT
+          r.StoreKey                                    AS StoreKey,
+          s.StoreName                                   AS StoreName,
+          r.ProductKey                                  AS ProductKey,
+          p.ProductName                                 AS ProductName,
+          r.product_sales                               AS product_sales,
+          r.product_sales / r.store_total_sales * 100   AS pct_of_store,
+          r.store_total_sales                           AS store_total_sales,
+          r.sales_rank                                  AS sales_rank
+      FROM ranked AS r
+      INNER JOIN retail.DimStore AS s ON r.StoreKey = s.StoreKey
+      LEFT JOIN retail.DimProduct AS p ON r.ProductKey = p.ProductKey
+      WHERE r.rn <= 3
+      ORDER BY StoreName, r.rn
+      SETTINGS join_use_nulls = 1
+
+  - id: E08
+    question: "按全年销售对单个季度的依赖程度从高到低列出各产品品类。"
+    shows: "「全年」未给年份取 2009（S8）；品类含 NULL 组（S1）；每个品类恰好 1 个峰值季度（argMax）"
+    sql: |
+      WITH
+          q AS (
+              SELECT
+                  pc.ProductCategoryName  AS ProductCategoryName,
+                  d.CalendarQuarterLabel  AS quarter,
+                  sum(f.SalesAmount)      AS quarter_sales
+              FROM retail.FactOnlineSales AS f
+              INNER JOIN retail.DimDate AS d ON f.DateKey = d.DateKey
+              LEFT JOIN retail.DimProduct AS p ON f.ProductKey = p.ProductKey
+              LEFT JOIN retail.DimProductSubcategory AS ps ON p.ProductSubcategoryKey = ps.ProductSubcategoryKey
+              LEFT JOIN retail.DimProductCategory AS pc ON ps.ProductCategoryKey = pc.ProductCategoryKey
+              WHERE d.CalendarYear = 2009
+              GROUP BY ProductCategoryName, quarter
+          ),
+          c AS (
+              SELECT
+                  ProductCategoryName,
+                  sum(quarter_sales)                AS annual_sales_amount,
+                  max(quarter_sales)                AS peak_quarter_sales,
+                  argMax(quarter, quarter_sales)    AS peak_quarter
+              FROM q
+              GROUP BY ProductCategoryName
+          )
+      SELECT
+          ProductCategoryName,
+          peak_quarter_sales / annual_sales_amount * 100                          AS peak_quarter_share_pct,
+          peak_quarter,
+          peak_quarter_sales,
+          annual_sales_amount,
+          rank() OVER (ORDER BY peak_quarter_sales / annual_sales_amount DESC)    AS dependency_rank
+      FROM c
+      ORDER BY dependency_rank
+      SETTINGS join_use_nulls = 1
+    note: "也可接受按 2007、2008、2009 各年分别计算（多一列 year），但要声明。"
+
+  - id: E09
+    question: "按产品品类比较，平均一个周末日的销售额比平均一个工作日高多少？"
+    shows: "组 × 天汇总后组内平均，分母是该组有销售的天数（S6）；品类含 NULL（S1）"
+    sql: |
+      WITH daily AS (
+          SELECT
+              pc.ProductCategoryName  AS ProductCategoryName,
+              f.DateKey               AS DateKey,
+              any(d.IsWorkDay)        AS day_type,
+              sum(f.SalesAmount)      AS day_sales
+          FROM retail.FactOnlineSales AS f
+          INNER JOIN retail.DimDate AS d ON f.DateKey = d.DateKey
+          LEFT JOIN retail.DimProduct AS p ON f.ProductKey = p.ProductKey
+          LEFT JOIN retail.DimProductSubcategory AS ps ON p.ProductSubcategoryKey = ps.ProductSubcategoryKey
+          LEFT JOIN retail.DimProductCategory AS pc ON ps.ProductCategoryKey = pc.ProductCategoryKey
+          GROUP BY ProductCategoryName, DateKey
+      )
+      SELECT
+          ProductCategoryName,
+          avgIf(day_sales, day_type = 'WeekEnd')                                AS avg_weekend_day_sales,
+          avgIf(day_sales, day_type = 'WorkDay')                                AS avg_weekday_sales,
+          avg_weekend_day_sales - avg_weekday_sales                             AS weekend_difference_amount,
+          (avg_weekend_day_sales - avg_weekday_sales) / avg_weekday_sales * 100 AS weekend_lift_pct
+      FROM daily
+      GROUP BY ProductCategoryName
+      ORDER BY ProductCategoryName
+      SETTINGS join_use_nulls = 1
+
+  - id: E10
+    question: "今年各季度的日均销售额，各比去年同期增长了百分之多少？"
+    shows: "今年 2009 / 去年 2008（约定 3）；先按天汇总再平均（约定 4）"
+    sql: |
+      WITH
+          daily AS (
+              SELECT
+                  d.CalendarYear          AS year,
+                  d.CalendarQuarterLabel  AS quarter,
+                  f.DateKey               AS DateKey,
+                  sum(f.SalesAmount)      AS day_sales
+              FROM retail.FactOnlineSales AS f
+              INNER JOIN retail.DimDate AS d ON f.DateKey = d.DateKey
+              WHERE d.CalendarYear IN (2008, 2009)
+              GROUP BY year, quarter, DateKey
+          ),
+          qa AS (
+              SELECT
+                  quarter,
+                  avgIf(day_sales, year = 2009) AS avg_daily_sales_2009,
+                  avgIf(day_sales, year = 2008) AS avg_daily_sales_2008
+              FROM daily
+              GROUP BY quarter
+          )
+      SELECT
+          quarter,
+          (avg_daily_sales_2009 - avg_daily_sales_2008) / avg_daily_sales_2008 * 100 AS daily_sales_growth_pct,
+          avg_daily_sales_2009 - avg_daily_sales_2008                                AS daily_sales_change_amount,
+          avg_daily_sales_2009,
+          avg_daily_sales_2008
+      FROM qa
+      ORDER BY quarter
+
+  - id: E11
+    question: "2009年，以正式销售目标的120%为挑战线，每位门店经理手下有多少家门店未达到这条线？这些门店距离挑战线的销售额缺口合计是多少？"
+    shows: "正式目标 = Budget（约定 12）；全部 306 家门店（S2）；没有未达标门店的经理也列出（S16）"
+    sql: |
+      WITH
+          actual AS (
+              SELECT StoreKey, sum(SalesAmount) AS actual_sales
+              FROM retail.FactSales
+              WHERE DateKey >= toDate('2009-01-01') AND DateKey < toDate('2010-01-01')
+              GROUP BY StoreKey
+          ),
+          target AS (
+              SELECT StoreKey, sum(SalesAmountQuota) AS target_sales
+              FROM retail.FactSalesQuota
+              WHERE ScenarioKey = 2
+                AND DateKey >= toDate('2009-01-01') AND DateKey < toDate('2010-01-01')
+              GROUP BY StoreKey
+          ),
+          store_gap AS (
+              SELECT
+                  s.StoreKey                                          AS StoreKey,
+                  toInt32(s.EmployeeKey)                              AS EmployeeKey,
+                  a.actual_sales                                      AS actual_sales,
+                  t.target_sales                                      AS target_sales,
+                  greatest(1.2 * t.target_sales - a.actual_sales, 0)  AS shortfall
+              FROM retail.DimStore AS s
+              LEFT JOIN actual AS a ON s.StoreKey = a.StoreKey
+              LEFT JOIN target AS t ON s.StoreKey = t.StoreKey
+          )
+      SELECT
+          g.EmployeeKey                           AS EmployeeKey,
+          concat(e.FirstName, ' ', e.LastName)    AS manager,
+          countIf(g.shortfall > 0)                AS under_target_stores,
+          sum(g.shortfall)                        AS shortfall_amount
+      FROM store_gap AS g
+      LEFT JOIN retail.DimEmployee AS e ON g.EmployeeKey = e.EmployeeKey
+      GROUP BY EmployeeKey, manager
+      ORDER BY EmployeeKey
+
+  - id: E12
+    question: "以2009年12月31日为观察截止日，按客户的真实首购月份分群，首购次日起7个自然日内的复购率分别是多少？排除观察期不足7天的客户。"
+    shows: "首购 / 复购取全部行（S10、S12）；7 天窗口与观察期排除（S12）"
+    sql: |
+      WITH
+          first_purchase AS (
+              SELECT CustomerKey, min(DateKey) AS first_date
+              FROM retail.FactOnlineSales
+              GROUP BY CustomerKey
+          ),
+          eligible AS (
+              SELECT CustomerKey, first_date
+              FROM first_purchase
+              WHERE addDays(first_date, 7) <= toDate('2009-12-31')
+          ),
+          repurchased AS (
+              SELECT DISTINCT e.CustomerKey AS CustomerKey
+              FROM eligible AS e
+              INNER JOIN retail.FactOnlineSales AS f ON f.CustomerKey = e.CustomerKey
+              WHERE f.DateKey > e.first_date
+                AND f.DateKey <= addDays(e.first_date, 7)
+          )
+      SELECT
+          toYear(first_date)                                                  AS cohort_year,
+          toMonth(first_date)                                                 AS cohort_month,
+          count()                                                             AS cohort_customers,
+          countIf(CustomerKey IN (SELECT CustomerKey FROM repurchased))       AS repurchase_customers,
+          repurchase_customers / cohort_customers * 100                       AS repurchase_pct
+      FROM eligible
+      GROUP BY cohort_year, cohort_month
+      ORDER BY cohort_year, cohort_month
+
+  - id: E13
+    question: "在2009年同店销售下降的门店中，降幅最大的3家门店各自由哪个产品品类拖累最多？列出门店降幅、该品类销售减少额及其占门店总减少额的百分比。"
+    shows: "同店口径（约定 15）；恰好 3 家门店、每店恰好 1 个品类：row_number() 选行，rank() 给名次（S19）；用 IN 过滤代替 JOIN 嵌套 CTE"
+    sql: |
+      WITH
+          store_year AS (
+              SELECT
+                  StoreKey,
+                  sumIf(SalesAmount, toYear(DateKey) = 2008) AS sales_2008,
+                  sumIf(SalesAmount, toYear(DateKey) = 2009) AS sales_2009
+              FROM retail.FactSales
+              WHERE toYear(DateKey) IN (2008, 2009)
+              GROUP BY StoreKey
+              HAVING sales_2008 > 0 AND sales_2009 > 0
+          ),
+          ranked_stores AS (
+              SELECT
+                  StoreKey,
+                  sales_2008 - sales_2009                                                      AS store_decline_amount,
+                  (sales_2008 - sales_2009) / sales_2008 * 100                                 AS decline_pct,
+                  rank() OVER (ORDER BY (sales_2008 - sales_2009) / sales_2008 DESC)           AS store_rank,
+                  row_number() OVER (ORDER BY (sales_2008 - sales_2009) / sales_2008 DESC, StoreKey) AS store_rn
+              FROM store_year
+              WHERE sales_2009 < sales_2008
+          ),
+          cat_year AS (
+              SELECT
+                  f.StoreKey                                        AS StoreKey,
+                  pc.ProductCategoryName                            AS category,
+                  sumIf(f.SalesAmount, toYear(f.DateKey) = 2008)    AS cat_sales_2008,
+                  sumIf(f.SalesAmount, toYear(f.DateKey) = 2009)    AS cat_sales_2009
+              FROM retail.FactSales AS f
+              LEFT JOIN retail.DimProduct AS p ON f.ProductKey = p.ProductKey
+              LEFT JOIN retail.DimProductSubcategory AS ps ON p.ProductSubcategoryKey = ps.ProductSubcategoryKey
+              LEFT JOIN retail.DimProductCategory AS pc ON ps.ProductCategoryKey = pc.ProductCategoryKey
+              WHERE toYear(f.DateKey) IN (2008, 2009)
+                AND f.StoreKey IN (SELECT StoreKey FROM ranked_stores WHERE store_rn <= 3)
+              GROUP BY StoreKey, category
+          ),
+          cat_rank AS (
+              SELECT
+                  StoreKey,
+                  category,
+                  cat_sales_2008 - cat_sales_2009                                                   AS decline_amount,
+                  (cat_sales_2008 - cat_sales_2009) / cat_sales_2008 * 100                          AS category_decline_pct,
+                  rank() OVER (PARTITION BY StoreKey ORDER BY cat_sales_2008 - cat_sales_2009 DESC) AS category_rank,
+                  row_number() OVER (PARTITION BY StoreKey ORDER BY cat_sales_2008 - cat_sales_2009 DESC, category) AS category_rn
+              FROM cat_year
+          )
+      SELECT
+          t.StoreKey                                          AS StoreKey,
+          s.StoreName                                         AS StoreName,
+          t.decline_pct                                       AS decline_pct,
+          c.category                                          AS category,
+          c.decline_amount                                    AS decline_amount,
+          c.decline_amount / t.store_decline_amount * 100     AS contribution_pct,
+          t.store_decline_amount                              AS store_decline_amount,
+          c.category_decline_pct                              AS category_decline_pct,
+          t.store_rank                                        AS store_rank,
+          c.category_rank                                     AS category_rank
+      FROM ranked_stores AS t
+      INNER JOIN cat_rank AS c ON t.StoreKey = c.StoreKey
+      INNER JOIN retail.DimStore AS s ON t.StoreKey = s.StoreKey
+      WHERE t.store_rn <= 3
+        AND c.category_rn = 1
+      ORDER BY t.store_rn
+      SETTINGS join_use_nulls = 1
+
+  - id: E14
+    question: "2009 年哪 10 对 Contoso 产品最常出现在同一个订单里？给出它们的共同订单数和提升度。"
+    shows: "购买事件取全部行（S10）；提升度分母是 2009 全部线上订单；前 10 对恰好 10 行：row_number() 选行，rank() 给名次"
+    sql: |
+      WITH
+          order_product AS (
+              SELECT DISTINCT f.SalesOrderNumber AS order_no, f.ProductKey AS product_key
+              FROM retail.FactOnlineSales AS f
+              INNER JOIN retail.DimProduct AS p ON f.ProductKey = p.ProductKey
+              WHERE f.DateKey >= toDate('2009-01-01') AND f.DateKey < toDate('2010-01-01')
+                AND p.BrandName = 'Contoso'
+          ),
+          product_orders AS (
+              SELECT product_key, count() AS n_orders
+              FROM order_product
+              GROUP BY product_key
+          ),
+          total AS (
+              SELECT uniqExact(SalesOrderNumber) AS n_total_orders
+              FROM retail.FactOnlineSales
+              WHERE DateKey >= toDate('2009-01-01') AND DateKey < toDate('2010-01-01')
+          ),
+          pairs AS (
+              SELECT a.product_key AS key1, b.product_key AS key2, count() AS common_orders
+              FROM order_product AS a
+              INNER JOIN order_product AS b
+                  ON a.order_no = b.order_no AND a.product_key < b.product_key
+              GROUP BY key1, key2
+          ),
+          ranked AS (
+              SELECT
+                  key1,
+                  key2,
+                  common_orders,
+                  rank() OVER (ORDER BY common_orders DESC)                    AS pair_rank,
+                  row_number() OVER (ORDER BY common_orders DESC, key1, key2)  AS rn
+              FROM pairs
+          )
+      SELECT
+          r.key1                                                          AS product1_key,
+          p1.ProductName                                                  AS product1_name,
+          r.key2                                                          AS product2_key,
+          p2.ProductName                                                  AS product2_name,
+          r.common_orders                                                 AS common_orders,
+          r.common_orders * t.n_total_orders / (o1.n_orders * o2.n_orders) AS lift_ratio,
+          r.pair_rank                                                     AS pair_rank
+      FROM ranked AS r
+      INNER JOIN product_orders AS o1 ON r.key1 = o1.product_key
+      INNER JOIN product_orders AS o2 ON r.key2 = o2.product_key
+      INNER JOIN retail.DimProduct AS p1 ON r.key1 = p1.ProductKey
+      INNER JOIN retail.DimProduct AS p2 ON r.key2 = p2.ProductKey
+      CROSS JOIN total AS t
+      WHERE r.rn <= 10
+      ORDER BY r.rn

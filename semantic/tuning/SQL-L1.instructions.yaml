@@ -1,0 +1,90 @@
+# SQL-L1 指令补丁（单元 SQL-L1-tuned-instr）
+#
+# 由 SQL-L1.yaml 第 1 版的 output_rules（O1–O8）、sql_pitfalls（6 条）原样搬来，只改格式；
+# 例外：去掉题号；O7 按更正后的评分规则重写（用户 2026-10-24 裁决）。
+# 另把 S 条目里「输出哪些列、用什么格式」的句子拆出来，记为 Sx-out（协调会话 2026-10-24 确认的分法），
+# 原句照搬，只在前面加适用的题型。出处与对照见 SQL-L1.notes.md。
+
+answer_requirements:      # 接在系统提示「作答要求」第 15 条之后，依次编号
+  - id: O1
+    text: "列别名一律用英文 snake_case（如 monthly_sales、return_rate_pct），不要用中文别名。"
+    why: "ClickHouse 里不加反引号的中文别名直接语法报错（Code: 62 Unrecognized token），51 次作答里有 11 次首查因此失败、浪费唯一一次修正机会。"
+  - id: O2
+    text: "任何数值列都不要 round()，原样输出全精度。"
+    why: "取整后的值（28.47、0.6623）与核实结果（28.4725…、66.2328…）比对不上。"
+  - id: O3
+    text: >-
+      比率、占比、增长率、利润率、复购率、准确率等一律以百分数输出（× 100），列名带 _pct；
+      同时输出算这个比率用到的金额 / 数量（分子、分母或差额）。
+      例外：变异系数这类本来就不是百分比的系数按原值输出。
+    why: "核实结果的比率全是 × 100 的百分数（如 return_rate_pct 0.77、margin_pct 66.89）；输出 0.2847 这种小数会判错。"
+  - id: O4
+    text: >-
+      维度取值原样输出，不拼接、不加前后缀、不改写：年份输出整数（2009，不要 'Year 2009'）；
+      季度输出 DimDate.CalendarQuarterLabel 的原值（'Q1'）；月份输出整数月号 1 ~ 12
+      （toMonth(DateKey) 或 DimDate.MonthNumber，不要 '2008-01-01'、'January'）。
+      跨年时年和季 / 月分成两列（year、quarter），不要拼成 '2009 Q1'。
+      一年之内的「各月 / 各季度」只输出月号 / 季度标签，不必再带年。
+    why: "有五道题口径全对，只因月份写成日期 / 英文名、年份写成 'Year 2007'、季度拼成 '2009 Q1' 而判错。"
+  - id: O5
+    text: >-
+      列出实体时同时输出业务键和名称：门店 StoreKey + StoreName；产品 ProductKey + ProductName；
+      客户 CustomerKey + FirstName + LastName（姓、名分两列原样输出，含 'Not Provided'，不拼接、不替换）；
+      门店经理 EmployeeKey + concat(FirstName, ' ', LastName)；计划实体 EntityKey + EntityName。
+      分组也按键分组（名称可能重名，例如 DimEntity 有 2 个重名）。
+    why: "有三道题因缺键列被判 missing_columns；一道题把客户姓名拼成一列而判错。"
+  - id: O6
+    text: >-
+      问题里提到的每个量都要成列输出；多层级的问题（门店降幅 + 品类减少额 + 占比）每一层的金额、
+      百分比、排名都输出。多给列不扣分，少给列判错。
+    why: "一道多层级题的三次作答都只给了部分列（缺门店键、门店总减少额、品类自身降幅），全部判 missing_columns。"
+  - id: O7
+    text: >-
+      「前 N 名 / 排名前 N / 最常…的 N 个」恰好返回 N 行（符合条件的不足 N 行时全部返回）；
+      第 N 名有并列时，从并列成员里任取几个凑足 N 行，不要把并列成员全部列出（行数多于 N 判错）。
+      分组内前 n 名（每家门店前 3、每个品类峰值季度等）每组恰好 n 个（不足 n 个的组全取），
+      第 n 名并列时同样任取。写法：用 row_number()（排序键后加一个唯一键打破并列）选行，
+      另用 rank() 输出排名列，排名值按 rank() 的结果写，并列同名次。分层选取（先选前 N 个门店、
+      再在每店内选前 1 个品类）每一层都按这条做。
+    why: "评分规则：前 N 名恰好 N 行、分组内每组恰好 n 个，并列任取；把第 N 名的全部并列列出会判错。"
+  - id: O8
+    text: "回答里写明口径假设（时间范围、渠道、去重粒度、标准差类型），但结果本身不要因为假设去改写取值。"
+
+  # —— 以下从 S 条目拆出的列 / 格式要求（口径本身留在 SQL-L1.yaml 的同号 S 条目里）——
+  - id: S5-out
+    text: "问平均折扣比例时，同时输出营收、折扣金额、折前原价。"
+  - id: S6-out
+    text: "问「周末 / 工作日（或其他两类日子）日均高多少」时，同时给出差额和相对差百分比。"
+  - id: S7-out
+    text: "问「各类日子的销售分别占多少比例」时，并输出总额。"
+  - id: S12-out
+    text: "按客户首购时间分群时，分群输出整数年（cohort_year）和整数月（cohort_month）两列；问终身消费价值时，同时输出组内客户数、平均值和合计。"
+  - id: S13-out
+    text: "问哪些客户某年比上年消费增长超过某个比例时，输出 CustomerKey、FirstName、LastName、两年消费额、增长百分比（× 100）。"
+  - id: S15-out
+    text: "按组织层级 / 实体汇总时，每个实体输出 EntityKey、EntityName、合计。"
+  - id: S18-out
+    text: "问变异系数时，按原值输出，不乘 100。"
+  - id: S19-out
+    text: "问同店降幅最大的门店及其拖累品类时，输出门店键、门店名、门店降幅 %、门店减少额、品类、品类减少额、品类自身降幅 %、品类减少额 ÷ 门店减少额 × 100、两个排名。"
+
+syntax_notes:             # 接在「查询语言说明」之后
+  - id: P1
+    text: "中文别名必须加反引号；更简单的做法是只用英文别名（见 O1）。"
+  - id: P2
+    text: >-
+      DimProduct.ProductSubcategoryKey、DimEntity.ParentEntityKey、DimStore.EmployeeKey、
+      DimStore.EntityKey 是 Nullable(Float64)。与 Int32 键直接用 = 连接即可，或用 toInt32(x)；
+      不要用 toInt32OrZero / toInt32OrNull（它们只接受 String，会报 ILLEGAL_TYPE_OF_ARGUMENT）。
+  - id: P3
+    text: >-
+      CTE 里每个要被外层引用的列都显式起别名；外层只能用别名访问（例如 CTE 里写
+      pcat.ProductCategoryKey 而没起别名，外层写 s.ProductCategoryKey 会报 UNKNOWN_IDENTIFIER）。
+  - id: P4
+    text: "窗口函数的结果不能在同一层 WHERE 里筛，先放进子查询 / CTE 再在外层 WHERE rank_col <= N。"
+  - id: P5
+    text: >-
+      遇到 "Correlated subqueries are not supported in JOINs" 时，把被连接的 CTE 改成先算好的
+      独立子查询，或改用 `x IN (SELECT … FROM cte)` 过滤，不要在 JOIN 里嵌套引用其他 CTE 的派生表。
+  - id: P6
+    text: "SETTINGS join_use_nulls = 1 写在整条查询的最末尾（WITH … SELECT … ORDER BY … SETTINGS …），对其中所有 JOIN 生效；用了它之后，左连接未命中的数值列是 NULL 而不是 0。"
