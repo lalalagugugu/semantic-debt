@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import yaml
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -55,3 +56,44 @@ def test_frozen_systems_and_combo(tmp_path, monkeypatch):
     cell = cells.COMBO_CELLS["SQL-L1plus-tuned-instr"]
     assert cell.instructions == "SQL-L1" and cell.skip_judge and cell.card == "T30"
     assert not cells.COMBO_CELLS.keys() & cells.CELLS.keys()
+
+
+def test_budget_stops_before_next_call_and_preserves_receipt(tmp_path):
+    from types import SimpleNamespace
+    from harness.client import MockClient
+    from harness.questions import Question
+    from scripts.t30_run_on_chdb_copy import BudgetBoundary
+
+    boundary = BudgetBoundary("fp_mock", budget=0.000001, raw_dir=tmp_path)
+    client = MockClient(lambda messages: "```sql\nSELECT 1\n```", model="deepseek-flash")
+    ctx = SimpleNamespace(boundary=boundary, client=client, raw_dir=tmp_path)
+    q = Question("Q_SYNTH", "synthetic", refs=None, rules=None)
+    with pytest.raises(run_direct.RunStopped, match="budget reached") as stopped:
+        run_direct._chat(ctx, q, 1, 0, [{"role": "system", "content": "synthetic"}])
+    assert stopped.value.reply is not None
+    assert (tmp_path / "Q_SYNTH_r1_t0.json").read_bytes() == stopped.value.reply.raw
+    with pytest.raises(run_direct.RunStopped):
+        run_direct._chat(ctx, q, 1, 1, [{"role": "system", "content": "synthetic"}])
+    assert len(client.requests) == 1
+    resumed = BudgetBoundary("fp_mock", budget=0.000001, raw_dir=tmp_path)
+    assert resumed.spent == boundary.spent
+    with pytest.raises(run_direct.RunStopped):
+        resumed.before_request()
+
+
+def test_budget_accounts_inflight_replies_and_rejects_unknown_usage(tmp_path):
+    from dataclasses import replace
+    from harness.client import MockClient
+    from scripts.t30_run_on_chdb_copy import BudgetBoundary
+
+    reply = MockClient(lambda messages: "synthetic").chat([{"role": "system", "content": "synthetic"}])
+    boundary = BudgetBoundary("fp_mock", budget=8, raw_dir=tmp_path)
+    boundary.check_reply(reply)
+    first_cost = boundary.spent
+    boundary.stopped.set()
+    with pytest.raises(run_direct.RunStopped):
+        boundary.check_reply(reply)
+    assert boundary.spent == 2 * first_cost
+    invalid = BudgetBoundary("fp_mock", budget=8, raw_dir=tmp_path)
+    with pytest.raises(run_direct.RunStopped, match="billing usage"):
+        invalid.check_reply(replace(reply, raw=b'{"usage": {}}'))
