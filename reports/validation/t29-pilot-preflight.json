@@ -102,9 +102,21 @@
     "--dry-run"
   ],
   "source_sha256": {
-    "harness/cells.py": "245ced8b563ac777a8bd288d1e01e59a8f327b103bfa69d3356eaae068ef3ed0",
-    "harness/run_direct.py": "84d2a1bc127811466994d59f6005e47fc6e12a259aa8d7fdb2f05eaef4e19a41",
+    "harness/cells.py": "3636b5f8ae644d6e7392c9472c937572c8084762accbd3fa17288e4ac5082538",
+    "harness/run_direct.py": "6f14f3272d9cb41d968fb534078ba3fd85bb674fcaa97c416c529dd764256541",
     "harness/prompt.py": "86fefce2157ff4fc09819fe8c8c5ad4fe7e6e064850f9ce9c8b1b67e97919e5e",
-    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4"
-  }
+    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4",
+    "harness/spend.py": "a9c57ce54e1394d6c6f5aacf64141db5b93b340832d25b2212db34165a784b18"
+  },
+  "runtime_budget": {
+    "threshold_cny": 1,
+    "shared_between_cells": true,
+    "serialized_api_requests": true,
+    "persisted_ledger": "$SEMDEBT_DATA_DIR/runs-raw/<run-id>/spend-ledger.jsonl",
+    "resume_recovers_cost": true,
+    "unconfirmed_cost_blocks_resume": true,
+    "transport_attempts": 1,
+    "semantics": "Stop all further calls after returned usage reaches or crosses 1 CNY; the final in-flight call can cross the threshold."
+  },
+  "frozen_sources_verification": "After merging origin/main, validate in an isolated checkout with semantic/ and render/ restored from semantic-v1.6-l1plus. Do not relax tag checks or change the T29 semantic tag."
 }
