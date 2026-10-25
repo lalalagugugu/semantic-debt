@@ -1,6 +1,6 @@
 # T22b L1+ 与 L3a：渲染、运行、报告、残余歧义归因
 
-- 状态：运行与报告完成，数字已获协调会话独立复算确认；T22b-1 已关闭，五类 + 单列疑点 dry-run 通过，待正式归因确认
+- 状态：运行与报告完成，数字已获协调会话独立复算确认；T22b-1 已关闭，五类 + 单列疑点及数据质量标记已冻结；Codex 82 条独立复核完成，Flash 出站授权待补充
 - 负责：Codex（2026-10-25 用户：不敏感的活交给 Codex，协调会话只做验收）
 - 模式：codex-main
 - 依据：`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-no-full-rerun-l1plus-last.md`
@@ -176,10 +176,20 @@ SEMDEBT_EVAL_DIR="$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2" UV_CACHE_DIR="$TMPDIR/uvc
 
 - 用户已批准 3 元，不再等待上一节的费用确认。新清单 `reports/attribution/l1plus-dry-run-dq.json`，旧清单保留；82 份逐条材料、原系统消息、语义 tag、题库完整提交及来源日志哈希与旧清单逐项一致。仅分类规则新增用户要求的辅助标记。
 - 新 dry-run：82 次归因调用、预计错峰 2.000806 元；前缀约 67567 token，其余估计参数不变。编码手册 SHA-256 `ac48b3c678fd3528d721742a4ac74ff9e06246189d7017677e42e11c272de2f1`，归因系统消息 SHA-256 `6eb381819b434bb61b0cf37521384ab2369feaf3d3ce37b11279106290cf3262`。
-- 预算实现：串行请求，每次传输前预留「UTF-8 输入字节数 + 4096 framing token，全按未缓存价」及官方 thinking/high 默认最大输出 65536 token 的费用；成功后按 usage 结算。传输无返回的预留额不释放；默认传输重试保留，但出现传输重试后即停止整批供核查。官方默认上限依据：https://api-docs.deepseek.com/api/create-chat-completion/ （2026-10-25 核对）。本次单次预留约 0.40 元；不足预留就不发请求。解析失败、指纹不符、费用或返回异常均先记日志再停。
+- 预算实现：串行请求，每次传输前预留「UTF-8 输入字节数 + 4096 framing token，全按未缓存价」及官方 thinking/high 默认最大输出 65536 token 的费用；成功后按 usage 结算。传输无返回的预留额不释放；默认传输重试保留，但出现传输重试后即停止整批供核查。官方默认上限依据：https://api-docs.deepseek.com/api/create-chat-completion/ （2026-10-25 核对）。本次单次预留约 0.54 元；不足预留就不发请求。解析失败、指纹不符、费用或返回异常均先记日志再停。
 - 验证：归因新旧测试共 30 passed，包括严格辅助标记类型、dry-run 预算闸、材料漂移拒绝、请求预留超预算拒绝及旧 run-id 不覆盖。没有修改共享客户端或原作答 harness。
 - 正式 run-id：`20261025-T22b-attrib-01`。独立复核从未含 Flash 标签的材料包开始；冻结 Codex 标签前不读 Flash 标签或思考。
 
 ```sh
 SEMDEBT_EVAL_DIR="$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2" UV_CACHE_DIR="$TMPDIR/uvcache" PYTHONUNBUFFERED=1 uv run python -m harness.attribute_l1plus --run-id 20261025-T22b-attrib-01 --budget 3 --preflight reports/attribution/l1plus-dry-run-dq.json
 ```
+
+- 启动受阻：自动审批尚未允许向 DeepSeek 官方 API 发送私有归因材料；命令在创建进程前被拒绝，没有请求、run 目录或费用。已向用户请求明确出站授权；本地独立复核可继续。
+
+### 启动受阻时的本地独立复核
+
+- Codex 已从固定材料包逐条独立完成 82 条主分类及数据质量辅助标记；`reports/attribution/l1plus-codex.csv` 仅含题号、次数、类别与布尔标记。冻结记录 `reports/attribution/l1plus-codex-freeze.json`；CSV SHA-256 为 `636971d4850e545ae9650093c66bd4c946a57fc513029c57597176ef7c757869`。冻结时 Flash 进程从未启动，没有 Flash 标签或思考可读。
+- 原方法顺序偏离：因自动审批阻止出站，先完成本地 Codex 独立标注，再等待 Flash 初判；二者独立性保持，不以一方标签提示另一方。规则、材料及预检哈希不再改。
+- 付费调用命令在创建进程前被自动审批拒绝，原因是尚需明确授权向具体目的地发送私有材料。已通过用户问题请求：允许将题面、参考 SQL / 结果摘要、最终作答 / 结果或报错摘要、假设、v2 评分原因和完整原系统消息发送至 `https://api.deepseek.com/chat/completions`（deepseek-flash），上限 3 元。
+- 没有创建归因 run 目录或原始响应，新增调用 0、费用 0 元；`20261025-T22b-attrib-01` 尚未使用。五类及单列的 Flash / Codex 对照汇总未完成，不以本地标签冒充两阶段完成结果。
+- 待补充具体出站授权后，直接执行上面的同一原生命令；自动审批拒绝不通过其他路径绕过。
