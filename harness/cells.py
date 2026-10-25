@@ -65,6 +65,13 @@ CELLS: dict[str, Cell] = {c.name: c for c in [
 ]}
 
 
+# T22b units are explicit opt-ins, like the C13 ladder. Preserve --cell all.
+L1PLUS_CELLS: dict[str, Cell] = {c.name: c for c in [
+    Cell(name, "chdb", ("retail",), f"build:{name}.yaml", "clickhouse_sql.md", card="T22b", skip_judge=True)
+    for name in ("SQL-L1plus", "SQL-L3a")
+]}
+
+
 # C13 syntax-note teaching ladder (decisions/2026-10-19-phase1-replan.md §三): SQL-L1's system
 # prompt and semantic context, only the syntax note changes. Depth per
 # decisions/2026-10-19-self-built-p-and-cube-notes.md §五: T2 = rules + conditions and pitfalls,

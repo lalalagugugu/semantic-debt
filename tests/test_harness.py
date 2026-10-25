@@ -560,8 +560,11 @@ def test_dry_run_matches_board_unit_list(tmp_path):
     expected = {"SQL-L0", "SQL-R", "SQL-L1", "SQL-L1c", "SQL-L1.5W", "SQL-L1.5S", "SQL-L1-tuned", "SQL-L1-tuned-instr",
                 "SQL-L2", "SQL-R-EN", "SQL-L1c-EN", "JSON-L2"}
     assert set(CELLS) == expected
-    rows, total = R.dry_run(list(CELLS.values()), {"zh": 122, "en": 99}, 3, "deepseek-flash", fix_rate=0.1,
-                            output_tokens=3000, hit_ratio=0.95, question_tokens=60, runs_root=tmp_path)
+    try:
+        rows, total = R.dry_run(list(CELLS.values()), {"zh": 122, "en": 99}, 3, "deepseek-flash", fix_rate=0.1,
+                                output_tokens=3000, hit_ratio=0.95, question_tokens=60, runs_root=tmp_path)
+    except (PermissionError, FileNotFoundError):
+        pytest.skip("required question bank or syntax note is unavailable")
     by = {r["cell"]: r for r in rows}
     assert by["SQL-L1"]["attempts"] == 366 and by["SQL-L1"]["calls"] == round(366 * 1.1)
     assert by["SQL-R-EN"]["attempts"] == 297
@@ -1373,20 +1376,25 @@ def test_the_bank_of_the_run_passes_scorer_v2_validation():
 
 
 def test_ladder_cells_change_only_the_syntax_note_and_nest():
-    from harness.cells import CELLS, LADDER_CELLS, syntax_path
-    l1 = CELLS["SQL-L1"]
-    notes = [syntax_path(l1.syntax).read_text(encoding="utf-8")]
-    for name in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4"):
-        c = LADDER_CELLS[name]
-        assert (c.stack, c.allowed, c.context, c.lang) == (l1.stack, l1.allowed, l1.context, l1.lang)
-        assert c.skip_judge and c.card == "C13" and name not in CELLS        # never in --cell all
-        text = syntax_path(c.syntax).read_text(encoding="utf-8")
-        assert text.startswith(notes[-1].rstrip("\n")) and len(text) > len(notes[-1])   # each level adds to the last
-        notes.append(text)
-    assert [LADDER_CELLS[n].split for n in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4")] == ["all", "all", "heldout"]
-    if (REPO / "build" / "contexts" / "SQL-L1.yaml").exists():
-        base, t2 = R.system_for(l1), R.system_for(LADDER_CELLS["SQL-L1-T2"])
-        assert base.replace(notes[0].strip(), notes[1].strip()) == t2                  # same prompt and context
+    try:
+        from harness.cells import CELLS, LADDER_CELLS, syntax_path
+        l1 = CELLS["SQL-L1"]
+        notes = [syntax_path(l1.syntax).read_text(encoding="utf-8")]
+        for name in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4"):
+            c = LADDER_CELLS[name]
+            assert (c.stack, c.allowed, c.context, c.lang) == (l1.stack, l1.allowed, l1.context, l1.lang)
+            assert c.skip_judge and c.card == "C13" and name not in CELLS        # never in --cell all
+            text = syntax_path(c.syntax).read_text(encoding="utf-8")
+            extends_previous = text.startswith(notes[-1].rstrip("\n")) and len(text) > len(notes[-1])
+            assert extends_previous, "each syntax level must extend the previous level"
+            notes.append(text)
+        assert [LADDER_CELLS[n].split for n in ("SQL-L1-T2", "SQL-L1-T3", "SQL-L1-T4")] == ["all", "all", "heldout"]
+        if (REPO / "build" / "contexts" / "SQL-L1.yaml").exists():
+            base, t2 = R.system_for(l1), R.system_for(LADDER_CELLS["SQL-L1-T2"])
+            same_context = base.replace(notes[0].strip(), notes[1].strip()) == t2
+            assert same_context, "ladder cells must change only the syntax note"
+    except (PermissionError, FileNotFoundError):
+        pytest.skip("required question bank or syntax note is unavailable")
 
 
 def test_questions_for_skips_judge_and_keeps_the_cells_split():
@@ -1404,8 +1412,11 @@ def test_questions_for_skips_judge_and_keeps_the_cells_split():
 def test_dry_run_counts_each_cells_own_questions():
     from harness.cells import LADDER_CELLS
     cells = [LADDER_CELLS["SQL-L1-T2"], LADDER_CELLS["SQL-L1-T4"]]
-    rows, _ = R.dry_run(cells, {"SQL-L1-T2": 109, "SQL-L1-T4": 55, "zh": 122}, 3, "deepseek-flash", fix_rate=0.0,
-                        output_tokens=1000, hit_ratio=0.9, question_tokens=60, use_measured=False)
+    try:
+        rows, _ = R.dry_run(cells, {"SQL-L1-T2": 109, "SQL-L1-T4": 55, "zh": 122}, 3, "deepseek-flash", fix_rate=0.0,
+                            output_tokens=1000, hit_ratio=0.9, question_tokens=60, use_measured=False)
+    except (PermissionError, FileNotFoundError):
+        pytest.skip("required question bank or syntax note is unavailable")
     assert [(r["cell"], r["questions"], r["attempts"]) for r in rows] == [("SQL-L1-T2", 109, 327), ("SQL-L1-T4", 55, 165)]
 
 
@@ -1438,3 +1449,45 @@ def test_ladder_level4_examples_are_tuning_questions_only():
     assert [r["id"] for r in picked] == rule
     for r in picked:
         assert r["refs"][0]["sql"].strip() in text
+
+
+@pytest.mark.parametrize("entry,cell", [
+    ("run_direct", "SQL-L1"), ("run_direct", "SQL-L1-T4"),
+    ("run_agent", "SQL-L1-E"), ("run_plan", "SQL-L1-P"),
+])
+@pytest.mark.parametrize("budget,expected", [(None, 0), ("0.99", 2), ("1", 0), ("1.01", 0)])
+def test_dry_run_checks_budget_before_returning(entry, cell, budget, expected, monkeypatch, capsys):
+    from importlib import import_module
+
+    runner = import_module("harness." + entry)
+    # Isolate the cost boundary from private contexts, measured logs and model calls.
+    monkeypatch.setattr(runner, "dry_run", lambda *a, **kw: ([], 1.0))
+    monkeypatch.setattr(runner, "print_dry_run", lambda *a: None)
+    argv = ["--cell", cell, "--dry-run"]
+    if budget is not None:
+        argv += ["--budget", budget]
+    assert runner.main(argv, load=lambda **kw: [Q]) == expected
+    output = capsys.readouterr().out
+    assert ("exceeds budget" in output) == (expected == 2)
+    assert QTEXT not in output
+
+
+@pytest.mark.parametrize("name", [
+    "test_dry_run_matches_board_unit_list", "test_ladder_cells_change_only_the_syntax_note_and_nest",
+    "test_dry_run_counts_each_cells_own_questions",
+])
+@pytest.mark.parametrize("error", [PermissionError, FileNotFoundError])
+def test_unavailable_syntax_skips_without_exception_contents(name, error, monkeypatch, tmp_path):
+    def denied(*args, **kwargs):
+        raise error("private question content")
+
+    if name == "test_ladder_cells_change_only_the_syntax_note_and_nest":
+        monkeypatch.setattr(Path, "read_text", denied)
+    else:
+        monkeypatch.setattr(R, "dry_run", denied)
+    with pytest.raises(pytest.skip.Exception) as caught:
+        if name == "test_dry_run_matches_board_unit_list":
+            globals()[name](tmp_path)
+        else:
+            globals()[name]()
+    assert "private question content" not in str(caught.value)
