@@ -1,0 +1,765 @@
+{
+  "eval_tag": "eval-v1.2",
+  "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+  "bank_archive_sha256": "2714b757928f2b6cd04571f53d2b92b4eea7503512a65a6fc447f1d77dfd63ac",
+  "sources": [
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "run": "20261025-T30-combo-01",
+      "log_sha256": "41546aff0de2dcb4d050cd27efd13b47de0797fe445ee48d668dc280bc1a16f2"
+    },
+    {
+      "cell": "SQL-L1plus",
+      "run": "20261025-T22b-l1plus-l3a-03",
+      "log_sha256": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592"
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "run": "20261025-T14-tuned-01",
+      "log_sha256": "1be51e0952e64a3ae5f274c9e2b1b2c22e7d1040de02b18232ca7466133fe532"
+    }
+  ],
+  "code_sha256": {
+    "scripts/t30_combo_report.py": "38f0f87c7c5268158b908ad86a8db0d4e91ca5ca63962dae6145298d8f015271",
+    "scripts/rescore_t23.py": "ba7df2060f254d8f743ece513a6dd4decd2dd277c31b4330227be45cfb5f6a48",
+    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4",
+    "harness/scorer_v3.py": "692785b1d07890570104019efa5ded13eac3da78f7a89767773dd8df7771d047"
+  },
+  "system_sha256": "16f3b0e2cc3b3ae547328c9c918f78be6acffac961c39becb4d54e477a6e6445",
+  "receipts": {
+    "cost_cny": "2.89061402",
+    "calls": 339,
+    "usage": {
+      "prompt_tokens": 27564335,
+      "prompt_cache_hit_tokens": 27457201,
+      "prompt_cache_miss_tokens": 107134,
+      "completion_tokens": 558584
+    },
+    "fingerprints": {
+      "e72d3c7f663d3e1383b00b3884cb4501": 339
+    },
+    "transport_retries": 3
+  },
+  "metrics": {
+    "SQL-L1plus-tuned-instr": {
+      "v2": {
+        "主表": {
+          "questions": 98,
+          "attempts": 294,
+          "correct": 257,
+          "accuracy": 0.8741496598639455,
+          "all_correct": 77,
+          "mixed": 15,
+          "all_wrong": 6,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 257,
+            "wrong": 36,
+            "exec_error": 1
+          }
+        },
+        "留出": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 119,
+          "accuracy": 0.8095238095238095,
+          "all_correct": 33,
+          "mixed": 11,
+          "all_wrong": 5,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 119,
+            "wrong": 27,
+            "exec_error": 1
+          }
+        },
+        "调优": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 138,
+          "accuracy": 0.9387755102040817,
+          "all_correct": 44,
+          "mixed": 4,
+          "all_wrong": 1,
+          "all_wrong_ids": [
+            "Q71"
+          ],
+          "outcomes": {
+            "correct": 138,
+            "wrong": 9
+          }
+        },
+        "含低区分度": {
+          "questions": 109,
+          "attempts": 327,
+          "correct": 282,
+          "accuracy": 0.8623853211009175,
+          "all_correct": 85,
+          "mixed": 16,
+          "all_wrong": 8,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q83",
+            "Q85",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 282,
+            "wrong": 44,
+            "exec_error": 1
+          }
+        }
+      },
+      "v3": {
+        "主表": {
+          "questions": 98,
+          "attempts": 294,
+          "correct": 257,
+          "accuracy": 0.8741496598639455,
+          "all_correct": 77,
+          "mixed": 15,
+          "all_wrong": 6,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 257,
+            "wrong": 36,
+            "exec_error": 1
+          }
+        },
+        "留出": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 119,
+          "accuracy": 0.8095238095238095,
+          "all_correct": 33,
+          "mixed": 11,
+          "all_wrong": 5,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 119,
+            "wrong": 27,
+            "exec_error": 1
+          }
+        },
+        "调优": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 138,
+          "accuracy": 0.9387755102040817,
+          "all_correct": 44,
+          "mixed": 4,
+          "all_wrong": 1,
+          "all_wrong_ids": [
+            "Q71"
+          ],
+          "outcomes": {
+            "correct": 138,
+            "wrong": 9
+          }
+        },
+        "含低区分度": {
+          "questions": 109,
+          "attempts": 327,
+          "correct": 282,
+          "accuracy": 0.8623853211009175,
+          "all_correct": 85,
+          "mixed": 16,
+          "all_wrong": 8,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q83",
+            "Q85",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 282,
+            "wrong": 44,
+            "exec_error": 1
+          }
+        }
+      }
+    },
+    "SQL-L1plus": {
+      "v2": {
+        "主表": {
+          "questions": 98,
+          "attempts": 294,
+          "correct": 222,
+          "accuracy": 0.7551020408163265,
+          "all_correct": 65,
+          "mixed": 16,
+          "all_wrong": 17,
+          "all_wrong_ids": [
+            "Q113",
+            "Q116",
+            "Q117",
+            "Q12",
+            "Q122",
+            "Q22",
+            "Q23",
+            "Q31",
+            "Q36",
+            "Q58",
+            "Q65",
+            "Q71",
+            "Q75",
+            "Q77",
+            "Q88",
+            "Q96",
+            "Q98"
+          ],
+          "outcomes": {
+            "correct": 222,
+            "wrong": 70,
+            "exec_error": 2
+          }
+        },
+        "留出": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 112,
+          "accuracy": 0.7619047619047619,
+          "all_correct": 33,
+          "mixed": 8,
+          "all_wrong": 8,
+          "all_wrong_ids": [
+            "Q113",
+            "Q22",
+            "Q23",
+            "Q31",
+            "Q65",
+            "Q77",
+            "Q88",
+            "Q96"
+          ],
+          "outcomes": {
+            "correct": 112,
+            "wrong": 34,
+            "exec_error": 1
+          }
+        },
+        "调优": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 110,
+          "accuracy": 0.7482993197278912,
+          "all_correct": 32,
+          "mixed": 8,
+          "all_wrong": 9,
+          "all_wrong_ids": [
+            "Q116",
+            "Q117",
+            "Q12",
+            "Q122",
+            "Q36",
+            "Q58",
+            "Q71",
+            "Q75",
+            "Q98"
+          ],
+          "outcomes": {
+            "correct": 110,
+            "wrong": 36,
+            "exec_error": 1
+          }
+        },
+        "含低区分度": {
+          "questions": 109,
+          "attempts": 327,
+          "correct": 245,
+          "accuracy": 0.7492354740061162,
+          "all_correct": 71,
+          "mixed": 19,
+          "all_wrong": 19,
+          "all_wrong_ids": [
+            "Q113",
+            "Q116",
+            "Q117",
+            "Q12",
+            "Q122",
+            "Q22",
+            "Q23",
+            "Q31",
+            "Q36",
+            "Q58",
+            "Q65",
+            "Q71",
+            "Q75",
+            "Q77",
+            "Q83",
+            "Q85",
+            "Q88",
+            "Q96",
+            "Q98"
+          ],
+          "outcomes": {
+            "correct": 245,
+            "wrong": 78,
+            "exec_error": 4
+          }
+        }
+      },
+      "v3": {
+        "主表": {
+          "questions": 98,
+          "attempts": 294,
+          "correct": 226,
+          "accuracy": 0.7687074829931972,
+          "all_correct": 66,
+          "mixed": 17,
+          "all_wrong": 15,
+          "all_wrong_ids": [
+            "Q113",
+            "Q117",
+            "Q122",
+            "Q22",
+            "Q23",
+            "Q31",
+            "Q36",
+            "Q58",
+            "Q65",
+            "Q71",
+            "Q75",
+            "Q77",
+            "Q88",
+            "Q96",
+            "Q98"
+          ],
+          "outcomes": {
+            "correct": 226,
+            "wrong": 66,
+            "exec_error": 2
+          }
+        },
+        "留出": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 112,
+          "accuracy": 0.7619047619047619,
+          "all_correct": 33,
+          "mixed": 8,
+          "all_wrong": 8,
+          "all_wrong_ids": [
+            "Q113",
+            "Q22",
+            "Q23",
+            "Q31",
+            "Q65",
+            "Q77",
+            "Q88",
+            "Q96"
+          ],
+          "outcomes": {
+            "correct": 112,
+            "wrong": 34,
+            "exec_error": 1
+          }
+        },
+        "调优": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 114,
+          "accuracy": 0.7755102040816326,
+          "all_correct": 33,
+          "mixed": 9,
+          "all_wrong": 7,
+          "all_wrong_ids": [
+            "Q117",
+            "Q122",
+            "Q36",
+            "Q58",
+            "Q71",
+            "Q75",
+            "Q98"
+          ],
+          "outcomes": {
+            "correct": 114,
+            "wrong": 32,
+            "exec_error": 1
+          }
+        },
+        "含低区分度": {
+          "questions": 109,
+          "attempts": 327,
+          "correct": 249,
+          "accuracy": 0.7614678899082569,
+          "all_correct": 72,
+          "mixed": 20,
+          "all_wrong": 17,
+          "all_wrong_ids": [
+            "Q113",
+            "Q117",
+            "Q122",
+            "Q22",
+            "Q23",
+            "Q31",
+            "Q36",
+            "Q58",
+            "Q65",
+            "Q71",
+            "Q75",
+            "Q77",
+            "Q83",
+            "Q85",
+            "Q88",
+            "Q96",
+            "Q98"
+          ],
+          "outcomes": {
+            "correct": 249,
+            "wrong": 74,
+            "exec_error": 4
+          }
+        }
+      }
+    },
+    "SQL-L1-tuned-instr": {
+      "v2": {
+        "主表": {
+          "questions": 98,
+          "attempts": 294,
+          "correct": 260,
+          "accuracy": 0.8843537414965986,
+          "all_correct": 79,
+          "mixed": 12,
+          "all_wrong": 7,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q87",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 260,
+            "wrong": 33,
+            "exec_error": 1
+          }
+        },
+        "留出": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 121,
+          "accuracy": 0.8231292517006803,
+          "all_correct": 35,
+          "mixed": 8,
+          "all_wrong": 6,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q87",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 121,
+            "wrong": 25,
+            "exec_error": 1
+          }
+        },
+        "调优": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 139,
+          "accuracy": 0.9455782312925171,
+          "all_correct": 44,
+          "mixed": 4,
+          "all_wrong": 1,
+          "all_wrong_ids": [
+            "Q71"
+          ],
+          "outcomes": {
+            "correct": 139,
+            "wrong": 8
+          }
+        },
+        "含低区分度": {
+          "questions": 109,
+          "attempts": 327,
+          "correct": 286,
+          "accuracy": 0.8746177370030581,
+          "all_correct": 87,
+          "mixed": 13,
+          "all_wrong": 9,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q83",
+            "Q85",
+            "Q87",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 286,
+            "wrong": 40,
+            "exec_error": 1
+          }
+        }
+      },
+      "v3": {
+        "主表": {
+          "questions": 98,
+          "attempts": 294,
+          "correct": 260,
+          "accuracy": 0.8843537414965986,
+          "all_correct": 79,
+          "mixed": 12,
+          "all_wrong": 7,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q87",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 260,
+            "wrong": 33,
+            "exec_error": 1
+          }
+        },
+        "留出": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 121,
+          "accuracy": 0.8231292517006803,
+          "all_correct": 35,
+          "mixed": 8,
+          "all_wrong": 6,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q87",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 121,
+            "wrong": 25,
+            "exec_error": 1
+          }
+        },
+        "调优": {
+          "questions": 49,
+          "attempts": 147,
+          "correct": 139,
+          "accuracy": 0.9455782312925171,
+          "all_correct": 44,
+          "mixed": 4,
+          "all_wrong": 1,
+          "all_wrong_ids": [
+            "Q71"
+          ],
+          "outcomes": {
+            "correct": 139,
+            "wrong": 8
+          }
+        },
+        "含低区分度": {
+          "questions": 109,
+          "attempts": 327,
+          "correct": 286,
+          "accuracy": 0.8746177370030581,
+          "all_correct": 87,
+          "mixed": 13,
+          "all_wrong": 9,
+          "all_wrong_ids": [
+            "Q30",
+            "Q31",
+            "Q65",
+            "Q67",
+            "Q71",
+            "Q83",
+            "Q85",
+            "Q87",
+            "Q88"
+          ],
+          "outcomes": {
+            "correct": 286,
+            "wrong": 40,
+            "exec_error": 1
+          }
+        }
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "version": "v2",
+      "baseline": "SQL-L1plus",
+      "group": "主表",
+      "questions": 98,
+      "diff_pp": 11.904761904761903,
+      "lo_pp": 4.421768707482992,
+      "hi_pp": 19.727891156462583,
+      "better": 24,
+      "worse": 10
+    },
+    {
+      "version": "v2",
+      "baseline": "SQL-L1plus",
+      "group": "留出",
+      "questions": 49,
+      "diff_pp": 4.761904761904762,
+      "lo_pp": -6.122448979591836,
+      "hi_pp": 15.646258503401361,
+      "better": 10,
+      "worse": 9
+    },
+    {
+      "version": "v2",
+      "baseline": "SQL-L1plus",
+      "group": "调优",
+      "questions": 49,
+      "diff_pp": 19.047619047619047,
+      "lo_pp": 9.523809523809526,
+      "hi_pp": 29.931972789115648,
+      "better": 14,
+      "worse": 1
+    },
+    {
+      "version": "v2",
+      "baseline": "SQL-L1-tuned-instr",
+      "group": "主表",
+      "questions": 98,
+      "diff_pp": -1.020408163265306,
+      "lo_pp": -5.1020408163265305,
+      "hi_pp": 3.061224489795918,
+      "better": 8,
+      "worse": 12
+    },
+    {
+      "version": "v2",
+      "baseline": "SQL-L1-tuned-instr",
+      "group": "留出",
+      "questions": 49,
+      "diff_pp": -1.3605442176870746,
+      "lo_pp": -6.802721088435374,
+      "hi_pp": 4.761904761904763,
+      "better": 4,
+      "worse": 8
+    },
+    {
+      "version": "v2",
+      "baseline": "SQL-L1-tuned-instr",
+      "group": "调优",
+      "questions": 49,
+      "diff_pp": -0.6802721088435373,
+      "lo_pp": -6.122448979591836,
+      "hi_pp": 4.761904761904762,
+      "better": 4,
+      "worse": 4
+    },
+    {
+      "version": "v3",
+      "baseline": "SQL-L1plus",
+      "group": "主表",
+      "questions": 98,
+      "diff_pp": 10.544217687074832,
+      "lo_pp": 3.401360544217687,
+      "hi_pp": 18.027210884353742,
+      "better": 23,
+      "worse": 10
+    },
+    {
+      "version": "v3",
+      "baseline": "SQL-L1plus",
+      "group": "留出",
+      "questions": 49,
+      "diff_pp": 4.761904761904762,
+      "lo_pp": -6.122448979591836,
+      "hi_pp": 15.646258503401361,
+      "better": 10,
+      "worse": 9
+    },
+    {
+      "version": "v3",
+      "baseline": "SQL-L1plus",
+      "group": "调优",
+      "questions": 49,
+      "diff_pp": 16.3265306122449,
+      "lo_pp": 7.482993197278912,
+      "hi_pp": 26.53061224489796,
+      "better": 13,
+      "worse": 1
+    },
+    {
+      "version": "v3",
+      "baseline": "SQL-L1-tuned-instr",
+      "group": "主表",
+      "questions": 98,
+      "diff_pp": -1.020408163265306,
+      "lo_pp": -5.1020408163265305,
+      "hi_pp": 3.061224489795918,
+      "better": 8,
+      "worse": 12
+    },
+    {
+      "version": "v3",
+      "baseline": "SQL-L1-tuned-instr",
+      "group": "留出",
+      "questions": 49,
+      "diff_pp": -1.3605442176870746,
+      "lo_pp": -6.802721088435374,
+      "hi_pp": 4.761904761904763,
+      "better": 4,
+      "worse": 8
+    },
+    {
+      "version": "v3",
+      "baseline": "SQL-L1-tuned-instr",
+      "group": "调优",
+      "questions": 49,
+      "diff_pp": -0.6802721088435373,
+      "lo_pp": -6.122448979591836,
+      "hi_pp": 4.761904761904762,
+      "better": 4,
+      "worse": 4
+    }
+  ],
+  "bootstrap_samples": 5000,
+  "bootstrap_seed": 0
+}
