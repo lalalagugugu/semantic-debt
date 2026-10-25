@@ -1,6 +1,6 @@
 # T14 调优（SQL-L1 调优；DAX-L2 调优用同一流程）
 
-- 状态：进行中（2026-10-23：SQL-L1-tuned 第 1 轮调优包已导出，等 B 角）
+- 状态：进行中（2026-10-25：第 1 轮两单元已跑完，结果暂定，等 Codex 泄漏审计；第 2 轮未开始）
 - 负责：Claude Code，两个**互不相通**的会话
   - A 角：普通模式（`scripts/start-card.sh T14`），可读题库，负责导出调优包、合并补充、跑结果。
   - B 角：调优包模式（`scripts/start-card.sh T14-B <调优包目录>`，例如 `$SEMDEBT_CARDS_DIR/T14/build/tuning-packet/sql-l1`），工作目录里只有调优包和 `semantic/` 的副本，不是 git clone，看不到题库、`runs/` 和数据目录。
@@ -63,4 +63,7 @@
   - **SQL-L1-tuned-instr 的实现**：`harness/cells.py` 新增该单元（与 SQL-L1-tuned 同一份上下文、同一份写法说明、同一执行范围，另带 `instructions="SQL-L1"`）；`harness/tuned_instructions.py` 读 `semantic/tuning/SQL-L1.instructions.yaml`，把 `answer_requirements` 接着系统提示第 15 条编号（16–31），`syntax_notes` 作为条目接在「查询语言说明」之后；每条带 id（条目之间按 id 互相引用，如 P1「见 O1」），`why` 不发给模型。`harness/prompt.py` 一字未改（它受 T16 的逐字节测试保护），没有补丁的单元系统消息不变：SQL-L1 仍是 `8df43ae0`。系统消息：SQL-L1-tuned 141,157 字符（`6ce71c76`），SQL-L1-tuned-instr 143,591 字符（`03ec10aa`）。BOARD 单元清单相应改成 17 个中文单元。
   - **两单元 dry-run**（harness 的 `dry_run` 估算函数；命令行的 `--dry-run` 要先过 `semantic-tuned-v1` 的版本校验，tag 打好后再跑一遍）：各 109 题 × 3 次、约 360 次调用；SQL-L1-tuned 5.58 元、SQL-L1-tuned-instr 5.60 元，合计 **11.18 元**（错峰，按每次输出 3000 token 的保守估法；SQL-L1 实测只有同法估算的六成），在 12 元上限内。
   - 测试：全部通过。共用 `$SEMDEBT_DATA_DIR/chdb` 当时被别的进程占用（EmbeddedServer 初始化失败，硬规则 9），这 18 个依赖它的测试在本次全量里跳过；它们当天早些时候在同一执行器代码上全部通过。
+  - **合并 main（2026-10-24）**：#163 与 main 冲突（`decisions/open-questions.md` 两行都保留；`harness/run_direct.py` 的 import 合并）。合并后除两个调优单元外，全部单元的系统消息与 origin/main 逐字节相同。合并提交 09f4738 由协调会话打 `semantic-tuned-v1`、`harness-tuned-v1`；打 tag 前在同一棵树上用命令行 `--dry-run --semantic-tag 09f4738` 复核：两单元 11.18 元，sha 不变。
+  - **第 1 轮运行 `20261025-T14-tuned-01`（2026-10-25 周日 09:20–09:37 错峰）**：654/654 done，4.77 元。chDB 用 `chdb-t14`，经 `scripts/t14_run_on_chdb_copy.py`（仿 C13 的包装脚本，只改执行器数据目录）。主表（98 题，不含低区分度）：SQL-L1 67.7% → tuned 83.3% → tuned-instr 88.4%；留出 49 题：61.9% → 75.5% → 82.3%（配对差 +13.6 [+4.8, +23.1]、+20.4 [+9.5, +32.0]）。协调会话从日志独立复算一致。报告 `reports/results/tuning.md`，写明留出题与调优题共用指标口径和约定、数字暂定。
+  - **第 2 轮暂缓**（协调会话 2026-10-25 转达）：先由 Codex 做泄漏审计（调优材料里有没有只对个别留出题有用的信息），之后由用户定是否做第 2 轮。
 - 工时：
