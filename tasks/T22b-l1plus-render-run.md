@@ -1,6 +1,6 @@
 # T22b L1+ 与 L3a：渲染、运行、报告、残余歧义归因
 
-- 状态：运行与报告完成（第三次直接调用原样 harness）；残余歧义归因与协调验收待做
+- 状态：运行与报告完成，数字已获协调会话独立复算确认；四类归因等待 T22b-1 边界裁决后 dry-run
 - 负责：Codex（2026-10-25 用户：不敏感的活交给 Codex，协调会话只做验收）
 - 模式：codex-main
 - 依据：`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-no-full-rerun-l1plus-last.md`
@@ -117,3 +117,13 @@ uv run python -m harness.run_direct --cell SQL-L1plus --cell SQL-L3a --skip-judg
 ```sh
 uv run python scripts/l1plus_report.py --run 20261025-T22b-l1plus-l3a-03 --scored-run 20261025-T22b-l1plus-l3a-03-rescore-01
 ```
+
+## 2026-10-25 合入 main 与四类归因准备
+
+- 用户确认：协调会话已从日志独立重算，结果一致。此确认仅覆盖结果数字；其余验收项不自行声称已完成。
+- 按用户要求将最新 `origin/main=8d8224a`（含 #170）合入 `T22b-work`，合并提交 `67ffbaf`，已推送。冲突仅在 `runs/INDEX.md` 和 `tasks/BOARD.md`；INDEX 保留双方完整追加序列，BOARD 保留 T22b 最新结果及 main 的 T23 状态。已有 T22b 日志和结果文件未变，报告测试 7 passed；GitHub #172 为 MERGEABLE / CLEAN。
+- 归因口径按用户新要求拆四类：文字仍有两种以上读法 / 口径根本没写 / 模型理解偏了 / 只是呈现不同。公开结果只写题号与类别，不复述题面、SQL 或自由文本理由。方法沿用 Flash 初判 + Codex 不看 Flash 标签独立复核；先正式 dry-run，预算另限 3 元。
+- 输入已校验：以 #172 的 v2 最终非正确作答为固定源，82 条、38 题（78 wrong + 4 exec_error，含低区分度，与 T19b 范围相同）。T23 裁决仍以 v2 为主数字，不因合入 v3 而改变该集合。
+- 来源：`20261025-T22b-l1plus-l3a-03-rescore-01/SQL-L1plus.jsonl`，原始执行结果来自 `20261025-T22b-l1plus-l3a-03/SQL-L1plus`；82 份材料构造及执行结果哈希检查通过。源系统消息 SHA-256 仍为 `b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3`，题库为 `eval-v1.2=90e13b385a639a9164ac78430c50c11a7859f976`。
+- 输入将依既有 T19b-2 裁决包含原作答要求与语法说明；不提供原作答思考。语义内容和评分结果不改。
+- 待用户决定：`decisions/open-questions.md` T22b-1，原 T19b 的题面歧义和非呈现参考 / 评分疑点如何落入四类。边界未定，不自行固定编码手册或归因提示词，因此尚未进行正式归因 dry-run；无新增付费调用。
