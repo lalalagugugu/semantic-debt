@@ -43,6 +43,7 @@
 | T25 | 立刻要修的流程缺口（`tasks/T25-immediate-fixes.md`） | Codex | 主仓库 clone | — | 0 | 已完成，待协调验收（2026-10-25）：调优目录双层禁读、4 项测试跳过保护、dry-run 预算检查；全量 1070 passed / 6 skipped |
 | T26 | L3a 本体质量校验（`tasks/T26-ontology-validation.md`） | Claude Code（新会话） | 普通 | T22b | 0 | 未开始 |
 | T27 | 叠加单元冲突核对（`tasks/T27-combo-conflict-check.md`） | Codex | 主仓库 clone | T22b、T14 | 0 | 核对完成，待协调验收（2026-10-25）：109 × 62 条静态核对，重复 21 对、互补 287 对、冲突 17 对（12 个调优条目）；报告 `reports/validation/combo-conflicts.md`；未删条目、未运行，运行等用户「跑叠加」 |
+| T28 | 中期报告 v3 补数（`tasks/T28-midterm-v3-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 未开始 |
 | C13 | 写法说明教学阶梯（ClickHouse SQL，档位 L1；`tasks/C13-syntax-ladder.md`） | Claude Code（T12） | 普通 | `harness-ladder-v1`；`semantic-v1.4` | 15 元 | **完成**（`20261019-C13-ladder-02`，7.17 元，#147）：首轮执行报错 32% → 3%（2 级），正确率 64.2% → 68.2%（+4.0 [−0.9, +9.2]）；3 级、4 级没有再提高（`reports/results/C13-ladder.md`） |
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
 | T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **完成**（#153，2026-10-23）：117 条，Flash 4.42 元；类别 κ 0.70、根因 κ 0.37；根因 3（模型没理解）11%–46%；两家都判根因 5 的 26 条 / 15 题待题库负责方核对（`reports/results/l1-error-attribution.md`） |
