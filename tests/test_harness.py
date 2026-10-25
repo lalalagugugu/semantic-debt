@@ -1515,6 +1515,134 @@ def test_selective_attempt_retains_existing_refusal_format_and_fix(name, answers
         assert "bad query" in messages[-1][-1]["content"]
 
 
+@pytest.mark.parametrize("amount", [0.5, 0.6])
+def test_selective_runtime_budget_shared_across_cells_and_resume(tmp_path, monkeypatch, amount):
+    from harness.cells import SELECTIVE_CELLS
+    from harness.spend import SpendGuard
+
+    monkeypatch.setattr(R, "cost_cny", lambda *a: amount)
+    ledger = tmp_path / "raw" / "spend-ledger.jsonl"
+    spend = SpendGuard(ledger, 1, "deepseek-flash")
+    boundary = R.CallBoundary(None, allow_peak=True, spend=spend)
+    client = MockClient(lambda m: "CANNOT_ANSWER", model="deepseek-flash")
+    for i, cell in enumerate(SELECTIVE_CELLS.values(), 1):
+        ctx = _ctx(tmp_path, client, FakeExecutor({}))
+        ctx.cell, ctx.boundary = cell, boundary
+        assert R.run_attempt(ctx, Q, i)["final"]["outcome"] == "refused"
+    assert spend.reached and boundary.stopped.is_set()
+    assert len(client.requests) == 2
+    assert R.run_attempt(ctx, Q, 3)["status"] == "stopped"
+    assert len(client.requests) == 2
+    restored = SpendGuard(ledger, 1, "deepseek-flash")
+    assert restored.total == spend.total and restored.reached
+    events = [json.loads(line) for line in ledger.read_text().splitlines()]
+    assert [r["event"] for r in events] == ["request", "charge"] * 2
+
+
+def test_selective_runtime_budget_blocks_execution_fix(tmp_path, monkeypatch):
+    from harness.spend import SpendGuard
+
+    monkeypatch.setattr(R, "cost_cny", lambda *a: 1.0)
+    respond, messages = _scripted("```sql\nSELECT bad\n```", "CANNOT_ANSWER")
+    ctx = _ctx(tmp_path, MockClient(respond, model="deepseek-flash"),
+               FakeExecutor({"SELECT bad": ExecResult(error="bad", error_class=ENGINE_ERROR)}))
+    ctx.boundary = R.CallBoundary(None, allow_peak=True,
+                                  spend=SpendGuard(tmp_path / "ledger.jsonl", 1, "deepseek-flash"))
+    record = R.run_attempt(ctx, Q, 1)
+    assert record["status"] == "stopped" and len(messages) == 1
+    assert len(record["turns"]) == 1 and record["turns"][0]["usage"]
+    assert (ctx.raw_dir / f"{Q.qid}_r1_t0.json").exists()
+
+
+def test_selective_runtime_budget_serializes_concurrent_requests(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from decimal import Decimal
+    from harness.spend import SpendGuard
+
+    monkeypatch.setattr(R, "cost_cny", lambda *a: 0.1)
+    ctx = _ctx(tmp_path, MockClient(lambda m: "CANNOT_ANSWER", model="deepseek-flash"), FakeExecutor({}))
+    spend = SpendGuard(tmp_path / "ledger.jsonl", 1, "deepseek-flash")
+    ctx.boundary = R.CallBoundary(None, allow_peak=True, spend=spend)
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        records = list(pool.map(lambda q: R.run_attempt(ctx, q, 1), _questions(30)))
+    assert len(ctx.client.requests) == 10
+    assert spend.total == Decimal("1.0")
+    assert sum(r["status"] == "done" for r in records) == 10
+    assert sum(r["status"] == "stopped" for r in records) == 20
+
+
+@pytest.mark.parametrize("failure", ["api_error", "missing_usage", "fingerprint"])
+def test_selective_runtime_budget_preserves_failed_or_unconfirmed_calls(tmp_path, monkeypatch, failure):
+    from dataclasses import replace
+    from harness.spend import SpendGuard
+
+    client = MockClient(lambda m: "CANNOT_ANSWER", model="deepseek-flash")
+    original_chat = client.chat
+    def respond(*a, **kw):
+        if failure == "api_error":
+            raise APIError("unknown transport result")
+        reply = original_chat(*a, **kw)
+        return replace(reply, usage={}) if failure == "missing_usage" else reply
+    client.chat = respond
+    ctx = _ctx(tmp_path, client, FakeExecutor({}))
+    ledger = tmp_path / "ledger.jsonl"
+    spend = SpendGuard(ledger, 1, "deepseek-flash")
+    ctx.boundary = R.CallBoundary("different" if failure == "fingerprint" else None, allow_peak=True, spend=spend)
+    rec = R.run_attempt(ctx, Q, 1)
+    assert ctx.boundary.stopped.is_set()
+    if failure == "fingerprint":
+        assert len(rec["turns"]) == 1 and spend.total > 0
+        assert SpendGuard(ledger, 1, "deepseek-flash").total == spend.total
+    else:
+        with pytest.raises(ValueError, match="unresolved request"):
+            SpendGuard(ledger, 1, "deepseek-flash")
+
+
+def test_selective_runtime_budget_rejects_reset_or_untracked_calls(tmp_path):
+    from harness.spend import SpendGuard
+
+    ledger = tmp_path / "ledger.jsonl"
+    spend = SpendGuard(ledger, 1, "deepseek-flash")
+    spend.begin("SQL-L1plus-sel-k1", "Q_SYNTH", 1, 0)
+    spend.charge(0.5, {"prompt_tokens": 1, "cache_hit_tokens": 0,
+                       "cache_miss_tokens": 1, "completion_tokens": 1})
+    with pytest.raises(ValueError, match="differs"):
+        SpendGuard(ledger, 2, "deepseek-flash")
+    other = tmp_path / "existing"
+    (other / "SQL-L1plus-sel-k1").mkdir(parents=True)
+    (other / "SQL-L1plus-sel-k1" / "Q01_r1_t0.json").write_text("{}")
+    with pytest.raises(ValueError, match="no spend ledger"):
+        SpendGuard(other / "spend-ledger.jsonl", 1, "deepseek-flash")
+
+
+def test_selective_runtime_budget_cli_shares_threshold_and_resumes_without_calls(tmp_path, monkeypatch):
+    from harness import client as C, questions as QL
+
+    clients = []
+    def make_client(model, **kwargs):
+        assert kwargs["max_attempts"] == 1
+        client = MockClient(lambda m: "CANNOT_ANSWER", model=model)
+        clients.append(client)
+        return client
+    monkeypatch.setattr(C, "DeepSeekClient", make_client)
+    monkeypatch.setattr(R, "REPO", tmp_path)
+    monkeypatch.setattr(R, "raw_root", lambda: tmp_path / "raw")
+    monkeypatch.setattr(R, "harness_commit", lambda: "synthetic")
+    monkeypatch.setattr(QL, "eval_commit", lambda: "synthetic")
+    monkeypatch.setattr(R, "system_for", lambda cell: "synthetic system")
+    monkeypatch.setattr(R, "make_executor", lambda *a: FakeExecutor({}))
+    monkeypatch.setattr(R, "dry_run", lambda *a, **kw: ([], 0.1))
+    monkeypatch.setattr(R, "cost_cny", lambda *a: 0.5)
+    argv = ["--cell", "SQL-L1plus-sel-k1", "--cell", "SQL-L1plus-sel-k3",
+            "--run-id", "synthetic-budget", "--reps", "1", "--budget", "1", "--allow-peak"]
+    assert R.main(argv, load=lambda **kw: [Q]) == 3
+    assert len(clients) == 1 and len(clients[0].requests) == 2
+    assert R.main(argv, load=lambda **kw: [Q]) == 3
+    assert len(clients) == 1  # no API client is created once the persisted budget is reached
+    assert R.main(["--cell", "SQL-L1plus-sel-k1", "--run-id", "synthetic-missing-budget"],
+                  load=lambda **kw: [Q]) == 2
+
+
 @pytest.mark.parametrize("name", [
     "test_dry_run_matches_board_unit_list", "test_ladder_cells_change_only_the_syntax_note_and_nest",
     "test_dry_run_counts_each_cells_own_questions",
