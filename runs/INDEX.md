@@ -75,3 +75,24 @@
 
 **T23 来源说明（追加，不改写前述运行）**：`20261025-T23-v3-01` 在进程运行期间补了输入防护，代码哈希又在结束时采集，因此该轮不作验收依据。正式结果以 `20261025-T23-v3-02` 为准：启动时固定代码哈希、结束时验证代码与源日志未变；27 份源日志 / 6,188 条 done，最终新增判对 82 条（均 P1），待跨厂商逐条复核。两轮均无模型调用、无查询执行，费用 0。本次没有发现 T22b 作答日志，不能把上述“全部已发现”误读成 T22b 已完成。
 | 20261025-T14-tuned-01 | 2026-10-25 | SQL-L1-tuned、SQL-L1-tuned-instr | T14 | 109（跳过 judge 13 题；调优 54、留出 55）× 3 次 × 2 单元 = 654 | deepseek-flash（`system_fingerprint` e72d3c7f663d3e1383b00b3884cb4501，669 次调用唯一，与 G3 一致） | eval-v1.2 = 90e13b3（只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2`，开跑前校验）；semantic-tuned-v1 = 09f4738（#163 合并提交，开跑前校验） | 4.77 | $SEMDEBT_DATA_DIR/runs-raw/20261025-T14-tuned-01 | T14 第 1 轮调优全量（用户 2026-10-24 批准，两单元合计上限 12 元；dry-run 估 11.18）。周日 09:20 起错峰，一次跑完、无暂停，654/654 done，无 api_error / harness_error。harness 工作树 = `harness-tuned-v1`（09f4738；日志 `harness_commit` b91eccc 是同一棵树）。系统消息 sha256：SQL-L1-tuned 6ce71c76…，SQL-L1-tuned-instr 03ec10aa…（SQL-L1 仍为 8df43ae0…）。chDB 用本卡副本 `$SEMDEBT_DATA_DIR/chdb-t14`（`data/build_chdb_copy.py` 建），经包装脚本 `scripts/t14_run_on_chdb_copy.py` 只改执行器数据目录、不改 harness（硬规则 9）。评分器 v2 当场判定即最终判定。SQL-L1-tuned 269/327（0.823），SQL-L1-tuned-instr 286/327（0.875，含 1 条最终执行报错）。报告待 `reports/results/tuning.md` |
+
+
+## T22b 归因启动前受阻（2026-10-25）
+
+| 计划 run-id | 单元 | 条目 | 已调用 | 费用 | 状态 |
+|---|---|---:|---:|---:|---|
+| 20261025-T22b-attrib-01（尚未创建） | SQL-L1plus 残余歧义归因 | 82 / 38 题 | 0 | 0 | 用户批准 3 元及数据质量辅助标记；新 dry-run 约 2.00 元。自动审批在创建进程前要求补充私有材料向 DeepSeek 官方 API 的具体出站授权；没有 run 目录、没有原始响应，未绕过。Codex 82 条独立标签已先行冻结，Flash 尚未初判，归因未完成。 |
+
+
+## T22b 五类归因正式启动（2026-10-25，追加）
+
+| run-id | 单元 | 条目 | 预算 | 状态 |
+|---|---|---:|---:|---|
+| 20261025-T22b-attrib-01 | SQL-L1plus 残余歧义归因 | 82 / 38 题 | 3 元 | 用户补充明确出站授权后启动；五类 + 单列疑点，另加数据质量辅助标记；原系统消息与语义 / 题库版本及 82 条材料哈希均核对。Codex 标签先行独立冻结，Flash 串行执行，规则不改，异常即停。实际费用与完成情况待结束后追加。 |
+
+
+## T22b 五类归因完成：20261025-T22b-attrib-01（追加）
+
+| run-id | 来源 | 条目 / 调用 | 模型及版本 | 费用 | 结果 |
+|---|---|---|---|---:|---|
+| 20261025-T22b-attrib-01 | SQL-L1plus；20261025-T22b-l1plus-l3a-03-rescore-01 v2 非正确作答；semantic-v1.6-l1plus=866004b；eval-v1.2=90e13b385a639a9164ac78430c50c11a7859f976 | 82/82 条 / 38 题；82 次调用 | deepseek-flash；指纹 e72d3c7f663d3e1383b00b3884cb4501 唯一 | 1.72537972 元 | 用户批准归因上限 3 元并明确出站授权，周日错峰，原生归因命令、串行费用预留；无传输重试、解析失败、指纹冲突、接口异常或待核算请求。五类 + 单列及数据质量辅助标记先写卡后冻结；Codex 82 条独立标签先于 Flash 调用冻结，未改。结果 reports/results/l1plus-error-attribution.md；原始响应在 $SEMDEBT_DATA_DIR/runs-raw/20261025-T22b-attrib-01；逐原始哈希、usage 费用、材料与版本审计通过。前述启动前受阻行保留，不覆盖历史。 |

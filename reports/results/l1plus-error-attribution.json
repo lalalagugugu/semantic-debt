@@ -1,0 +1,1037 @@
+{
+  "run_id": "20261025-T22b-attrib-01",
+  "attempts": 82,
+  "questions": 38,
+  "calls": 82,
+  "cost_cny": 1.72537972,
+  "budget_cny": 3,
+  "uncertain_cost_bound_cny": 0,
+  "source_run": "20261025-T22b-l1plus-l3a-03-rescore-01",
+  "semantic_tag": "semantic-v1.6-l1plus",
+  "semantic_commit": "866004b3b1e55950139ba87f728d3f7f13f26433",
+  "eval_tag": "eval-v1.2",
+  "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+  "codebook_sha256": "ac48b3c678fd3528d721742a4ac74ff9e06246189d7017677e42e11c272de2f1",
+  "system_sha256": "6eb381819b434bb61b0cf37521384ab2369feaf3d3ce37b11279106290cf3262",
+  "codex_csv_sha256": "636971d4850e545ae9650093c66bd4c946a57fc513029c57597176ef7c757869",
+  "codex_frozen_at": "2026-10-25T07:34:58.476845+00:00",
+  "flash": {
+    "categories": {
+      "语义文档里的文字仍有两种以上读法": 0,
+      "口径在语义文档里根本没写": 1,
+      "文档写清楚了，模型理解偏了": 24,
+      "题面本身有歧义": 4,
+      "只是呈现不同": 44,
+      "参考答案或评分可疑": 9
+    },
+    "five_class_total": 73,
+    "single_total": 9,
+    "unparsed": 0,
+    "data_quality_related": 5
+  },
+  "codex": {
+    "categories": {
+      "语义文档里的文字仍有两种以上读法": 0,
+      "口径在语义文档里根本没写": 2,
+      "文档写清楚了，模型理解偏了": 29,
+      "题面本身有歧义": 6,
+      "只是呈现不同": 39,
+      "参考答案或评分可疑": 6
+    },
+    "five_class_total": 76,
+    "single_total": 6,
+    "unparsed": 0,
+    "data_quality_related": 6
+  },
+  "category_agreement": 65,
+  "category_kappa": 0.6706049149338374,
+  "flag_agreement": 81,
+  "data_quality_both": 5,
+  "data_quality_either": 6,
+  "items": [
+    {
+      "qid": "Q05",
+      "rep": 1,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q05",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q104",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q109",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q109",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q110",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q112",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q113",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q113",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q113",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q116",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q116",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q116",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q117",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q117",
+      "rep": 1,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q117",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q118",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q12",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q12",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q12",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q122",
+      "rep": 1,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q122",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q122",
+      "rep": 3,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q17",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q18",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q22",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q23",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q23",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q22",
+      "rep": 3,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q23",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q22",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q26",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q29",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q29",
+      "rep": 3,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q31",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q31",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q31",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q34",
+      "rep": 1,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q36",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q36",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q36",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q58",
+      "rep": 2,
+      "flash": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q58",
+      "rep": 3,
+      "flash": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q58",
+      "rep": 1,
+      "flash": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q64",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q64",
+      "rep": 3,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q65",
+      "rep": 1,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q65",
+      "rep": 3,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q65",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q67",
+      "rep": 3,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q69",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q71",
+      "rep": 2,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      },
+      "codex": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      }
+    },
+    {
+      "qid": "Q71",
+      "rep": 3,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      },
+      "codex": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      }
+    },
+    {
+      "qid": "Q71",
+      "rep": 1,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      },
+      "codex": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      }
+    },
+    {
+      "qid": "Q73",
+      "rep": 1,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q74",
+      "rep": 3,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q75",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q75",
+      "rep": 2,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q75",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q77",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q77",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q77",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q82",
+      "rep": 1,
+      "flash": {
+        "category": "口径在语义文档里根本没写",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "口径在语义文档里根本没写",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q83",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q82",
+      "rep": 2,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      },
+      "codex": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": true
+      }
+    },
+    {
+      "qid": "Q83",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q83",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q85",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q85",
+      "rep": 3,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q85",
+      "rep": 1,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q87",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q88",
+      "rep": 1,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q88",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q88",
+      "rep": 2,
+      "flash": {
+        "category": "参考答案或评分可疑",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q94",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q94",
+      "rep": 2,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q96",
+      "rep": 1,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q96",
+      "rep": 2,
+      "flash": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q96",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "文档写清楚了，模型理解偏了",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q98",
+      "rep": 2,
+      "flash": {
+        "category": "题面本身有歧义",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "口径在语义文档里根本没写",
+        "data_quality_related": false
+      }
+    },
+    {
+      "qid": "Q98",
+      "rep": 3,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": false
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": true
+      }
+    },
+    {
+      "qid": "Q98",
+      "rep": 1,
+      "flash": {
+        "category": "只是呈现不同",
+        "data_quality_related": true
+      },
+      "codex": {
+        "category": "只是呈现不同",
+        "data_quality_related": true
+      }
+    }
+  ]
+}

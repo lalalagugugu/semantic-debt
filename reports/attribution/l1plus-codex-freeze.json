@@ -1,0 +1,10 @@
+{
+  "frozen_at": "2026-10-25T07:34:58.476845+00:00",
+  "reviewer": "Codex",
+  "method": "independent manual review; no Flash labels or reasoning read; Flash process has not started",
+  "csv_sha256": "636971d4850e545ae9650093c66bd4c946a57fc513029c57597176ef7c757869",
+  "preflight_sha256": "5536146af347aeff24aa4763971092e4bfcf22578a35386e11317535d6900cd2",
+  "codebook_sha256": "ac48b3c678fd3528d721742a4ac74ff9e06246189d7017677e42e11c272de2f1",
+  "system_sha256": "6eb381819b434bb61b0cf37521384ab2369feaf3d3ce37b11279106290cf3262",
+  "items": 82
+}
