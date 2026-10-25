@@ -53,7 +53,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    DAX_CELLS, LADDER_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
+    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -815,7 +815,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     args = parse_args(argv)
     names = args.cell or ["all"]
-    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS}
+    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS}
     cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
     if not args.dry_run and sum(c.stack == "dax" for c in cells) > 1:
         print("refusing to start: Power BI Desktop serves one model at a time; run one DAX cell per invocation")
