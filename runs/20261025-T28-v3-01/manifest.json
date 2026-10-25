@@ -1,0 +1,16 @@
+{
+  "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+  "bank_archive_sha256": "2714b757928f2b6cd04571f53d2b92b4eea7503512a65a6fc447f1d77dfd63ac",
+  "code_sha256": {
+    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4",
+    "harness/scorer_v3.py": "692785b1d07890570104019efa5ded13eac3da78f7a89767773dd8df7771d047",
+    "scripts/rescore_t23.py": "ba7df2060f254d8f743ece513a6dd4decd2dd277c31b4330227be45cfb5f6a48",
+    "reports/midterm/v3_data.py": "97d2b9c6dacba2148b639b5f93e245f98cc1ada31e835eb013fa26853a5c7a47"
+  },
+  "source_sha256": {
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L1plus.jsonl": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L3a.jsonl": "67f282deddb1a92b4406133da746e8ba6250cf99c9f81c78127ccbe4dec7a2c6"
+  },
+  "attempts": 654,
+  "cost_cny": 0
+}
