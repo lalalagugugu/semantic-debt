@@ -1,0 +1,231 @@
+{
+  "eval_tag": "eval-v1.2",
+  "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+  "bank_archive_sha256": "2714b757928f2b6cd04571f53d2b92b4eea7503512a65a6fc447f1d77dfd63ac",
+  "code_sha256": {
+    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4",
+    "harness/scorer_v3.py": "4b7d8b5ad3b25ae359144f8317b2684a5f0e06d462d3a01f40d6809847724de2",
+    "scripts/rescore_t23.py": "6967aee9cd11085da185459e640634b5a9eebdd41b9670d05939f353bf9fc409"
+  },
+  "sources": [
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L0",
+      "origin": "repo",
+      "source_log_sha256": "cd18674fad7a222339802f982a7f94a16feec25f06f304c8e27e1dbb4f73ce8c",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1",
+      "origin": "repo",
+      "source_log_sha256": "9d8a6b7ee75de9211642b7a94f88dc1be11f3823b50592b024c388fde897ead6",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1.5S",
+      "origin": "repo",
+      "source_log_sha256": "25ac3f16eb377ef7e2b195dac70e5543fcd27c1eb25fab390184dda40ea9e2fa",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1.5W",
+      "origin": "repo",
+      "source_log_sha256": "c063cd130288d105c7f061c705beae9801dcbb6cb8b2f51bc290cb64bbe1a2c3",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1c",
+      "origin": "repo",
+      "source_log_sha256": "6deb1a4a0c03f68d879794ee09c73a26f2987b8fac0361c1b37a30f42ff2b802",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-R",
+      "origin": "repo",
+      "source_log_sha256": "27ab95f5761450501912ebda3922bb9dd37e4a195b730678b88e95e175757e97",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-C13-ladder-01",
+      "cell": "SQL-L1-T2",
+      "origin": "repo",
+      "source_log_sha256": "60c89fd8e47ee21098be13c979055e1a28b66e45148a6a9e83964e7c8d5fd7c3",
+      "done": 1,
+      "non_done": {
+        "harness_error": 12
+      }
+    },
+    {
+      "run": "20261019-C13-ladder-02",
+      "cell": "SQL-L1-T2",
+      "origin": "repo",
+      "source_log_sha256": "9a28982d4079f0188161afc2d87d9d345bde8ec9bb2b722c3d236c426b8a4965",
+      "done": 327,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-C13-ladder-02",
+      "cell": "SQL-L1-T3",
+      "origin": "repo",
+      "source_log_sha256": "e59be1041f960897f670da39ecb0c329f7ba1b0a8331592c42ad3dc2ec99b39e",
+      "done": 327,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-C13-ladder-02",
+      "cell": "SQL-L1-T4",
+      "origin": "repo",
+      "source_log_sha256": "459032ff2dec16d0225bc173e2df96142b2977ba3550eeddb4d19898cf4697ff",
+      "done": 165,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T13-l15s-v14-01",
+      "cell": "SQL-L1.5S",
+      "origin": "repo",
+      "source_log_sha256": "c7e465c42eddf564ad5a2c622651713aaa916db4e1e8bd1fb1e97d53a63f9c8a",
+      "done": 327,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T15-explorer-01",
+      "cell": "SQL-L0-E",
+      "origin": "repo",
+      "source_log_sha256": "f0c4d2bc3a7c70a129b1f80b2b918f508ee6904bde57a92dc6b2e6c0bf5c9461",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T15-explorer-01",
+      "cell": "SQL-L1-E",
+      "origin": "repo",
+      "source_log_sha256": "a09ce03bb899e739939c7fa3763d21ede9f8b47fdd076973ab88ca482d9227be",
+      "done": 366,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T15-explorer-l2e-01",
+      "cell": "SQL-L2-E",
+      "origin": "repo",
+      "source_log_sha256": "1b63f5e25e24de688130e865ed05cb3a8f263e543ae0279f57391b156826ecb5",
+      "done": 7,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T15-pilot-01",
+      "cell": "SQL-L0-E",
+      "origin": "repo",
+      "source_log_sha256": "c264a3b6b8ef1f78a8a53cf394046b0ed2606cf4a6ff1d817b8f5454b4d91930",
+      "done": 24,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T15-pilot-01",
+      "cell": "SQL-L1-E",
+      "origin": "repo",
+      "source_log_sha256": "55e18dff94f4a919a05669cf5e40b54642d81d8300d21395cc103d2d6d6baeba",
+      "done": 24,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T15-pilot-l0e-02",
+      "cell": "SQL-L0-E",
+      "origin": "repo",
+      "source_log_sha256": "9eb2aa72053bc6354a39f8fbea1ae993d7bf4f222d43a05c32b9b472e2c984ee",
+      "done": 24,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T16-full-v14-json-01",
+      "cell": "JSON-L2",
+      "origin": "repo",
+      "source_log_sha256": "10a1ab5c480b8708c81f6bd9fa61a947cbaf81ed45194a205db23808f3a4c7cf",
+      "done": 327,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T16-full-v14-sql-new-01",
+      "cell": "SQL-L2",
+      "origin": "repo",
+      "source_log_sha256": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+      "done": 327,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T16-full-v14-sql-old-01",
+      "cell": "SQL-L2-notes-v12",
+      "origin": "repo",
+      "source_log_sha256": "f58926226ebb7031d806437c100b5db2196e05b91f68f9002c3ca45be500e2a4",
+      "done": 327,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T16-pilot-01",
+      "cell": "SQL-L2",
+      "origin": "repo",
+      "source_log_sha256": "60f2566162dcc895567a3eb5e445563027ccee03a9e76c1f5a6ff07822f28355",
+      "done": 24,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T16-pilot-v13-02",
+      "cell": "JSON-L2",
+      "origin": "repo",
+      "source_log_sha256": "39b45621001d21574265d912c85e257303d4fe5ec074cb5b98c6b459572fab04",
+      "done": 23,
+      "non_done": {}
+    },
+    {
+      "run": "20261019-T16-pilot-v13-02",
+      "cell": "SQL-L2",
+      "origin": "repo",
+      "source_log_sha256": "70a81ed10ea60194f7f4f99c77c665186c96f5e6dd2615f805f3a7ddbb8be959",
+      "done": 23,
+      "non_done": {}
+    },
+    {
+      "run": "20261020-T15-explorer-l2e-02",
+      "cell": "SQL-L2-E",
+      "origin": "repo",
+      "source_log_sha256": "c9122c04dd556268dcf5fbcae57631405ba61aab037feb2c58826524ab77d746",
+      "done": 284,
+      "non_done": {}
+    },
+    {
+      "run": "20261020-T15-explorer-l2e-03",
+      "cell": "SQL-L2-E",
+      "origin": "repo",
+      "source_log_sha256": "44628d83f320dd6fd64313ffac4d124754b6f3dbf014831ff453853e45aadf4f",
+      "done": 45,
+      "non_done": {}
+    },
+    {
+      "run": "20261025-T14-tuned-01",
+      "cell": "SQL-L1-tuned",
+      "origin": "$SEMDEBT_CARDS_DIR/T14",
+      "source_log_sha256": "e65be80548af9fdcdc818258ad7430f90f42e9dc212c245e78cec3a25f9ceb9b",
+      "done": 327,
+      "non_done": {}
+    },
+    {
+      "run": "20261025-T14-tuned-01",
+      "cell": "SQL-L1-tuned-instr",
+      "origin": "$SEMDEBT_CARDS_DIR/T14",
+      "source_log_sha256": "1be51e0952e64a3ae5f274c9e2b1b2c22e7d1040de02b18232ca7466133fe532",
+      "done": 327,
+      "non_done": {}
+    }
+  ],
+  "t22b_present": false
+}
