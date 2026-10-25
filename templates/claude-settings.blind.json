@@ -22,7 +22,9 @@
       "mcp__claude_ai_Notion",
       "mcp__claude_ai_Google_Drive",
       "mcp__claude_ai_Google_Calendar",
-      "mcp__claude_ai_Gmail"
+      "mcp__claude_ai_Gmail",
+      "Read(/${SEMDEBT_CARD_DIR}/semantic/tuning/**)",
+      "Read(/${SEMDEBT_CARD_DIR}/reports/tuning/**)"
     ]
   },
   "sandbox": {
@@ -31,7 +33,9 @@
         "${SEMDEBT_EVAL_DIR}",
         "${SEMDEBT_DATA_DIR}/runs-raw",
         "${SEMDEBT_MAIN_DIR}/runs",
-        "${SEMDEBT_CARD_DIR}/harness/syntax_ladder/clickhouse_sql_t4.md"
+        "${SEMDEBT_CARD_DIR}/harness/syntax_ladder/clickhouse_sql_t4.md",
+        "${SEMDEBT_CARD_DIR}/semantic/tuning",
+        "${SEMDEBT_CARD_DIR}/reports/tuning"
       ]
     }
   }

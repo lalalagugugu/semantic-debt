@@ -417,3 +417,11 @@ def test_start_card_dry_run_touches_nothing(tmp_path) -> None:
     assert r.returncode == 0, r.stderr
     assert not cards_dir.exists(), "--dry-run 不应该建任何目录"
     assert "git clone" in r.stdout and "[dry-run]" in r.stdout
+
+
+@pytest.mark.parametrize("directory", ["semantic/tuning", "reports/tuning"])
+def test_blind_template_denies_clone_tuning_directories(directory) -> None:
+    cfg = json.loads((REPO / "templates/claude-settings.blind.json").read_text(encoding="utf-8"))
+    path = "${SEMDEBT_CARD_DIR}/" + directory
+    assert f"Read(/{path}/**)" in cfg["permissions"]["deny"]
+    assert path in cfg["sandbox"]["filesystem"]["denyRead"]

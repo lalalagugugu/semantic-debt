@@ -1,0 +1,223 @@
+{
+  "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+  "bootstrap": {
+    "seed": 20261020,
+    "samples": 10000
+  },
+  "sources": {
+    "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L0.jsonl": {
+      "sha256": "22601993ca5a4e71b922747eb0abc5fe0611dd5e4d94cde4316061678da29144",
+      "lines": 366
+    },
+    "runs/20261018-T13-sql-direct-01-rescore-01/SQL-R.jsonl": {
+      "sha256": "fb1d4dcae262b66ff8099eb40272b58ce099340718e84d7b777d097076e27d45",
+      "lines": 366
+    },
+    "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1.jsonl": {
+      "sha256": "89c70e961b448173d7556b39c2765c48ff337f9c41ca1a1660bdec6a639ef77f",
+      "lines": 366
+    },
+    "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1c.jsonl": {
+      "sha256": "be9be7e205a977d6cae0ea140d5e81d1df2cbd53e7eeb38489279b25cb7bba10",
+      "lines": 366
+    },
+    "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1.5W.jsonl": {
+      "sha256": "5c0417609dfc9e05c88f71c209efe3312dc85f96c9ecdc4c40ad34534329fe03",
+      "lines": 366
+    },
+    "runs/20261019-T13-l15s-v14-01/SQL-L1.5S.jsonl": {
+      "sha256": "c7e465c42eddf564ad5a2c622651713aaa916db4e1e8bd1fb1e97d53a63f9c8a",
+      "lines": 327
+    },
+    "runs/20261019-T15-explorer-01-rescore-01/SQL-L0-E.jsonl": {
+      "sha256": "b74a3431321878c8c4326eeac095a97476f425921413698a20d225a392fe6730",
+      "lines": 366
+    },
+    "runs/20261019-T15-explorer-01-rescore-01/SQL-L1-E.jsonl": {
+      "sha256": "c2c215fe0078f93c1f5a805e70a8680243093594768693d8d8abb4da16b1f595",
+      "lines": 366
+    },
+    "runs/20261019-T16-full-v14-sql-new-01-rescore-01/SQL-L2.jsonl": {
+      "sha256": "561ce9e1c4ba28b96a0e37845ac0c0da0960dab48275870e7f8b0f5d43e3a507",
+      "lines": 327
+    },
+    "runs/20261019-T16-full-v14-json-01-rescore-01/JSON-L2.jsonl": {
+      "sha256": "96d3d6f75e015e5db184ed5075ed0ddb95b111ac5557e13b77f0cedd5dfb94f3",
+      "lines": 327
+    },
+    "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl": {
+      "sha256": "c9122c04dd556268dcf5fbcae57631405ba61aab037feb2c58826524ab77d746",
+      "lines": 284
+    },
+    "runs/20261020-T15-explorer-l2e-03/SQL-L2-E.jsonl": {
+      "sha256": "44628d83f320dd6fd64313ffac4d124754b6f3dbf014831ff453853e45aadf4f",
+      "lines": 45
+    },
+    "runs/20261019-C13-ladder-02/SQL-L1-T2.jsonl": {
+      "sha256": "9a28982d4079f0188161afc2d87d9d345bde8ec9bb2b722c3d236c426b8a4965",
+      "lines": 327
+    },
+    "runs/20261019-C13-ladder-02/SQL-L1-T3.jsonl": {
+      "sha256": "e59be1041f960897f670da39ecb0c329f7ba1b0a8331592c42ad3dc2ec99b39e",
+      "lines": 327
+    },
+    "runs/20261019-C13-ladder-02/SQL-L1-T4.jsonl": {
+      "sha256": "459032ff2dec16d0225bc173e2df96142b2977ba3550eeddb4d19898cf4697ff",
+      "lines": 165
+    },
+    "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1.5S.jsonl": {
+      "sha256": "e854810e2fb1d5a97e119bcce86641a03e42bc89dd0282e09daa069f0f39a8da",
+      "lines": 366
+    },
+    "runs/20261019-T16-full-v14-sql-old-01-rescore-01/SQL-L2-notes-v12.jsonl": {
+      "sha256": "5cffb2ad14cda5154b15cb5dcf78a3ece853dcaf1abd7136a1100d54ac83265b",
+      "lines": 327
+    },
+    "runs/20261023-T19c-confidence-01/confidence.jsonl": {
+      "sha256": "744bc12565b95a5b83e13143ec83f53a6bd2388e0dad5c4c9837ad335a151616",
+      "lines": 327
+    },
+    "reports/attribution/codex.csv": {
+      "sha256": "7a632e315fded692e74a4c468f3857747a9dc7b28b2d1590c45110492c369f23",
+      "lines": 118
+    },
+    "reports/midterm/review.json": {
+      "sha256": "e8d5fdbd14ecfb98afa38185b71a474a74b0b2731a457b6f3333c1da387d9af1",
+      "lines": 22
+    },
+    "reports/midterm/analyze.py": {
+      "sha256": "73683fedfe1075653bb09fbfe515ca628c40a112cc6efa9423f771a74839892a",
+      "lines": 375
+    },
+    "reports/midterm/quality.py": {
+      "sha256": "b8f07402a8dbeb93270aadba53de3c28bf7313539ff5424a3ef6831af09e0eb7",
+      "lines": 155
+    },
+    "harness/cells.py": {
+      "sha256": "c618e43e47f42359506718a9ece49ff86eeb9a81edc46d598b13ae11e7475951",
+      "lines": 118
+    },
+    "runs/INDEX.md": {
+      "sha256": "c6cef9366679649f012795279875fcecb1c3194417f5052219e1926a01119fb8",
+      "lines": 53
+    },
+    "reports/midterm/quality-evidence.json": {
+      "sha256": "fd1401d12347c49acaacabc5ed8b2dcba99cfe65086ae9952427e3cb7a409c2f",
+      "lines": 1075
+    }
+  },
+  "units": [
+    [
+      "SQL-L0",
+      "定稿",
+      "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L0.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-R",
+      "定稿",
+      "runs/20261018-T13-sql-direct-01-rescore-01/SQL-R.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-L1",
+      "定稿",
+      "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-L1c",
+      "定稿",
+      "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1c.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-L1.5W",
+      "定稿",
+      "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1.5W.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-L1.5S",
+      "定稿 semantic-v1.4",
+      "runs/20261019-T13-l15s-v14-01/SQL-L1.5S.jsonl",
+      327,
+      "无"
+    ],
+    [
+      "SQL-L0-E",
+      "定稿",
+      "runs/20261019-T15-explorer-01-rescore-01/SQL-L0-E.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-L1-E",
+      "定稿",
+      "runs/20261019-T15-explorer-01-rescore-01/SQL-L1-E.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-L2",
+      "定稿 新说明",
+      "runs/20261019-T16-full-v14-sql-new-01-rescore-01/SQL-L2.jsonl",
+      327,
+      "无"
+    ],
+    [
+      "JSON-L2",
+      "定稿",
+      "runs/20261019-T16-full-v14-json-01-rescore-01/JSON-L2.jsonl",
+      327,
+      "无"
+    ],
+    [
+      "SQL-L2-E",
+      "定稿 续跑合并",
+      "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl + runs/20261020-T15-explorer-l2e-03/SQL-L2-E.jsonl",
+      327,
+      "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl:284, runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl:283"
+    ],
+    [
+      "SQL-L1-T2",
+      "定稿；T4 仅留出题",
+      "runs/20261019-C13-ladder-02/SQL-L1-T2.jsonl",
+      327,
+      "无"
+    ],
+    [
+      "SQL-L1-T3",
+      "定稿；T4 仅留出题",
+      "runs/20261019-C13-ladder-02/SQL-L1-T3.jsonl",
+      327,
+      "无"
+    ],
+    [
+      "SQL-L1-T4",
+      "定稿；T4 仅留出题",
+      "runs/20261019-C13-ladder-02/SQL-L1-T4.jsonl",
+      165,
+      "无"
+    ],
+    [
+      "SQL-L1.5S-old",
+      "旧版；被 SQL-L1.5S semantic-v1.4 替代",
+      "runs/20261018-T13-sql-direct-01-rescore-01/SQL-L1.5S.jsonl",
+      366,
+      "无"
+    ],
+    [
+      "SQL-L2-notes-v12",
+      "旧说明；被 SQL-L2 新说明替代",
+      "runs/20261019-T16-full-v14-sql-old-01-rescore-01/SQL-L2-notes-v12.jsonl",
+      327,
+      "无"
+    ]
+  ]
+}
