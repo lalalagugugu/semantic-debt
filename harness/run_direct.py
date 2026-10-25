@@ -864,7 +864,9 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     args = parse_args(argv)
     names = args.cell or ["all"]
-    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS, **SELECTIVE_CELLS}
+    from harness.cells import COMBO_CELLS
+
+    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS, **COMBO_CELLS, **SELECTIVE_CELLS}
     cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
     if not args.dry_run and sum(c.stack == "dax" for c in cells) > 1:
         print("refusing to start: Power BI Desktop serves one model at a time; run one DAX cell per invocation")

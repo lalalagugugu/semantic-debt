@@ -61,3 +61,5 @@ cards:
   - {id: T27,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T27-combo-conflict-check.md, note: "叠加单元（L1+ + 调优 + 指令）冲突核对；免费；运行等用户"}
   - {id: T28,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T28-midterm-v3-data.md, note: "中期报告 v3 补数：只用现有日志，免费；协调会话重算验收"}
   - {id: T29,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T29-selective-answering.md, note: "会取舍（+1/−k/0，k=1、3）与声明假设的服务层单元；试跑 ≤1 元，正式 ≤12 元待用户批"}
+  - {id: T30,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T30-combo-cell.md, note: "叠加单元 L1+ + 调优（去掉 T27 的 12 条冲突）+ 作答要求；≤6 元待用户批"}
+  - {id: T31,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T31-reference-and-presentation-review.md, note: "可疑参考答案集中核对 + 呈现差异逐类盘点（是否进一步放宽评分）；免费，只读题库"}
