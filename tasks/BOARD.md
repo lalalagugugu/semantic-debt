@@ -40,7 +40,7 @@
 | T22b | L1+ / L3a 渲染、运行、报告、残余歧义归因（`tasks/T22b-l1plus-render-run.md`） | Codex | 主仓库 clone | T22 第 1–3 步 | 15 + 3 元（Flash，用户已上调） | 运行与报告已完成，协调会话独立复算数字一致；98 题 L1plus 75.5%、L3a 74.5%，运行已知累计 8.09429950 元。归因 20261025-T22b-attrib-01 完成 82/82 条、1.72537972 元；五类 + 单列及数据质量标记固定，Flash / Codex 独立计数与题号清单见 reports/results/l1plus-error-attribution.md；无异常或待核算费用，PR #176 待协调验收归因 |
 | T29 | 会取舍、会声明假设的作答（`tasks/T29-selective-answering.md`） | Codex | 主仓库 clone | `semantic-v1.6-l1plus` | 1 + 12 元（Flash，待用户批） | 未开始；设计用户 2026-10-25 审定 |
 | T23 | 评分器呈现容错 v3 与全部单元离线重评（`tasks/T23-scorer-presentation.md`） | Codex | 主仓库 clone | `harness-v1.1` | 0 | 实现及现有 27 份日志 / 6,188 条作答重评完成（2026-10-25，`20261025-T23-v3-02`）；451 tests passed；v2 仍为主数字，v3 敏感性分析；82 条新增判对待 Claude Code 逐条复核，T22b 完成后补评 |
-| T30 | 叠加单元：L1+ + 调优 + 作答要求（`tasks/T30-combo-cell.md`） | Codex | 主仓库 clone | T27；`semantic-v1.6-l1plus`、`semantic-tuned-v1` | 6 元（Flash，待用户批） | 未开始；用户 2026-10-25 同意运行 |
+| T30 | 叠加单元：L1+ + 调优 + 作答要求（`tasks/T30-combo-cell.md`） | Codex | 主仓库 clone | T27；`semantic-v1.6-l1plus`、`semantic-tuned-v1` | 6 元（Flash，待用户批） | 已渲染，13 项测试通过；待合并打 combo tag 后 dry-run；用户允许与 T29 同跑，chDB 用独立副本 |
 | T24 | 中期报告补数：稳定性、C4–C7、token、数据集与数据质量、名词表、数字来源（`tasks/T24-midterm-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）；入口 `reports/midterm/README.md`；T14、L1+、L3a留位待补 |
 | T28 | 中期报告 v3 补数（`tasks/T28-midterm-v3-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 未开始 |
 | T25 | 立刻要修的流程缺口（`tasks/T25-immediate-fixes.md`） | Codex | 主仓库 clone | — | 0 | 已完成，待协调验收（2026-10-25）：调优目录双层禁读、4 项测试跳过保护、dry-run 预算检查；全量 1070 passed / 6 skipped |
