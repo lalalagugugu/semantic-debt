@@ -54,6 +54,7 @@ CELLS: dict[str, tuple[str, str, str | None]] = {
     "SQL-L0": ("sql", "L0", None),
     "SQL-L1": ("sql", "L1", None),
     "SQL-L1plus": ("sql", "L1plus", None),
+    "SQL-L1plus-tuned-instr": ("sql", "L1plus", "SQL-L1.combo"),
     "SQL-L3a": ("sql", "L3a", None),
     "SQL-L1.5W": ("sql", "L1.5W", None),
     "SQL-L1.5S": ("sql", "L1.5S", None),
