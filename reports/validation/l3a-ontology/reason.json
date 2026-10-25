@@ -1,0 +1,25 @@
+{
+ "asserted_subclass_cycles": [],
+ "asserted_triples": 5701,
+ "class_and_individual_punning": [],
+ "closure_triples": 9910,
+ "dl_reasoner": "not run: no Java runtime on this machine (HermiT / Pellet need one); not installed by this card",
+ "equivalent_named_class_pairs_in_closure": [],
+ "inconsistency_messages": [],
+ "named_classes": 65,
+ "named_individuals": 237,
+ "new_named_class_memberships": [],
+ "owl_Nothing_members": [],
+ "reasoner": "owlrl 7.6.2 OWL-RL closure (axiomatic and datatype axioms off)",
+ "undeclared_predicates_used": {
+  "rdf:_n": 960,
+  "sh:hasValue": 25,
+  "sh:in": 1,
+  "sh:maxCount": 1,
+  "sh:minCount": 1,
+  "sh:path": 26,
+  "sh:property": 26,
+  "sh:targetClass": 26
+ },
+ "unsatisfiable_named_classes": []
+}

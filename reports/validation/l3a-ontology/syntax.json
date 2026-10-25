@@ -1,0 +1,28 @@
+{
+ "bytes_utf8": 406610,
+ "declared_prefixes": {
+  "": "urn:semdebt:l1plus:",
+  "owl": "http://www.w3.org/2002/07/owl#",
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+  "sh": "http://www.w3.org/ns/shacl#",
+  "xsd": "http://www.w3.org/2001/XMLSchema#"
+ },
+ "emitted_lines_parsed_by_generator_reader": 5701,
+ "iri_uses_by_namespace": {
+  "": 10473,
+  "owl": 388,
+  "rdf": 1620,
+  "rdfs": 626,
+  "sh": 158
+ },
+ "literal_datatypes": {
+  "http://www.w3.org/2001/XMLSchema#integer": 12,
+  "plain": 3826
+ },
+ "ntriples_roundtrip_triples": 5701,
+ "parse_errors": [],
+ "parser": "rdflib 7.6.0 (turtle)",
+ "roundtrip_isomorphic": true,
+ "triples": 5701
+}

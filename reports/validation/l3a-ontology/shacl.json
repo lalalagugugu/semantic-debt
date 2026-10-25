@@ -1,0 +1,246 @@
+{
+ "engine": "pyshacl 0.40.1",
+ "every_shape_accepts_good": true,
+ "every_shape_rejects_bad": true,
+ "every_shape_rejects_missing": true,
+ "meta_shacl_conforms": true,
+ "node_shapes": 26,
+ "on_l3a_itself_as_data": true,
+ "probes": [
+  {
+   "bad": false,
+   "good": true,
+   "kind": "in+count",
+   "missing": false,
+   "path": ":ScenarioKey",
+   "shape": ":H10Shape",
+   "target": ":class/计划、目标记录"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":channelKey",
+   "shape": ":shape/H01/全渠道线上汇总行",
+   "target": ":class/全渠道线上汇总行"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":SalesQuantity",
+   "shape": ":shape/H01/线上退货行",
+   "target": ":class/线上退货行"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":StoreType",
+   "shape": ":shape/H02/实体店",
+   "target": ":class/实体店"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Status",
+   "shape": ":shape/H02/已关店门店",
+   "target": ":class/已关店门店"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":StoreType",
+   "shape": ":shape/H02/目录店",
+   "target": ":class/目录店"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":StoreType",
+   "shape": ":shape/H02/线上店",
+   "target": ":class/线上店"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":StoreType",
+   "shape": ":shape/H02/经销店",
+   "target": ":class/经销店"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Status",
+   "shape": ":shape/H02/营业中门店",
+   "target": ":class/营业中门店"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Status",
+   "shape": ":shape/H03/停售产品",
+   "target": ":class/停售产品"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Status",
+   "shape": ":shape/H03/在售产品",
+   "target": ":class/在售产品"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Title",
+   "shape": ":shape/H06/大区经理",
+   "target": ":class/大区经理"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Title",
+   "shape": ":shape/H06/州经理",
+   "target": ":class/州经理"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Title",
+   "shape": ":shape/H06/销售总监",
+   "target": ":class/销售总监"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":Title",
+   "shape": ":shape/H06/门店经理",
+   "target": ":class/门店经理"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":PromotionKey",
+   "shape": ":shape/H09/无折扣交易",
+   "target": ":class/无折扣交易"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":ScenarioKey",
+   "shape": ":shape/H10/Actual",
+   "target": ":class/Actual"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":ScenarioKey",
+   "shape": ":shape/H10/Budget",
+   "target": ":class/Budget"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":ScenarioKey",
+   "shape": ":shape/H10/Forecast",
+   "target": ":class/Forecast"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":IsWorkDay",
+   "shape": ":shape/H11/周末",
+   "target": ":class/周末"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":IsWorkDay",
+   "shape": ":shape/H11/工作日",
+   "target": ":class/工作日"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":OnHandQuantity",
+   "shape": ":shape/H12/零库存组合",
+   "target": ":class/零库存组合"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":CostType",
+   "shape": ":shape/H13/年度维护费",
+   "target": ":class/年度维护费"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":CostType",
+   "shape": ":shape/H13/设备购置费",
+   "target": ":class/设备购置费"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":MachineType",
+   "shape": ":shape/H13/路由器",
+   "target": ":class/路由器"
+  },
+  {
+   "bad": false,
+   "good": true,
+   "kind": "hasValue",
+   "missing": false,
+   "path": ":MachineType",
+   "shape": ":shape/H13/集线器",
+   "target": ":class/集线器"
+  }
+ ],
+ "property_shapes": 26
+}

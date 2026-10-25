@@ -1,6 +1,6 @@
 # T26 L3a 本体质量校验（免费）
 
-- 状态：未开始
+- 状态：完成，待协调会话验收
 - 负责：Claude Code（新会话，普通模式；不得由协调会话或其子 agent 代做）
 - 模式：open
 - 依据：用户 2026-10-25「L3A 里头写的本体，既没有跑过推理机，也没有跑过 SHACL 约束检验，怎么判断我们写的本体是高质量的呢？……所以本体校验还是要做的。」
@@ -41,3 +41,25 @@
 ## 验收（协调会话）
 
 协调会话重跑步骤 1、2、4 的命令核对结论；抽 5 条步骤 3 的判定对照原文；步骤 5 核对查出的环和孤儿行数与 T24 的数据质量报告一致（FactOnlineSales 孤儿行 1,715,380 条）。
+
+## 2026-10-25 执行记录（Claude Code）
+
+- 状态：步骤 1–7 完成；未调用付费模型；`semantic/`、`render/`、L3a 产物、评分器均未改动（`render/l1plus.py` 重跑后对应核对报告逐字节不变）。
+- 产出：报告 `reports/validation/l3a-ontology-validation.md`；逐步结果 `reports/validation/l3a-ontology/{syntax,reason,model,shacl,data,missed}.json`（只含条目编号与题号）；脚本 `scripts/t26/ontology_check.py`；另写的数据 shape `scripts/t26/data-shapes.ttl`（不并入 L3a）；事先登记 `scripts/t26/preregistered.py`（提交 c64f4f1，早于读取逐题结果）；测试 `tests/test_t26_ontology.py`（5 passed）。
+- 结论摘要：
+  - 语法 5,701 三元组无错；OWL-RL 无不一致、无不可满足类、无子类环（DL 推理器未跑：本机无 Java 运行时）；
+  - 30 条形式化条目 一致 28 / 不一致 1（E07 丢了不区分大小写的 filter）/ 拿不准 1（E09 把条件放进 :value）；
+  - pySHACL：26 个 shape 合法、可执行；
+  - 数据回测查出两个环（科目 1、24，员工 1、18）、284 个孤儿键 / 1,715,380 行、Blue 148 / blue 2，与 T24 一致；未查出新问题；
+  - E07 涉及的 13 题无一参考按蓝色筛选 → 没有「误导且涉及 L3a 错题」的错误，按事先登记不重跑；
+  - 79 条注解里 16 条有现成写法，涉及 32 题，L3a 错 14 题（L1+ 错 13 题），作为 L3b 输入。
+- 复现：见报告「复现」一节（`uv run --group ontology python -m scripts.t26.ontology_check ...`）。
+- 偏离与理由：
+  - 依赖用 `ontology` 依赖组（不是默认依赖），未改动已有依赖版本；
+  - 步骤 6 的签名对照参考 SQL 机械匹配，规则在看结果前提交；E07 的「参考是否按蓝色筛选」是映射之后的补充核对，报告里已标明。
+- 未处理的已有问题：`tests/test_repo_layout.py::test_open_modes_gated_behind_g1` 在 main 上就失败——`tasks/cards.yaml` 的 T26 行（open 模式）没写 `after:`。这是协调会话加的行，不在本卡范围，没有改，交给协调会话补（建议 `after: G3`）。
+- 工时：约 1.5 小时（含数据回测运行约 7 分钟）。
+
+### 用户确认
+
+- [ ] 是否仍要修正 E07（及 E09、H05 的编码）后重跑 SQL-L3a（约 5 元）。按事先登记不触发重跑，由用户定。

@@ -11,6 +11,11 @@ dependencies = [
 
 [dependency-groups]
 dev = ["pytest>=8.0"]
+ontology = [
+    "owlrl>=7.6.2",
+    "pyshacl>=0.40.1",
+    "rdflib>=7.6.0",
+]
 # T17: DAX against Power BI Desktop's local engine (ADOMD.NET via pythonnet); Windows only
 windows = [
     "pyadomd>=0.1.1; sys_platform == 'win32'",
