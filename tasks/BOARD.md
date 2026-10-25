@@ -42,7 +42,7 @@
 | T23 | 评分器呈现容错 v3 与全部单元离线重评（`tasks/T23-scorer-presentation.md`） | Codex | 主仓库 clone | `harness-v1.1` | 0 | 实现及现有 27 份日志 / 6,188 条作答重评完成（2026-10-25，`20261025-T23-v3-02`）；451 tests passed；v2 仍为主数字，v3 敏感性分析；82 条新增判对待 Claude Code 逐条复核，T22b 完成后补评 |
 | T30 | 叠加单元：L1+ + 调优 + 作答要求（`tasks/T30-combo-cell.md`） | Codex | 主仓库 clone | T27；`semantic-v1.6-l1plus`、`semantic-tuned-v1` | 6 元（Flash，待用户批） | 未开始；用户 2026-10-25 同意运行 |
 | T24 | 中期报告补数：稳定性、C4–C7、token、数据集与数据质量、名词表、数字来源（`tasks/T24-midterm-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）；入口 `reports/midterm/README.md`；T14、L1+、L3a留位待补 |
-| T28 | 中期报告 v3 补数（`tasks/T28-midterm-v3-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 未开始 |
+| T28 | 中期报告 v3 补数（`tasks/T28-midterm-v3-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）：`reports/midterm/v3-data.md`含11项补数；21条调优残余人工分类，L1plus/L3a免费v3补评654条；主表v3为76.9%/77.2%，L1plus归因上界86.4%，L3a缺少双方归因不计算；本卡费用0元 |
 | T25 | 立刻要修的流程缺口（`tasks/T25-immediate-fixes.md`） | Codex | 主仓库 clone | — | 0 | 已完成，待协调验收（2026-10-25）：调优目录双层禁读、4 项测试跳过保护、dry-run 预算检查；全量 1070 passed / 6 skipped |
 | T26 | L3a 本体质量校验（`tasks/T26-ontology-validation.md`） | Claude Code（新会话） | 普通 | T22b | 0 | 完成，协调会话已验收（2026-10-25，重跑步骤 1、2、4 逐字节一致）：语法 / OWL-RL / SHACL 无错；30 条形式化 一致 28、不一致 1（E07）、拿不准 1；数据回测查出两环、1,715,380 孤儿行、Blue/blue；无误导性错误涉及 L3a 错题，按事先登记不重跑；16 条可形式化涉及 32 题（L3a 错 14） |
 | T27 | 叠加单元冲突核对（`tasks/T27-combo-conflict-check.md`） | Codex | 主仓库 clone | T22b、T14 | 0 | 核对完成，协调会话已验收、#175 已合并（2026-10-25）：109 × 62 条静态核对，重复 21 对、互补 287 对、冲突 17 对（12 个调优条目）；报告 `reports/validation/combo-conflicts.md`；未删条目、未运行，运行等用户「跑叠加」 |
