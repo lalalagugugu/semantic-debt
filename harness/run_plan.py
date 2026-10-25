@@ -509,11 +509,11 @@ def main(argv: list[str] | None = None, load=None, sandbox=None) -> int:
                           growth=args.est_growth_tokens, output=args.est_output_tokens,
                           question_tokens=args.est_question_tokens, use_measured=not args.est_from_args)
     print_dry_run(rows, total, args.model, args.reps)
-    if args.dry_run:
-        return 0
     if args.budget is not None and total > args.budget:
         print(f"estimate {total:.2f} CNY exceeds budget {args.budget:.2f}; stop and ask the user")
         return 2
+    if args.dry_run:
+        return 0
     if R.is_peak() and not args.allow_peak:
         print("DeepSeek peak hours (weekdays 09-12, 14-18 Beijing): batch runs go off-peak (hard rule 6)")
         return 2

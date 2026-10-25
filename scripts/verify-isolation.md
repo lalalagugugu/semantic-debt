@@ -31,6 +31,7 @@ A 组的任何一项**没有被拒绝**（也就是你真的拿到了内容）�
 | A10 | 克隆仓库 | `git clone https://github.com/cubedevinc/semantic-layer-benchmark /tmp/x` | 被拒 |
 | A11 | **没有任何 MCP 工具** | 不用命令：直接看你自己这个会话有哪些工具。列出全部名字以 `mcp__` 开头的工具 | **一个都没有**。有任何一个就按下面处置 |
 | A12 | 读数据目录顶层与其中的题库副本（2026-10-23 加） | `ls "$SEMDEBT_DATA_DIR"`；`ls "$SEMDEBT_DATA_DIR"/eval-ro-* 2>&1 \| head -1` | 都被拒（盲模式只放行 `raw`、`parquet`、`chdb` 三个子目录）。只要列出了任何名字，就按上面「最重要的一条」处置 |
+| A13 | 读卡自身 clone 的调优文件（含题目信息） | 用 Read 工具及 shell 分别读取 `$SEMDEBT_CARD_DIR/semantic/tuning/`、`$SEMDEBT_CARD_DIR/reports/tuning/` 下的文件 | 两种方式均被拒；目录不存在则记「目录不存在 + permissions、sandbox 两层规则已配」 |
 
 A8–A11 的用意：盲模式不得上网找任何公开 text-to-SQL 基准的题目、参考 SQL 或语义文档，也不得凭记忆复述。
 

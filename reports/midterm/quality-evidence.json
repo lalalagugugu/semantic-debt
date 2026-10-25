@@ -1,0 +1,1075 @@
+{
+  "ddl_sha256": "17b77c6f1863a61e28f0c8efb2aad5c0792d2e009c260af5d4105a3532bbb236",
+  "chdb_version": "4.4.0",
+  "inputs": [
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimAccount.parquet",
+      "bytes": 3566,
+      "sha256": "ea200e6d5ab2fcb8712a8a91fdb1de8138cd4bf93023a5123d7187595f37e057"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimChannel.parquet",
+      "bytes": 1405,
+      "sha256": "40afb705727436cffa3178de7a6835d5c337fcbd3cf18b5e81e234127a9c3548"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimCurrency.parquet",
+      "bytes": 1970,
+      "sha256": "278d048a4a5e76df9eeeab575cc1d80719268a2f12735bb21f9a3cd19488271b"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimCustomer.parquet",
+      "bytes": 422636,
+      "sha256": "f87078494cd95de32a5f6ad28796275bad5b6ccf6609f388fbeff687b450f590"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimDate.parquet",
+      "bytes": 23978,
+      "sha256": "2b025d972730f6eecee61de0cd14d3a2fe496257db434a812fa46377b083bc75"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimEmployee.parquet",
+      "bytes": 30827,
+      "sha256": "b1c4bb96ff6b4a77c67a6959801a1d46d5fce1c35978cd8eefe2bd1a59039774"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimEntity.parquet",
+      "bytes": 18961,
+      "sha256": "431bb6a956070cd2ebb92397d9af688bfcfa8644faf78c73b6e9474860526571"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimGeography.parquet",
+      "bytes": 13679,
+      "sha256": "38f12485a46cfbf7292508dea60fffca6440ea9c293c956b45b96fc0492c78cf"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimMachine.parquet",
+      "bytes": 60598,
+      "sha256": "3adbc509d21eeddae86147aa5e0d6ad963c188b67c257736222261fb9ce81454"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimOutage.parquet",
+      "bytes": 8012,
+      "sha256": "fa1698d9a4b1cc3e26115345b592399e447dcbc3488fc27753c354adbd1c70ca"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimProduct.parquet",
+      "bytes": 89785,
+      "sha256": "30d761a21522376efb3b5ed2b3b41bc464bdffdc8583bbbc683fb18e3b861147"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimProductCategory.parquet",
+      "bytes": 1125,
+      "sha256": "04b0715bb9688c3b9653259c20ef742178bb523ed135c3c307ad0183f64a20ff"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimProductSubcategory.parquet",
+      "bytes": 2176,
+      "sha256": "f13cccfe26fb7d05677b38b1267d2712e36bc56c969e7a6b994ca8bac51f2762"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimPromotion.parquet",
+      "bytes": 2851,
+      "sha256": "2b3267613997a2bb396530be7d4c723b78505cdb010939a6d2d5876832ac0ad9"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimSalesTerritory.parquet",
+      "bytes": 13309,
+      "sha256": "44fd95779ece64d235addec415be062880597ad57e69db01fcbb5df624fd69f2"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimScenario.parquet",
+      "bytes": 957,
+      "sha256": "887c2f59662585c929cfd8b66a733b9a1a70577aed56a2ea59699fdc2a4f967b"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/DimStore.parquet",
+      "bytes": 22922,
+      "sha256": "9f7d2c768e467f579a13ab31fd9938a181b721bb70ba9bedeb3c1b7e1ac50933"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactExchangeRate.parquet",
+      "bytes": 18277,
+      "sha256": "046b0577ba874b497b0a445d34b7e615db1ddb976924c9811445a53e25a6285c"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactITMachine.parquet",
+      "bytes": 199978,
+      "sha256": "cb2c0673f0baaa37d873570af56cb746cb2f00c844e2596f462af61d8de0b76d"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactITSLA.parquet",
+      "bytes": 149670,
+      "sha256": "1eb8a02a7b28aff20f92b72faaace562f15bf225d370fe1d59946ff97c6425f3"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactInventory.parquet",
+      "bytes": 96949300,
+      "sha256": "d6efdf54bb05f7e40621e14d4316b5f418b54631efd85805d046faf099ed26bf"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactOnlineSales.parquet",
+      "bytes": 75199480,
+      "sha256": "9eb47c074acb121eb9821b04d2ebd76c7fb4d764ac12dfbbd2a8e44a39b247a0"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactSales.parquet",
+      "bytes": 53380867,
+      "sha256": "75e0edf8a023907e2b64abc278445794e6ebed4364237228942692e377845f4c"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactSalesQuota.parquet",
+      "bytes": 102736229,
+      "sha256": "68daaba38eafa702126d5b30691d44f2d3f1fea279149f358450f0f6267e04e3"
+    },
+    {
+      "path": "$SEMDEBT_DATA_DIR/parquet/FactStrategyPlan.parquet",
+      "bytes": 30256483,
+      "sha256": "2f1bb7de1360a92af0812455c4d657fd116ae7c38699ca1c5e7e68da8a26cdc9"
+    }
+  ],
+  "queries": [
+    {
+      "id": 1,
+      "sql": "SELECT count() AS n FROM retail.DimAccount",
+      "result": [
+        {
+          "n": 24
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "sql": "SELECT count() AS n FROM retail.DimChannel",
+      "result": [
+        {
+          "n": 4
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "sql": "SELECT count() AS n FROM retail.DimCurrency",
+      "result": [
+        {
+          "n": 28
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "sql": "SELECT count() AS n FROM retail.DimCustomer",
+      "result": [
+        {
+          "n": 18869
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "sql": "SELECT count() AS n FROM retail.DimDate",
+      "result": [
+        {
+          "n": 2556
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "sql": "SELECT count() AS n FROM retail.DimEmployee",
+      "result": [
+        {
+          "n": 293
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "sql": "SELECT count() AS n FROM retail.DimEntity",
+      "result": [
+        {
+          "n": 421
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "sql": "SELECT count() AS n FROM retail.DimGeography",
+      "result": [
+        {
+          "n": 674
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "sql": "SELECT count() AS n FROM retail.DimMachine",
+      "result": [
+        {
+          "n": 7816
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "sql": "SELECT count() AS n FROM retail.DimOutage",
+      "result": [
+        {
+          "n": 303
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "sql": "SELECT count() AS n FROM retail.DimProduct",
+      "result": [
+        {
+          "n": 2233
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "sql": "SELECT count() AS n FROM retail.DimProductCategory",
+      "result": [
+        {
+          "n": 8
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "sql": "SELECT count() AS n FROM retail.DimProductSubcategory",
+      "result": [
+        {
+          "n": 44
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "sql": "SELECT count() AS n FROM retail.DimPromotion",
+      "result": [
+        {
+          "n": 28
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "sql": "SELECT count() AS n FROM retail.DimSalesTerritory",
+      "result": [
+        {
+          "n": 265
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "sql": "SELECT count() AS n FROM retail.DimScenario",
+      "result": [
+        {
+          "n": 3
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "sql": "SELECT count() AS n FROM retail.DimStore",
+      "result": [
+        {
+          "n": 306
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "sql": "SELECT count() AS n FROM retail.FactExchangeRate",
+      "result": [
+        {
+          "n": 773
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "sql": "SELECT count() AS n FROM retail.FactITMachine",
+      "result": [
+        {
+          "n": 23283
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "sql": "SELECT count() AS n FROM retail.FactITSLA",
+      "result": [
+        {
+          "n": 4925
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "sql": "SELECT count() AS n FROM retail.FactInventory",
+      "result": [
+        {
+          "n": 8013099
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales",
+      "result": [
+        {
+          "n": 12627608
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "sql": "SELECT count() AS n FROM retail.FactSales",
+      "result": [
+        {
+          "n": 3406089
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "sql": "SELECT count() AS n FROM retail.FactSalesQuota",
+      "result": [
+        {
+          "n": 7465911
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "sql": "SELECT count() AS n FROM retail.FactStrategyPlan",
+      "result": [
+        {
+          "n": 2750628
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "sql": "SELECT count() AS n FROM retail.DimAccount WHERE ParentAccountKey IS NOT NULL AND ParentAccountKey NOT IN (SELECT AccountKey FROM retail.DimAccount)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "sql": "SELECT count() AS n FROM retail.DimCustomer WHERE GeographyKey IS NOT NULL AND GeographyKey NOT IN (SELECT GeographyKey FROM retail.DimGeography)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "sql": "SELECT count() AS n FROM retail.DimEmployee WHERE ParentEmployeeKey IS NOT NULL AND ParentEmployeeKey NOT IN (SELECT EmployeeKey FROM retail.DimEmployee)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "sql": "SELECT count() AS n FROM retail.DimEntity WHERE ParentEntityKey IS NOT NULL AND ParentEntityKey NOT IN (SELECT EntityKey FROM retail.DimEntity)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "sql": "SELECT count() AS n FROM retail.DimMachine WHERE StoreKey IS NOT NULL AND StoreKey NOT IN (SELECT StoreKey FROM retail.DimStore)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "sql": "SELECT count() AS n FROM retail.DimProduct WHERE ProductSubcategoryKey IS NOT NULL AND ProductSubcategoryKey NOT IN (SELECT ProductSubcategoryKey FROM retail.DimProductSubcategory)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "sql": "SELECT count() AS n FROM retail.DimProductSubcategory WHERE ProductCategoryKey IS NOT NULL AND ProductCategoryKey NOT IN (SELECT ProductCategoryKey FROM retail.DimProductCategory)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "sql": "SELECT count() AS n FROM retail.DimSalesTerritory WHERE GeographyKey IS NOT NULL AND GeographyKey NOT IN (SELECT GeographyKey FROM retail.DimGeography)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "sql": "SELECT count() AS n FROM retail.DimSalesTerritory WHERE EmployeeKey IS NOT NULL AND EmployeeKey NOT IN (SELECT EmployeeKey FROM retail.DimEmployee)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "sql": "SELECT count() AS n FROM retail.DimStore WHERE GeographyKey IS NOT NULL AND GeographyKey NOT IN (SELECT GeographyKey FROM retail.DimGeography)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "sql": "SELECT count() AS n FROM retail.DimStore WHERE EntityKey IS NOT NULL AND EntityKey NOT IN (SELECT EntityKey FROM retail.DimEntity)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "sql": "SELECT count() AS n FROM retail.DimStore WHERE EmployeeKey IS NOT NULL AND EmployeeKey NOT IN (SELECT EmployeeKey FROM retail.DimEmployee)",
+      "result": [
+        {
+          "n": 1
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "sql": "SELECT count() AS n FROM retail.FactExchangeRate WHERE CurrencyKey IS NOT NULL AND CurrencyKey NOT IN (SELECT CurrencyKey FROM retail.DimCurrency)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "sql": "SELECT count() AS n FROM retail.FactExchangeRate WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "sql": "SELECT count() AS n FROM retail.FactITMachine WHERE MachineKey IS NOT NULL AND MachineKey NOT IN (SELECT MachineKey FROM retail.DimMachine)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "sql": "SELECT count() AS n FROM retail.FactITMachine WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "sql": "SELECT count() AS n FROM retail.FactITSLA WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "sql": "SELECT count() AS n FROM retail.FactITSLA WHERE StoreKey IS NOT NULL AND StoreKey NOT IN (SELECT StoreKey FROM retail.DimStore)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "sql": "SELECT count() AS n FROM retail.FactITSLA WHERE MachineKey IS NOT NULL AND MachineKey NOT IN (SELECT MachineKey FROM retail.DimMachine)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "sql": "SELECT count() AS n FROM retail.FactITSLA WHERE OutageKey IS NOT NULL AND OutageKey NOT IN (SELECT OutageKey FROM retail.DimOutage)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "sql": "SELECT count() AS n FROM retail.FactInventory WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "sql": "SELECT count() AS n FROM retail.FactInventory WHERE StoreKey IS NOT NULL AND StoreKey NOT IN (SELECT StoreKey FROM retail.DimStore)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "sql": "SELECT count() AS n FROM retail.FactInventory WHERE ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct)",
+      "result": [
+        {
+          "n": 533358
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "sql": "SELECT count() AS n FROM retail.FactInventory WHERE CurrencyKey IS NOT NULL AND CurrencyKey NOT IN (SELECT CurrencyKey FROM retail.DimCurrency)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE StoreKey IS NOT NULL AND StoreKey NOT IN (SELECT StoreKey FROM retail.DimStore)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct)",
+      "result": [
+        {
+          "n": 1715380
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE PromotionKey IS NOT NULL AND PromotionKey NOT IN (SELECT PromotionKey FROM retail.DimPromotion)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE CurrencyKey IS NOT NULL AND CurrencyKey NOT IN (SELECT CurrencyKey FROM retail.DimCurrency)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE CustomerKey IS NOT NULL AND CustomerKey NOT IN (SELECT CustomerKey FROM retail.DimCustomer)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE channelKey IS NOT NULL AND channelKey NOT IN (SELECT ChannelKey FROM retail.DimChannel)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE StoreKey IS NOT NULL AND StoreKey NOT IN (SELECT StoreKey FROM retail.DimStore)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct)",
+      "result": [
+        {
+          "n": 338898
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE PromotionKey IS NOT NULL AND PromotionKey NOT IN (SELECT PromotionKey FROM retail.DimPromotion)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE CurrencyKey IS NOT NULL AND CurrencyKey NOT IN (SELECT CurrencyKey FROM retail.DimCurrency)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "sql": "SELECT count() AS n FROM retail.FactSalesQuota WHERE ChannelKey IS NOT NULL AND ChannelKey NOT IN (SELECT ChannelKey FROM retail.DimChannel)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "sql": "SELECT count() AS n FROM retail.FactSalesQuota WHERE StoreKey IS NOT NULL AND StoreKey NOT IN (SELECT StoreKey FROM retail.DimStore)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "sql": "SELECT count() AS n FROM retail.FactSalesQuota WHERE ProductKey IS NOT NULL AND ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct)",
+      "result": [
+        {
+          "n": 521121
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "sql": "SELECT count() AS n FROM retail.FactSalesQuota WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "sql": "SELECT count() AS n FROM retail.FactSalesQuota WHERE CurrencyKey IS NOT NULL AND CurrencyKey NOT IN (SELECT CurrencyKey FROM retail.DimCurrency)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "sql": "SELECT count() AS n FROM retail.FactSalesQuota WHERE ScenarioKey IS NOT NULL AND ScenarioKey NOT IN (SELECT ScenarioKey FROM retail.DimScenario)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "sql": "SELECT count() AS n FROM retail.FactStrategyPlan WHERE DateKey IS NOT NULL AND DateKey NOT IN (SELECT DateKey FROM retail.DimDate)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "sql": "SELECT count() AS n FROM retail.FactStrategyPlan WHERE EntityKey IS NOT NULL AND EntityKey NOT IN (SELECT EntityKey FROM retail.DimEntity)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "sql": "SELECT count() AS n FROM retail.FactStrategyPlan WHERE ScenarioKey IS NOT NULL AND ScenarioKey NOT IN (SELECT ScenarioKey FROM retail.DimScenario)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "sql": "SELECT count() AS n FROM retail.FactStrategyPlan WHERE AccountKey IS NOT NULL AND AccountKey NOT IN (SELECT AccountKey FROM retail.DimAccount)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "sql": "SELECT count() AS n FROM retail.FactStrategyPlan WHERE CurrencyKey IS NOT NULL AND CurrencyKey NOT IN (SELECT CurrencyKey FROM retail.DimCurrency)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "sql": "SELECT count() AS n FROM retail.FactStrategyPlan WHERE ProductCategoryKey IS NOT NULL AND ProductCategoryKey NOT IN (SELECT ProductCategoryKey FROM retail.DimProductCategory)",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "sql": "SELECT count() AS n FROM (SELECT DISTINCT ProductKey FROM retail.FactSales) WHERE ProductKey NOT IN (SELECT ProductKey FROM retail.DimProduct)",
+      "result": [
+        {
+          "n": 284
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "sql": "SELECT count() AS n FROM retail.DimProduct WHERE ColorName = 'blue'",
+      "result": [
+        {
+          "n": 2
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "sql": "SELECT count() AS n FROM retail.DimProduct WHERE ColorName = 'Blue'",
+      "result": [
+        {
+          "n": 148
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "sql": "SELECT count() AS n FROM retail.DimProduct WHERE ColorName = 'Silver Grey'",
+      "result": [
+        {
+          "n": 14
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "sql": "SELECT count() AS n FROM retail.DimEmployee WHERE position(DepartmentName, 'Contral') > 0",
+      "result": [
+        {
+          "n": 1
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "sql": "SELECT count() AS n FROM retail.DimPromotion WHERE position(PromotionName, 'Scholl') > 0",
+      "result": [
+        {
+          "n": 3
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "sql": "SELECT count() AS n FROM retail.DimGeography WHERE RegionCountryName = ''",
+      "result": [
+        {
+          "n": 3
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "sql": "SELECT count() AS n FROM retail.DimCustomer WHERE YearlyIncome = 10000000",
+      "result": [
+        {
+          "n": 385
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "sql": "SELECT count() AS n FROM retail.DimStore WHERE SellingAreaSize = 93800",
+      "result": [
+        {
+          "n": 2
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "sql": "SELECT count() AS n FROM retail.DimStore WHERE EmployeeCount = 325",
+      "result": [
+        {
+          "n": 1
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "sql": "SELECT count() AS n FROM retail.DimStore WHERE CloseDate = '2090-12-31'",
+      "result": [
+        {
+          "n": 294
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "sql": "SELECT count() AS n FROM retail.DimProduct WHERE startsWith(StyleName, 'Product')",
+      "result": [
+        {
+          "n": 2233
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "sql": "SELECT count() AS n FROM retail.DimStore WHERE StoreManager = toString(EmployeeKey)",
+      "result": [
+        {
+          "n": 306
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "sql": "SELECT count() AS n FROM retail.DimSalesTerritory WHERE SalesTerritoryManager = toString(EmployeeKey)",
+      "result": [
+        {
+          "n": 265
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE PromotionKey != 1 AND DiscountAmount = 0",
+      "result": [
+        {
+          "n": 446677
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE PromotionKey != 1 AND DiscountAmount = 0",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "sql": "SELECT count() AS n FROM retail.FactInventory",
+      "result": [
+        {
+          "n": 8013099
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "sql": "SELECT count() AS n FROM retail.DimDate WHERE IsHoliday = 'Yes'",
+      "result": [
+        {
+          "n": 731
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "sql": "SELECT count() AS n FROM retail.DimDate WHERE (IsHoliday = 'Yes') != (toDayOfWeek(DateKey) IN (6,7))",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "sql": "SELECT count() AS n FROM retail.DimDate WHERE DateKey < (SELECT min(DateKey) FROM retail.FactOnlineSales) OR DateKey > (SELECT max(DateKey) FROM retail.FactOnlineSales)",
+      "result": [
+        {
+          "n": 1460
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "sql": "SELECT count() AS n FROM retail.DimSalesTerritory t INNER JOIN retail.DimGeography g ON t.GeographyKey = g.GeographyKey WHERE t.SalesTerritoryCountry != g.RegionCountryName",
+      "result": [
+        {
+          "n": 22
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "sql": "SELECT count() AS n FROM retail.FactSales WHERE SalesQuantity = 0 AND ReturnQuantity > 0",
+      "result": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "sql": "SELECT count() AS n FROM retail.FactOnlineSales WHERE SalesQuantity = 0 AND ReturnQuantity > 0",
+      "result": [
+        {
+          "n": 100166
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "sql": "SELECT toDayOfWeek(DateKey) AS weekday, uniqExact(DateKey) AS snapshot_days, count() AS affected_rows, min(DateKey) AS first_day, max(DateKey) AS last_day FROM retail.FactInventory GROUP BY weekday ORDER BY weekday",
+      "result": [
+        {
+          "weekday": 6,
+          "snapshot_days": 156,
+          "affected_rows": 8013099,
+          "first_day": "2007-01-06",
+          "last_day": "2009-12-26"
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "sql": "SELECT toYear(first_day) AS first_year, count() AS customers FROM (SELECT CustomerKey, min(DateKey) AS first_day FROM retail.FactOnlineSales GROUP BY CustomerKey) GROUP BY first_year ORDER BY first_year",
+      "result": [
+        {
+          "first_year": 2007,
+          "customers": 18868
+        },
+        {
+          "first_year": 2009,
+          "customers": 1
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "sql": "SELECT 'FactSales Online' AS source, count() AS affected_rows, sum(toDecimal128(SalesAmount,6)) AS sales, sum(toDecimal128(ReturnAmount,6)) AS returns FROM retail.FactSales WHERE channelKey = 2 UNION ALL SELECT 'FactOnlineSales', count(), sum(toDecimal128(SalesAmount,6)), sum(toDecimal128(ReturnAmount,6)) FROM retail.FactOnlineSales",
+      "result": [
+        {
+          "source": "FactSales Online",
+          "affected_rows": 629223,
+          "sales": 2677599035.069384,
+          "returns": 32983261.287851
+        },
+        {
+          "source": "FactOnlineSales",
+          "affected_rows": 12627608,
+          "sales": 2718202629.650406,
+          "returns": 29244318.203859
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "sql": "SELECT AccountKey AS child, ParentAccountKey AS parent FROM retail.DimAccount",
+      "result": [
+        {
+          "cycle_nodes": 2,
+          "affected_rows": 24,
+          "self_roots": 0
+        }
+      ]
+    },
+    {
+      "id": 101,
+      "sql": "SELECT EmployeeKey AS child, ParentEmployeeKey AS parent FROM retail.DimEmployee",
+      "result": [
+        {
+          "cycle_nodes": 2,
+          "affected_rows": 293,
+          "self_roots": 0
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "sql": "SELECT EntityKey AS child, ParentEntityKey AS parent FROM retail.DimEntity",
+      "result": [
+        {
+          "cycle_nodes": 0,
+          "affected_rows": 0,
+          "self_roots": 3
+        }
+      ]
+    }
+  ]
+}

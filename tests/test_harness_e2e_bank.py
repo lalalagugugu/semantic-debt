@@ -80,9 +80,12 @@ def _pick(recs: dict[str, dict], manifest: dict[str, dict]) -> dict[str, str]:
 
 
 def test_mock_end_to_end_real_questions(tmp_path):
-    recs, manifest = _records(), _manifest()
-    pick = _pick(recs, manifest)
-    questions = {q.qid: q for q in load_questions(EVAL)}
+    try:
+        recs, manifest = _records(), _manifest()
+        pick = _pick(recs, manifest)
+        questions = {q.qid: q for q in load_questions(EVAL)}
+    except (PermissionError, FileNotFoundError):
+        pytest.skip("required question bank is unavailable")
     chosen = [questions[qid] for qid in pick.values()]
     if R.invalid_rules(chosen):                # a bank written for the old scorer (before eval-v1.2)
         pytest.skip(f"bank rules predate scorer v2: {R.invalid_rules(chosen)[0]}")
@@ -175,3 +178,14 @@ def test_mock_end_to_end_english_anchors(tmp_path):
             assert "revised" not in r["final"]
             continue
         assert r["final"]["revised"]["outcome"] in {"correct", "wrong", "pending"}
+
+
+@pytest.mark.parametrize("error", [PermissionError, FileNotFoundError])
+def test_unavailable_bank_skips_without_exception_contents(error, monkeypatch, tmp_path):
+    def denied():
+        raise error("private question content")
+
+    monkeypatch.setattr(sys.modules[__name__], "_records", denied)
+    with pytest.raises(pytest.skip.Exception) as caught:
+        test_mock_end_to_end_real_questions(tmp_path)
+    assert "private question content" not in str(caught.value)

@@ -1,6 +1,6 @@
 # T22b L1+ 与 L3a：渲染、运行、报告、残余歧义归因
 
-- 状态：未开始
+- 状态：进行中（渲染阶段完成，运行待检查点与预算裁决）
 - 负责：Codex（2026-10-25 用户：不敏感的活交给 Codex，协调会话只做验收）
 - 模式：codex-main
 - 依据：`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-no-full-rerun-l1plus-last.md`
@@ -21,3 +21,37 @@
 ## 验收（协调会话）
 
 协调会话从原始日志独立重算第 6 步的主表数字，并抽查第 2 步的核对脚本。
+
+## 2026-10-25 渲染阶段产出
+
+- 状态：第 1–2 步完成，第 3 步源文件保持原样；第 4 步等待 PR 合并与用户打 tag；第 5–8 步尚未执行，未调用付费模型。
+- 产出：`render/l1plus.py` 从同一份 YAML 生成叠加内容、OWL / SHACL Turtle，并解析实际上下文逐字段核对；`reports/validation/l1plus-l3a-correspondence.md` 共 109 条，形式化 30 条、注解保留 79 条。形式化条目的复杂部分仍完整保留为注解。
+- 用户裁决：`decisions/2026-10-25-t22b-l3a-presentation.md`。L3a 只测形式化写法对模型写 SQL 的帮助，不含可执行规则；可执行形式化留第二期 L3b。
+- 接线：`harness/cells.py` 注册显式指定的两个单元，`harness/run_direct.py` 识别它们；不扩大既有 `--cell all` 集合。系统提示与 SQL 写法说明沿用 SQL-L1。
+- 验证：已有各单元逐字节对比开工基线 `d236e13b719db6fe0c29e5a88af6c127929ac12f`；两个受保护源文件与该基线无差异。核对器测试覆盖缺条目、改 SQL、改类别、丢子类关系、丢 shape 与多余条目。
+- 测试：上述三个文件最终合计 **157 passed, 1 skipped**；跳过的是题库当前检出不是 `eval-v1.2` 时的全题库规则校验（tag 本身存在）；未切换共享题库。渲染、核对命令成功，`git diff --check` 通过。
+- 偏离与理由：仅完成合并前阶段，遵守第 4–5 步的检查点；未提前生成结果或归因结论。
+- 工时：约 0.4 小时（本会话渲染、接线、核对与测试；不含等待审定和后续运行）。
+
+复现渲染与核对：
+
+```sh
+uv run python render/context.py
+uv run python -m render.l1plus
+uv run pytest tests/test_l1plus_render.py tests/test_render.py tests/test_harness.py
+```
+
+### 预算预估（未冻结，不是正式 tag 校验 dry-run）
+
+复用 harness 的 `dry_run`，采用卡上每单元 109 题、3 次，默认修正率 10%、输出 3000 token、缓存命中 95%、题面 60 token、不读既有实测。估计：SQL-L1plus 5.98 元，SQL-L3a 8.21 元，合计 **14.19 元**；654 次作答，预计含修正 720 次调用。此估算未验证待打的 tag，不可作为已批准运行的证据。归因预算仍为 3 元。
+
+tag 就绪后的正式 dry-run（仍不调用模型）：
+
+```sh
+uv run python -m harness.run_direct --cell SQL-L1plus --cell SQL-L3a --skip-judge --reps 3 --model deepseek-flash --semantic-tag semantic-v1.6-l1plus --eval-tag eval-v1.2 --budget 10 --dry-run
+```
+
+### 用户确认
+
+- [ ] 审查并合并渲染 PR，由用户打 `semantic-v1.6-l1plus`。
+- [ ] 正式 dry-run 后裁决运行预算（当前初估 14.19 元 > 10 元），明确批准后才开始付费运行。

@@ -1,6 +1,6 @@
 # T25 立刻要修的流程缺口
 
-- 状态：未开始
+- 状态：已完成，待协调验收（2026-10-25）
 - 负责：Codex
 - 模式：codex-main
 - 依据：`decisions/2026-10-25-no-full-rerun-l1plus-last.md`；T14 dry-run 报告（2026-10-25）；T22 自检（#164 正文）
@@ -18,3 +18,36 @@
 ## 验收（协调会话）
 
 协调会话审 diff；盲模式模板改动由协调会话渲染一遍核对。
+
+
+## 执行记录（2026-10-25）
+
+### 产出
+
+- `templates/claude-settings.blind.json`：卡自身 clone 的 `semantic/tuning/`、`reports/tuning/` 同时加入 permissions 与 sandbox 禁读。
+- `scripts/verify-isolation.md`：新增 A13，要求 Read 工具和 shell 均验证调优目录不可读。
+- `tests/test_repo_layout.py`：检查两个调优目录的双层规则。
+- `tests/test_harness.py`、`tests/test_harness_e2e_bank.py`：指定四个测试对 PermissionError / FileNotFoundError 使用固定文本跳过，不输出异常内容；阶梯文本比较只断言布尔结果，避免失败输出题面。补访问失败回归测试。
+- `harness/run_direct.py`、`harness/run_agent.py`、`harness/run_plan.py`：预算检查移到 dry-run 返回之前，超限退出 2；阶梯、DAX 共用直答入口。预算回归覆盖直答、阶梯、探查、规划，以及无预算、超限、相等、充足四种边界。
+- `tasks/BOARD.md`、本卡：登记状态与验收事项。
+
+### 验证
+
+- 可复现命令：`UV_CACHE_DIR="$TMPDIR/uvcache" uv run pytest`。
+- 最终代码串行全量：1070 passed、6 skipped、109 warnings，148.20 秒；无失败。
+- `git diff --check` 通过；模板变量替换后的 JSON 自检确认两个目录双层禁读。该自检不代替协调会话独立验收或真实盲模式隔离实测。
+- 未调用付费模型，费用 0；未改系统提示、评分器、语义层或 `.claude/settings.json`。
+
+### 偏离与理由
+
+- clone 无虚拟环境，临时缓存缺依赖且沙箱内 DNS 不通；获执行环境放行后按锁文件安装既有依赖，未新增依赖或修改锁文件。
+- 曾误将相关测试与全量测试重叠启动，导致共享 chDB 数据目录锁冲突，出现 22 failed。该次不作为验收依据；后续串行完成全量验证，不修改数据或执行器来掩盖此错误。
+
+### 用户确认
+
+- [ ] 协调会话审 diff，并独立渲染盲模式模板核对。
+- [ ] 用户审阅并合并 PR。
+
+### 工时
+
+- 本会话完成，未精确计时；单次全量测试约 2–3 分钟。

@@ -53,7 +53,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    DAX_CELLS, LADDER_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
+    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -815,7 +815,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     args = parse_args(argv)
     names = args.cell or ["all"]
-    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS}
+    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS}
     cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
     if not args.dry_run and sum(c.stack == "dax" for c in cells) > 1:
         print("refusing to start: Power BI Desktop serves one model at a time; run one DAX cell per invocation")
@@ -877,11 +877,11 @@ def main(argv: list[str] | None = None, load=None) -> int:
                           hit_ratio=args.est_hit_ratio, question_tokens=args.est_question_tokens,
                           use_measured=not args.est_from_args)
     print_dry_run(rows, total, args.model, args.reps, args.est_fix_rate)
-    if args.dry_run:
-        return 0
     if args.budget is not None and total > args.budget:
         print(f"estimate {total:.2f} CNY exceeds budget {args.budget:.2f}; stop and ask the user")
         return 2
+    if args.dry_run:
+        return 0
     if is_peak() and not args.allow_peak:
         print("DeepSeek peak hours (weekdays 09-12, 14-18 Beijing): batch runs go off-peak (hard rule 6); "
               "pass --allow-peak for a deliberate small run")
