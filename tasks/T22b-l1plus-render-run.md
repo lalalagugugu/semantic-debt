@@ -160,3 +160,26 @@ SEMDEBT_EVAL_DIR="$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2" UV_CACHE_DIR="$TMPDIR/uvc
 - 产出：`harness/attribute_l1plus.py` 仅开放预检，不含客户端实例化或付费运行入口；未改原作答 harness、旧 T19b 提示词或受保护语义源文件。付费入口和 Codex 独立复核待本次费用确认后继续，材料与规则不得改变。
 - 验证：归因新旧解析、隐私格式与预算闸测试共 24 passed；实际 82 份材料和来源版本核验通过，执行结果哈希由 T19b 材料函数检查。没有新增模型调用，实际新增费用 0 元。
 - 待用户确认：是否按上述固定规则与材料启动错峰归因（Flash 初判 + Codex 独立复核），另限 3 元。
+
+## 2026-10-25 开跑前补充冻结：数据质量辅助标记
+
+用户批准正式归因，上限仍为 3 元；开跑前增加辅助标记，开始后不再改。
+
+- 字段「涉及数据质量问题」取是 / 否，不影响既定五类主分类及单列疑点。
+- 判是：本次错答与孤儿行、取值大小写不一、层级成环、编码缺失有关。仅仅该数据集存在这些问题、但与本次错答无关，判否。不从答错本身推定存在数据质量问题。
+- Flash 与 Codex 独立标注相同字段，逐次作答计数；公开报告另报带标记条数，明细只写题号、类别与标记，不写自由文本理由。
+- 更新输出 JSON 为 `{"category":"类别原文","data_quality_related":true}`，辅助标记用 JSON 布尔值；否为 false。缺失或非布尔值记 unparsed，不修复重试。
+- 此补充发生在首次付费归因前；上一版 dry-run 清单保留，重新 dry-run 后固定新规则及归因系统消息哈希。题面、参考、最终作答、原系统消息与 v2 输入集合保持一致。
+- 正式入口为原生 `uv run python -m harness.attribute_l1plus`，不套外层监督脚本，不改原作答 harness、评分或 SQL 重试逻辑。归因串行、客户端保留默认传输重试；每次传输前预留保守请求费用，已返回响应以 usage 结算，未返回请求保留预留额度，避免当作零元。异常或预算不足立即停止，不自动重跑。
+
+### 含辅助标记的正式预检与启动
+
+- 用户已批准 3 元，不再等待上一节的费用确认。新清单 `reports/attribution/l1plus-dry-run-dq.json`，旧清单保留；82 份逐条材料、原系统消息、语义 tag、题库完整提交及来源日志哈希与旧清单逐项一致。仅分类规则新增用户要求的辅助标记。
+- 新 dry-run：82 次归因调用、预计错峰 2.000806 元；前缀约 67567 token，其余估计参数不变。编码手册 SHA-256 `ac48b3c678fd3528d721742a4ac74ff9e06246189d7017677e42e11c272de2f1`，归因系统消息 SHA-256 `6eb381819b434bb61b0cf37521384ab2369feaf3d3ce37b11279106290cf3262`。
+- 预算实现：串行请求，每次传输前预留「UTF-8 输入字节数 + 4096 framing token，全按未缓存价」及官方 thinking/high 默认最大输出 65536 token 的费用；成功后按 usage 结算。传输无返回的预留额不释放；默认传输重试保留，但出现传输重试后即停止整批供核查。官方默认上限依据：https://api-docs.deepseek.com/api/create-chat-completion/ （2026-10-25 核对）。本次单次预留约 0.40 元；不足预留就不发请求。解析失败、指纹不符、费用或返回异常均先记日志再停。
+- 验证：归因新旧测试共 30 passed，包括严格辅助标记类型、dry-run 预算闸、材料漂移拒绝、请求预留超预算拒绝及旧 run-id 不覆盖。没有修改共享客户端或原作答 harness。
+- 正式 run-id：`20261025-T22b-attrib-01`。独立复核从未含 Flash 标签的材料包开始；冻结 Codex 标签前不读 Flash 标签或思考。
+
+```sh
+SEMDEBT_EVAL_DIR="$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2" UV_CACHE_DIR="$TMPDIR/uvcache" PYTHONUNBUFFERED=1 uv run python -m harness.attribute_l1plus --run-id 20261025-T22b-attrib-01 --budget 3 --preflight reports/attribution/l1plus-dry-run-dq.json
+```
