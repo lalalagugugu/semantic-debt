@@ -59,3 +59,4 @@ cards:
   - {id: T25,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T25-immediate-fixes.md, note: "盲模式禁读调优文件、测试跳过保护、dry-run 查预算"}
   - {id: T26,  owner: claude, mode: open,          repo: main, card: tasks/T26-ontology-validation.md, after: G3, note: "L3a 本体质量校验：语法、推理、建模、SHACL、数据回测；免费；跨厂商"}
   - {id: T27,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T27-combo-conflict-check.md, note: "叠加单元（L1+ + 调优 + 指令）冲突核对；免费；运行等用户"}
+  - {id: T28,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T28-midterm-v3-data.md, note: "中期报告 v3 补数：只用现有日志，免费；协调会话重算验收"}
