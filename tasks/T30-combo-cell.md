@@ -1,6 +1,6 @@
 # T30 叠加单元：L1+ + 调优 + 作答要求
 
-- 状态：tag 与 dry-run 已核对，用户已批准 ≤8 元错峰运行，准备正式运行
+- 状态：正式运行与 v2/v3 报告完成，待协调验收；3 次未返回 usage 的传输失败费用待账单核对
 - 负责：Codex
 - 模式：codex-main
 - 依据：用户 2026-10-25「叠加单元可以跑」；`tasks/T27-combo-conflict-check.md` 事先登记的处理规则（L1+ 优先，删掉冲突的调优条目）；`reports/validation/combo-conflicts.md`
@@ -65,3 +65,19 @@
 - 因原 harness 的 `--budget` 只查估算，在 T30 包装入口新增实际回包费用检查，逐回包核算，达到 8 元阻止新调用；在途回包完整保留并计费。未改冻结的 harness、语义或渲染内容，系统消息哈希仍为 `16f3b0e2cc3b3ae547328c9c918f78be6acffac961c39becb4d54e477a6e6445`。
 - 最小验证：`uv run pytest tests/test_combo.py tests/test_l1plus_render.py -q`，15 项通过；预算检查覆盖停止新增调用、在途响应计费、原始回包保存及恢复时已用费用累计。
 - 重新 dry-run `--budget 8` 通过；付费入口使用 `--expected-fingerprint e72d3c7f663d3e1383b00b3884cb4501`，指纹或错峰条件变化立即停止。
+
+## 正式运行与报告交付（2026-10-25）
+
+- `20261025-T30-combo-01`：周日错峰，109 题 × 3 = 327 次作答全部完成；339 次有回包调用，含执行错误后的 12 次固定修正。没有补跑；无 API/harness 失败行、无 pending/unscored、无指纹变化。
+- 原始回包逐哈希与 usage 对账：可核算费用 **2.89061402 元**，低于 8 元，费用停止阈值未触发。传输重试 **3 次**（Q49 第 3 次、Q67 第 3 次、Q79 第 2 次各 1）；由既有 harness 自动处理，失败请求未返回 usage，其费用无法从本地确认，未按零计费。严格总账仍待提供商账单核对，没有宣称未知费用已包含在可核算金额中。
+- 最终类别（v2/v3 相同）：correct 282、wrong 44、exec_error 1、refused 0。Q84 第 3 次为最终 exec_error，原样保留，不补跑。
+- 系统消息 SHA-256：`16f3b0e2cc3b3ae547328c9c918f78be6acffac961c39becb4d54e477a6e6445`，339 次回包对应的指纹均为 `e72d3c7f663d3e1383b00b3884cb4501`。
+- `20261025-T30-combo-01-rescore-01`：复用 T23 的冻结题库与原始执行结果哈希核对，对本单元及两个对照单元共 981 次作答离线重评；无额外模型调用、无 SQL 重跑。
+- v2/v3 均为：主表 87.4%（257/294）、留出 81.0%（119/147）、调优 93.9%（138/147）；叠加单元 v3 改判 0 次。
+- 按题三次稳定性（109 题）：全对 85、有对有错 16、全错 8；主表 98 题为 77/15/6，留出 49 题为 33/11/5。
+- 产出：`reports/results/combo.md`、付费原始日志、离线重评日志及 manifest、`scripts/t30_combo_report.py`。报告只列题号、单元、次数、类别与所需汇总统计，不含题面、查询或参考值；按卡注明删除 12 条中 9 条示例 SQL 的下限限制。
+- 配对比较按题 5,000 次自助抽样、种子 0：v2 叠加 − SQL-L1plus 主表 +11.9 点 [ +4.4, +19.7 ]、留出 +4.8 点 [ −6.1, +15.6 ]；叠加 − SQL-L1-tuned-instr 主表 −1.0 点 [ −5.1, +3.1 ]、留出 −1.4 点 [ −6.8, +4.8 ]。v3 并列数字见报告。
+- 运行复现（会付费，重跑必须另建 run-id 并重新批准）：`uv run python scripts/t30_run_on_chdb_copy.py --cell SQL-L1plus-tuned-instr --model deepseek-flash --reps 3 --concurrency 8 --semantic-tag semantic-combo-v1 --eval-tag eval-v1.2 --budget 8 --expected-fingerprint e72d3c7f663d3e1383b00b3884cb4501 --run-id <新的run编号>`；题库环境使用 `eval-v1.2` 的只读副本。
+- 免费复算：`uv run python scripts/t30_combo_report.py --run 20261025-T30-combo-01 --scored-run <新的离线run编号>`。
+- 验证：16 项过滤、冻结消息、预算停止、回包保留、统计分母及重复记录检查通过；运行与报告的原始回包、执行结果哈希核对通过。
+- 待协调会话独立核对数字、费用、哈希和机械过滤副本；3 次失败请求的提供商账单费用仍待核对。

@@ -97,3 +97,23 @@ def test_budget_accounts_inflight_replies_and_rejects_unknown_usage(tmp_path):
     invalid = BudgetBoundary("fp_mock", budget=8, raw_dir=tmp_path)
     with pytest.raises(run_direct.RunStopped, match="billing usage"):
         invalid.check_reply(replace(reply, raw=b'{"usage": {}}'))
+
+
+def test_report_preserves_denominators_and_rejects_duplicate_attempts():
+    from scripts.t30_combo_report import metrics, paired, validate
+
+    ids = {"Q_SYNTH_A", "Q_SYNTH_B", "Q_SYNTH_C"}
+    rows = [{"qid": qid, "rep": rep, "status": "done", "final": {
+        v: {"outcome": "correct" if qid == "Q_SYNTH_A" or (qid == "Q_SYNTH_B" and rep == 1) else "wrong"}
+        for v in ("v2", "v3")}}
+        for qid in sorted(ids) for rep in (1, 2, 3)]
+    result = metrics(rows, ids, "v2")
+    assert (result["correct"], result["attempts"]) == (4, 9)
+    assert (result["all_correct"], result["mixed"], result["all_wrong"]) == (1, 1, 1)
+    assert result["all_wrong_ids"] == ["Q_SYNTH_C"]
+    comparison = paired(rows, rows, ids, "v3")
+    assert comparison["diff_pp"] == comparison["lo_pp"] == comparison["hi_pp"] == 0
+    with pytest.raises(ValueError, match="duplicate"):
+        validate(rows + [rows[0]], ids)
+    with pytest.raises(ValueError, match="Missing"):
+        validate(rows[:-1], ids)
