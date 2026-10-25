@@ -1,6 +1,6 @@
 # T22 L1+（内容补全与歧义澄清）与 L3a（同内容的形式化 ontology）
 
-- 状态：进行中（2026-10-23：第 1–3 步已交；2026-10-24：Codex 复核完，用户裁决 R1–R10，盲写会话按条目编号修订完 `semantic/l1plus.yaml`（version 2）与 `semantic/l1plus-audit.md`；同日 Codex 第二轮复查 b97cf93，用户裁决 R11、R12，按条目编号再改成 version 3；Codex 第三轮复查 92b7723 后再改 A02、A03、E05、E13、A24、D04、D29 四处（无需裁决，见 audit 文末「第三轮复查」）。下一步：交 Codex 再查，通过后第 4–6 步在普通模式）
+- 状态：第 1–3 步完成（#164）；第 4–6 步移到 T22b（Codex，`tasks/T22b-l1plus-render-run.md`；tag 改名 `semantic-v1.6-l1plus`，见 `decisions/2026-10-25-no-full-rerun-l1plus-last.md`）。原记录：（2026-10-23：第 1–3 步已交；2026-10-24：Codex 复核完，用户裁决 R1–R10，盲写会话按条目编号修订完 `semantic/l1plus.yaml`（version 2）与 `semantic/l1plus-audit.md`；同日 Codex 第二轮复查 b97cf93，用户裁决 R11、R12，按条目编号再改成 version 3；Codex 第三轮复查 92b7723 后再改 A02、A03、E05、E13、A24、D04、D29 四处（无需裁决，见 audit 文末「第三轮复查」）。下一步：交 Codex 再查，通过后第 4–6 步在普通模式）
 - 负责：Claude Code（第 1–3 步盲模式；第 4–6 步普通模式，可由另一个会话做）；Codex 复核
 - 模式：盲（写内容）→ 普通（渲染、运行）
 - 依据：`decisions/2026-10-23-l1plus-l3a.md`

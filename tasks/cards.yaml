@@ -53,3 +53,7 @@ cards:
   - {id: T20,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T20-independent-recheck.md}
   - {id: T21,  owner: claude, mode: open,          repo: main, card: tasks/T21-planning-agent.md, after: G3, note: "自写 -P（规划 + Python + 按需检索），对照 T15 全量"}
   - {id: T22,  owner: claude, mode: blind,         repo: main, card: tasks/T22-l1plus-l3a.md, after: G3, note: "L1+ 盲写（第 1–3 步）；渲染与运行另开普通模式会话"}
+  - {id: T22b, owner: codex,  mode: codex-main,    repo: main, card: tasks/T22b-l1plus-render-run.md, after: G3, note: "L1+ / L3a 渲染、运行、残余歧义归因；tag semantic-v1.6-l1plus 由用户打"}
+  - {id: T23,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T23-scorer-presentation.md, after: G3, note: "scorer v3 呈现容错，规则先交用户审定；全部单元离线重评"}
+  - {id: T24,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T24-midterm-data.md, after: G3, note: "中期报告补数，免费；协调会话跨厂商重算验收"}
+  - {id: T25,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T25-immediate-fixes.md, note: "盲模式禁读调优文件、测试跳过保护、dry-run 查预算"}
