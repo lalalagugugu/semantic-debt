@@ -42,6 +42,7 @@ class Cell:
     instructions: str | None = None # semantic/tuning/<name>.instructions.yaml: tuned answer requirements
                                     # and syntax notes (decisions/2026-10-23-tuning-instructions.md)
     selective_k: int | None = None  # T29: append the fixed +1 / -k / 0 scoring rule
+    selective_variant: str | None = None  # T29 v2: front-loaded rule or confidence line
 
     @property
     def runnable_here(self) -> bool:
@@ -79,6 +80,15 @@ SELECTIVE_CELLS: dict[str, Cell] = {
     f"SQL-L1plus-sel-k{k}": replace(L1PLUS_CELLS["SQL-L1plus"], name=f"SQL-L1plus-sel-k{k}",
                                     card="T29", selective_k=k)
     for k in (1, 3)
+}
+
+SELECTIVE_V2_CELLS: dict[str, Cell] = {
+    **{f"SQL-L1plus-sel-k{k}": replace(L1PLUS_CELLS["SQL-L1plus"], name=f"SQL-L1plus-sel-k{k}",
+                                      card="T29", selective_k=k) for k in (5, 10, 20, 100)},
+    **{f"SQL-L1plus-sel-front-k{k}": replace(L1PLUS_CELLS["SQL-L1plus"], name=f"SQL-L1plus-sel-front-k{k}",
+                                            card="T29", selective_k=k, selective_variant="front") for k in (3, 10)},
+    "SQL-L1plus-confidence": replace(L1PLUS_CELLS["SQL-L1plus"], name="SQL-L1plus-confidence", card="T29",
+                                     split="tuning", selective_variant="confidence"),
 }
 
 
