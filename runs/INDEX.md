@@ -98,6 +98,8 @@
 | 20261025-T22b-attrib-01 | SQL-L1plus；20261025-T22b-l1plus-l3a-03-rescore-01 v2 非正确作答；semantic-v1.6-l1plus=866004b；eval-v1.2=90e13b385a639a9164ac78430c50c11a7859f976 | 82/82 条 / 38 题；82 次调用 | deepseek-flash；指纹 e72d3c7f663d3e1383b00b3884cb4501 唯一 | 1.72537972 元 | 用户批准归因上限 3 元并明确出站授权，周日错峰，原生归因命令、串行费用预留；无传输重试、解析失败、指纹冲突、接口异常或待核算请求。五类 + 单列及数据质量辅助标记先写卡后冻结；Codex 82 条独立标签先于 Flash 调用冻结，未改。结果 reports/results/l1plus-error-attribution.md；原始响应在 $SEMDEBT_DATA_DIR/runs-raw/20261025-T22b-attrib-01；逐原始哈希、usage 费用、材料与版本审计通过。前述启动前受阻行保留，不覆盖历史。 |
 
 | 20261025-T28-v3-01 | 2026-10-25 | SQL-L1plus、SQL-L3a | T28 | 654（各109×3） | 无模型调用 | eval-v1.2=90e13b3 | 0 | 沿用源运行 runs-raw | T28 免费补评；复用 scripts/rescore_t23.py，逐执行结果哈希核对；不执行查询；v2 主数字、v3 敏感性；新增判对待跨厂商复核。 |
+| 20261025-T30-combo-01 | 2026-10-25 | SQL-L1plus-tuned-instr | T30 | 327（109×3） | deepseek-flash；e72d3c7f663d3e1383b00b3884cb4501 | eval-v1.2=90e13b385a639a9164ac78430c50c11a7859f976 | 可核算 2.89061402；3 次未返 usage 请求费用未知 | $SEMDEBT_DATA_DIR/runs-raw/20261025-T30-combo-01 | 用户批准预算 8 元，combo tags=2f2d644，周日错峰，并发 8；私有 chdb-t30；实际回包费用守卫未触发。327/327 done，339 次有回包调用；3 次传输重试（Q49 r3、Q67 r3、Q79 r2），未把未知费用计作零。correct 282 / wrong 44 / exec_error 1（Q84 r3）；无补跑、无 API/harness 失败行或指纹异常。 |
+| 20261025-T30-combo-01-rescore-01 | 2026-10-25 | SQL-L1plus-tuned-instr、SQL-L1plus、SQL-L1-tuned-instr | T30 | 981（3单元各109×3） | 无模型调用 | eval-v1.2=90e13b385a639a9164ac78430c50c11a7859f976 | 0 | 沿用源运行 runs-raw | 冻结题库，逐执行结果哈希离线 v2/v3 重评；没有 SQL 重跑。叠加单元 v2/v3 均为主表 257/294、留出 119/147，改判 0；报告 reports/results/combo.md，manifest 记录来源、代码哈希、费用、分层统计及配对区间；待协调独立验收。 |
 
 ## T29 试跑启动前受阻（追加）
 
