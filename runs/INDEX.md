@@ -61,3 +61,17 @@
 | 20261025-T22b-l1plus-l3a-03（完成补记） | 2026-10-25 | SQL-L1plus、SQL-L3a | T22b | **654/654 done**（各 109 × 3），811 次已返回响应调用 | deepseek-flash，811 次调用指纹唯一 e72d3c7f663d3e1383b00b3884cb4501 | eval-v1.2=90e13b3；semantic-v1.6-l1plus=866004b；系统消息哈希与 preflight 一致 | **8.05898170**（L1plus 3.21187542；L3a 4.84710628）；加前两次已返回响应费用，已知累计 **8.09429950** 元 | $SEMDEBT_DATA_DIR/runs-raw/20261025-T22b-l1plus-l3a-03 | 原样 harness 正常退出；无自写监督脚本，未改提示、执行、评分或重试逻辑。5 次原生自动传输重试成功并保留；最终 API 异常、未判分、指纹冲突均 0。模型 SQL 修正后仍有 4 / 2 条 engine_error，正常计入执行失败。逐 API 原始响应哈希和 token 费用核对通过；离线重评 0 翻转。主表 98 题 L1plus 75.5%（222/294）、L3a 74.5%（219/294）；109 题 74.9%（245/327）、73.4%（240/327）。稳定性及配对区间见 reports/results/l1plus-l3a.md |
 | 20261025-T22b-l1plus-l3a-03-rescore-01 | 2026-10-25 | SQL-L1plus、SQL-L3a | T22b | 654（各 327） | 无模型调用 | eval-v1.2=90e13b3；沿用源运行 semantic-v1.6-l1plus | **0** | 沿用 $SEMDEBT_DATA_DIR/runs-raw/20261025-T22b-l1plus-l3a-03 | 新目录离线重评，不执行 SQL；复用冻结 harness.rescore.rescore_line，逐执行结果哈希核对。原 rescore CLI 的注册表尚无两个新单元，由只读汇总脚本调用同一已有评分函数，不修改 harness。两单元暂定与最终判定均 0 翻转 |
 | 20261025-T22b-l1plus-l3a-02（费用后查补记） | 2026-10-25 | SQL-L1plus | T22b | 沿用原中止记录 | deepseek-flash | eval-v1.2=90e13b3；semantic-v1.6-l1plus=866004b | 已确认仍为 **0.00259616** 元，不重复累计 | $SEMDEBT_DATA_DIR/runs-raw/20261025-T22b-l1plus-l3a-02 | 截至第三次运行完成，原目录仍只有一份已返回 API 响应；未发现额外 usage，终止时在途请求费用仍不能从本地确认，不作 0 元断言。以后若可核实再追加；旧日志和记录不改写 |
+## T23 v3 敏感性重评：20261025-T23-v3-01
+
+| run-id | 单元 | 来源 | 题库 | 费用 | 原因 |
+|---|---|---|---|---:|---|
+| 20261025-T23-v3-01 | 全部已发现 T13 / T15 / T16 / C13 / T14 / T22b 单元 | 27 份源日志，6188 条 done；逐份见 manifest.json | eval-v1.2=90e13b3 | 0 | 用户审定的 P1–P4；v2 主数字、v3 敏感性分析；只读原始执行结果，不调用模型、不执行查询；新增判对待 Claude Code 逐条复核 |
+
+## T23 v3 敏感性重评：20261025-T23-v3-02
+
+| run-id | 单元 | 来源 | 题库 | 费用 | 原因 |
+|---|---|---|---|---:|---|
+| 20261025-T23-v3-02 | 全部已发现 T13 / T15 / T16 / C13 / T14 / T22b 单元 | 27 份源日志，6188 条 done；逐份见 manifest.json | eval-v1.2=90e13b3 | 0 | 用户审定的 P1–P4；v2 主数字、v3 敏感性分析；只读原始执行结果，不调用模型、不执行查询；新增判对待 Claude Code 逐条复核 |
+
+**T23 来源说明（追加，不改写前述运行）**：`20261025-T23-v3-01` 在进程运行期间补了输入防护，代码哈希又在结束时采集，因此该轮不作验收依据。正式结果以 `20261025-T23-v3-02` 为准：启动时固定代码哈希、结束时验证代码与源日志未变；27 份源日志 / 6,188 条 done，最终新增判对 82 条（均 P1），待跨厂商逐条复核。两轮均无模型调用、无查询执行，费用 0。本次没有发现 T22b 作答日志，不能把上述“全部已发现”误读成 T22b 已完成。
+| 20261025-T14-tuned-01 | 2026-10-25 | SQL-L1-tuned、SQL-L1-tuned-instr | T14 | 109（跳过 judge 13 题；调优 54、留出 55）× 3 次 × 2 单元 = 654 | deepseek-flash（`system_fingerprint` e72d3c7f663d3e1383b00b3884cb4501，669 次调用唯一，与 G3 一致） | eval-v1.2 = 90e13b3（只读 worktree `$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2`，开跑前校验）；semantic-tuned-v1 = 09f4738（#163 合并提交，开跑前校验） | 4.77 | $SEMDEBT_DATA_DIR/runs-raw/20261025-T14-tuned-01 | T14 第 1 轮调优全量（用户 2026-10-24 批准，两单元合计上限 12 元；dry-run 估 11.18）。周日 09:20 起错峰，一次跑完、无暂停，654/654 done，无 api_error / harness_error。harness 工作树 = `harness-tuned-v1`（09f4738；日志 `harness_commit` b91eccc 是同一棵树）。系统消息 sha256：SQL-L1-tuned 6ce71c76…，SQL-L1-tuned-instr 03ec10aa…（SQL-L1 仍为 8df43ae0…）。chDB 用本卡副本 `$SEMDEBT_DATA_DIR/chdb-t14`（`data/build_chdb_copy.py` 建），经包装脚本 `scripts/t14_run_on_chdb_copy.py` 只改执行器数据目录、不改 harness（硬规则 9）。评分器 v2 当场判定即最终判定。SQL-L1-tuned 269/327（0.823），SQL-L1-tuned-instr 286/327（0.875，含 1 条最终执行报错）。报告待 `reports/results/tuning.md` |
