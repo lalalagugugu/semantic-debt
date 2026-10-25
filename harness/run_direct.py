@@ -41,6 +41,7 @@ import subprocess
 import sys
 import threading
 import time
+from contextlib import nullcontext
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime
@@ -53,7 +54,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
+    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, SELECTIVE_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -62,6 +63,7 @@ from harness.executors import (  # noqa: E402
 from harness.questions import Question  # noqa: E402
 from harness.score_guard import SCORE_TIMEOUT, SCORE_TIMEOUT_S, score_with_timeout  # noqa: E402
 from harness.scorer_v2 import REFUSAL, ExecError, ScoreResult, score_detailed  # noqa: E402
+from harness.spend import SpendGuard, SpendLimit  # noqa: E402
 
 NO_QUERY = "no_query"
 BEIJING = ZoneInfo("Asia/Shanghai")
@@ -106,7 +108,16 @@ def system_for(cell: Cell) -> str:
         from harness import tuned_instructions as TI
 
         return TI.system_message(context_text(cell), syntax, lang, TI.load(instructions_path(cell.instructions)))
-    return P.system_message(context_text(cell), syntax, lang)
+    system = P.system_message(context_text(cell), syntax, lang)
+    if cell.selective_k is not None:
+        k = cell.selective_k
+        if k not in (1, 3):
+            raise ValueError(f"unsupported selective weight: {k}")
+        threshold = {1: "50%", 3: "75%"}[k]
+        system += (f"\n计分规则：每道题独立计分。答对得 1 分，答错扣 {k} 分，只输出 CANNOT_ANSWER 得 0 分。"
+                   f"请让本题的期望得分最高：只有当你判断自己答对的可能性高于 {threshold} 时才作答，"
+                   "否则只输出 CANNOT_ANSWER。题面有歧义时，可以在「假设：」里写明你采用的理解再作答。\n")
+    return system
 
 
 def sha256(data: bytes | str) -> str:
@@ -163,11 +174,13 @@ class RunStopped(RuntimeError):
 class CallBoundary:
     """Shared by all workers; stop before further calls on a version or time violation."""
 
-    def __init__(self, expected_fingerprint: str | None, allow_peak: bool = False) -> None:
+    def __init__(self, expected_fingerprint: str | None, allow_peak: bool = False,
+                 spend: SpendGuard | None = None) -> None:
         self.expected_fingerprint = expected_fingerprint
         self.allow_peak = allow_peak
         self.stopped = threading.Event()
         self.reason = ""
+        self.spend = spend
 
     def stop(self, reason: str) -> None:
         self.reason = reason
@@ -177,6 +190,8 @@ class CallBoundary:
     def before_request(self) -> None:
         if self.stopped.is_set():
             raise RunStopped(self.reason)
+        if self.spend is not None and self.spend.reached:
+            self.stop(f"runtime budget reached: {self.spend.total} CNY / {self.spend.limit} CNY")
         if not self.allow_peak and is_peak():
             self.stop("peak hours reached; resume off-peak")
 
@@ -186,12 +201,46 @@ class CallBoundary:
 
 
 def _chat(ctx: RunContext, q: Question, rep: int, turn: int, messages: list[dict[str, str]]) -> Reply:
+    spend = ctx.boundary.spend if ctx.boundary else None
+    # Serialize API calls across both cells, including fixes, until each reply
+    # has been saved and charged. Other cells retain their existing concurrency.
+    with spend.lock if spend is not None else nullcontext():
+        try:
+            if spend is not None:
+                ctx.boundary.before_request()
+                spend.begin(ctx.cell.name, q.qid, rep, turn)
+            peak = is_peak()
+            reply = _chat_unaccounted(ctx, q, rep, turn, messages, check_reply=spend is None)
+            if spend is not None:
+                spend.charge(cost_cny(ctx.client.model, reply.usage, peak), reply.usage)
+                # A response that crosses the threshold is retained and scored;
+                # no further request, including an execution fix, may start.
+                if spend.reached:
+                    ctx.boundary.reason = f"runtime budget reached: {spend.total} CNY / {spend.limit} CNY"
+                    ctx.boundary.stopped.set()
+                ctx.boundary.check_reply(reply)
+            return reply
+        except Exception as exc:
+            if spend is not None:
+                ctx.boundary.reason = str(exc)
+                ctx.boundary.stopped.set()
+            if isinstance(exc, SpendLimit):
+                stopped = RunStopped(str(exc))
+                stopped.reply = locals().get("reply")
+                raise stopped from exc
+            if isinstance(exc, RunStopped) and locals().get("reply") is not None:
+                exc.reply = reply
+            raise
+
+
+def _chat_unaccounted(ctx: RunContext, q: Question, rep: int, turn: int,
+                      messages: list[dict[str, str]], *, check_reply: bool = True) -> Reply:
     if ctx.boundary is not None:
         ctx.boundary.before_request()
     reply = ctx.client.chat(messages)
     # Preserve even a mismatching response before stopping; never send its query to the engine.
     _save_raw(ctx, q, rep, turn, reply)
-    if ctx.boundary is not None:
+    if ctx.boundary is not None and check_reply:
         try:
             ctx.boundary.check_reply(reply)
         except RunStopped as exc:
@@ -817,7 +866,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
     names = args.cell or ["all"]
     from harness.cells import COMBO_CELLS
 
-    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS, **COMBO_CELLS}
+    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS, **COMBO_CELLS, **SELECTIVE_CELLS}
     cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
     if not args.dry_run and sum(c.stack == "dax" for c in cells) > 1:
         print("refusing to start: Power BI Desktop serves one model at a time; run one DAX cell per invocation")
@@ -884,6 +933,10 @@ def main(argv: list[str] | None = None, load=None) -> int:
         return 2
     if args.dry_run:
         return 0
+    selective = any(c.selective_k is not None for c in cells)
+    if selective and args.budget is None:
+        print("refusing to start: selective cells require --budget for the shared runtime spend threshold")
+        return 2
     if is_peak() and not args.allow_peak:
         print("DeepSeek peak hours (weekdays 09-12, 14-18 Beijing): batch runs go off-peak (hard rule 6); "
               "pass --allow-peak for a deliberate small run")
@@ -903,8 +956,21 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     from harness.client import DeepSeekClient
 
-    boundary = CallBoundary(args.expected_fingerprint, args.allow_peak)
-    client = DeepSeekClient(args.model, before_request=boundary.before_request)
+    try:
+        spend = SpendGuard(raw_root() / args.run_id / "spend-ledger.jsonl", args.budget, args.model) if selective else None
+    except (ValueError, OSError, KeyError, TypeError, ArithmeticError) as exc:
+        print(f"refusing to start: {exc}")
+        return 2
+    boundary = CallBoundary(args.expected_fingerprint, args.allow_peak, spend=spend)
+    if spend is not None:
+        print(f"runtime budget: {spend.total} / {spend.limit} CNY (shared; API calls serialized)")
+        if spend.reached:
+            print("STOP: runtime budget already reached; no model call")
+            return 3
+    # A transport failure can have unknown billable usage; the capped run must
+    # stop for reconciliation instead of sending another unaccounted request.
+    client = DeepSeekClient(args.model, before_request=boundary.before_request,
+                            **({"max_attempts": 1} if spend is not None else {}))
     commit = eval_commit()
     guard = FingerprintGuard.from_logs(log_path(args.run_id, "x").parent, args.model)
     for cell in cells:

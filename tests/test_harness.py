@@ -1453,6 +1453,7 @@ def test_ladder_level4_examples_are_tuning_questions_only():
 
 @pytest.mark.parametrize("entry,cell", [
     ("run_direct", "SQL-L1"), ("run_direct", "SQL-L1-T4"),
+    ("run_direct", "SQL-L1plus-sel-k1"), ("run_direct", "SQL-L1plus-sel-k3"),
     ("run_agent", "SQL-L1-E"), ("run_plan", "SQL-L1-P"),
 ])
 @pytest.mark.parametrize("budget,expected", [(None, 0), ("0.99", 2), ("1", 0), ("1.01", 0)])
@@ -1470,6 +1471,176 @@ def test_dry_run_checks_budget_before_returning(entry, cell, budget, expected, m
     output = capsys.readouterr().out
     assert ("exceeds budget" in output) == (expected == 2)
     assert QTEXT not in output
+
+
+def test_selective_cells_preserve_base_prompt_and_scope(tmp_path, monkeypatch):
+    from dataclasses import replace
+    from harness.cells import L1PLUS_CELLS, SELECTIVE_CELLS
+    from render.context import dump_yaml, render_cell
+
+    monkeypatch.setattr(R, "CONTEXTS", tmp_path)
+    tmp_path.joinpath("SQL-L1plus.yaml").write_text(dump_yaml(render_cell("SQL-L1plus")), encoding="utf-8")
+    base = L1PLUS_CELLS["SQL-L1plus"]
+    before = R.system_for(base)
+    assert R.sha256(before) == "b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3"
+    for name, cell in SELECTIVE_CELLS.items():
+        k = cell.selective_k
+        assert replace(cell, name=base.name, card=base.card, selective_k=None) == base
+        rule = (f"计分规则：每道题独立计分。答对得 1 分，答错扣 {k} 分，只输出 CANNOT_ANSWER 得 0 分。"
+                f"请让本题的期望得分最高：只有当你判断自己答对的可能性高于 {50 if k == 1 else 75}% 时才作答，"
+                "否则只输出 CANNOT_ANSWER。题面有歧义时，可以在「假设：」里写明你采用的理解再作答。")
+        assert R.system_for(cell) == before + "\n" + rule + "\n"
+        assert name not in CELLS and cell.skip_judge
+    assert R.system_for(base) == before
+
+
+@pytest.mark.parametrize("name", ["SQL-L1plus-sel-k1", "SQL-L1plus-sel-k3"])
+@pytest.mark.parametrize("answers,expected,calls", [
+    (["CANNOT_ANSWER"], "refused", 1),
+    (["invalid format"], "exec_error", 1),
+    (["```sql\nSELECT bad\n```", "```sql\nSELECT 42\n```\n假设：无"], "correct", 2),
+])
+def test_selective_attempt_retains_existing_refusal_format_and_fix(name, answers, expected, calls, tmp_path):
+    from harness.cells import SELECTIVE_CELLS
+
+    respond, messages = _scripted(*answers)
+    executor = FakeExecutor({"SELECT bad": ExecResult(error="bad query", error_class=ENGINE_ERROR),
+                             "SELECT 42": ExecResult(rows=[[42]])})
+    ctx = _ctx(tmp_path, MockClient(respond), executor)
+    ctx.cell = SELECTIVE_CELLS[name]
+    rec = R.run_attempt(ctx, Q, 1)
+    assert rec["final"]["outcome"] == expected
+    assert len(messages) == calls
+    if calls == 2:
+        assert "bad query" in messages[-1][-1]["content"]
+
+
+@pytest.mark.parametrize("amount", [0.5, 0.6])
+def test_selective_runtime_budget_shared_across_cells_and_resume(tmp_path, monkeypatch, amount):
+    from harness.cells import SELECTIVE_CELLS
+    from harness.spend import SpendGuard
+
+    monkeypatch.setattr(R, "cost_cny", lambda *a: amount)
+    ledger = tmp_path / "raw" / "spend-ledger.jsonl"
+    spend = SpendGuard(ledger, 1, "deepseek-flash")
+    boundary = R.CallBoundary(None, allow_peak=True, spend=spend)
+    client = MockClient(lambda m: "CANNOT_ANSWER", model="deepseek-flash")
+    for i, cell in enumerate(SELECTIVE_CELLS.values(), 1):
+        ctx = _ctx(tmp_path, client, FakeExecutor({}))
+        ctx.cell, ctx.boundary = cell, boundary
+        assert R.run_attempt(ctx, Q, i)["final"]["outcome"] == "refused"
+    assert spend.reached and boundary.stopped.is_set()
+    assert len(client.requests) == 2
+    assert R.run_attempt(ctx, Q, 3)["status"] == "stopped"
+    assert len(client.requests) == 2
+    restored = SpendGuard(ledger, 1, "deepseek-flash")
+    assert restored.total == spend.total and restored.reached
+    events = [json.loads(line) for line in ledger.read_text().splitlines()]
+    assert [r["event"] for r in events] == ["request", "charge"] * 2
+
+
+def test_selective_runtime_budget_blocks_execution_fix(tmp_path, monkeypatch):
+    from harness.spend import SpendGuard
+
+    monkeypatch.setattr(R, "cost_cny", lambda *a: 1.0)
+    respond, messages = _scripted("```sql\nSELECT bad\n```", "CANNOT_ANSWER")
+    ctx = _ctx(tmp_path, MockClient(respond, model="deepseek-flash"),
+               FakeExecutor({"SELECT bad": ExecResult(error="bad", error_class=ENGINE_ERROR)}))
+    ctx.boundary = R.CallBoundary(None, allow_peak=True,
+                                  spend=SpendGuard(tmp_path / "ledger.jsonl", 1, "deepseek-flash"))
+    record = R.run_attempt(ctx, Q, 1)
+    assert record["status"] == "stopped" and len(messages) == 1
+    assert len(record["turns"]) == 1 and record["turns"][0]["usage"]
+    assert (ctx.raw_dir / f"{Q.qid}_r1_t0.json").exists()
+
+
+def test_selective_runtime_budget_serializes_concurrent_requests(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from decimal import Decimal
+    from harness.spend import SpendGuard
+
+    monkeypatch.setattr(R, "cost_cny", lambda *a: 0.1)
+    ctx = _ctx(tmp_path, MockClient(lambda m: "CANNOT_ANSWER", model="deepseek-flash"), FakeExecutor({}))
+    spend = SpendGuard(tmp_path / "ledger.jsonl", 1, "deepseek-flash")
+    ctx.boundary = R.CallBoundary(None, allow_peak=True, spend=spend)
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        records = list(pool.map(lambda q: R.run_attempt(ctx, q, 1), _questions(30)))
+    assert len(ctx.client.requests) == 10
+    assert spend.total == Decimal("1.0")
+    assert sum(r["status"] == "done" for r in records) == 10
+    assert sum(r["status"] == "stopped" for r in records) == 20
+
+
+@pytest.mark.parametrize("failure", ["api_error", "missing_usage", "fingerprint"])
+def test_selective_runtime_budget_preserves_failed_or_unconfirmed_calls(tmp_path, monkeypatch, failure):
+    from dataclasses import replace
+    from harness.spend import SpendGuard
+
+    client = MockClient(lambda m: "CANNOT_ANSWER", model="deepseek-flash")
+    original_chat = client.chat
+    def respond(*a, **kw):
+        if failure == "api_error":
+            raise APIError("unknown transport result")
+        reply = original_chat(*a, **kw)
+        return replace(reply, usage={}) if failure == "missing_usage" else reply
+    client.chat = respond
+    ctx = _ctx(tmp_path, client, FakeExecutor({}))
+    ledger = tmp_path / "ledger.jsonl"
+    spend = SpendGuard(ledger, 1, "deepseek-flash")
+    ctx.boundary = R.CallBoundary("different" if failure == "fingerprint" else None, allow_peak=True, spend=spend)
+    rec = R.run_attempt(ctx, Q, 1)
+    assert ctx.boundary.stopped.is_set()
+    if failure == "fingerprint":
+        assert len(rec["turns"]) == 1 and spend.total > 0
+        assert SpendGuard(ledger, 1, "deepseek-flash").total == spend.total
+    else:
+        with pytest.raises(ValueError, match="unresolved request"):
+            SpendGuard(ledger, 1, "deepseek-flash")
+
+
+def test_selective_runtime_budget_rejects_reset_or_untracked_calls(tmp_path):
+    from harness.spend import SpendGuard
+
+    ledger = tmp_path / "ledger.jsonl"
+    spend = SpendGuard(ledger, 1, "deepseek-flash")
+    spend.begin("SQL-L1plus-sel-k1", "Q_SYNTH", 1, 0)
+    spend.charge(0.5, {"prompt_tokens": 1, "cache_hit_tokens": 0,
+                       "cache_miss_tokens": 1, "completion_tokens": 1})
+    with pytest.raises(ValueError, match="differs"):
+        SpendGuard(ledger, 2, "deepseek-flash")
+    other = tmp_path / "existing"
+    (other / "SQL-L1plus-sel-k1").mkdir(parents=True)
+    (other / "SQL-L1plus-sel-k1" / "Q01_r1_t0.json").write_text("{}")
+    with pytest.raises(ValueError, match="no spend ledger"):
+        SpendGuard(other / "spend-ledger.jsonl", 1, "deepseek-flash")
+
+
+def test_selective_runtime_budget_cli_shares_threshold_and_resumes_without_calls(tmp_path, monkeypatch):
+    from harness import client as C, questions as QL
+
+    clients = []
+    def make_client(model, **kwargs):
+        assert kwargs["max_attempts"] == 1
+        client = MockClient(lambda m: "CANNOT_ANSWER", model=model)
+        clients.append(client)
+        return client
+    monkeypatch.setattr(C, "DeepSeekClient", make_client)
+    monkeypatch.setattr(R, "REPO", tmp_path)
+    monkeypatch.setattr(R, "raw_root", lambda: tmp_path / "raw")
+    monkeypatch.setattr(R, "harness_commit", lambda: "synthetic")
+    monkeypatch.setattr(QL, "eval_commit", lambda: "synthetic")
+    monkeypatch.setattr(R, "system_for", lambda cell: "synthetic system")
+    monkeypatch.setattr(R, "make_executor", lambda *a: FakeExecutor({}))
+    monkeypatch.setattr(R, "dry_run", lambda *a, **kw: ([], 0.1))
+    monkeypatch.setattr(R, "cost_cny", lambda *a: 0.5)
+    argv = ["--cell", "SQL-L1plus-sel-k1", "--cell", "SQL-L1plus-sel-k3",
+            "--run-id", "synthetic-budget", "--reps", "1", "--budget", "1", "--allow-peak"]
+    assert R.main(argv, load=lambda **kw: [Q]) == 3
+    assert len(clients) == 1 and len(clients[0].requests) == 2
+    assert R.main(argv, load=lambda **kw: [Q]) == 3
+    assert len(clients) == 1  # no API client is created once the persisted budget is reached
+    assert R.main(["--cell", "SQL-L1plus-sel-k1", "--run-id", "synthetic-missing-budget"],
+                  load=lambda **kw: [Q]) == 2
 
 
 @pytest.mark.parametrize("name", [
