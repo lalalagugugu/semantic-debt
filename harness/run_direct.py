@@ -53,7 +53,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
+    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, SELECTIVE_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -106,7 +106,16 @@ def system_for(cell: Cell) -> str:
         from harness import tuned_instructions as TI
 
         return TI.system_message(context_text(cell), syntax, lang, TI.load(instructions_path(cell.instructions)))
-    return P.system_message(context_text(cell), syntax, lang)
+    system = P.system_message(context_text(cell), syntax, lang)
+    if cell.selective_k is not None:
+        k = cell.selective_k
+        if k not in (1, 3):
+            raise ValueError(f"unsupported selective weight: {k}")
+        threshold = {1: "50%", 3: "75%"}[k]
+        system += (f"\n计分规则：每道题独立计分。答对得 1 分，答错扣 {k} 分，只输出 CANNOT_ANSWER 得 0 分。"
+                   f"请让本题的期望得分最高：只有当你判断自己答对的可能性高于 {threshold} 时才作答，"
+                   "否则只输出 CANNOT_ANSWER。题面有歧义时，可以在「假设：」里写明你采用的理解再作答。\n")
+    return system
 
 
 def sha256(data: bytes | str) -> str:
@@ -815,7 +824,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
 
     args = parse_args(argv)
     names = args.cell or ["all"]
-    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS}
+    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS, **SELECTIVE_CELLS}
     cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
     if not args.dry_run and sum(c.stack == "dax" for c in cells) > 1:
         print("refusing to start: Power BI Desktop serves one model at a time; run one DAX cell per invocation")

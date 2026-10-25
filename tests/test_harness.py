@@ -1453,6 +1453,7 @@ def test_ladder_level4_examples_are_tuning_questions_only():
 
 @pytest.mark.parametrize("entry,cell", [
     ("run_direct", "SQL-L1"), ("run_direct", "SQL-L1-T4"),
+    ("run_direct", "SQL-L1plus-sel-k1"), ("run_direct", "SQL-L1plus-sel-k3"),
     ("run_agent", "SQL-L1-E"), ("run_plan", "SQL-L1-P"),
 ])
 @pytest.mark.parametrize("budget,expected", [(None, 0), ("0.99", 2), ("1", 0), ("1.01", 0)])
@@ -1470,6 +1471,48 @@ def test_dry_run_checks_budget_before_returning(entry, cell, budget, expected, m
     output = capsys.readouterr().out
     assert ("exceeds budget" in output) == (expected == 2)
     assert QTEXT not in output
+
+
+def test_selective_cells_preserve_base_prompt_and_scope(tmp_path, monkeypatch):
+    from dataclasses import replace
+    from harness.cells import L1PLUS_CELLS, SELECTIVE_CELLS
+    from render.context import dump_yaml, render_cell
+
+    monkeypatch.setattr(R, "CONTEXTS", tmp_path)
+    tmp_path.joinpath("SQL-L1plus.yaml").write_text(dump_yaml(render_cell("SQL-L1plus")), encoding="utf-8")
+    base = L1PLUS_CELLS["SQL-L1plus"]
+    before = R.system_for(base)
+    assert R.sha256(before) == "b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3"
+    for name, cell in SELECTIVE_CELLS.items():
+        k = cell.selective_k
+        assert replace(cell, name=base.name, card=base.card, selective_k=None) == base
+        rule = (f"计分规则：每道题独立计分。答对得 1 分，答错扣 {k} 分，只输出 CANNOT_ANSWER 得 0 分。"
+                f"请让本题的期望得分最高：只有当你判断自己答对的可能性高于 {50 if k == 1 else 75}% 时才作答，"
+                "否则只输出 CANNOT_ANSWER。题面有歧义时，可以在「假设：」里写明你采用的理解再作答。")
+        assert R.system_for(cell) == before + "\n" + rule + "\n"
+        assert name not in CELLS and cell.skip_judge
+    assert R.system_for(base) == before
+
+
+@pytest.mark.parametrize("name", ["SQL-L1plus-sel-k1", "SQL-L1plus-sel-k3"])
+@pytest.mark.parametrize("answers,expected,calls", [
+    (["CANNOT_ANSWER"], "refused", 1),
+    (["invalid format"], "exec_error", 1),
+    (["```sql\nSELECT bad\n```", "```sql\nSELECT 42\n```\n假设：无"], "correct", 2),
+])
+def test_selective_attempt_retains_existing_refusal_format_and_fix(name, answers, expected, calls, tmp_path):
+    from harness.cells import SELECTIVE_CELLS
+
+    respond, messages = _scripted(*answers)
+    executor = FakeExecutor({"SELECT bad": ExecResult(error="bad query", error_class=ENGINE_ERROR),
+                             "SELECT 42": ExecResult(rows=[[42]])})
+    ctx = _ctx(tmp_path, MockClient(respond), executor)
+    ctx.cell = SELECTIVE_CELLS[name]
+    rec = R.run_attempt(ctx, Q, 1)
+    assert rec["final"]["outcome"] == expected
+    assert len(messages) == calls
+    if calls == 2:
+        assert "bad query" in messages[-1][-1]["content"]
 
 
 @pytest.mark.parametrize("name", [

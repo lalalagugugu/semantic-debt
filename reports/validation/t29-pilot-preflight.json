@@ -1,0 +1,110 @@
+{
+  "task": "T29",
+  "phase": "pilot dry-run only; paid calls await user approval",
+  "model": "deepseek-flash",
+  "harness_tag": "pending user: harness-sel-v1",
+  "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+  "semantic_commit": "866004b3b1e55950139ba87f728d3f7f13f26433",
+  "b1_freeze_commit": "50098ef5380fc913692a95d143b9bdce3baca3ad",
+  "system_sha256": {
+    "SQL-L1plus": "b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3",
+    "SQL-L1plus-sel-k1": "8198443926c8afd449a14ee17637bc6551fb55124b7ca24a08cae07ee82dcd36",
+    "SQL-L1plus-sel-k3": "91277cca3c7e61581fd323c2cfaefc9cb90d35596977eb341a75c04f11db00a8"
+  },
+  "sampling_rule": "first 20 deterministic tuning questions by numeric question id; no model answers consulted",
+  "pilot_qids": [
+    "Q03",
+    "Q06",
+    "Q08",
+    "Q12",
+    "Q13",
+    "Q15",
+    "Q17",
+    "Q19",
+    "Q24",
+    "Q26",
+    "Q27",
+    "Q28",
+    "Q34",
+    "Q36",
+    "Q38",
+    "Q43",
+    "Q47",
+    "Q49",
+    "Q50",
+    "Q51"
+  ],
+  "reps": 1,
+  "budget_cny": 1,
+  "estimate_parameters": {
+    "fix_rate": 0.1,
+    "output_tokens": 3000,
+    "hit_ratio": 0.95,
+    "question_tokens": 60,
+    "from_measured_logs": false
+  },
+  "rows": [
+    {
+      "cell": "SQL-L1plus-sel-k1",
+      "card": "T29",
+      "stack": "chdb",
+      "questions": 20,
+      "attempts": 20,
+      "calls": 22,
+      "prompt_tokens": 66829,
+      "output_tokens": 3000,
+      "cost_offpeak": 0.36544642200000005,
+      "source": "estimated"
+    },
+    {
+      "cell": "SQL-L1plus-sel-k3",
+      "card": "T29",
+      "stack": "chdb",
+      "questions": 20,
+      "attempts": 20,
+      "calls": 22,
+      "prompt_tokens": 66829,
+      "output_tokens": 3000,
+      "cost_offpeak": 0.36544642200000005,
+      "source": "estimated"
+    }
+  ],
+  "total_cost_offpeak_cny": 0.7308928440000001,
+  "scenarios_same_token_assumptions": {
+    "zero_fixes": {
+      "calls": 40,
+      "cost_cny": 0.6644480400000001
+    },
+    "all_execution_errors_fixed_once": {
+      "calls": 80,
+      "cost_cny": 1.3288960800000003
+    }
+  },
+  "argv": [
+    "--cell",
+    "SQL-L1plus-sel-k1",
+    "--cell",
+    "SQL-L1plus-sel-k3",
+    "--questions",
+    "Q03,Q06,Q08,Q12,Q13,Q15,Q17,Q19,Q24,Q26,Q27,Q28,Q34,Q36,Q38,Q43,Q47,Q49,Q50,Q51",
+    "--skip-judge",
+    "--reps",
+    "1",
+    "--model",
+    "deepseek-flash",
+    "--semantic-tag",
+    "semantic-v1.6-l1plus",
+    "--eval-tag",
+    "eval-v1.2",
+    "--budget",
+    "1",
+    "--est-from-args",
+    "--dry-run"
+  ],
+  "source_sha256": {
+    "harness/cells.py": "245ced8b563ac777a8bd288d1e01e59a8f327b103bfa69d3356eaae068ef3ed0",
+    "harness/run_direct.py": "84d2a1bc127811466994d59f6005e47fc6e12a259aa8d7fdb2f05eaef4e19a41",
+    "harness/prompt.py": "86fefce2157ff4fc09819fe8c8c5ad4fe7e6e064850f9ce9c8b1b67e97919e5e",
+    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4"
+  }
+}
