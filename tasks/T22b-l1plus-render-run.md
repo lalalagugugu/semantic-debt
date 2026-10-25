@@ -229,3 +229,5 @@ SEMDEBT_EVAL_DIR="$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2" UV_CACHE_DIR="$TMPDIR/uvc
 ```sh
 uv run python scripts/l1plus_attribution_report.py --run-id 20261025-T22b-attrib-01
 ```
+
+- 交付：归因后续 PR #176（https://github.com/lalalagugugu/semantic-debt/pull/176）；已合入最新 origin/main，归因规则、运行代码、输入和标签均未因合并改变。
