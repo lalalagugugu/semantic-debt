@@ -51,3 +51,6 @@
 - 模型版本：接口返回的版本字符串，不是请求里写的名字。
 - 题库提交号：运行时 `$SEMDEBT_EVAL_DIR` 的 `git rev-parse --short HEAD`。
 - 原始响应目录：只记路径；里面的内容不入库，日志里记哈希。
+
+| 20261025-T22b-l1plus-l3a-01 | 2026-10-25 | SQL-L1plus、SQL-L3a | T22b | 计划各 109 × 3，合计 654（跳过 judge） | deepseek-flash；预期指纹 e72d3c7f663d3e1383b00b3884cb4501 | eval-v1.2=90e13b3（独立快照）；semantic-v1.6-l1plus=866004b | 运行中，用户批准上限 15 元；归因另限 3 元 | $SEMDEBT_DATA_DIR/runs-raw/20261025-T22b-l1plus-l3a-01 | 首跑，用户明确批准；正式 dry-run 14.19 元，预计 720 次调用；main=34a75dd（含 #166），周日错峰，并发 4。临时 supervisor.py 存于原始目录；逐 API 响应累计费用，费用达到上限或指纹、API、基础设施、评分异常即停止后续请求；SQL 执行报错按冻结规则修正一次，传输失败不自动重试。结束状态与实际费用另行追加，不改写本行 |
+| 20261025-T22b-l1plus-l3a-01（中止补记） | 2026-10-25 | SQL-L1plus（SQL-L3a 未开始） | T22b | 0 条完成判分；Q01 r1 一条 harness_error | deepseek-flash，2 次调用指纹均 e72d3c7f663d3e1383b00b3884cb4501 | eval-v1.2=90e13b3；semantic-v1.6-l1plus=866004b | **0.03272164**（原始 usage 与 supervision.jsonl 核算；harness_error 摘要无费用，不能取其 0 元） | $SEMDEBT_DATA_DIR/runs-raw/20261025-T22b-l1plus-l3a-01 | 临时监督脚本缺 __main__ 入口保护，spawn 评分进程重复执行启动断言，触发 run-id 已使用；该异常是 Codex 包装脚本错误。首答及固定一次 SQL 修正共 2 次 API 调用，费用已计入 15 元总上限；按用户要求异常即停，未续跑。出错版本、修复版本与 incident.json 均保留外部原始目录；修复后离线 spawn 评分与预算守卫通过，等待用户确认新 run-id 重跑。无完整准确率或稳定性统计；归因费用 0 |
