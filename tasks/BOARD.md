@@ -39,7 +39,7 @@
 | T22 | L1+（内容补全与歧义澄清，盲写）与 L3a（同内容的 OWL + SHACL）（`tasks/T22-l1plus-l3a.md`） | Claude Code（盲 → 普通）+ Codex 复核 | 盲 / 普通 | `semantic-v1.4`；`harness-v1.1` | 10 元（Flash） | 第 1–3 步完成（#164，`semantic/l1plus.yaml` v3，Codex 三轮复核、用户裁决 R1–R12）；第 4–6 步移到 T22b |
 | T22b | L1+ / L3a 渲染、运行、报告、残余歧义归因（`tasks/T22b-l1plus-render-run.md`） | Codex | 主仓库 clone | T22 第 1–3 步 | 10 + 3 元（Flash） | 进行中：渲染与逐条核对完成（109 条，形式化 30 / 注解保留 79）；待 PR 合并、用户打 `semantic-v1.6-l1plus`；初步估算 14.19 元超运行预算，待用户裁决 |
 | T23 | 评分器呈现容错 v3 与全部单元离线重评（`tasks/T23-scorer-presentation.md`） | Codex | 主仓库 clone | `harness-v1.1` | 0 | 未开始 |
-| T24 | 中期报告补数：稳定性、C4–C7、token、数据集与数据质量、名词表、数字来源（`tasks/T24-midterm-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 未开始 |
+| T24 | 中期报告补数：稳定性、C4–C7、token、数据集与数据质量、名词表、数字来源（`tasks/T24-midterm-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）；入口 `reports/midterm/README.md`；T14、L1+、L3a留位待补 |
 | T25 | 立刻要修的流程缺口（`tasks/T25-immediate-fixes.md`） | Codex | 主仓库 clone | — | 0 | 已完成，待协调验收（2026-10-25）：调优目录双层禁读、4 项测试跳过保护、dry-run 预算检查；全量 1070 passed / 6 skipped |
 | C13 | 写法说明教学阶梯（ClickHouse SQL，档位 L1；`tasks/C13-syntax-ladder.md`） | Claude Code（T12） | 普通 | `harness-ladder-v1`；`semantic-v1.4` | 15 元 | **完成**（`20261019-C13-ladder-02`，7.17 元，#147）：首轮执行报错 32% → 3%（2 级），正确率 64.2% → 68.2%（+4.0 [−0.9, +9.2]）；3 级、4 级没有再提高（`reports/results/C13-ladder.md`） |
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
