@@ -1,0 +1,400 @@
+{
+ "case_value_rows": {
+  "Case_DimProduct_ColorName": {
+   "Blue": 148,
+   "blue": 2
+  }
+ },
+ "conforms": false,
+ "instance_triples": 41339,
+ "instances": {
+  "DimAccount": 24,
+  "DimEmployee": 293,
+  "DimEntity": 421,
+  "DimProduct": 2233,
+  "DimProductSubcategory": 44,
+  "FactOnlineSales distinct ProductKey": 2516,
+  "FactOnlineSales rows": 12627608
+ },
+ "l3a_H10_shape_on_plan_scenario_keys": {
+  "conforms": true,
+  "instances": 6
+ },
+ "l3a_account_tree_vs_raw_parent_diff": {
+  "1": {
+   "l3a": null,
+   "raw": "24"
+  }
+ },
+ "orphan_fact_rows": 1715380,
+ "orphan_product_keys": 284,
+ "parent_columns": "raw ParentAccountKey / ParentEmployeeKey / ParentEntityKey, before L1+ breaks cycles",
+ "results_by_shape": {
+  "AcyclicAccount": {
+   "count": 2,
+   "results": [
+    {
+     "focus": "account/1",
+     "severity": "sh:Violation",
+     "value": "account/1"
+    },
+    {
+     "focus": "account/24",
+     "severity": "sh:Violation",
+     "value": "account/24"
+    }
+   ]
+  },
+  "AcyclicEmployee": {
+   "count": 2,
+   "results": [
+    {
+     "focus": "employee/1",
+     "severity": "sh:Violation",
+     "value": "employee/1"
+    },
+    {
+     "focus": "employee/18",
+     "severity": "sh:Violation",
+     "value": "employee/18"
+    }
+   ]
+  },
+  "Case_DimProduct_ColorName": {
+   "count": 1,
+   "results": [
+    {
+     "focus": "table/DimProduct",
+     "severity": "sh:Violation",
+     "value": "Blue"
+    }
+   ]
+  },
+  "FKOnlineSalesProduct": {
+   "count": 284,
+   "results": [
+    {
+     "focus": "osk/1257",
+     "severity": "sh:Violation",
+     "value": "product/1257"
+    },
+    {
+     "focus": "osk/1297",
+     "severity": "sh:Violation",
+     "value": "product/1297"
+    },
+    {
+     "focus": "osk/1298",
+     "severity": "sh:Violation",
+     "value": "product/1298"
+    },
+    {
+     "focus": "osk/1300",
+     "severity": "sh:Violation",
+     "value": "product/1300"
+    },
+    {
+     "focus": "osk/1301",
+     "severity": "sh:Violation",
+     "value": "product/1301"
+    },
+    {
+     "focus": "osk/1302",
+     "severity": "sh:Violation",
+     "value": "product/1302"
+    },
+    {
+     "focus": "osk/1303",
+     "severity": "sh:Violation",
+     "value": "product/1303"
+    },
+    {
+     "focus": "osk/1304",
+     "severity": "sh:Violation",
+     "value": "product/1304"
+    },
+    {
+     "focus": "osk/1305",
+     "severity": "sh:Violation",
+     "value": "product/1305"
+    },
+    {
+     "focus": "osk/1306",
+     "severity": "sh:Violation",
+     "value": "product/1306"
+    },
+    {
+     "focus": "osk/1311",
+     "severity": "sh:Violation",
+     "value": "product/1311"
+    },
+    {
+     "focus": "osk/1312",
+     "severity": "sh:Violation",
+     "value": "product/1312"
+    },
+    {
+     "focus": "osk/1313",
+     "severity": "sh:Violation",
+     "value": "product/1313"
+    },
+    {
+     "focus": "osk/1315",
+     "severity": "sh:Violation",
+     "value": "product/1315"
+    },
+    {
+     "focus": "osk/1707",
+     "severity": "sh:Violation",
+     "value": "product/1707"
+    },
+    {
+     "focus": "osk/1708",
+     "severity": "sh:Violation",
+     "value": "product/1708"
+    },
+    {
+     "focus": "osk/1709",
+     "severity": "sh:Violation",
+     "value": "product/1709"
+    },
+    {
+     "focus": "osk/1710",
+     "severity": "sh:Violation",
+     "value": "product/1710"
+    },
+    {
+     "focus": "osk/1711",
+     "severity": "sh:Violation",
+     "value": "product/1711"
+    },
+    {
+     "focus": "osk/1712",
+     "severity": "sh:Violation",
+     "value": "product/1712"
+    },
+    {
+     "focus": "osk/1713",
+     "severity": "sh:Violation",
+     "value": "product/1713"
+    },
+    {
+     "focus": "osk/1714",
+     "severity": "sh:Violation",
+     "value": "product/1714"
+    },
+    {
+     "focus": "osk/1715",
+     "severity": "sh:Violation",
+     "value": "product/1715"
+    },
+    {
+     "focus": "osk/1716",
+     "severity": "sh:Violation",
+     "value": "product/1716"
+    },
+    {
+     "focus": "osk/1717",
+     "severity": "sh:Violation",
+     "value": "product/1717"
+    },
+    {
+     "focus": "osk/1718",
+     "severity": "sh:Violation",
+     "value": "product/1718"
+    },
+    {
+     "focus": "osk/1719",
+     "severity": "sh:Violation",
+     "value": "product/1719"
+    },
+    {
+     "focus": "osk/1720",
+     "severity": "sh:Violation",
+     "value": "product/1720"
+    },
+    {
+     "focus": "osk/1721",
+     "severity": "sh:Violation",
+     "value": "product/1721"
+    },
+    {
+     "focus": "osk/1722",
+     "severity": "sh:Violation",
+     "value": "product/1722"
+    },
+    {
+     "focus": "osk/1723",
+     "severity": "sh:Violation",
+     "value": "product/1723"
+    },
+    {
+     "focus": "osk/1724",
+     "severity": "sh:Violation",
+     "value": "product/1724"
+    },
+    {
+     "focus": "osk/1725",
+     "severity": "sh:Violation",
+     "value": "product/1725"
+    },
+    {
+     "focus": "osk/1726",
+     "severity": "sh:Violation",
+     "value": "product/1726"
+    },
+    {
+     "focus": "osk/1727",
+     "severity": "sh:Violation",
+     "value": "product/1727"
+    },
+    {
+     "focus": "osk/1728",
+     "severity": "sh:Violation",
+     "value": "product/1728"
+    },
+    {
+     "focus": "osk/1729",
+     "severity": "sh:Violation",
+     "value": "product/1729"
+    },
+    {
+     "focus": "osk/1730",
+     "severity": "sh:Violation",
+     "value": "product/1730"
+    },
+    {
+     "focus": "osk/1731",
+     "severity": "sh:Violation",
+     "value": "product/1731"
+    },
+    {
+     "focus": "osk/1732",
+     "severity": "sh:Violation",
+     "value": "product/1732"
+    },
+    {
+     "focus": "osk/1733",
+     "severity": "sh:Violation",
+     "value": "product/1733"
+    },
+    {
+     "focus": "osk/1734",
+     "severity": "sh:Violation",
+     "value": "product/1734"
+    },
+    {
+     "focus": "osk/1735",
+     "severity": "sh:Violation",
+     "value": "product/1735"
+    },
+    {
+     "focus": "osk/1736",
+     "severity": "sh:Violation",
+     "value": "product/1736"
+    },
+    {
+     "focus": "osk/1737",
+     "severity": "sh:Violation",
+     "value": "product/1737"
+    },
+    {
+     "focus": "osk/1738",
+     "severity": "sh:Violation",
+     "value": "product/1738"
+    },
+    {
+     "focus": "osk/1739",
+     "severity": "sh:Violation",
+     "value": "product/1739"
+    },
+    {
+     "focus": "osk/1740",
+     "severity": "sh:Violation",
+     "value": "product/1740"
+    },
+    {
+     "focus": "osk/1741",
+     "severity": "sh:Violation",
+     "value": "product/1741"
+    },
+    {
+     "focus": "osk/1742",
+     "severity": "sh:Violation",
+     "value": "product/1742"
+    },
+    {
+     "focus": "osk/1743",
+     "severity": "sh:Violation",
+     "value": "product/1743"
+    },
+    {
+     "focus": "osk/1744",
+     "severity": "sh:Violation",
+     "value": "product/1744"
+    },
+    {
+     "focus": "osk/1745",
+     "severity": "sh:Violation",
+     "value": "product/1745"
+    },
+    {
+     "focus": "osk/1746",
+     "severity": "sh:Violation",
+     "value": "product/1746"
+    },
+    {
+     "focus": "osk/1747",
+     "severity": "sh:Violation",
+     "value": "product/1747"
+    },
+    {
+     "focus": "osk/1748",
+     "severity": "sh:Violation",
+     "value": "product/1748"
+    },
+    {
+     "focus": "osk/1749",
+     "severity": "sh:Violation",
+     "value": "product/1749"
+    },
+    {
+     "focus": "osk/1750",
+     "severity": "sh:Violation",
+     "value": "product/1750"
+    },
+    {
+     "focus": "osk/1751",
+     "severity": "sh:Violation",
+     "value": "product/1751"
+    },
+    {
+     "focus": "osk/1752",
+     "severity": "sh:Violation",
+     "value": "product/1752"
+    }
+   ]
+  },
+  "SelfRootInfo": {
+   "count": 3,
+   "results": [
+    {
+     "focus": "entity/1",
+     "severity": "sh:Info",
+     "value": "entity/1"
+    },
+    {
+     "focus": "entity/2",
+     "severity": "sh:Info",
+     "value": "entity/2"
+    },
+    {
+     "focus": "entity/3",
+     "severity": "sh:Info",
+     "value": "entity/3"
+    }
+   ]
+  }
+ },
+ "sampling": "none: every row of the four dimension tables; FactOnlineSales compressed to one instance per distinct ProductKey with its exact row count (orphan rows = sum over violating keys)"
+}

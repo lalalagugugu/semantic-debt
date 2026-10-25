@@ -1,0 +1,1675 @@
+{
+ "formal_entries": {
+  "E01": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 5,
+   "l1plus_wrong": [
+    "Q110"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 4,
+   "l3a_wrong": [
+    "Q110"
+   ],
+   "l3a_wrong_main": [
+    "Q110"
+   ],
+   "n": 2,
+   "n_main": 2,
+   "questions": [
+    "Q110",
+    "Q28"
+   ]
+  },
+  "E02": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 0,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 0,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 0,
+   "n_main": 0,
+   "questions": []
+  },
+  "E03": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 6,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 2,
+   "n_main": 2,
+   "questions": [
+    "Q25",
+    "Q43"
+   ]
+  },
+  "E04": {
+   "l1plus_all_wrong": [
+    "Q22"
+   ],
+   "l1plus_correct_attempts": 12,
+   "l1plus_wrong": [
+    "Q22"
+   ],
+   "l3a_all_wrong": [
+    "Q22"
+   ],
+   "l3a_correct_attempts": 12,
+   "l3a_wrong": [
+    "Q22"
+   ],
+   "l3a_wrong_main": [
+    "Q22"
+   ],
+   "n": 5,
+   "n_main": 5,
+   "questions": [
+    "Q108",
+    "Q15",
+    "Q22",
+    "Q43",
+    "Q80"
+   ]
+  },
+  "E05": {
+   "l1plus_all_wrong": [
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l1plus_correct_attempts": 30,
+   "l1plus_wrong": [
+    "Q05",
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_all_wrong": [
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_correct_attempts": 31,
+   "l3a_wrong": [
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q61",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_wrong_main": [
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q61",
+    "Q71",
+    "Q98"
+   ],
+   "n": 15,
+   "n_main": 13,
+   "questions": [
+    "Q05",
+    "Q102",
+    "Q104",
+    "Q11",
+    "Q117",
+    "Q121",
+    "Q24",
+    "Q31",
+    "Q38",
+    "Q61",
+    "Q71",
+    "Q76",
+    "Q90",
+    "Q98",
+    "Q99"
+   ]
+  },
+  "E06": {
+   "l1plus_all_wrong": [
+    "Q122",
+    "Q71",
+    "Q98"
+   ],
+   "l1plus_correct_attempts": 39,
+   "l1plus_wrong": [
+    "Q122",
+    "Q34",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q98"
+   ],
+   "l3a_all_wrong": [
+    "Q122",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_correct_attempts": 37,
+   "l3a_wrong": [
+    "Q122",
+    "Q61",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q92",
+    "Q98"
+   ],
+   "l3a_wrong_main": [
+    "Q122",
+    "Q61",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q92",
+    "Q98"
+   ],
+   "n": 17,
+   "n_main": 15,
+   "questions": [
+    "Q04",
+    "Q11",
+    "Q122",
+    "Q20",
+    "Q24",
+    "Q34",
+    "Q57",
+    "Q61",
+    "Q62",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q76",
+    "Q90",
+    "Q92",
+    "Q98",
+    "Q99"
+   ]
+  },
+  "E07": {
+   "l1plus_all_wrong": [
+    "Q71",
+    "Q98"
+   ],
+   "l1plus_correct_attempts": 30,
+   "l1plus_wrong": [
+    "Q34",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q98"
+   ],
+   "l3a_all_wrong": [
+    "Q71",
+    "Q98"
+   ],
+   "l3a_correct_attempts": 29,
+   "l3a_wrong": [
+    "Q61",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q98"
+   ],
+   "l3a_wrong_main": [
+    "Q61",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q98"
+   ],
+   "n": 13,
+   "n_main": 11,
+   "questions": [
+    "Q11",
+    "Q20",
+    "Q24",
+    "Q34",
+    "Q61",
+    "Q62",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q76",
+    "Q90",
+    "Q98",
+    "Q99"
+   ]
+  },
+  "E08": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 0,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 0,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 0,
+   "n_main": 0,
+   "questions": []
+  },
+  "E09": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 10,
+   "l1plus_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 9,
+   "l3a_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_wrong_main": [
+    "Q18"
+   ],
+   "n": 4,
+   "n_main": 3,
+   "questions": [
+    "Q18",
+    "Q66",
+    "Q69",
+    "Q78"
+   ]
+  },
+  "E10": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 3,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 3,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 1,
+   "n_main": 1,
+   "questions": [
+    "Q25"
+   ]
+  },
+  "E11": {
+   "l1plus_all_wrong": [
+    "Q113",
+    "Q31",
+    "Q85"
+   ],
+   "l1plus_correct_attempts": 14,
+   "l1plus_wrong": [
+    "Q112",
+    "Q113",
+    "Q31",
+    "Q85"
+   ],
+   "l3a_all_wrong": [
+    "Q113",
+    "Q31",
+    "Q85"
+   ],
+   "l3a_correct_attempts": 14,
+   "l3a_wrong": [
+    "Q113",
+    "Q31",
+    "Q49",
+    "Q85"
+   ],
+   "l3a_wrong_main": [
+    "Q113",
+    "Q31",
+    "Q49"
+   ],
+   "n": 8,
+   "n_main": 6,
+   "questions": [
+    "Q111",
+    "Q112",
+    "Q113",
+    "Q31",
+    "Q38",
+    "Q49",
+    "Q79",
+    "Q85"
+   ]
+  },
+  "E12": {
+   "l1plus_all_wrong": [
+    "Q31"
+   ],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [
+    "Q31"
+   ],
+   "l3a_all_wrong": [
+    "Q31"
+   ],
+   "l3a_correct_attempts": 5,
+   "l3a_wrong": [
+    "Q31",
+    "Q49"
+   ],
+   "l3a_wrong_main": [
+    "Q31",
+    "Q49"
+   ],
+   "n": 3,
+   "n_main": 3,
+   "questions": [
+    "Q31",
+    "Q38",
+    "Q49"
+   ]
+  },
+  "E13": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 12,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 12,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 4,
+   "n_main": 4,
+   "questions": [
+    "Q120",
+    "Q19",
+    "Q55",
+    "Q63"
+   ]
+  },
+  "E14": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 12,
+   "l1plus_wrong": [
+    "Q17",
+    "Q29"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 11,
+   "l3a_wrong": [
+    "Q17",
+    "Q29"
+   ],
+   "l3a_wrong_main": [],
+   "n": 5,
+   "n_main": 0,
+   "questions": [
+    "Q17",
+    "Q29",
+    "Q59",
+    "Q68",
+    "Q99"
+   ]
+  },
+  "E15": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 3,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 3,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 1,
+   "n_main": 1,
+   "questions": [
+    "Q10"
+   ]
+  },
+  "E16": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 0,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 0,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 0,
+   "n_main": 0,
+   "questions": []
+  },
+  "E17": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 4,
+   "l1plus_wrong": [
+    "Q82"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 3,
+   "l3a_wrong": [
+    "Q35",
+    "Q82"
+   ],
+   "l3a_wrong_main": [
+    "Q35",
+    "Q82"
+   ],
+   "n": 2,
+   "n_main": 2,
+   "questions": [
+    "Q35",
+    "Q82"
+   ]
+  },
+  "H01": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 3,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 3,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 1,
+   "n_main": 1,
+   "questions": [
+    "Q24"
+   ]
+  },
+  "H02": {
+   "l1plus_all_wrong": [
+    "Q65"
+   ],
+   "l1plus_correct_attempts": 14,
+   "l1plus_wrong": [
+    "Q112",
+    "Q65"
+   ],
+   "l3a_all_wrong": [
+    "Q65"
+   ],
+   "l3a_correct_attempts": 15,
+   "l3a_wrong": [
+    "Q65"
+   ],
+   "l3a_wrong_main": [
+    "Q65"
+   ],
+   "n": 6,
+   "n_main": 6,
+   "questions": [
+    "Q10",
+    "Q106",
+    "Q107",
+    "Q112",
+    "Q65",
+    "Q70"
+   ]
+  },
+  "H03": {
+   "l1plus_all_wrong": [
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l1plus_correct_attempts": 42,
+   "l1plus_wrong": [
+    "Q05",
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q34",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q98"
+   ],
+   "l3a_all_wrong": [
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_correct_attempts": 43,
+   "l3a_wrong": [
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q61",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q98"
+   ],
+   "l3a_wrong_main": [
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q61",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q98"
+   ],
+   "n": 20,
+   "n_main": 18,
+   "questions": [
+    "Q05",
+    "Q102",
+    "Q104",
+    "Q11",
+    "Q117",
+    "Q121",
+    "Q20",
+    "Q24",
+    "Q31",
+    "Q34",
+    "Q38",
+    "Q61",
+    "Q62",
+    "Q67",
+    "Q71",
+    "Q73",
+    "Q76",
+    "Q90",
+    "Q98",
+    "Q99"
+   ]
+  },
+  "H04": {
+   "l1plus_all_wrong": [
+    "Q22"
+   ],
+   "l1plus_correct_attempts": 21,
+   "l1plus_wrong": [
+    "Q22"
+   ],
+   "l3a_all_wrong": [
+    "Q22"
+   ],
+   "l3a_correct_attempts": 21,
+   "l3a_wrong": [
+    "Q22"
+   ],
+   "l3a_wrong_main": [
+    "Q22"
+   ],
+   "n": 8,
+   "n_main": 8,
+   "questions": [
+    "Q106",
+    "Q107",
+    "Q108",
+    "Q15",
+    "Q22",
+    "Q25",
+    "Q43",
+    "Q80"
+   ]
+  },
+  "H05": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 3,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 2,
+   "l3a_wrong": [
+    "Q49"
+   ],
+   "l3a_wrong_main": [
+    "Q49"
+   ],
+   "n": 1,
+   "n_main": 1,
+   "questions": [
+    "Q49"
+   ]
+  },
+  "H06": {
+   "l1plus_all_wrong": [
+    "Q65"
+   ],
+   "l1plus_correct_attempts": 12,
+   "l1plus_wrong": [
+    "Q112",
+    "Q65",
+    "Q82"
+   ],
+   "l3a_all_wrong": [
+    "Q65"
+   ],
+   "l3a_correct_attempts": 12,
+   "l3a_wrong": [
+    "Q35",
+    "Q65",
+    "Q82"
+   ],
+   "l3a_wrong_main": [
+    "Q35",
+    "Q65",
+    "Q82"
+   ],
+   "n": 6,
+   "n_main": 6,
+   "questions": [
+    "Q08",
+    "Q112",
+    "Q35",
+    "Q60",
+    "Q65",
+    "Q82"
+   ]
+  },
+  "H07": {
+   "l1plus_all_wrong": [
+    "Q31"
+   ],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [
+    "Q31"
+   ],
+   "l3a_all_wrong": [
+    "Q31"
+   ],
+   "l3a_correct_attempts": 5,
+   "l3a_wrong": [
+    "Q31",
+    "Q49"
+   ],
+   "l3a_wrong_main": [
+    "Q31",
+    "Q49"
+   ],
+   "n": 3,
+   "n_main": 3,
+   "questions": [
+    "Q31",
+    "Q38",
+    "Q49"
+   ]
+  },
+  "H08": {
+   "l1plus_all_wrong": [
+    "Q116",
+    "Q22",
+    "Q36",
+    "Q75",
+    "Q83",
+    "Q88",
+    "Q96"
+   ],
+   "l1plus_correct_attempts": 53,
+   "l1plus_wrong": [
+    "Q116",
+    "Q22",
+    "Q26",
+    "Q36",
+    "Q75",
+    "Q83",
+    "Q88",
+    "Q96"
+   ],
+   "l3a_all_wrong": [
+    "Q116",
+    "Q22",
+    "Q75",
+    "Q83",
+    "Q88"
+   ],
+   "l3a_correct_attempts": 57,
+   "l3a_wrong": [
+    "Q116",
+    "Q22",
+    "Q36",
+    "Q75",
+    "Q83",
+    "Q88",
+    "Q89"
+   ],
+   "l3a_wrong_main": [
+    "Q116",
+    "Q22",
+    "Q36",
+    "Q75",
+    "Q88",
+    "Q89"
+   ],
+   "n": 25,
+   "n_main": 23,
+   "questions": [
+    "Q03",
+    "Q100",
+    "Q108",
+    "Q114",
+    "Q115",
+    "Q116",
+    "Q120",
+    "Q14",
+    "Q15",
+    "Q19",
+    "Q22",
+    "Q25",
+    "Q26",
+    "Q32",
+    "Q36",
+    "Q43",
+    "Q63",
+    "Q75",
+    "Q76",
+    "Q80",
+    "Q81",
+    "Q83",
+    "Q88",
+    "Q89",
+    "Q96"
+   ]
+  },
+  "H09": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 10,
+   "l1plus_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 9,
+   "l3a_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_wrong_main": [
+    "Q18"
+   ],
+   "n": 4,
+   "n_main": 3,
+   "questions": [
+    "Q18",
+    "Q66",
+    "Q69",
+    "Q78"
+   ]
+  },
+  "H10": {
+   "l1plus_all_wrong": [
+    "Q113",
+    "Q31",
+    "Q85"
+   ],
+   "l1plus_correct_attempts": 14,
+   "l1plus_wrong": [
+    "Q112",
+    "Q113",
+    "Q31",
+    "Q85"
+   ],
+   "l3a_all_wrong": [
+    "Q113",
+    "Q31",
+    "Q85"
+   ],
+   "l3a_correct_attempts": 14,
+   "l3a_wrong": [
+    "Q113",
+    "Q31",
+    "Q49",
+    "Q85"
+   ],
+   "l3a_wrong_main": [
+    "Q113",
+    "Q31",
+    "Q49"
+   ],
+   "n": 8,
+   "n_main": 6,
+   "questions": [
+    "Q111",
+    "Q112",
+    "Q113",
+    "Q31",
+    "Q38",
+    "Q49",
+    "Q79",
+    "Q85"
+   ]
+  },
+  "H11": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 12,
+   "l1plus_wrong": [
+    "Q17",
+    "Q29"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 11,
+   "l3a_wrong": [
+    "Q17",
+    "Q29"
+   ],
+   "l3a_wrong_main": [],
+   "n": 5,
+   "n_main": 0,
+   "questions": [
+    "Q17",
+    "Q29",
+    "Q59",
+    "Q68",
+    "Q99"
+   ]
+  },
+  "H12": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 12,
+   "l1plus_wrong": [
+    "Q34",
+    "Q73",
+    "Q87"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 14,
+   "l3a_wrong": [
+    "Q73"
+   ],
+   "l3a_wrong_main": [
+    "Q73"
+   ],
+   "n": 5,
+   "n_main": 5,
+   "questions": [
+    "Q20",
+    "Q21",
+    "Q34",
+    "Q73",
+    "Q87"
+   ]
+  },
+  "H13": {
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 0,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 0,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 0,
+   "n_main": 0,
+   "questions": []
+  }
+ },
+ "formalizable_annotation_entries": {
+  "A17": {
+   "construct": "类定义 sh:not [sh:hasValue 1]（打折交易 = PromotionKey != 1）；比率本身不可",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 10,
+   "l1plus_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 9,
+   "l3a_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_wrong_main": [
+    "Q18"
+   ],
+   "n": 4,
+   "n_main": 3,
+   "questions": [
+    "Q18",
+    "Q66",
+    "Q69",
+    "Q78"
+   ]
+  },
+  "A19": {
+   "construct": "基数 / 函数性：促销键 → 促销名 sh:maxCount 1，每个打折促销名 sh:qualifiedMinCount 3",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 7,
+   "l1plus_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 6,
+   "l3a_wrong": [
+    "Q18",
+    "Q69"
+   ],
+   "l3a_wrong_main": [
+    "Q18"
+   ],
+   "n": 3,
+   "n_main": 2,
+   "questions": [
+    "Q18",
+    "Q69",
+    "Q78"
+   ]
+  },
+  "A24": {
+   "construct": "sh:lessThan（在手 < 安全库存）、sh:hasValue 0（零库存）；跨店汇总不可",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 5,
+   "l1plus_wrong": [
+    "Q73"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 5,
+   "l3a_wrong": [
+    "Q73"
+   ],
+   "l3a_wrong_main": [
+    "Q73"
+   ],
+   "n": 2,
+   "n_main": 2,
+   "questions": [
+    "Q20",
+    "Q73"
+   ]
+  },
+  "A27": {
+   "construct": "互斥覆盖 owl:disjointUnionOf（三层覆盖分层客户集合）；末购日分层不可",
+   "l1plus_all_wrong": [
+    "Q36"
+   ],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [
+    "Q36"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 6,
+   "l3a_wrong": [
+    "Q36",
+    "Q89"
+   ],
+   "l3a_wrong_main": [
+    "Q36",
+    "Q89"
+   ],
+   "n": 3,
+   "n_main": 3,
+   "questions": [
+    "Q115",
+    "Q36",
+    "Q89"
+   ]
+  },
+  "A33": {
+   "construct": "固定取值 sh:in（计划表 17 个叶子科目）、sh:minExclusive 0（Amount 为正）、传递祖先属性",
+   "l1plus_all_wrong": [
+    "Q31"
+   ],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [
+    "Q31"
+   ],
+   "l3a_all_wrong": [
+    "Q31"
+   ],
+   "l3a_correct_attempts": 5,
+   "l3a_wrong": [
+    "Q31",
+    "Q49"
+   ],
+   "l3a_wrong_main": [
+    "Q31",
+    "Q49"
+   ],
+   "n": 3,
+   "n_main": 3,
+   "questions": [
+    "Q31",
+    "Q38",
+    "Q49"
+   ]
+  },
+  "A34": {
+   "construct": "固定取值 sh:in / hasValue（CostType 两值）",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 0,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 0,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 0,
+   "n_main": 0,
+   "questions": []
+  },
+  "A38": {
+   "construct": "层级：员工实例树（同 H07 写法）+ 根 18 + 无环 SHACL-SPARQL",
+   "l1plus_all_wrong": [
+    "Q65"
+   ],
+   "l1plus_correct_attempts": 12,
+   "l1plus_wrong": [
+    "Q112",
+    "Q65",
+    "Q82"
+   ],
+   "l3a_all_wrong": [
+    "Q65"
+   ],
+   "l3a_correct_attempts": 12,
+   "l3a_wrong": [
+    "Q35",
+    "Q65",
+    "Q82"
+   ],
+   "l3a_wrong_main": [
+    "Q35",
+    "Q65",
+    "Q82"
+   ],
+   "n": 6,
+   "n_main": 6,
+   "questions": [
+    "Q08",
+    "Q112",
+    "Q35",
+    "Q60",
+    "Q65",
+    "Q82"
+   ]
+  },
+  "A40": {
+   "construct": "实例断言：子类 19 属于品类 Computers",
+   "l1plus_all_wrong": [
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l1plus_correct_attempts": 27,
+   "l1plus_wrong": [
+    "Q05",
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_all_wrong": [
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_correct_attempts": 29,
+   "l3a_wrong": [
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "l3a_wrong_main": [
+    "Q104",
+    "Q117",
+    "Q31",
+    "Q71",
+    "Q98"
+   ],
+   "n": 14,
+   "n_main": 12,
+   "questions": [
+    "Q05",
+    "Q102",
+    "Q104",
+    "Q11",
+    "Q117",
+    "Q121",
+    "Q24",
+    "Q31",
+    "Q38",
+    "Q71",
+    "Q76",
+    "Q90",
+    "Q98",
+    "Q99"
+   ]
+  },
+  "A41": {
+   "construct": "层级：断环后的科目树（H07 已有实例树）+ 无环 SHACL-SPARQL",
+   "l1plus_all_wrong": [
+    "Q31"
+   ],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [
+    "Q31"
+   ],
+   "l3a_all_wrong": [
+    "Q31"
+   ],
+   "l3a_correct_attempts": 5,
+   "l3a_wrong": [
+    "Q31",
+    "Q49"
+   ],
+   "l3a_wrong_main": [
+    "Q31",
+    "Q49"
+   ],
+   "n": 3,
+   "n_main": 3,
+   "questions": [
+    "Q31",
+    "Q38",
+    "Q49"
+   ]
+  },
+  "D05": {
+   "construct": "基数 owl:minQualifiedCardinality 2（≥ 2 个订单）；窗口不可",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 3,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 3,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 1,
+   "n_main": 0,
+   "questions": [
+    "Q76"
+   ]
+  },
+  "D05b": {
+   "construct": "同 D05，限定 SalesQuantity > 0 的订单",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 3,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 3,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 1,
+   "n_main": 0,
+   "questions": [
+    "Q76"
+   ]
+  },
+  "D09": {
+   "construct": "互斥覆盖（同 A27）；比率不可",
+   "l1plus_all_wrong": [
+    "Q36"
+   ],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [
+    "Q36"
+   ],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 6,
+   "l3a_wrong": [
+    "Q36",
+    "Q89"
+   ],
+   "l3a_wrong_main": [
+    "Q36",
+    "Q89"
+   ],
+   "n": 3,
+   "n_main": 3,
+   "questions": [
+    "Q115",
+    "Q36",
+    "Q89"
+   ]
+  },
+  "D10": {
+   "construct": "取值区间分档 sh:minInclusive / sh:maxExclusive",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 0,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 0,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 0,
+   "n_main": 0,
+   "questions": []
+  },
+  "D11": {
+   "construct": "取值区间分档 sh:minInclusive / sh:maxExclusive",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 6,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 2,
+   "n_main": 2,
+   "questions": [
+    "Q120",
+    "Q56"
+   ]
+  },
+  "D23": {
+   "construct": "固定取值 hasValue 'Off' + rdfs:subClassOf 实体店（12 家全是实体店）",
+   "l1plus_all_wrong": [],
+   "l1plus_correct_attempts": 0,
+   "l1plus_wrong": [],
+   "l3a_all_wrong": [],
+   "l3a_correct_attempts": 0,
+   "l3a_wrong": [],
+   "l3a_wrong_main": [],
+   "n": 0,
+   "n_main": 0,
+   "questions": []
+  },
+  "D32": {
+   "construct": "层级：费用叶子集合 = 科目树传递闭包；减法不可",
+   "l1plus_all_wrong": [
+    "Q31"
+   ],
+   "l1plus_correct_attempts": 6,
+   "l1plus_wrong": [
+    "Q31"
+   ],
+   "l3a_all_wrong": [
+    "Q31"
+   ],
+   "l3a_correct_attempts": 5,
+   "l3a_wrong": [
+    "Q31",
+    "Q49"
+   ],
+   "l3a_wrong_main": [
+    "Q31",
+    "Q49"
+   ],
+   "n": 3,
+   "n_main": 3,
+   "questions": [
+    "Q31",
+    "Q38",
+    "Q49"
+   ]
+  }
+ },
+ "formalizable_union": {
+  "l1plus_all_wrong": [
+   "Q117",
+   "Q31",
+   "Q36",
+   "Q65",
+   "Q71",
+   "Q98"
+  ],
+  "l1plus_correct_attempts": 69,
+  "l1plus_wrong": [
+   "Q05",
+   "Q104",
+   "Q112",
+   "Q117",
+   "Q18",
+   "Q31",
+   "Q36",
+   "Q65",
+   "Q69",
+   "Q71",
+   "Q73",
+   "Q82",
+   "Q98"
+  ],
+  "l3a_all_wrong": [
+   "Q117",
+   "Q31",
+   "Q65",
+   "Q71",
+   "Q98"
+  ],
+  "l3a_correct_attempts": 69,
+  "l3a_wrong": [
+   "Q104",
+   "Q117",
+   "Q18",
+   "Q31",
+   "Q35",
+   "Q36",
+   "Q49",
+   "Q65",
+   "Q69",
+   "Q71",
+   "Q73",
+   "Q82",
+   "Q89",
+   "Q98"
+  ],
+  "l3a_wrong_main": [
+   "Q104",
+   "Q117",
+   "Q18",
+   "Q31",
+   "Q35",
+   "Q36",
+   "Q49",
+   "Q65",
+   "Q71",
+   "Q73",
+   "Q82",
+   "Q89",
+   "Q98"
+  ],
+  "n": 32,
+  "n_main": 29,
+  "questions": [
+   "Q05",
+   "Q08",
+   "Q102",
+   "Q104",
+   "Q11",
+   "Q112",
+   "Q115",
+   "Q117",
+   "Q120",
+   "Q121",
+   "Q18",
+   "Q20",
+   "Q24",
+   "Q31",
+   "Q35",
+   "Q36",
+   "Q38",
+   "Q49",
+   "Q56",
+   "Q60",
+   "Q65",
+   "Q66",
+   "Q69",
+   "Q71",
+   "Q73",
+   "Q76",
+   "Q78",
+   "Q82",
+   "Q89",
+   "Q90",
+   "Q98",
+   "Q99"
+  ]
+ },
+ "main": 98,
+ "overall": {
+  "l1plus_all_wrong": [
+   "Q113",
+   "Q116",
+   "Q117",
+   "Q12",
+   "Q122",
+   "Q22",
+   "Q23",
+   "Q31",
+   "Q36",
+   "Q58",
+   "Q65",
+   "Q71",
+   "Q75",
+   "Q77",
+   "Q83",
+   "Q85",
+   "Q88",
+   "Q96",
+   "Q98"
+  ],
+  "l1plus_correct_attempts": 245,
+  "l1plus_wrong": [
+   "Q05",
+   "Q104",
+   "Q109",
+   "Q110",
+   "Q112",
+   "Q113",
+   "Q116",
+   "Q117",
+   "Q118",
+   "Q12",
+   "Q122",
+   "Q17",
+   "Q18",
+   "Q22",
+   "Q23",
+   "Q26",
+   "Q29",
+   "Q31",
+   "Q34",
+   "Q36",
+   "Q58",
+   "Q64",
+   "Q65",
+   "Q67",
+   "Q69",
+   "Q71",
+   "Q73",
+   "Q74",
+   "Q75",
+   "Q77",
+   "Q82",
+   "Q83",
+   "Q85",
+   "Q87",
+   "Q88",
+   "Q94",
+   "Q96",
+   "Q98"
+  ],
+  "l3a_all_wrong": [
+   "Q113",
+   "Q116",
+   "Q117",
+   "Q122",
+   "Q22",
+   "Q23",
+   "Q30",
+   "Q31",
+   "Q64",
+   "Q65",
+   "Q71",
+   "Q75",
+   "Q77",
+   "Q83",
+   "Q85",
+   "Q88",
+   "Q98"
+  ],
+  "l3a_correct_attempts": 240,
+  "l3a_wrong": [
+   "Q07",
+   "Q104",
+   "Q109",
+   "Q110",
+   "Q113",
+   "Q116",
+   "Q117",
+   "Q118",
+   "Q12",
+   "Q122",
+   "Q17",
+   "Q18",
+   "Q22",
+   "Q23",
+   "Q29",
+   "Q30",
+   "Q31",
+   "Q35",
+   "Q36",
+   "Q37",
+   "Q47",
+   "Q49",
+   "Q58",
+   "Q61",
+   "Q64",
+   "Q65",
+   "Q67",
+   "Q69",
+   "Q71",
+   "Q72",
+   "Q73",
+   "Q74",
+   "Q75",
+   "Q77",
+   "Q82",
+   "Q83",
+   "Q84",
+   "Q85",
+   "Q88",
+   "Q89",
+   "Q92",
+   "Q94",
+   "Q98"
+  ],
+  "l3a_wrong_main": [
+   "Q104",
+   "Q109",
+   "Q110",
+   "Q113",
+   "Q116",
+   "Q117",
+   "Q118",
+   "Q12",
+   "Q122",
+   "Q18",
+   "Q22",
+   "Q23",
+   "Q30",
+   "Q31",
+   "Q35",
+   "Q36",
+   "Q37",
+   "Q47",
+   "Q49",
+   "Q58",
+   "Q61",
+   "Q64",
+   "Q65",
+   "Q67",
+   "Q71",
+   "Q72",
+   "Q73",
+   "Q74",
+   "Q75",
+   "Q77",
+   "Q82",
+   "Q84",
+   "Q88",
+   "Q89",
+   "Q92",
+   "Q94",
+   "Q98"
+  ],
+  "n": 109,
+  "n_main": 98,
+  "questions": [
+   "Q01",
+   "Q02",
+   "Q03",
+   "Q04",
+   "Q05",
+   "Q06",
+   "Q07",
+   "Q08",
+   "Q09",
+   "Q10",
+   "Q100",
+   "Q101",
+   "Q102",
+   "Q103",
+   "Q104",
+   "Q105",
+   "Q106",
+   "Q107",
+   "Q108",
+   "Q109",
+   "Q11",
+   "Q110",
+   "Q111",
+   "Q112",
+   "Q113",
+   "Q114",
+   "Q115",
+   "Q116",
+   "Q117",
+   "Q118",
+   "Q119",
+   "Q12",
+   "Q120",
+   "Q121",
+   "Q122",
+   "Q13",
+   "Q14",
+   "Q15",
+   "Q16",
+   "Q17",
+   "Q18",
+   "Q19",
+   "Q20",
+   "Q21",
+   "Q22",
+   "Q23",
+   "Q24",
+   "Q25",
+   "Q26",
+   "Q27",
+   "Q28",
+   "Q29",
+   "Q30",
+   "Q31",
+   "Q32",
+   "Q34",
+   "Q35",
+   "Q36",
+   "Q37",
+   "Q38",
+   "Q41",
+   "Q43",
+   "Q47",
+   "Q49",
+   "Q50",
+   "Q51",
+   "Q52",
+   "Q53",
+   "Q54",
+   "Q55",
+   "Q56",
+   "Q57",
+   "Q58",
+   "Q59",
+   "Q60",
+   "Q61",
+   "Q62",
+   "Q63",
+   "Q64",
+   "Q65",
+   "Q66",
+   "Q67",
+   "Q68",
+   "Q69",
+   "Q70",
+   "Q71",
+   "Q72",
+   "Q73",
+   "Q74",
+   "Q75",
+   "Q76",
+   "Q77",
+   "Q78",
+   "Q79",
+   "Q80",
+   "Q81",
+   "Q82",
+   "Q83",
+   "Q84",
+   "Q85",
+   "Q87",
+   "Q88",
+   "Q89",
+   "Q90",
+   "Q92",
+   "Q94",
+   "Q96",
+   "Q98",
+   "Q99"
+  ]
+ },
+ "questions": 109,
+ "rules": "scripts/t26/preregistered.py (committed before outcomes were read)",
+ "run": "20261025-T22b-l1plus-l3a-03-rescore-01"
+}

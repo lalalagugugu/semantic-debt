@@ -1,0 +1,71 @@
+@prefix : <urn:semdebt:t26:data:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# T26 step 5: the minimal extra shapes, kept separate from L3a (not part of it).
+# Three kinds only: hierarchy has no cycle (SHACL-SPARQL), foreign key resolves
+# (SHACL Core sh:class), values are case-consistent (SHACL-SPARQL).
+# Per-column case shapes are generated from this template by the script
+# (scripts/t26/ontology_check.py, CASE_COLUMNS) with $PATH bound to each column.
+
+:prefixDecl sh:declare [ sh:prefix "" ; sh:namespace "urn:semdebt:t26:data:"^^xsd:anyURI ] .
+
+# ---------- 1. hierarchy has no cycle ----------
+:AcyclicAccount a sh:NodeShape ;
+  sh:targetClass :Account ;
+  sh:sparql [ a sh:SPARQLConstraint ; sh:prefixes :prefixDecl ;
+    sh:message "account is on a ParentAccountKey cycle" ;
+    sh:select """SELECT $this WHERE { $this :parent+ $this . FILTER NOT EXISTS { $this :parent $this } }""" ] .
+
+:AcyclicEmployee a sh:NodeShape ;
+  sh:targetClass :Employee ;
+  sh:sparql [ a sh:SPARQLConstraint ; sh:prefixes :prefixDecl ;
+    sh:message "employee is on a ParentEmployeeKey cycle" ;
+    sh:select """SELECT $this WHERE { $this :parent+ $this . FILTER NOT EXISTS { $this :parent $this } }""" ] .
+
+:AcyclicEntity a sh:NodeShape ;
+  sh:targetClass :Entity ;
+  sh:sparql [ a sh:SPARQLConstraint ; sh:prefixes :prefixDecl ;
+    sh:message "entity is on a ParentEntityKey cycle" ;
+    sh:select """SELECT $this WHERE { $this :parent+ $this . FILTER NOT EXISTS { $this :parent $this } }""" ] .
+
+# Self-reference is the documented root convention of DimEntity (H05): Info only.
+:SelfRootInfo a sh:NodeShape ;
+  sh:targetClass :Account, :Employee, :Entity ;
+  sh:severity sh:Info ;
+  sh:sparql [ a sh:SPARQLConstraint ; sh:prefixes :prefixDecl ; sh:severity sh:Info ;
+    sh:message "self-referencing parent (root by convention)" ;
+    sh:select """SELECT $this WHERE { $this :parent $this }""" ] .
+
+# ---------- 2. foreign key resolves ----------
+:FKOnlineSalesProduct a sh:NodeShape ;
+  sh:targetClass :OnlineSalesProductKey ;
+  sh:property [ sh:path :refersProduct ; sh:minCount 1 ; sh:class :Product ;
+    sh:message "FactOnlineSales.ProductKey has no DimProduct row" ] .
+
+:FKParentAccount a sh:NodeShape ;
+  sh:targetClass :Account ;
+  sh:property [ sh:path :parent ; sh:class :Account ; sh:message "ParentAccountKey has no DimAccount row" ] .
+
+:FKParentEmployee a sh:NodeShape ;
+  sh:targetClass :Employee ;
+  sh:property [ sh:path :parent ; sh:class :Employee ; sh:message "ParentEmployeeKey has no DimEmployee row" ] .
+
+:FKProductSubcategory a sh:NodeShape ;
+  sh:targetClass :Product ;
+  sh:property [ sh:path :subcategory ; sh:class :Subcategory ;
+    sh:message "ProductSubcategoryKey has no DimProductSubcategory row" ] .
+
+# ---------- 3. values are case-consistent (template) ----------
+# For one table node and one column: two distinct raw values that are equal
+# after lower-casing. Distinct values are taken first so the join is small.
+:CaseTemplate a sh:NodeShape ;
+  sh:sparql [ a sh:SPARQLConstraint ; sh:prefixes :prefixDecl ;
+    sh:message "same value in different letter case" ;
+    sh:select """SELECT $this ?value ?other WHERE {
+      { SELECT DISTINCT ?value WHERE { ?a :inTable $this ; $PATH ?value } }
+      { SELECT DISTINCT ?other WHERE { ?b :inTable $this ; $PATH ?other } }
+      FILTER (LCASE(STR(?value)) = LCASE(STR(?other)) && STR(?value) < STR(?other))
+    }""" ] .

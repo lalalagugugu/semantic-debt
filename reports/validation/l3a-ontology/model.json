@@ -1,0 +1,1244 @@
+{
+ "H10_scenario_classes_subclass_of_plan_record": [
+  false,
+  false,
+  false
+ ],
+ "account_individuals_typed_with_a_class": 0,
+ "alias_label_collisions": {},
+ "class_iri_shared_by_entries": {},
+ "disjointness_axioms": 0,
+ "entries": {
+  "E01": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [
+    "key"
+   ],
+   "dropped_item_fields": [],
+   "mappings": 4,
+   "no_formal_value": [],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E02": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 3,
+   "no_formal_value": [],
+   "note_only_in_comment": false,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E03": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 3,
+   "no_formal_value": [],
+   "note_only_in_comment": false,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E04": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 35,
+   "no_formal_value": [
+    34
+   ],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E05": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [
+    "level"
+   ],
+   "dropped_item_fields": [
+    "no_exact_mapping",
+    "no_exact_mapping_rule"
+   ],
+   "mappings": 43,
+   "no_formal_value": [
+    8
+   ],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E06": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 1,
+   "no_formal_value": [],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E07": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [
+    "filter"
+   ],
+   "dropped_item_fields": [],
+   "mappings": 16,
+   "no_formal_value": [],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E08": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 6,
+   "no_formal_value": [],
+   "note_only_in_comment": false,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E09": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 14,
+   "no_formal_value": [
+    11,
+    12,
+    13
+   ],
+   "note_only_in_comment": true,
+   "predicate_values": [
+    0,
+    1
+   ],
+   "section": "aliases"
+  },
+  "E10": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 5,
+   "no_formal_value": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E11": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 3,
+   "no_formal_value": [],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E12": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [
+    "key"
+   ],
+   "dropped_item_fields": [],
+   "mappings": 24,
+   "no_formal_value": [],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E13": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [
+    "no_exact_mapping",
+    "no_exact_mapping_rule"
+   ],
+   "mappings": 16,
+   "no_formal_value": [],
+   "note_only_in_comment": false,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E14": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [
+    "op"
+   ],
+   "dropped_item_fields": [],
+   "mappings": 28,
+   "no_formal_value": [],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E15": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 2,
+   "no_formal_value": [],
+   "note_only_in_comment": false,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E16": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 6,
+   "no_formal_value": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "note_only_in_comment": false,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "E17": {
+   "all_columns_ok": true,
+   "all_labels_equal": true,
+   "all_values_ok": true,
+   "dropped_fields": [],
+   "dropped_item_fields": [],
+   "mappings": 4,
+   "no_formal_value": [],
+   "note_only_in_comment": true,
+   "predicate_values": [],
+   "section": "aliases"
+  },
+  "H01": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "线上订单行",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "线上销售行",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "线上退货行",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "全渠道汇总行",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "全渠道线上汇总行",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 3,
+   "memberships": [
+    {
+     "class": "线上订单行",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "线上销售行",
+     "kind": "other-operator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "线上退货行",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "全渠道汇总行",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "全渠道线上汇总行",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    }
+   ],
+   "relations": [],
+   "section": "hierarchies"
+  },
+  "H02": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "门店",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "实体店",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "虚拟门店",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "线上店",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "经销店",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "目录店",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "营业中门店",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "已关店门店",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 3,
+   "memberships": [
+    {
+     "class": "门店",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "实体店",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "虚拟门店",
+     "kind": "other-operator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "线上店",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "经销店",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "目录店",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "营业中门店",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "已关店门店",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    }
+   ],
+   "relations": [
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "位于",
+     "via": "DimStore.GeographyKey"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "由谁管理",
+     "via": "DimStore.EmployeeKey"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "对应计划实体",
+     "via": "DimStore.EntityKey"
+    }
+   ],
+   "section": "hierarchies"
+  },
+  "H03": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "产品键",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "已登记产品",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "未登记产品",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "在售产品",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "停售产品",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "品类",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "子类",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 3,
+   "memberships": [
+    {
+     "class": "产品键",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "已登记产品",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "未登记产品",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "在售产品",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "停售产品",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "品类",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "子类",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    }
+   ],
+   "relations": [
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "属于子类",
+     "via": "DimProduct.ProductSubcategoryKey"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "属于品类",
+     "via": "DimProductSubcategory.ProductCategoryKey（以数据为准，A40）"
+    }
+   ],
+   "section": "hierarchies"
+  },
+  "H04": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "大洲",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "国家 / 地区",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "省 / 州",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "城市",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 0,
+   "constraints_total": 3,
+   "memberships": [
+    {
+     "class": "大洲",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "国家 / 地区",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "省 / 州",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "城市",
+     "kind": "equality-missed-by-generator",
+     "shape": false,
+     "shape_ok": null
+    }
+   ],
+   "relations": [
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "位于省州",
+     "via": "同一行的 (RegionCountryName, StateProvinceName)"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "位于国家",
+     "via": "RegionCountryName"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "位于大洲",
+     "via": "ContinentName"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "客户所在地",
+     "via": "DimCustomer.GeographyKey"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "门店所在地",
+     "via": "DimStore.GeographyKey"
+    }
+   ],
+   "section": "hierarchies"
+  },
+  "H05": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "计划实体",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "集团级实体",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "国家 / 地区级实体",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "州级实体",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "门店实体",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 4,
+   "memberships": [
+    {
+     "class": "计划实体",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "集团级实体",
+     "kind": "equality-missed-by-generator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "国家 / 地区级实体",
+     "kind": "equality-missed-by-generator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "州级实体",
+     "kind": "equality-missed-by-generator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "门店实体",
+     "kind": "equality-missed-by-generator",
+     "shape": false,
+     "shape_ok": null
+    }
+   ],
+   "relations": [
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "隶属于",
+     "via": "DimEntity.ParentEntityKey"
+    }
+   ],
+   "section": "hierarchies"
+  },
+  "H06": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "员工",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "销售总监",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "大区经理",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "州经理",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "门店经理",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 4,
+   "memberships": [
+    {
+     "class": "员工",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "销售总监",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "大区经理",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "州经理",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "门店经理",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    }
+   ],
+   "relations": [
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "汇报给",
+     "via": "DimEmployee.ParentEmployeeKey"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "管理门店",
+     "via": "DimStore.EmployeeKey"
+    }
+   ],
+   "section": "hierarchies"
+  },
+  "H07": {
+   "account_tree": {
+    "kind_leaf_fields_formal": false,
+    "nodes": 24,
+    "parent_mismatches": []
+   },
+   "classes": [],
+   "constraints_mentioning_disjoint_or_covering": 0,
+   "constraints_total": 4,
+   "memberships": [],
+   "relations": [],
+   "section": "hierarchies"
+  },
+  "H08": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "客户",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "分层客户集合",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "活跃客户",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "有流失风险客户",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "已流失客户",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "未购买客户",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "新客",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "复购客户",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 2,
+   "memberships": [
+    {
+     "class": "客户",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "分层客户集合",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "活跃客户",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "有流失风险客户",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "已流失客户",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "未购买客户",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "新客",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "复购客户",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    }
+   ],
+   "relations": [],
+   "section": "hierarchies"
+  },
+  "H09": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "交易",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "无折扣交易",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "打折交易",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 2,
+   "memberships": [
+    {
+     "class": "无折扣交易",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "打折交易",
+     "kind": "other-operator",
+     "shape": false,
+     "shape_ok": null
+    }
+   ],
+   "relations": [
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "参加活动实例",
+     "via": "PromotionKey"
+    },
+    {
+     "domain_ok": true,
+     "is_object_property": true,
+     "range_ok": true,
+     "relation": "属于活动家族",
+     "via": "DimPromotion.PromotionName"
+    }
+   ],
+   "section": "hierarchies"
+  },
+  "H10": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "Actual",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "Budget",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "Forecast",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 0,
+   "constraints_total": 3,
+   "memberships": [
+    {
+     "class": "Actual",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "Budget",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "Forecast",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    }
+   ],
+   "relations": [],
+   "section": "hierarchies"
+  },
+  "H11": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "工作日",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "周末",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 1,
+   "memberships": [
+    {
+     "class": "工作日",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "周末",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    }
+   ],
+   "relations": [],
+   "section": "hierarchies"
+  },
+  "H12": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "门店产品组合",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "低于安全库存组合",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "零库存组合",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 0,
+   "constraints_total": 1,
+   "memberships": [
+    {
+     "class": "门店产品组合",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "低于安全库存组合",
+     "kind": "other-operator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "零库存组合",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    }
+   ],
+   "relations": [],
+   "section": "hierarchies"
+  },
+  "H13": {
+   "account_tree": null,
+   "classes": [
+    {
+     "class": "IT 设备",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "POS",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "服务器",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "集线器",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "路由器",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "IT 成本",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "设备购置费",
+     "in_represents": true,
+     "parent_ok": true
+    },
+    {
+     "class": "年度维护费",
+     "in_represents": true,
+     "parent_ok": true
+    }
+   ],
+   "constraints_mentioning_disjoint_or_covering": 1,
+   "constraints_total": 1,
+   "memberships": [
+    {
+     "class": "IT 设备",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "POS",
+     "kind": "other-operator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "服务器",
+     "kind": "other-operator",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "集线器",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "路由器",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "IT 成本",
+     "kind": "prose",
+     "shape": false,
+     "shape_ok": null
+    },
+    {
+     "class": "设备购置费",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    },
+    {
+     "class": "年度维护费",
+     "kind": "equality-formalized",
+     "shape": true,
+     "shape_ok": true
+    }
+   ],
+   "relations": [],
+   "section": "hierarchies"
+  }
+ },
+ "inverse_or_equivalent_property_axioms": 0,
+ "label_predicate": "rdfs:label holds every synonym term (no skos:altLabel / language tag)",
+ "nodes_with_more_than_one_class_type": [],
+ "properties_without_domain_or_range": [
+  ":CostType",
+  ":IsWorkDay",
+  ":MachineType",
+  ":OnHandQuantity",
+  ":PromotionKey",
+  ":SalesQuantity",
+  ":ScenarioKey",
+  ":Status",
+  ":StoreType",
+  ":Title",
+  ":channelKey",
+  ":parentAccount",
+  ":value"
+ ],
+ "relations_on_same_column": {
+  "DimStore.EmployeeKey": [
+   "H02/1 门店→员工（H06）",
+   "H06/1 员工→门店（H02）"
+  ],
+  "DimStore.GeographyKey": [
+   "H02/0 门店→城市（H04）",
+   "H04/4 门店（H02）→城市"
+  ]
+ },
+ "shape_paths_shared_across_target_classes": {
+  ":CostType": [
+   ":class/年度维护费",
+   ":class/设备购置费"
+  ],
+  ":IsWorkDay": [
+   ":class/周末",
+   ":class/工作日"
+  ],
+  ":MachineType": [
+   ":class/路由器",
+   ":class/集线器"
+  ],
+  ":ScenarioKey": [
+   ":class/Actual",
+   ":class/Budget",
+   ":class/Forecast",
+   ":class/计划、目标记录"
+  ],
+  ":Status": [
+   ":class/停售产品",
+   ":class/在售产品",
+   ":class/已关店门店",
+   ":class/营业中门店"
+  ],
+  ":StoreType": [
+   ":class/实体店",
+   ":class/目录店",
+   ":class/线上店",
+   ":class/经销店"
+  ],
+  ":Title": [
+   ":class/大区经理",
+   ":class/州经理",
+   ":class/销售总监",
+   ":class/门店经理"
+  ]
+ }
+}

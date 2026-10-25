@@ -41,7 +41,7 @@
 | T23 | 评分器呈现容错 v3 与全部单元离线重评（`tasks/T23-scorer-presentation.md`） | Codex | 主仓库 clone | `harness-v1.1` | 0 | 实现及现有 27 份日志 / 6,188 条作答重评完成（2026-10-25，`20261025-T23-v3-02`）；451 tests passed；v2 仍为主数字，v3 敏感性分析；82 条新增判对待 Claude Code 逐条复核，T22b 完成后补评 |
 | T24 | 中期报告补数：稳定性、C4–C7、token、数据集与数据质量、名词表、数字来源（`tasks/T24-midterm-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）；入口 `reports/midterm/README.md`；T14、L1+、L3a留位待补 |
 | T25 | 立刻要修的流程缺口（`tasks/T25-immediate-fixes.md`） | Codex | 主仓库 clone | — | 0 | 已完成，待协调验收（2026-10-25）：调优目录双层禁读、4 项测试跳过保护、dry-run 预算检查；全量 1070 passed / 6 skipped |
-| T26 | L3a 本体质量校验（`tasks/T26-ontology-validation.md`） | Claude Code（新会话） | 普通 | T22b | 0 | 未开始 |
+| T26 | L3a 本体质量校验（`tasks/T26-ontology-validation.md`） | Claude Code（新会话） | 普通 | T22b | 0 | 完成，待验收：语法 / OWL-RL / SHACL 无错；30 条形式化 一致 28、不一致 1（E07）、拿不准 1；数据回测查出两环、1,715,380 孤儿行、Blue/blue；无误导性错误涉及 L3a 错题，按事先登记不重跑；16 条可形式化涉及 32 题（L3a 错 14） |
 | T27 | 叠加单元冲突核对（`tasks/T27-combo-conflict-check.md`） | Codex | 主仓库 clone | T22b、T14 | 0 | 未开始；运行等用户「跑叠加」 |
 | C13 | 写法说明教学阶梯（ClickHouse SQL，档位 L1；`tasks/C13-syntax-ladder.md`） | Claude Code（T12） | 普通 | `harness-ladder-v1`；`semantic-v1.4` | 15 元 | **完成**（`20261019-C13-ladder-02`，7.17 元，#147）：首轮执行报错 32% → 3%（2 级），正确率 64.2% → 68.2%（+4.0 [−0.9, +9.2]）；3 级、4 级没有再提高（`reports/results/C13-ladder.md`） |
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
