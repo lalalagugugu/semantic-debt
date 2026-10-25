@@ -37,7 +37,7 @@
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
 | T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 第一期暂停，第二期再做（2026-10-19 用户裁决，与 judge-v1 一起）；小样本保留（`20261019-T21-pilot-01`，1.18 元，L0-P 50.0%、L1-P 58.3%，Python 0/48） |
 | T22 | L1+（内容补全与歧义澄清，盲写）与 L3a（同内容的 OWL + SHACL）（`tasks/T22-l1plus-l3a.md`） | Claude Code（盲 → 普通）+ Codex 复核 | 盲 / 普通 | `semantic-v1.4`；`harness-v1.1` | 10 元（Flash） | 第 1–3 步完成（#164，`semantic/l1plus.yaml` v3，Codex 三轮复核、用户裁决 R1–R12）；第 4–6 步移到 T22b |
-| T22b | L1+ / L3a 渲染、运行、报告、残余歧义归因（`tasks/T22b-l1plus-render-run.md`） | Codex | 主仓库 clone | T22 第 1–3 步 | 15 + 3 元（Flash，用户已上调） | 进行中：#167 与 tag 已就绪，正式 dry-run 14.19 元；首跑 `20261025-T22b-l1plus-l3a-01` 因监督脚本 spawn 入口异常停止（2 次调用，0.03272164 元，0 条完成判分）；脚本已修复并离线验证，待用户确认新 run-id 重跑 |
+| T22b | L1+ / L3a 渲染、运行、报告、残余歧义归因（`tasks/T22b-l1plus-render-run.md`） | Codex | 主仓库 clone | T22 第 1–3 步 | 15 + 3 元（Flash，用户已上调） | 进行中：#167 与 tag 已就绪；首跑监督入口异常中止，第二次 `20261025-T22b-l1plus-l3a-02` 原样 harness 完成 1 条判分后因外层监控短 / 完整提交号比较误报中止；版本、系统哈希实际一致。已返回用量累计 0.03531780 元，在途未返回用量无法从本地确认；修复已离线验证，未自动恢复，待用户决定 |
 | T23 | 评分器呈现容错 v3 与全部单元离线重评（`tasks/T23-scorer-presentation.md`） | Codex | 主仓库 clone | `harness-v1.1` | 0 | 未开始 |
 | T24 | 中期报告补数：稳定性、C4–C7、token、数据集与数据质量、名词表、数字来源（`tasks/T24-midterm-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）；入口 `reports/midterm/README.md`；T14、L1+、L3a留位待补 |
 | T25 | 立刻要修的流程缺口（`tasks/T25-immediate-fixes.md`） | Codex | 主仓库 clone | — | 0 | 已完成，待协调验收（2026-10-25）：调优目录双层禁读、4 项测试跳过保护、dry-run 预算检查；全量 1070 passed / 6 skipped |
