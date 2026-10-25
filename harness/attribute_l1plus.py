@@ -1,7 +1,7 @@
-"""T22b attribution preflight; no model client is constructed in this preparation phase.
+"""T22b attribution: frozen material preflight and a sequential, budgeted Flash pass.
 
 Material helpers and the price estimate are shared with T19b. Full original system
-instructions are included per T19b-2. Paid execution awaits separate user approval.
+instructions are included per T19b-2. Codex review must not read Flash labels first.
 """
 from __future__ import annotations
 
@@ -10,11 +10,13 @@ import json
 import math
 import re
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 from harness import attribute_l1 as A
 from harness import run_direct as R
-from harness.cells import L1PLUS_CELLS, REPO
+from harness.cells import L1PLUS_CELLS, PRICES_OFFPEAK, REPO
+from harness.client import APIError, DeepSeekClient
 from harness.questions import eval_dir, verify_eval_tag
 from harness.semantic_version import verify_semantic_tag
 
@@ -44,10 +46,12 @@ def parse_labels(content: str) -> tuple[dict | None, str | None]:
         obj = json.loads(text)
     except json.JSONDecodeError:
         return None, "not JSON"
-    if not isinstance(obj, dict) or set(obj) != {"category"}:
-        return None, "expected only category"
+    if not isinstance(obj, dict) or set(obj) != {"category", "data_quality_related"}:
+        return None, "expected category and data_quality_related"
     if obj["category"] not in (*CATEGORIES, SUSPICIOUS):
         return None, "category outside frozen codebook"
+    if not isinstance(obj["data_quality_related"], bool):
+        return None, "data_quality_related must be boolean"
     return obj, None
 
 
@@ -97,6 +101,7 @@ def prepare() -> tuple[str, list[str], dict]:
         "eval_tag": EVAL_TAG, "eval_commit": eval_full,
         "codebook_sha256": R.sha256(CODEBOOK.read_bytes()), "system_sha256": R.sha256(system),
         "material_builder_sha256": R.sha256(Path(A.__file__).read_bytes()),
+        "runner_sha256": R.sha256(Path(__file__).read_bytes()),
         "items": [{"qid": rec["qid"], "rep": rec["rep"], "user_sha256": R.sha256(user)}
                   for rec, user in zip(todo, users)],
         "model": A.MODEL, "expected_fingerprint": A.FINGERPRINT,
@@ -115,31 +120,155 @@ def estimate_with_budget(system: str, users: list[str], output_tokens: int, hit_
     return estimate
 
 
+# Thinking/high defaults to 64K generated tokens per the official API contract:
+# https://api-docs.deepseek.com/api/create-chat-completion/ (checked 2026-10-25).
+# Input is bounded conservatively by UTF-8 bytes + framing, all cache-miss priced.
+DEFAULT_OUTPUT_BOUND = 65536
+
+
+def request_bound(system: str, user: str) -> float:
+    price = PRICES_OFFPEAK[A.MODEL]
+    input_bound = len(system.encode()) + len(user.encode()) + 4096
+    return (input_bound * price["miss"] + DEFAULT_OUTPUT_BOUND * price["output"]) / 1e6
+
+
+def append_json(path: Path, obj: dict) -> None:
+    with path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(obj, ensure_ascii=False) + "\n")
+        fh.flush()
+
+
+def run_paid(run_id: str, system: str, users: list[str], manifest: dict, budget: float) -> int:
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", run_id):
+        raise ValueError("unsafe run-id")
+    if R.is_peak():
+        raise ValueError("peak hours refused")
+    log_dir = REPO / "runs" / run_id
+    raw_dir = R.raw_root() / run_id
+    if log_dir.exists() or raw_dir.exists():
+        raise ValueError("run-id already exists; no overwrite or implicit resume")
+    # Validate the key before creating a run, without ever printing it.
+    boundary = R.CallBoundary(A.FINGERPRINT)
+    client = DeepSeekClient(A.MODEL, before_request=boundary.before_request)
+    log_dir.mkdir()
+    raw_dir.mkdir()
+    (raw_dir / "inputs").mkdir()
+    (raw_dir / "system.txt").write_text(system, encoding="utf-8")
+    frozen = {**manifest, "run_id": run_id, "harness_commit": R.harness_commit(),
+              "started_at": datetime.now(R.BEIJING).isoformat(), "budget_cny": budget,
+              "default_output_bound": DEFAULT_OUTPUT_BOUND}
+    (log_dir / "manifest.json").write_text(json.dumps(frozen, ensure_ascii=False, indent=2) + "\n")
+    log = log_dir / "attribution.jsonl"
+    spent, uncertain = 0.0, 0.0
+    stop_reason = ""
+    for item, user in zip(manifest["items"], users):
+        qid, rep = item["qid"], item["rep"]
+        (raw_dir / "inputs" / f"{qid}_r{rep}.txt").write_text(user, encoding="utf-8")
+        bound = request_bound(system, user)
+        reserved = []
+        started = datetime.now(R.BEIJING)
+
+        def before_request() -> None:
+            boundary.before_request()
+            if spent + uncertain + sum(reserved) + bound > budget:
+                boundary.stop("budget cannot cover the next conservative request reservation")
+            reserved.append(bound)
+            append_json(raw_dir / "requests.jsonl", {"qid": qid, "rep": rep,
+                        "attempt": len(reserved), "reserved_cny": bound,
+                        "at": datetime.now(R.BEIJING).isoformat()})
+
+        client.before_request = before_request
+        line = {"run_id": run_id, "qid": qid, "rep": rep, "started_at": started.isoformat(),
+                "system_sha256": manifest["system_sha256"], "codebook_sha256": manifest["codebook_sha256"],
+                "user_sha256": item["user_sha256"], "model_requested": A.MODEL,
+                "source_run": SOURCE_RUN, "source_cell": CELL, "peak": False}
+        try:
+            reply = client.chat([{"role": "system", "content": system}, {"role": "user", "content": user}])
+            with (raw_dir / f"{qid}_r{rep}.json").open("xb") as fh:
+                fh.write(reply.raw)
+            cost = R.cost_cny(A.MODEL, reply.usage, False)
+            labels, why = parse_labels(reply.content)
+            line.update({"status": "done" if labels else "unparsed", "raw_sha256": R.sha256(reply.raw),
+                         "usage": reply.usage, "cost_cny": cost, "model_version": reply.model_version,
+                         "system_fingerprint": reply.system_fingerprint, "finish_reason": reply.finish_reason,
+                         "transport_retries": reply.transport_retries, "latency_s": reply.latency_s})
+            if labels:
+                line["labels"] = labels
+            else:
+                line["unparsed"] = why
+            spent += cost or 0
+            uncertain += sum(reserved[:-1])
+            try:
+                boundary.check_reply(reply)
+            except R.RunStopped as exc:
+                stop_reason = str(exc)
+            if (cost is None or cost > bound or not labels or reply.finish_reason != "stop" or reply.transport_retries
+                    or reply.usage.get("prompt_tokens", 0) <= 0
+                    or reply.usage.get("prompt_tokens") != reply.usage.get("cache_hit_tokens", 0) + reply.usage.get("cache_miss_tokens", 0)):
+                stop_reason = stop_reason or "abnormal response, parse, cost bound or transport retry; stop for review"
+        except (APIError, R.RunStopped) as exc:
+            uncertain += sum(reserved)
+            stop_reason = str(exc)
+            line.update({"status": "stopped" if isinstance(exc, R.RunStopped) else "api_error",
+                         "error_type": type(exc).__name__, "attempted_requests": len(reserved)})
+        except Exception as exc:
+            uncertain += sum(reserved)
+            stop_reason = f"unexpected {type(exc).__name__}; inspect external raw files"
+            line.update({"status": "harness_error", "error_type": type(exc).__name__,
+                         "attempted_requests": len(reserved)})
+        line["cumulative_cost_cny"] = spent
+        line["uncertain_cost_bound_cny"] = uncertain
+        append_json(log, line)
+        print(f"{qid} r{rep}: {line['status']}; known={spent:.8f} CNY; uncertain_bound={uncertain:.6f}", flush=True)
+        if spent + uncertain > budget:
+            stop_reason = "actual plus uncertain expense exceeds budget"
+        if stop_reason:
+            break
+    summary = {"run_id": run_id, "known_cost_cny": spent, "uncertain_cost_bound_cny": uncertain,
+               "stopped": bool(stop_reason), "stop_reason": stop_reason,
+               "finished_at": datetime.now(R.BEIJING).isoformat()}
+    (log_dir / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
+    print(json.dumps(summary, ensure_ascii=False), flush=True)
+    return 1 if stop_reason else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--dry-run", action="store_true", required=True,
-                    help="only preflight is enabled; paid attribution awaits user confirmation")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--run-id")
     ap.add_argument("--budget", type=float, required=True)
-    ap.add_argument("--est-output-tokens", type=int, default=4500,
-                    help="includes reasoning tokens; conservative allowance over T19b's 3000-token assumption")
+    ap.add_argument("--est-output-tokens", type=int, default=4500)
     ap.add_argument("--est-hit-ratio", type=float, default=0.95)
-    ap.add_argument("--manifest", type=Path, help="write a NEW metadata-only preflight manifest")
+    ap.add_argument("--manifest", type=Path, help="write a NEW metadata-only dry-run manifest")
+    ap.add_argument("--preflight", type=Path, help="required for paid run; compare all frozen inputs")
     args = ap.parse_args(argv)
+    if not args.dry_run and (not args.run_id or not args.preflight):
+        ap.error("paid run requires --run-id and --preflight")
     try:
         system, users, manifest = prepare()
         estimate = estimate_with_budget(system, users, args.est_output_tokens, args.est_hit_ratio, args.budget)
-        manifest.update({"dry_run": True, "paid_calls": 0, "budget_cny": args.budget,
-                         "est_output_tokens": args.est_output_tokens, "est_hit_ratio": args.est_hit_ratio,
-                         "estimated_cost_cny": estimate})
         print(f"items={manifest['calls']} questions={manifest['questions']}")
         for key in ("semantic_tag", "semantic_commit", "eval_tag", "eval_commit", "source_system_sha256",
                     "codebook_sha256", "system_sha256"):
             print(f"{key}={manifest[key]}")
-        if args.manifest:
-            with args.manifest.open("x", encoding="utf-8") as fh:
-                fh.write(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
-        print("budget preflight passed; no model calls")
-        return 0
+        if args.dry_run:
+            manifest.update({"dry_run": True, "paid_calls": 0, "budget_cny": args.budget,
+                             "est_output_tokens": args.est_output_tokens, "est_hit_ratio": args.est_hit_ratio,
+                             "estimated_cost_cny": estimate})
+            if args.manifest:
+                with args.manifest.open("x", encoding="utf-8") as fh:
+                    fh.write(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+            print("budget preflight passed; no model calls")
+            return 0
+        approved = json.loads(args.preflight.read_text(encoding="utf-8"))
+        for key, value in manifest.items():
+            if approved.get(key) != value:
+                raise ValueError(f"preflight mismatch: {key}")
+        if (approved.get("budget_cny") != args.budget
+                or approved.get("est_output_tokens") != args.est_output_tokens
+                or approved.get("est_hit_ratio") != args.est_hit_ratio):
+            raise ValueError("preflight estimate settings mismatch")
+        return run_paid(args.run_id, system, users, manifest, args.budget)
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
         print(f"refused: {exc}")
         return 2
