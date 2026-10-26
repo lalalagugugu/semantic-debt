@@ -1,0 +1,7 @@
+question bank: eval-v1.2 = 90e13b385a639a9164ac78430c50c11a7859f976
+semantic layer: semantic-v1.6-l1plus = 866004b3b1e55950139ba87f728d3f7f13f26433
+model=deepseek-flash reps=1 fix_rate=10% (off-peak prices; peak = x2)
+cell          card  stack         Q  attempts   calls   in/call  out/call       CNY  source
+SQL-L1plus-sel-k1T29   chdb         20        20      22     66829      3000      0.37  estimated
+SQL-L1plus-sel-k3T29   chdb         20        20      22     66829      3000      0.37  estimated
+total                                      40      44                          0.73  (peak 1.46)

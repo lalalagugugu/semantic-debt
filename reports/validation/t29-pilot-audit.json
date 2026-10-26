@@ -1,0 +1,38 @@
+{
+  "run_id": "20261025-T29-pilot-01",
+  "harness_tag": "harness-sel-v1",
+  "harness_commit": "903c767f38a085c339fece0c2f18ce28d5c47e09",
+  "source_preflight_sha256": "08aa6780dc6c9fa475136da1ef820654f921e49441c8f5d025035ac539d2cb41",
+  "cells": [
+    {
+      "cell": "SQL-L1plus-sel-k1",
+      "attempts": 20,
+      "refusals": 0,
+      "final_format_errors": 0,
+      "format_error_calls": 0,
+      "calls": 29,
+      "cost_cny": "0.14927536"
+    },
+    {
+      "cell": "SQL-L1plus-sel-k3",
+      "attempts": 20,
+      "refusals": 0,
+      "final_format_errors": 0,
+      "format_error_calls": 0,
+      "calls": 25,
+      "cost_cny": "0.15530624"
+    }
+  ],
+  "logged_harness_commit": "903c767-dirty",
+  "dirty_reason": "The runtime intentionally restores semantic/ and render/ from semantic-v1.6-l1plus; harness source hashes exactly match the tagged commit.",
+  "total_cost_cny": "0.30458160",
+  "ledger_cost_cny": "0.3045816000000000032",
+  "total_calls": 54,
+  "format_error_qids": [],
+  "estimated_cost_cny": 0.7308928440000001,
+  "integrity": "40 unique done attempts; frozen hashes/version checked; every raw response hash, fingerprint and usage checked; cost independently recalculated from usage and reconciled with ledger and logs; no transport retries.",
+  "logs_sha256": {
+    "SQL-L1plus-sel-k1.jsonl": "201c7c01ebeb1fb7c6bc24fbac72d3422d1e62385d608231d8eed0302a83bf5f",
+    "SQL-L1plus-sel-k3.jsonl": "ca3beb8e4c4cc2e79b9138ebd2c73d23337e5b8ebcca5f7a4b9445a299ee00e9"
+  }
+}

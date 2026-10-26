@@ -8,7 +8,7 @@ the session's default database (T11 card, carried-forward requirement 1).
 from __future__ import annotations
 
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -41,6 +41,8 @@ class Cell:
     skip_judge: bool = False        # never answer judge questions (phase 1 replan §二)
     instructions: str | None = None # semantic/tuning/<name>.instructions.yaml: tuned answer requirements
                                     # and syntax notes (decisions/2026-10-23-tuning-instructions.md)
+    selective_k: int | None = None  # T29: append the fixed +1 / -k / 0 scoring rule
+    selective_variant: str | None = None  # T29 v2: front-loaded rule or confidence line
 
     @property
     def runnable_here(self) -> bool:
@@ -70,6 +72,24 @@ L1PLUS_CELLS: dict[str, Cell] = {c.name: c for c in [
     Cell(name, "chdb", ("retail",), f"build:{name}.yaml", "clickhouse_sql.md", card="T22b", skip_judge=True)
     for name in ("SQL-L1plus", "SQL-L3a")
 ]}
+
+
+# T29 is an explicit opt-in: same L1plus context and executor, one extra rule.
+# Keep it out of CELLS so existing --cell all runs retain their scope.
+SELECTIVE_CELLS: dict[str, Cell] = {
+    f"SQL-L1plus-sel-k{k}": replace(L1PLUS_CELLS["SQL-L1plus"], name=f"SQL-L1plus-sel-k{k}",
+                                    card="T29", selective_k=k)
+    for k in (1, 3)
+}
+
+SELECTIVE_V2_CELLS: dict[str, Cell] = {
+    **{f"SQL-L1plus-sel-k{k}": replace(L1PLUS_CELLS["SQL-L1plus"], name=f"SQL-L1plus-sel-k{k}",
+                                      card="T29", selective_k=k) for k in (5, 10, 20, 100)},
+    **{f"SQL-L1plus-sel-front-k{k}": replace(L1PLUS_CELLS["SQL-L1plus"], name=f"SQL-L1plus-sel-front-k{k}",
+                                            card="T29", selective_k=k, selective_variant="front") for k in (3, 10)},
+    "SQL-L1plus-confidence": replace(L1PLUS_CELLS["SQL-L1plus"], name="SQL-L1plus-confidence", card="T29",
+                                     split="tuning", selective_variant="confidence"),
+}
 
 
 # T30 is opt-in; --cell all continues to select only the original cells.

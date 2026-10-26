@@ -1,0 +1,122 @@
+{
+  "task": "T29",
+  "phase": "pilot dry-run only; paid calls await user approval",
+  "model": "deepseek-flash",
+  "harness_tag": "pending user: harness-sel-v1",
+  "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+  "semantic_commit": "866004b3b1e55950139ba87f728d3f7f13f26433",
+  "b1_freeze_commit": "50098ef5380fc913692a95d143b9bdce3baca3ad",
+  "system_sha256": {
+    "SQL-L1plus": "b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3",
+    "SQL-L1plus-sel-k1": "8198443926c8afd449a14ee17637bc6551fb55124b7ca24a08cae07ee82dcd36",
+    "SQL-L1plus-sel-k3": "91277cca3c7e61581fd323c2cfaefc9cb90d35596977eb341a75c04f11db00a8"
+  },
+  "sampling_rule": "first 20 deterministic tuning questions by numeric question id; no model answers consulted",
+  "pilot_qids": [
+    "Q03",
+    "Q06",
+    "Q08",
+    "Q12",
+    "Q13",
+    "Q15",
+    "Q17",
+    "Q19",
+    "Q24",
+    "Q26",
+    "Q27",
+    "Q28",
+    "Q34",
+    "Q36",
+    "Q38",
+    "Q43",
+    "Q47",
+    "Q49",
+    "Q50",
+    "Q51"
+  ],
+  "reps": 1,
+  "budget_cny": 1,
+  "estimate_parameters": {
+    "fix_rate": 0.1,
+    "output_tokens": 3000,
+    "hit_ratio": 0.95,
+    "question_tokens": 60,
+    "from_measured_logs": false
+  },
+  "rows": [
+    {
+      "cell": "SQL-L1plus-sel-k1",
+      "card": "T29",
+      "stack": "chdb",
+      "questions": 20,
+      "attempts": 20,
+      "calls": 22,
+      "prompt_tokens": 66829,
+      "output_tokens": 3000,
+      "cost_offpeak": 0.36544642200000005,
+      "source": "estimated"
+    },
+    {
+      "cell": "SQL-L1plus-sel-k3",
+      "card": "T29",
+      "stack": "chdb",
+      "questions": 20,
+      "attempts": 20,
+      "calls": 22,
+      "prompt_tokens": 66829,
+      "output_tokens": 3000,
+      "cost_offpeak": 0.36544642200000005,
+      "source": "estimated"
+    }
+  ],
+  "total_cost_offpeak_cny": 0.7308928440000001,
+  "scenarios_same_token_assumptions": {
+    "zero_fixes": {
+      "calls": 40,
+      "cost_cny": 0.6644480400000001
+    },
+    "all_execution_errors_fixed_once": {
+      "calls": 80,
+      "cost_cny": 1.3288960800000003
+    }
+  },
+  "argv": [
+    "--cell",
+    "SQL-L1plus-sel-k1",
+    "--cell",
+    "SQL-L1plus-sel-k3",
+    "--questions",
+    "Q03,Q06,Q08,Q12,Q13,Q15,Q17,Q19,Q24,Q26,Q27,Q28,Q34,Q36,Q38,Q43,Q47,Q49,Q50,Q51",
+    "--skip-judge",
+    "--reps",
+    "1",
+    "--model",
+    "deepseek-flash",
+    "--semantic-tag",
+    "semantic-v1.6-l1plus",
+    "--eval-tag",
+    "eval-v1.2",
+    "--budget",
+    "1",
+    "--est-from-args",
+    "--dry-run"
+  ],
+  "source_sha256": {
+    "harness/cells.py": "3636b5f8ae644d6e7392c9472c937572c8084762accbd3fa17288e4ac5082538",
+    "harness/run_direct.py": "6f14f3272d9cb41d968fb534078ba3fd85bb674fcaa97c416c529dd764256541",
+    "harness/prompt.py": "86fefce2157ff4fc09819fe8c8c5ad4fe7e6e064850f9ce9c8b1b67e97919e5e",
+    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4",
+    "harness/spend.py": "a9c57ce54e1394d6c6f5aacf64141db5b93b340832d25b2212db34165a784b18"
+  },
+  "runtime_budget": {
+    "threshold_cny": 1,
+    "shared_between_cells": true,
+    "serialized_api_requests": true,
+    "persisted_ledger": "$SEMDEBT_DATA_DIR/runs-raw/<run-id>/spend-ledger.jsonl",
+    "resume_recovers_cost": true,
+    "unconfirmed_cost_blocks_resume": true,
+    "transport_attempts": 1,
+    "semantics": "Stop all further calls after returned usage reaches or crosses 1 CNY; the final in-flight call can cross the threshold."
+  },
+  "frozen_sources_verification": "After merging origin/main, validate in an isolated checkout with semantic/ and render/ restored from semantic-v1.6-l1plus. Do not relax tag checks or change the T29 semantic tag."
+}
