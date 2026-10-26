@@ -141,3 +141,11 @@ A四档和B两档各自拒答都<5%，且C的AUC95%区间含0.5时不做正式�
 用户将扩展预算提高到3元，出站50题不变；原1.5元在并发预留下可能过早停止。重新dry-run仍为1.4371418775533538元，单次最大预估0.133522元。顺序改为C → B → A，三阶段同run-id、同费用账本。撤回原8路潜在超支估计：准入已预扣在途费用，单次实际费用均不超过预估时总花费不超过上限；单次超预估则完整记账并停止新请求。等待用户合并同一PR并打harness-sel-v2；本轮无付费调用。
 
 本次修订验证：`uv run --offline pytest tests/test_selective_v2.py tests/test_harness.py tests/test_repo_layout.py`：207 passed、4 skipped；冻结环境重新dry-run通过，预计费用不变。
+
+
+## D 免费一致性对照（2026-10-26）
+
+- 已读取原SQL-L1plus327次最终执行结果，逐份核对执行文件哈希；三次两两比较，行顺序忽略、重复行保留；任次执行失败/拒答不作答，作答按第1次v2评分。
+- 原20题：8/20作答（40.0%），作答部分8/8正确（100.0%）；主表98：44/98作答（44.9%），37/44正确（84.1%）；主表留出49：24/49作答（49.0%），20/24正确（83.3%）；全部109：48/109作答（44.0%），41/48正确（85.4%）。仅离线对照，不作正式效果结论。
+- 产出：`scripts/t29_consistency_report.py`、`reports/validation/t29-consistency.md`、`t29-consistency-audit.json`、`tests/test_t29_reports.py`。不新执行SQL或调用API；细节仅题号、类别、次数与哈希。
+- 可复现：题库环境指向eval-v1.2，`uv run --offline python scripts/t29_consistency_report.py`。测试`uv run --offline pytest tests/test_t29_reports.py tests/test_selective_v2.py`：22 passed。
