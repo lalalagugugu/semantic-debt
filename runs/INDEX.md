@@ -117,3 +117,18 @@
 合计40次唯一作答、54次调用、**0.30458160元**（预计0.730892844元、1元停止阈值）。DeepSeek官方API deepseek-flash，指纹e72d3c7f663d3e1383b00b3884cb4501唯一；无传输重试、API错误、指纹变化、异常状态或待核算费用。参考答案未出站。三个系统消息哈希与批准前preflight一致；harness-sel-v1=903c767，语义semantic-v1.6-l1plus=866004b、题库eval-v1.2=90e13b3均通过校验。日志903c767-dirty仅因隔离检出恢复冻结semantic/render；harness源码与tag一致。日志只追加，原始响应/执行结果/费用账本在外部runs-raw同名目录；报告`reports/validation/t29-pilot.md`，审计脚本`scripts/t29_pilot_report.py`。提示词未改，未作效果分析，正式运行及B2未启动，等用户另批。
 
 | 20261026-T29-expanded-01 | T29 扩展试跑初次启动异常（追加，后续同run-id保留） | 外部早间时间包装器参数不兼容，169条发送前harness_error；API调用0、费用0、未结算0。全部失败日志保留，用户批准午休改用冻结原入口、原preflight续跑。报告`reports/validation/t29-expanded-startup-failure.json`。 |
+
+
+## T29 扩展试跑完成（2026-10-26追加）
+
+| run-id | 单元 | 首轮 / 含纠错调用 | 费用（元） | 状态 |
+|---|---|---:|---:|---|
+| 20261026-T29-expanded-01 | SQL-L1plus-confidence | 49 / 60 | 0.58129880 | 原生拒答0；缺把握最终13次，50/75/90门槛拒13/15/28 |
+| 20261026-T29-expanded-01 | SQL-L1plus-sel-front-k3 | 20 / 24 | 0.30207980 | 拒答0、格式错0 |
+| 20261026-T29-expanded-01 | SQL-L1plus-sel-front-k10 | 20 / 25 | 0.26918308 | 拒答0、格式错0 |
+| 20261026-T29-expanded-01 | SQL-L1plus-sel-k5 | 20 / 23 | 0.13256568 | 拒答0、格式错0 |
+| 20261026-T29-expanded-01 | SQL-L1plus-sel-k10 | 20 / 25 | 0.15016924 | 拒答0、格式错0 |
+| 20261026-T29-expanded-01 | SQL-L1plus-sel-k20 | 20 / 27 | 0.16113680 | 拒答0、格式错0 |
+| 20261026-T29-expanded-01 | SQL-L1plus-sel-k100 | 20 / 25 | 0.17213224 | 拒答0、格式错0 |
+
+顺序C→B→A，169次首轮、209调用、合计1.76856564元；3元上限，午休原入口全部完成，账本未结算0。早间169条零调用失败日志保持原样，追加169条完成记录，原包和执行结果在外部runs-raw同名目录；公开日志移除SQL、假设、错误原文与原始把握值，manifest记录哈希。harness-sel-v2=f726f5b；运行f726f5b-dirty仅为恢复冻结semantic/render，harness、入口与preflight逐字一致。报告`reports/validation/t29-expanded.md`及audit/attempts。v2筛选无候选达标，正式仍等内容准确率口径复算、双口径裁决；结果前登记798c44a。免费D/B2已分别提交75e0ac4、23b83d4。

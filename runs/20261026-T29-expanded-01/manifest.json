@@ -1,0 +1,51 @@
+{
+  "run_id": "20261026-T29-expanded-01",
+  "harness_tag": "harness-sel-v2",
+  "harness_commit": "f726f5bb1a5779a8d6b3a31a5103de510206129c",
+  "registration_commit": "798c44ac76b5fa61348b3d5800b58400121d6ff7",
+  "preflight_sha256": "9720dfb3d7326c5c0cf4cd7808684eea46387709cd3177b6f7b8252a4c77595f",
+  "ledger_sha256": "42cd5f7d0cc271348e02e5d246fb6adf9bcc747ead5a7ad6f968823b1f990334",
+  "logs": {
+    "SQL-L1plus-confidence": {
+      "source_sha256": "187c205d7f945232b2d66397ff02335e257cdc8df06e45fe45d6502f919367e9",
+      "initial_startup_error_lines": 49,
+      "public_sha256": "536dd31c050b0f58192f64c3dc1555a16bbec967901d9e421e49143bc42c5160"
+    },
+    "SQL-L1plus-sel-front-k3": {
+      "source_sha256": "3c91d86ae371f7545afbbab6e6ecf4f69da343c438b4a74b8c703b5ba192916d",
+      "initial_startup_error_lines": 20,
+      "public_sha256": "5a622009e1732f4216142b29e23955f6f967c2639e16b544a26cb08bc354672b"
+    },
+    "SQL-L1plus-sel-front-k10": {
+      "source_sha256": "00d9022ae70a269e704bc5bcd5783b4d9d0af80c6709d7eb2c285da3ebc55a2f",
+      "initial_startup_error_lines": 20,
+      "public_sha256": "d11e3673cbd0b5ea454a513826424837fc758d555c3933159c2b44eb9b80100f"
+    },
+    "SQL-L1plus-sel-k5": {
+      "source_sha256": "21139fa6456256ddb418fc3156493f510caa8b40430cb65c8e4d3dec0070980d",
+      "initial_startup_error_lines": 20,
+      "public_sha256": "5bb1555afecabacfe5ba52416e95b3de838741c5c6c083cf1e1e2da3db4e937c"
+    },
+    "SQL-L1plus-sel-k10": {
+      "source_sha256": "7f948d988ee353be61ee29555396c09e3969803852fb5b73084be31db9c7146a",
+      "initial_startup_error_lines": 20,
+      "public_sha256": "f5f5fd77d23a535e4caf413814b446578323011011afba6feb3ab7e09f46f4f7"
+    },
+    "SQL-L1plus-sel-k20": {
+      "source_sha256": "6979487d2a314b22bf7d3c89aa57669e56cfed76f447631a104bb5d4d7c41a15",
+      "initial_startup_error_lines": 20,
+      "public_sha256": "fc52360ce55e4e33475c54689cac6e8bf1b4084358a8af4a58bd192fb123547e"
+    },
+    "SQL-L1plus-sel-k100": {
+      "source_sha256": "23d71c3cb8560e744c1b76011b1cd32d8a85b9a47792c60a28fb1c45921aec4d",
+      "initial_startup_error_lines": 20,
+      "public_sha256": "d7bf1f8705f2aae23d9937a44243b01df39a0dfb11689b7798ff39f6d6e41f84"
+    }
+  },
+  "completed_attempts": 169,
+  "initial_startup_error_lines": 169,
+  "total_calls": 209,
+  "total_cost_cny": "1.76856564",
+  "pending_requests": 0,
+  "dirty_reason": "Only semantic/ and render/ restored to semantic-v1.6-l1plus; frozen harness and entry match harness-sel-v2."
+}
