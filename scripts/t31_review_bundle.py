@@ -42,7 +42,7 @@ def main():
     bundle.mkdir(exist_ok=False)
     public = ROOT / 'reports/validation/t31-v4-flips.csv'
     with public.open('w', newline='') as stream:
-        writer = csv.writer(stream)
+        writer = csv.writer(stream, lineterminator="\n")
         writer.writerow(['qid', 'cell', 'rep', 'rules', 'in_original_sheet'])
         for x in flips:
             writer.writerow([x['qid'], x['cell'], x['rep'], ';'.join(x['rules']), str(x['seen_error']).lower()])
