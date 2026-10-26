@@ -149,3 +149,13 @@ A四档和B两档各自拒答都<5%，且C的AUC95%区间含0.5时不做正式�
 - 原20题：8/20作答（40.0%），作答部分8/8正确（100.0%）；主表98：44/98作答（44.9%），37/44正确（84.1%）；主表留出49：24/49作答（49.0%），20/24正确（83.3%）；全部109：48/109作答（44.0%），41/48正确（85.4%）。仅离线对照，不作正式效果结论。
 - 产出：`scripts/t29_consistency_report.py`、`reports/validation/t29-consistency.md`、`t29-consistency-audit.json`、`tests/test_t29_reports.py`。不新执行SQL或调用API；细节仅题号、类别、次数与哈希。
 - 可复现：题库环境指向eval-v1.2，`uv run --offline python scripts/t29_consistency_report.py`。测试`uv run --offline pytest tests/test_t29_reports.py tests/test_selective_v2.py`：22 passed。
+
+
+## B2 免费人工核对（2026-10-26）
+
+- 用户追加边界裁决见 `decisions/2026-10-26-t29-b2-boundaries.md`。原SQL-L1plus327次最终假设与SQL均已人工审阅，私有逐次标注有假设、SQL、原回包及冻结B1的哈希可追溯；不调用模型。
+- 原正确245/327；B2正确235/327。新认可5次、明确假设矛盾撤销11次、约定排除4次单列。单解无声明17、多解无声明0、多解未说明所选理解7；结合SQL的参考上限额外2次，不进主口径。
+- 产出：`scripts/t29_assumption_report.py`、`reports/validation/t29-assumptions.md`、`t29-assumptions-audit.json`、`tests/test_t29_reports.py`及裁决记录；敏感内容只在私有目录，不改主评分。
+- 可复现：固定eval-v1.2与SEMDEBT_DATA_DIR，`uv run --offline python scripts/t29_assumption_report.py`；人工标签为私有固定输入，脚本拒绝来源哈希变化。
+
+B2边界测试：`uv run --offline pytest tests/test_t29_reports.py`：4 passed；覆盖单解/多解无声明、笼统声明、明确矛盾与约定排除。
