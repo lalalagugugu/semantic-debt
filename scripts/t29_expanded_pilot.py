@@ -22,6 +22,9 @@ SEMANTIC = "semantic-v1.6-l1plus"
 SOURCE = "20261025-T29-pilot-01"
 AB = tuple(n for n in SELECTIVE_V2_CELLS if n != "SQL-L1plus-confidence")
 CONFIDENCE = "SQL-L1plus-confidence"
+B = tuple(n for n in AB if "-front-" in n)
+A = tuple(n for n in AB if n not in B)
+BUDGET = 3
 
 
 def scopes(questions):
@@ -60,8 +63,7 @@ def estimate(data, counts):
                 parameters=parameters, rows=rows, cold_prefix_allowance_cny=cold,
                 expected_cost_cny=total+cold, max_input_tokens_estimate=max_input,
                 max_output_tokens_observed=max_output, max_call_cost_cny=maximum,
-                approximate_worst_overspend_cny=8*maximum,
-                note="Estimate only: no API token cap; actual costs may exceed the estimate.")
+                note="Admission reserves in-flight costs. Total cost stays within the budget if each actual call cost does not exceed the maximum estimate. A call exceeding the estimate is fully charged and stops new requests.")
 
 
 def verify_harness():
@@ -87,13 +89,14 @@ def main(argv=None):
     old, confidence = scopes(questions)
     data = Path(os.environ["SEMDEBT_DATA_DIR"])
     info = estimate(data, {**dict.fromkeys(AB, 20), CONFIDENCE: 49})
-    preflight = dict(harness_tag=TAG, concurrency=8, budget_cny=1.5, attempts=169,
+    preflight = dict(harness_tag=TAG, concurrency=8, budget_cny=BUDGET, attempts=169,
+                     execution_order=[CONFIDENCE, *B, *A],
                      authorized_qids=sorted(set(old+confidence)),
                      system_sha256={name: R.sha256(R.system_for(cell)) for name, cell in SELECTIVE_V2_CELLS.items()},
                      **info)
     print(json.dumps(preflight, ensure_ascii=False, indent=2))
-    if info["expected_cost_cny"] > 1.5:
-        print("STOP: combined estimate exceeds 1.5 CNY; ask user")
+    if info["expected_cost_cny"] > BUDGET:
+        print(f"STOP: combined estimate exceeds {BUDGET} CNY; ask user")
         return 2
     if args.dry_run:
         return 0
@@ -106,11 +109,11 @@ def main(argv=None):
     executors.default_chdb_path = lambda: str(copy)
     p = info["parameters"]
     common = ["--run-id", args.run_id, "--model", "deepseek-flash", "--reps", "1", "--concurrency", "8",
-              "--budget", "1.5", "--max-call-cost", str(info["max_call_cost_cny"]),
+              "--budget", str(BUDGET), "--max-call-cost", str(info["max_call_cost_cny"]),
               "--semantic-tag", SEMANTIC, "--skip-judge", "--est-from-args",
               "--est-fix-rate", str(p["fix_rate"]), "--est-output-tokens", str(p["output_tokens"]),
               "--est-hit-ratio", str(p["hit_ratio"]), "--expected-fingerprint", "e72d3c7f663d3e1383b00b3884cb4501"]
-    for cells, ids in ((AB, old), ((CONFIDENCE,), confidence)):
+    for cells, ids in (((CONFIDENCE,), confidence), (B, old), (A, old)):
         command = common + ["--questions", ",".join(ids)]
         for cell in cells:
             command += ["--cell", cell]

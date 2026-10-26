@@ -83,7 +83,7 @@ def test_concurrent_reservations_account_out_of_order_and_keep_admission_closed(
     from harness.spend import ConcurrentSpendGuard, SpendLimit
 
     path = tmp_path / "ledger.jsonl"
-    guard = ConcurrentSpendGuard(path, 1.5, "deepseek-flash", .2)
+    guard = ConcurrentSpendGuard(path, 1.6, "deepseek-flash", .2)
     tickets = [guard.begin("cell", f"Q{i}", 1, 0) for i in range(8)]
     assert guard.reached
     with pytest.raises(SpendLimit):
@@ -91,7 +91,7 @@ def test_concurrent_reservations_account_out_of_order_and_keep_admission_closed(
     usage = {"prompt_tokens": 1, "cache_hit_tokens": 0, "cache_miss_tokens": 1, "completion_tokens": 1}
     for ticket in reversed(tickets):
         guard.charge(ticket, .01, usage)
-    restored = ConcurrentSpendGuard(path, 1.5, "deepseek-flash", .2)
+    restored = ConcurrentSpendGuard(path, 1.6, "deepseek-flash", .2)
     assert restored.total == Decimal(".08") and restored.reached
     assert not restored.outstanding
 
@@ -104,7 +104,7 @@ def test_concurrent_chat_finishes_all_eight_admitted_responses(tmp_path, monkeyp
     from harness.spend import ConcurrentSpendGuard
     from harness.questions import Question
 
-    guard = ConcurrentSpendGuard(tmp_path / "raw" / "ledger.jsonl", 1.5, "deepseek-flash", .2)
+    guard = ConcurrentSpendGuard(tmp_path / "raw" / "ledger.jsonl", 1.6, "deepseek-flash", .2)
     barrier = threading.Barrier(8)
     def respond(messages):
         barrier.wait(timeout=10)
@@ -178,3 +178,58 @@ def test_expanded_runner_keeps_authorized_scopes_and_checks_tag(monkeypatch):
     monkeypatch.setattr(runner.subprocess, "run", missing_tag)
     with pytest.raises(runner.subprocess.CalledProcessError):
         runner.verify_harness()
+
+
+def test_reservation_cannot_cross_budget_and_closure_survives_restart(tmp_path):
+    from decimal import Decimal
+    from harness.spend import ConcurrentSpendGuard, SpendLimit
+
+    path = tmp_path / "ledger.jsonl"
+    guard = ConcurrentSpendGuard(path, 3, "deepseek-flash", .133522)
+    usage = dict(prompt_tokens=1, cache_hit_tokens=0, cache_miss_tokens=1, completion_tokens=1)
+    for i in range(14):
+        guard.charge(guard.begin("cell", f"Q{i}", 1, 0), .133522, usage)
+    tickets = [guard.begin("cell", f"Q{i}", 1, 0) for i in range(14, 22)]
+    assert guard.exposure <= Decimal(3)
+    with pytest.raises(SpendLimit):
+        guard.begin("cell", "too_much", 1, 0)
+    for ticket in reversed(tickets):
+        guard.charge(ticket, .133522, usage)
+    restored = ConcurrentSpendGuard(path, 3, "deepseek-flash", .133522)
+    assert restored.total == Decimal("2.937484") and restored.reached
+
+
+def test_runner_dispatches_c_then_b_then_a_with_shared_three_yuan_budget(tmp_path, monkeypatch):
+    import json
+    from scripts import t29_expanded_pilot as runner
+
+    old, confidence = [f"Q{i}" for i in range(20)], [f"Q{i}" for i in range(49)]
+    info = dict(expected_cost_cny=1.44, max_call_cost_cny=.133522,
+                parameters=dict(fix_rate=.35, output_tokens=974, hit_ratio=.99))
+    monkeypatch.setenv("SEMDEBT_DATA_DIR", str(tmp_path))
+    (tmp_path / "chdb-t29").mkdir()
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "verify_eval_tag", lambda *a: None)
+    monkeypatch.setattr(runner, "verify_semantic_tag", lambda *a, **kw: None)
+    monkeypatch.setattr(runner, "verify_harness", lambda: None)
+    monkeypatch.setattr(runner, "load_questions", lambda **kw: [])
+    monkeypatch.setattr(runner, "scopes", lambda q: (old, confidence))
+    monkeypatch.setattr(runner, "estimate", lambda *a: info)
+    monkeypatch.setattr(R, "system_for", lambda cell: cell.name)
+    monkeypatch.setattr(runner.executors, "default_chdb_path", lambda: "unused")
+    preflight = dict(harness_tag=runner.TAG, concurrency=8, budget_cny=3, attempts=169,
+                     execution_order=[runner.CONFIDENCE, *runner.B, *runner.A],
+                     authorized_qids=sorted(set(old+confidence)),
+                     system_sha256={n: R.sha256(n) for n in SELECTIVE_V2_CELLS}, **info)
+    report = tmp_path / "reports/validation/t29-expanded-preflight.json"
+    report.parent.mkdir(parents=True)
+    report.write_text(json.dumps(preflight))
+    calls = []
+    monkeypatch.setattr(R, "main", lambda command: calls.append(R.parse_args(command)) or 0)
+    assert runner.main(["--run-id", "synthetic"]) == 0
+    assert [c.cell for c in calls] == [[runner.CONFIDENCE], list(runner.B), list(runner.A)]
+    assert all(c.budget == 3 and c.concurrency == 8 and c.run_id == "synthetic" for c in calls)
+    assert [len(c.questions.split(',')) for c in calls] == [49, 20, 20]
+    calls.clear()
+    monkeypatch.setattr(R, "main", lambda command: calls.append(command) or 3)
+    assert runner.main(["--run-id", "synthetic"]) == 3 and len(calls) == 1

@@ -103,6 +103,8 @@ class ConcurrentSpendGuard:
                 ticket = r["request_id"]
                 self.closed = self.closed or r.get("admission_closed", False)
                 self.sequence = max(self.sequence, ticket)
+                if r["event"] == "closed" and r.get("admission_closed") is True:
+                    continue
                 if r["event"] == "request" and type(ticket) is int and ticket > 0 and ticket not in seen:
                     seen.add(ticket)
                     self.outstanding.add(ticket)
@@ -139,7 +141,10 @@ class ConcurrentSpendGuard:
 
     def begin(self, cell, qid, rep, turn):
         with self.lock:
-            if self.closed or self.exposure >= self.limit:
+            if self.closed or self.exposure + self.max_call_cost > self.limit:
+                if not self.closed:
+                    self._append("closed", self.sequence, admission_closed=True)
+                self.closed = True
                 raise SpendLimit(f"runtime admission stopped: settled plus in-flight estimate {self.exposure} / {self.limit} CNY")
             self.sequence += 1
             ticket = self.sequence

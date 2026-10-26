@@ -1,8 +1,17 @@
 {
   "harness_tag": "harness-sel-v2",
   "concurrency": 8,
-  "budget_cny": 1.5,
+  "budget_cny": 3,
   "attempts": 169,
+  "execution_order": [
+    "SQL-L1plus-confidence",
+    "SQL-L1plus-sel-front-k3",
+    "SQL-L1plus-sel-front-k10",
+    "SQL-L1plus-sel-k5",
+    "SQL-L1plus-sel-k10",
+    "SQL-L1plus-sel-k20",
+    "SQL-L1plus-sel-k100"
+  ],
   "authorized_qids": [
     "Q03",
     "Q06",
@@ -163,6 +172,5 @@
   "max_input_tokens_estimate": 89022,
   "max_output_tokens_observed": 11125,
   "max_call_cost_cny": 0.133522,
-  "approximate_worst_overspend_cny": 1.068176,
-  "note": "Estimate only: no API token cap; actual costs may exceed the estimate."
+  "note": "Admission reserves in-flight costs. Total cost stays within the budget if each actual call cost does not exceed the maximum estimate. A call exceeding the estimate is fully charged and stops new requests."
 }
