@@ -1,0 +1,3296 @@
+{
+  "source": {
+    "b1_commit": "50098ef5380fc913692a95d143b9bdce3baca3ad",
+    "b1_sha256": "01874ecbcc3a57a311b678b5f12f92e0e224a81def7750e5aa12e4ea222204e5",
+    "scores_sha256": "741aaf429ea2745868496089d99d5699a3c3b58c91bca88301da3ffaaecc0a29",
+    "manual_labels_sha256": "44875acff800b03caf9bfeff0449fae492d13bbc199f3f21ab553657d752e9f0"
+  },
+  "summary": {
+    "attempts": 327,
+    "primary_correct": 245,
+    "b2_correct": 235,
+    "categories": {
+      "excluded_reference_l1plus": 4,
+      "newly_recognized": 5,
+      "not_recognized": 77,
+      "retained_primary": 230,
+      "revoked_declared_contradiction": 11
+    },
+    "no_assumption_single": 17,
+    "no_assumption_multiple": 0,
+    "underspecified_multiple": 7,
+    "upper_bound_extra": 2
+  },
+  "rows": [
+    {
+      "qid": "Q01",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q01",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q01",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q02",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q02",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q02",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q03",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q03",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q03",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q04",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q04",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q04",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q05",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q05",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q05",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q06",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q06",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q06",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q07",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q07",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q07",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q08",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q08",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q08",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q09",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q09",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q09",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q10",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q10",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q10",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q11",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q11",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q11",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q12",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q12",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q12",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q13",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q13",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q13",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q14",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q14",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q14",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q15",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q15",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q15",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q16",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q16",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q16",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q17",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q17",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q17",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q18",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q18",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q18",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q19",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q19",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q19",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q20",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q20",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q20",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q21",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q21",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q21",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q22",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q22",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q22",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q23",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q23",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q23",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q24",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q24",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q24",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q25",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q25",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q25",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q26",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q26",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q26",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q27",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q27",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q27",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q28",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q28",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q28",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q29",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q29",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q29",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q30",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "assumption_sql_mismatch",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q30",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "assumption_sql_mismatch",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q30",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "assumption_sql_mismatch",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q31",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q31",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q31",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q32",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q32",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q32",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q34",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q34",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q34",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q35",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "excluded_reference_l1plus",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q35",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "excluded_reference_l1plus",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q35",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "excluded_reference_l1plus",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q36",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q36",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q36",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q37",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q37",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q37",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q38",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "underspecified_multiple",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q38",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q38",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q41",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q41",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q41",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q43",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q43",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q43",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q47",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q47",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q47",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q49",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q49",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q49",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q50",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q50",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q50",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q51",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q51",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q51",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q52",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q52",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q52",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q53",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q53",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q53",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q54",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q54",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q54",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q55",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q55",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q55",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q56",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q56",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q56",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q57",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q57",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q57",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q58",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "newly_recognized",
+      "primary_correct": false,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q58",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "newly_recognized",
+      "primary_correct": false,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q58",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "newly_recognized",
+      "primary_correct": false,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q59",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q59",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q59",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q60",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q60",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q60",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q61",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q61",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q61",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q62",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q62",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q62",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q63",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q63",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q63",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q64",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q64",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q64",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q65",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "underspecified_multiple",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": true
+    },
+    {
+      "qid": "Q65",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "underspecified_multiple",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": true
+    },
+    {
+      "qid": "Q65",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "newly_recognized",
+      "primary_correct": false,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q66",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q66",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q66",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "underspecified_multiple",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q67",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q67",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q67",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q68",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q68",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q68",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q69",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q69",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q69",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q70",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q70",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q70",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q71",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q71",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q71",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q72",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q72",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q72",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q73",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q73",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q73",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q74",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q74",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q74",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q75",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q75",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q75",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q76",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q76",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q76",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q77",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q77",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q77",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q78",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q78",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q78",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q79",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q79",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q79",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q80",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q80",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q80",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q81",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q81",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q81",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q82",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q82",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "newly_recognized",
+      "primary_correct": false,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q82",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "excluded_reference_l1plus",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q83",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q83",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q83",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q84",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q84",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q84",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q85",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q85",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "assumption_sql_mismatch",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q85",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q87",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q87",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q87",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q88",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q88",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q88",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q89",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q89",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q89",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q90",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q90",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q90",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q92",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q92",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q92",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q94",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q94",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q94",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q96",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q96",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q96",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q98",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q98",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q98",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q99",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q99",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q99",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q100",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q100",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q100",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q101",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q101",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q101",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q102",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q102",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q102",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q103",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q103",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q103",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q104",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q104",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q104",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q105",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q105",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q105",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q106",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q106",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q106",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q107",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q107",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q107",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q108",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q108",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q108",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q109",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q109",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q109",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q110",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q110",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "no_assumption_single",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q110",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q111",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q111",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q111",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q112",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q112",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q112",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q113",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q113",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q113",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q114",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q114",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q114",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q115",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q115",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q115",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "assumption_sql_mismatch",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q116",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q116",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q116",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q117",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q117",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q117",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q118",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q118",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q118",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "outside_b1",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q119",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "underspecified_multiple",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q119",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "underspecified_multiple",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q119",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "underspecified_multiple",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q120",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q120",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q120",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "revoked_declared_contradiction",
+      "primary_correct": true,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q121",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q121",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q121",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "retained_primary",
+      "primary_correct": true,
+      "b2_correct": true,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q122",
+      "rep": 1,
+      "cell": "SQL-L1plus",
+      "declaration_category": "mapped",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q122",
+      "rep": 2,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    },
+    {
+      "qid": "Q122",
+      "rep": 3,
+      "cell": "SQL-L1plus",
+      "declaration_category": "excluded_l1plus",
+      "category": "not_recognized",
+      "primary_correct": false,
+      "b2_correct": false,
+      "upper_bound_extra": false
+    }
+  ]
+}
