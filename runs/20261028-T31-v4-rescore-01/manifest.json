@@ -1,0 +1,461 @@
+{
+  "eval_tag": "eval-v1.3",
+  "eval_commit": "5b65e0c450ba36d83707c00dc9443be16b08d086",
+  "archive_sha256": "75bbeabb6d03a2a23da1ef0fb7299bad75a5d2d024168be45e5d4b0e3686e353",
+  "model_calls": 0,
+  "query_executions": 0,
+  "cost_cny": 0,
+  "source_logs": [
+    {
+      "source_run": "20261016-T11-smoke-01",
+      "cell": "SQL-L1",
+      "sha256": "7f4fb6df70ad6100bb15b05154e645208ac639cbca10b5ec8b93743712fad290",
+      "counts": {
+        "status:harness_error": 1,
+        "changed_or_missing_question_hash": 6
+      }
+    },
+    {
+      "source_run": "20261017-T11-smoke-1017-01",
+      "cell": "SQL-L1",
+      "sha256": "481d892b52eb3ec886de64ce47d58b58b76ff4c03eb32503a9b24bbc97e7cc4d",
+      "counts": {
+        "eligible": 6
+      }
+    },
+    {
+      "source_run": "20261018-T12-pilot-flash-01",
+      "cell": "SQL-L1",
+      "sha256": "09c3371e350ab25f4533e3a05affab915e2b116bd4d141e9f8c16bf862a9c0eb",
+      "counts": {
+        "eligible": 66,
+        "not_deterministic": 3,
+        "changed_or_missing_question_hash": 3
+      }
+    },
+    {
+      "source_run": "20261018-T12-pilot-flash-01",
+      "cell": "SQL-R",
+      "sha256": "4a1938a4e3723b07fbb68f0e0a748877130427803947eb5b661e062470edcd62",
+      "counts": {
+        "eligible": 66,
+        "not_deterministic": 3,
+        "changed_or_missing_question_hash": 3
+      }
+    },
+    {
+      "source_run": "20261018-T12-pilot-pro-01",
+      "cell": "SQL-L1",
+      "sha256": "d44348a1a207aa2f6373dc1e57df26f92e480c057290d3bb7267cbee3b471aae",
+      "counts": {
+        "eligible": 66,
+        "not_deterministic": 3,
+        "changed_or_missing_question_hash": 3
+      }
+    },
+    {
+      "source_run": "20261018-T12-pilot-pro-01",
+      "cell": "SQL-R",
+      "sha256": "a820f7d5f4d64f7f0697467702d3150c38050fc47688e0ebc1462683acb680f4",
+      "counts": {
+        "eligible": 66,
+        "not_deterministic": 3,
+        "changed_or_missing_question_hash": 3
+      }
+    },
+    {
+      "source_run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L0",
+      "sha256": "cd18674fad7a222339802f982a7f94a16feec25f06f304c8e27e1dbb4f73ce8c",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1",
+      "sha256": "9d8a6b7ee75de9211642b7a94f88dc1be11f3823b50592b024c388fde897ead6",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1.5S",
+      "sha256": "25ac3f16eb377ef7e2b195dac70e5543fcd27c1eb25fab390184dda40ea9e2fa",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1.5W",
+      "sha256": "c063cd130288d105c7f061c705beae9801dcbb6cb8b2f51bc290cb64bbe1a2c3",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-L1c",
+      "sha256": "6deb1a4a0c03f68d879794ee09c73a26f2987b8fac0361c1b37a30f42ff2b802",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261018-T13-sql-direct-01",
+      "cell": "SQL-R",
+      "sha256": "27ab95f5761450501912ebda3922bb9dd37e4a195b730678b88e95e175757e97",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261019-C13-ladder-01",
+      "cell": "SQL-L1-T2",
+      "sha256": "60c89fd8e47ee21098be13c979055e1a28b66e45148a6a9e83964e7c8d5fd7c3",
+      "counts": {
+        "status:harness_error": 12,
+        "eligible": 1
+      }
+    },
+    {
+      "source_run": "20261019-C13-ladder-02",
+      "cell": "SQL-L1-T2",
+      "sha256": "9a28982d4079f0188161afc2d87d9d345bde8ec9bb2b722c3d236c426b8a4965",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261019-C13-ladder-02",
+      "cell": "SQL-L1-T3",
+      "sha256": "e59be1041f960897f670da39ecb0c329f7ba1b0a8331592c42ad3dc2ec99b39e",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261019-C13-ladder-02",
+      "cell": "SQL-L1-T4",
+      "sha256": "459032ff2dec16d0225bc173e2df96142b2977ba3550eeddb4d19898cf4697ff",
+      "counts": {
+        "eligible": 165
+      }
+    },
+    {
+      "source_run": "20261019-T13-l15s-v14-01",
+      "cell": "SQL-L1.5S",
+      "sha256": "c7e465c42eddf564ad5a2c622651713aaa916db4e1e8bd1fb1e97d53a63f9c8a",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261019-T15-explorer-01",
+      "cell": "SQL-L0-E",
+      "sha256": "f0c4d2bc3a7c70a129b1f80b2b918f508ee6904bde57a92dc6b2e6c0bf5c9461",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261019-T15-explorer-01",
+      "cell": "SQL-L1-E",
+      "sha256": "a09ce03bb899e739939c7fa3763d21ede9f8b47fdd076973ab88ca482d9227be",
+      "counts": {
+        "eligible": 327,
+        "not_deterministic": 39
+      }
+    },
+    {
+      "source_run": "20261019-T15-explorer-l2e-01",
+      "cell": "SQL-L2-E",
+      "sha256": "1b63f5e25e24de688130e865ed05cb3a8f263e543ae0279f57391b156826ecb5",
+      "counts": {
+        "eligible": 7
+      }
+    },
+    {
+      "source_run": "20261019-T15-pilot-01",
+      "cell": "SQL-L0-E",
+      "sha256": "c264a3b6b8ef1f78a8a53cf394046b0ed2606cf4a6ff1d817b8f5454b4d91930",
+      "counts": {
+        "eligible": 23,
+        "not_deterministic": 1
+      }
+    },
+    {
+      "source_run": "20261019-T15-pilot-01",
+      "cell": "SQL-L1-E",
+      "sha256": "55e18dff94f4a919a05669cf5e40b54642d81d8300d21395cc103d2d6d6baeba",
+      "counts": {
+        "eligible": 23,
+        "not_deterministic": 1
+      }
+    },
+    {
+      "source_run": "20261019-T15-pilot-l0e-02",
+      "cell": "SQL-L0-E",
+      "sha256": "9eb2aa72053bc6354a39f8fbea1ae993d7bf4f222d43a05c32b9b472e2c984ee",
+      "counts": {
+        "eligible": 23,
+        "not_deterministic": 1
+      }
+    },
+    {
+      "source_run": "20261019-T16-full-v14-json-01",
+      "cell": "JSON-L2",
+      "sha256": "10a1ab5c480b8708c81f6bd9fa61a947cbaf81ed45194a205db23808f3a4c7cf",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261019-T16-full-v14-sql-new-01",
+      "cell": "SQL-L2",
+      "sha256": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261019-T16-full-v14-sql-old-01",
+      "cell": "SQL-L2-notes-v12",
+      "sha256": "f58926226ebb7031d806437c100b5db2196e05b91f68f9002c3ca45be500e2a4",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261019-T16-pilot-01",
+      "cell": "SQL-L2",
+      "sha256": "60f2566162dcc895567a3eb5e445563027ccee03a9e76c1f5a6ff07822f28355",
+      "counts": {
+        "eligible": 23,
+        "not_deterministic": 1
+      }
+    },
+    {
+      "source_run": "20261019-T16-pilot-v13-02",
+      "cell": "JSON-L2",
+      "sha256": "39b45621001d21574265d912c85e257303d4fe5ec074cb5b98c6b459572fab04",
+      "counts": {
+        "eligible": 23
+      }
+    },
+    {
+      "source_run": "20261019-T16-pilot-v13-02",
+      "cell": "SQL-L2",
+      "sha256": "70a81ed10ea60194f7f4f99c77c665186c96f5e6dd2615f805f3a7ddbb8be959",
+      "counts": {
+        "eligible": 23
+      }
+    },
+    {
+      "source_run": "20261019-T21-pilot-01",
+      "cell": "SQL-L0-P",
+      "sha256": "f70f8081fdcae5358f78645b8d9b3e4cf2a6c3de9a57b037699f6f15b3e58dd1",
+      "counts": {
+        "eligible": 23,
+        "not_deterministic": 1
+      }
+    },
+    {
+      "source_run": "20261019-T21-pilot-01",
+      "cell": "SQL-L1-P",
+      "sha256": "a065ff89b215ffe37842c7161bb6cdd2e4f058ff531d887e2aa909f50fe5f7d2",
+      "counts": {
+        "eligible": 23,
+        "not_deterministic": 1
+      }
+    },
+    {
+      "source_run": "20261020-T15-explorer-l2e-02",
+      "cell": "SQL-L2-E",
+      "sha256": "c9122c04dd556268dcf5fbcae57631405ba61aab037feb2c58826524ab77d746",
+      "counts": {
+        "eligible": 284
+      }
+    },
+    {
+      "source_run": "20261020-T15-explorer-l2e-03",
+      "cell": "SQL-L2-E",
+      "sha256": "44628d83f320dd6fd64313ffac4d124754b6f3dbf014831ff453853e45aadf4f",
+      "counts": {
+        "eligible": 45
+      }
+    },
+    {
+      "source_run": "20261025-T14-tuned-01",
+      "cell": "SQL-L1-tuned",
+      "sha256": "e65be80548af9fdcdc818258ad7430f90f42e9dc212c245e78cec3a25f9ceb9b",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261025-T14-tuned-01",
+      "cell": "SQL-L1-tuned-instr",
+      "sha256": "1be51e0952e64a3ae5f274c9e2b1b2c22e7d1040de02b18232ca7466133fe532",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261025-T22b-l1plus-l3a-01",
+      "cell": "SQL-L1plus",
+      "sha256": "1c646177b881372d8df256d5924a02dd74b03dc97b9789a3fadd1cf668c566bf",
+      "counts": {
+        "status:harness_error": 1
+      }
+    },
+    {
+      "source_run": "20261025-T22b-l1plus-l3a-02",
+      "cell": "SQL-L1plus",
+      "sha256": "ee48bd7c593327483983eec0aa43c3118c0e891e2a82dc9e8e901c2b8bd18cfc",
+      "counts": {
+        "eligible": 1
+      }
+    },
+    {
+      "source_run": "20261025-T22b-l1plus-l3a-03",
+      "cell": "SQL-L1plus",
+      "sha256": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261025-T22b-l1plus-l3a-03",
+      "cell": "SQL-L3a",
+      "sha256": "67f282deddb1a92b4406133da746e8ba6250cf99c9f81c78127ccbe4dec7a2c6",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261025-T29-pilot-01",
+      "cell": "SQL-L1plus-sel-k1",
+      "sha256": "201c7c01ebeb1fb7c6bc24fbac72d3422d1e62385d608231d8eed0302a83bf5f",
+      "counts": {
+        "eligible": 20
+      }
+    },
+    {
+      "source_run": "20261025-T29-pilot-01",
+      "cell": "SQL-L1plus-sel-k3",
+      "sha256": "ca3beb8e4c4cc2e79b9138ebd2c73d23337e5b8ebcca5f7a4b9445a299ee00e9",
+      "counts": {
+        "eligible": 20
+      }
+    },
+    {
+      "source_run": "20261025-T30-combo-01",
+      "cell": "SQL-L1plus-tuned-instr",
+      "sha256": "41546aff0de2dcb4d050cd27efd13b47de0797fe445ee48d668dc280bc1a16f2",
+      "counts": {
+        "eligible": 327
+      }
+    },
+    {
+      "source_run": "20261026-T29-expanded-01",
+      "cell": "SQL-L1plus-confidence",
+      "sha256": "536dd31c050b0f58192f64c3dc1555a16bbec967901d9e421e49143bc42c5160",
+      "counts": {
+        "status:harness_error": 49,
+        "eligible": 49
+      }
+    },
+    {
+      "source_run": "20261026-T29-expanded-01",
+      "cell": "SQL-L1plus-sel-front-k10",
+      "sha256": "d11e3673cbd0b5ea454a513826424837fc758d555c3933159c2b44eb9b80100f",
+      "counts": {
+        "status:harness_error": 20,
+        "eligible": 20
+      }
+    },
+    {
+      "source_run": "20261026-T29-expanded-01",
+      "cell": "SQL-L1plus-sel-front-k3",
+      "sha256": "5a622009e1732f4216142b29e23955f6f967c2639e16b544a26cb08bc354672b",
+      "counts": {
+        "status:harness_error": 20,
+        "eligible": 20
+      }
+    },
+    {
+      "source_run": "20261026-T29-expanded-01",
+      "cell": "SQL-L1plus-sel-k10",
+      "sha256": "f5f5fd77d23a535e4caf413814b446578323011011afba6feb3ab7e09f46f4f7",
+      "counts": {
+        "status:harness_error": 20,
+        "eligible": 20
+      }
+    },
+    {
+      "source_run": "20261026-T29-expanded-01",
+      "cell": "SQL-L1plus-sel-k100",
+      "sha256": "d7bf1f8705f2aae23d9937a44243b01df39a0dfb11689b7798ff39f6d6e41f84",
+      "counts": {
+        "status:harness_error": 20,
+        "eligible": 20
+      }
+    },
+    {
+      "source_run": "20261026-T29-expanded-01",
+      "cell": "SQL-L1plus-sel-k20",
+      "sha256": "fc52360ce55e4e33475c54689cac6e8bf1b4084358a8af4a58bd192fb123547e",
+      "counts": {
+        "status:harness_error": 20,
+        "eligible": 20
+      }
+    },
+    {
+      "source_run": "20261026-T29-expanded-01",
+      "cell": "SQL-L1plus-sel-k5",
+      "sha256": "5bb1555afecabacfe5ba52416e95b3de838741c5c6c083cf1e1e2da3db4e937c",
+      "counts": {
+        "status:harness_error": 20,
+        "eligible": 20
+      }
+    }
+  ],
+  "exclusions": {
+    "status:harness_error": 183,
+    "changed_or_missing_question_hash": 18,
+    "not_deterministic": 330
+  },
+  "attempts": 7379,
+  "a": 4411,
+  "b": 362,
+  "monotonicity": true,
+  "inputs": {
+    "reports/validation/t31-residual-sample.csv": "2c53c53c2a3b6282b41db7e8a068fc307a394ce35f418d1e9debc70b85678603",
+    "reports/validation/t31-residual-frame.csv": "da89ea39c8839285ba06ca6feab951de8447910981be04359283e144f8906b81",
+    "reports/validation/t31-residual-sample-codex.csv": "5043fee3d44bbf640eb72d8b45d6d53187dbfd35a62778dc49817fb56564a3d8",
+    "reports/validation/t31-residual-sample-claude.csv": "d61e43f9eb0a3d2d16d1366aa972c14b7682a76241372a0f6d3736f50495591a",
+    "reports/validation/t31-v4-claude-review.csv": "05276639f89a4a08d0b2c01316c1e1292bdbb47d730ce7c75a79013da597dedc",
+    "reports/validation/t31-v4-claude-review-manual.csv": "9741b89ca4209159cedfe45b942ca73737c67ca443e6be33bbfecaac09b6dcec",
+    "scripts/t31_v4_recompute.py": "6951bcbf3b6d29f01432cb4f304c325718810fe1cf2a84ff68ca8500e35e3641",
+    "scripts/t31_candidate_scan.py": "5e6a1f91a3d713eb3688b3042cc9d266a3446e4d167389b8a275c006bd5a7360",
+    "scripts/rescore_t23.py": "ba7df2060f254d8f743ece513a6dd4decd2dd277c31b4330227be45cfb5f6a48",
+    "harness/scorer_v2.py": "a012aba545e8df760e967828a1df1ca0a1db993fc3d309ece24a70bc4ce207d4",
+    "harness/scorer_v3.py": "692785b1d07890570104019efa5ded13eac3da78f7a89767773dd8df7771d047"
+  },
+  "sample_update": {
+    "retained": 180,
+    "v2_pass": 17,
+    "rule_pass": 3
+  },
+  "status": "pending independent cross-vendor recomputation"
+}

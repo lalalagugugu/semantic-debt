@@ -1,0 +1,16 @@
+source_run,cell,qid,rep,reason
+20261018-T13-sql-direct-01,SQL-L0,Q30,1,reference_changed
+20261018-T13-sql-direct-01,SQL-L1,Q30,2,reference_changed
+20261018-T13-sql-direct-01,SQL-L1.5W,Q30,2,reference_changed
+20261018-T13-sql-direct-01,SQL-L1.5W,Q30,3,reference_changed
+20261018-T13-sql-direct-01,SQL-L1c,Q30,2,reference_changed
+20261018-T13-sql-direct-01,SQL-L1c,Q30,3,reference_changed
+20261018-T13-sql-direct-01,SQL-R,Q30,1,reference_changed
+20261019-C13-ladder-02,SQL-L1-T2,Q30,1,reference_changed
+20261019-T15-explorer-01,SQL-L0-E,Q30,1,reference_changed
+20261019-T15-explorer-01,SQL-L1-E,Q30,1,reference_changed
+20261020-T15-explorer-l2e-02,SQL-L2-E,Q30,3,reference_changed
+20261025-T22b-l1plus-l3a-03,SQL-L1plus,Q30,1,reference_changed
+20261025-T22b-l1plus-l3a-03,SQL-L1plus,Q30,2,reference_changed
+20261025-T22b-l1plus-l3a-03,SQL-L1plus,Q30,3,reference_changed
+20261025-T22b-l1plus-l3a-03,SQL-L1plus,Q96,3,prior_verified_error
