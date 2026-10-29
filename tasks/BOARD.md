@@ -37,9 +37,9 @@
 | T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | 未开始 |
 | T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 第一期暂停，第二期再做（2026-10-19 用户裁决，与 judge-v1 一起）；小样本保留（`20261019-T21-pilot-01`，1.18 元，L0-P 50.0%、L1-P 58.3%，Python 0/48） |
 | T22 | L1+（内容补全与歧义澄清，盲写）与 L3a（同内容的 OWL + SHACL）（`tasks/T22-l1plus-l3a.md`） | Claude Code（盲 → 普通）+ Codex 复核 | 盲 / 普通 | `semantic-v1.4`；`harness-v1.1` | 10 元（Flash） | 第 1–3 步完成（#164，`semantic/l1plus.yaml` v3，Codex 三轮复核、用户裁决 R1–R12）；第 4–6 步移到 T22b |
-| T22b | L1+ / L3a 渲染、运行、报告、残余歧义归因（`tasks/T22b-l1plus-render-run.md`） | Codex | 主仓库 clone | T22 第 1–3 步 | 15 + 3 元（Flash，用户已上调） | **完成**（#172、#176）：98 题 L1plus 75.5%、L3a 74.5%（v2）；残余归因 82/82 条（`reports/results/l1plus-error-attribution.md`）。v4 双口径见 `reports/results/accuracy-v4.md` |
-| T29 | 会取舍、会声明假设的作答（`tasks/T29-selective-answering.md`） | Codex | 主仓库 clone | `semantic-v1.6-l1plus` | 首轮0.30458160元；扩展1.76856564元（上限3元）；正式暂缓 | 扩展试跑与免费 D/B2 完成；v2（按约定交付率）筛选无达标组。**下一步**：按卡第 9 行，用 v4 的内容准确率口径对同一批试跑复算筛选（零费用，Codex）；两口径结论不一致交用户裁决；正式运行（上限 12 元）另批 |
-| T23 | 评分器呈现容错 v3 与全部单元离线重评（`tasks/T23-scorer-presentation.md`） | Codex | 主仓库 clone | `harness-v1.1` | 0 | **完成**（#170；82 条新增判对经 Claude Code 逐条复核全部通过，#171）：v3 仅作敏感性分析；主口径已改为 v4 双口径（`decisions/2026-10-26-accuracy-vs-delivery.md`） |
+| T22b | L1+ / L3a 渲染、运行、报告、残余歧义归因（`tasks/T22b-l1plus-render-run.md`） | Codex | 主仓库 clone | T22 第 1–3 步 | 15 + 3 元（Flash，用户已上调） | 运行与报告已完成，协调会话独立复算数字一致；98 题 L1plus 75.5%、L3a 74.5%，运行已知累计 8.09429950 元。归因 20261025-T22b-attrib-01 完成 82/82 条、1.72537972 元；五类 + 单列及数据质量标记固定，Flash / Codex 独立计数与题号清单见 reports/results/l1plus-error-attribution.md；无异常或待核算费用，PR #176 待协调验收归因 |
+| T29 | 会取舍、会声明假设的作答（`tasks/T29-selective-answering.md`） | Codex | 主仓库 clone | `semantic-v1.6-l1plus` | 首轮0.30458160元；扩展1.76856564元（上限3元）；正式暂缓 | 扩展169次首轮全部完成、209调用、无未结算；A/B各档拒答/格式错均0，C缺把握13、三门槛拒13/15/28。v2无B/C达标组，C AUC0.635[0.400,0.855]；报告`reports/validation/t29-expanded.md`。D/B2分别完成，原主评分不改。等待PR #190内容准确率口径按同规则复算，双口径之后再决定正式；B达标还需另批拆分试跑 |
+| T23 | 评分器呈现容错 v3 与全部单元离线重评（`tasks/T23-scorer-presentation.md`） | Codex | 主仓库 clone | `harness-v1.1` | 0 | 实现及现有 27 份日志 / 6,188 条作答重评完成（2026-10-25，`20261025-T23-v3-02`）；451 tests passed；v2 仍为主数字，v3 敏感性分析；82 条新增判对待 Claude Code 逐条复核，T22b 完成后补评 |
 | T30 | 叠加单元：L1+ + 调优 + 作答要求（`tasks/T30-combo-cell.md`） | Codex | 主仓库 clone | T27；`semantic-v1.6-l1plus`、`semantic-tuned-v1` | 8 元（Flash，用户已批准） | 运行与报告完成，待协调验收：327/327，339 次有回包调用，可核算 2.89061402 元；3 次传输失败未返 usage，账单费用待核对。v2/v3 主表 87.4%、留出 81.0%；报告 reports/results/combo.md；chDB 独立副本 |
 | T24 | 中期报告补数：稳定性、C4–C7、token、数据集与数据质量、名词表、数字来源（`tasks/T24-midterm-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）；入口 `reports/midterm/README.md`；T14、L1+、L3a留位待补 |
 | T28 | 中期报告 v3 补数（`tasks/T28-midterm-v3-data.md`） | Codex | 主仓库 clone | 现有日志 | 0 | 产出完成，待协调会话跨厂商验收（2026-10-25）：`reports/midterm/v3-data.md`含11项补数；21条调优残余人工分类，L1plus/L3a免费v3补评654条；主表v3为76.9%/77.2%，L1plus归因上界86.4%，L3a缺少双方归因不计算；本卡费用0元 |
@@ -50,15 +50,8 @@
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：骨架在 `T19a-skeleton`（PR #149，草稿；`4951c14` 已写入探查为何不涨分）；T19b 结果出来后纳入 |
 | T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **完成**（#153，2026-10-23）：117 条，Flash 4.42 元；类别 κ 0.70、根因 κ 0.37；根因 3（模型没理解）11%–46%；两家都判根因 5 的 26 条 / 15 题待题库负责方核对（`reports/results/l1-error-attribution.md`） |
 | T19c | 模型知不知道自己会不会（`tasks/T19c-abstention-signals.md`，2026-10-23 改写）：隐含信号 + 自评把握的校准，判定规则先写死 | Claude Code | 普通 | T13 SQL-L1 最终日志 | 5 元（Flash；`decisions/2026-10-23-l1plus-l3a.md` 第四节） | **完成**（2026-10-23，实花 1.02 元）：思考 token AUC 0.755（参照）；自评把握判定「介于两者之间」，不建议新单元。报告 `reports/results/confidence-calibration.md`；待 PR 合并 |
-| T31 | 可疑参考答案核对与呈现差异盘点（`tasks/T31-reference-and-presentation-review.md`） | Codex | 主仓库 clone（只读题库） | T22b、T28 | 0 | **完成**（2026-10-28，#200；Claude Code 跨厂商核对通过 #201，`reports/validation/accuracy-v4-claude-check.md`）：`eval-v1.3`（5b65e0c）下全部正式单元双口径——按约定交付率 a、规则放行 b、残余抽样估计 c；主表 98 题见 `reports/results/accuracy-v4.md`。需披露：eval-v1.3 新增的 8 次规则放行未逐条复核；L1plus、复盘、叠加单元 c 的可用样本只剩 4–5 次，区间宽 |
+| T31 | 可疑参考答案核对与呈现差异盘点（`tasks/T31-reference-and-presentation-review.md`） | Codex | 主仓库 clone（只读题库） | T22b、T28 | 0 | 双口径离线重评已产出（2026-10-28），待跨厂商独立核对：eval-v1.3、全历史追加评分、正式19单元与T29两口径、98题抽样估计及109题边界；15次框外已知错误按用户裁定不估入c。见reports/results/accuracy-v4.md，数字未进入正式报告；待用户合并本轮PR |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
-
-## 2026-10-29 刷新（云端代班）
-
-- 最后一次合并：#201（10-28 08:47）。开着的 PR 只有 #149（中期报告骨架，10-20 的草稿，已过时）。
-- 主口径改为 **v4 双口径**（`decisions/2026-10-26-accuracy-vs-delivery.md`）：准确率（内容，a + b + 抽样估计 c）与按约定交付率（v2，a）并列；`eval-v1.3` 已含五题参考裁定（`decisions/2026-10-28-reference-rulings-five-questions.md`）；Claude Code 跨厂商核对通过（#201）。
-- 待做：中期报告按 v4 双口径定稿（T19a；#149 需重写或关闭）；T29 按内容口径复算筛选后由用户决定正式运行；T17 Windows 探测与冒烟（另待用户决定是否打 `semantic-v1.5`、open-questions T17-1）；T30 的 3 次传输失败的账单核对；BOARD 上 T24、T25、T28、T30 写着「待协调验收」，仓库里没有对应的验收记录，需补或确认。
-- 下一期：作答对照浏览器（`decisions/2026-10-26-answer-browser-idea.md`）；指令遵循假设（`decisions/2026-10-26-instruction-following-hypotheses.md`）；第二期候选见 2026-10-22 一节与 `decisions/2026-10-23-orphan-rows-and-confidence.md`。
 
 ## 2026-10-22 刷新：第一期 SQL 线运行完成
 
