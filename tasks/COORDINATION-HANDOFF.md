@@ -92,3 +92,7 @@ eval-v1.2（题库 90e13b3）、harness-agent-v1 / v1.1、harness-v1.1（评分�
 **报告要求新增**：孤儿行这一数据质量问题及其对结论的影响必须披露（`decisions/2026-10-23-orphan-rows-and-confidence.md` 第一节）。
 
 **补充（2026-10-23 16:10）**：#158 已合并：T22（L1+ 盲写、L3a 形式化）已裁决并开卡，T19c 预算上限 5 元。#156（T16 的 DAX 对齐清单 `reports/validation/t16_dax_reference_alignment.md`）已合并，交 T17-mac 实现。主工作区已切回 main（此前停在 `T19b-error-attribution`，没有未提交改动，该分支已在 main 里）。
+
+## 云端代班接手（2026-10-29 19:30）
+
+10-23 之后本文件没有更新；以下据 git 历史、BOARD 与 decisions 重建。主线：T14 调优（tuned / tuned-instr）、T22/T22b L1+ 与 L3a、T26 本体校验、T27/T30 叠加单元、T29 会取舍的作答（试跑）、T23 评分器 v3（敏感性）、T24/T28 中期报告补数、T31 参考核对与 v4 双口径（准确率 vs 按约定交付率），全部合并到 #201。BOARD 的「2026-10-29 刷新」一节列出了待做。T31-2、T31-3 在 open-questions 里标为已裁决。
