@@ -270,7 +270,13 @@ def _chat_unaccounted(ctx: RunContext, q: Question, rep: int, turn: int,
                       messages: list[dict[str, str]], *, check_reply: bool = True) -> Reply:
     if ctx.boundary is not None:
         ctx.boundary.before_request()
-    reply = ctx.client.chat(messages)
+    try:
+        reply = ctx.client.chat(messages)
+    except APIError as exc:
+        if ctx.boundary is not None and str(exc).startswith(("HTTP 401:", "HTTP 402:")):
+            ctx.boundary.reason = str(exc)
+            ctx.boundary.stopped.set()
+        raise
     # Preserve even a mismatching response before stopping; never send its query to the engine.
     _save_raw(ctx, q, rep, turn, reply)
     if ctx.boundary is not None and check_reply:
@@ -345,22 +351,31 @@ def final_score(candidate, q: Question, error_class: str | None, limit: str | No
     return final
 
 
-def _save_raw(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply) -> str:
-    path = ctx.raw_dir / f"{q.qid}_r{rep}_t{turn}.json"
+def _save_numbered(path: Path, payload: bytes) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(reply.raw)
-    return sha256(reply.raw)
+    index = 0
+    while True:
+        target = path if index == 0 else path.with_name(f"{path.stem}.{index}{path.suffix}")
+        try:
+            with target.open("xb") as out:
+                out.write(payload)
+            return sha256(payload)
+        except FileExistsError:
+            if target.read_bytes() == payload:  # the same response saved again: nothing new to keep
+                return sha256(payload)
+            index += 1
+
+
+def _save_raw(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply) -> str:
+    return _save_numbered(ctx.raw_dir / f"{q.qid}_r{rep}_t{turn}.json", reply.raw)
 
 
 def _save_exec(ctx: RunContext, q: Question, rep: int, turn: int, result: ExecResult) -> str:
-    """Full execution outcome (rows, or the unabridged engine message) for later scoring and audit."""
+    """Preserve every execution package, including repeated attempts."""
     payload = json.dumps({"columns": result.columns, "rows": result.rows, "error": result.error,
                           "error_class": result.error_class, "limit": result.limit, "detail": result.detail},
                          ensure_ascii=False, default=str).encode()
-    path = ctx.raw_dir / f"{q.qid}_r{rep}_t{turn}.exec.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(payload)
-    return sha256(payload)
+    return _save_numbered(ctx.raw_dir / f"{q.qid}_r{rep}_t{turn}.exec.json", payload)
 
 
 def _turn_record(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply,
@@ -536,7 +551,10 @@ def done_pairs(path: Path) -> set[tuple[str, int]]:
         if line.strip():
             rec = json.loads(line)
             if rec.get("status") == "done":
-                done.add((str(rec["qid"]), int(rec["rep"])))
+                key = str(rec["qid"]), int(rec["rep"])
+                if key in done:
+                    raise ValueError(f"duplicate done identity in {path}: {key}")
+                done.add(key)
     return done
 
 
@@ -630,7 +648,7 @@ def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency:
         except Exception as exc:  # recorded, never swallowed
             record = {"run_id": ctx.run_id, "cell": ctx.cell.name, "qid": qid, "rep": rep,
                       "status": "harness_error", "error": f"{type(exc).__name__}: {exc}"[:500]}
-        if ((stop_on_error or ctx.cell.selective_variant == "uncertainty") and ctx.boundary is not None
+        if (stop_on_error and ctx.boundary is not None
                 and record["status"] not in ("done", "stopped")):
             ctx.boundary.reason = f"attempt stopped: {record['status']}"
             ctx.boundary.stopped.set()
@@ -988,7 +1006,8 @@ def main(argv: list[str] | None = None, load=None, spend_guard: ConcurrentSpendG
         return 2
     if args.dry_run:
         return 0
-    selective = any(c.selective_k is not None or c.selective_variant is not None for c in cells)
+    selective = any((c.selective_k is not None or c.selective_variant is not None)
+                    and c.name not in U2_CELLS for c in cells)
     if selective and args.budget is None:
         print("refusing to start: selective cells require --budget for the shared runtime spend threshold")
         return 2
