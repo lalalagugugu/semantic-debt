@@ -1,5 +1,7 @@
 """T29 continuation U2: fixed 98 x 3 x 6 cells, same-fingerprint baselines, approval-gated paid entry."""
 import argparse
+import fcntl
+import shutil
 import hashlib
 import json
 import math
@@ -15,9 +17,9 @@ from harness import executors, run_direct as R
 from harness.cells import CELLS, U2_CELLS, PRICES_OFFPEAK
 from harness.questions import load_questions, verify_eval_tag
 from harness.semantic_version import verify_semantic_tag
-from harness.spend import ConcurrentSpendGuard
 
-TAG = "harness-u2-v3"
+TAG = "harness-u2-v4"
+RUN_ID = "20261031-T29-u2-v3-01"
 SEMANTIC = "semantic-v1.2"
 EVAL = "eval-v1.3"
 ESTIMATE_BASELINE_RUN = "20261018-T13-sql-direct-01"
@@ -111,7 +113,9 @@ def build_preflight(questions):
                 qids=[q.qid for q in selected], questions=98, reps=3, cells=list(COLLECTION_CELLS),
                 first_calls=1764, estimated_calls=sum(r["estimated_calls"] for r in rows),
                 maximum_calls_one_fix_each=3528, budget_ceiling_cny=BUDGET, prior_run=PRIOR_RUN, prior_cost_cny=float(PRIOR_COST),
-                run_budget_cny=RUN_BUDGET, concurrency=8, required_spend_reservation=True,
+                run_budget_cny=RUN_BUDGET, concurrency=8, required_spend_reservation=False,
+                resume_run_id=RUN_ID, retain_done_from_tag="harness-u2-v3", retained_attempts=56,
+                remaining_first_attempts=1708, collection_mode="T13; default transport retries; per-cell usage cost audit; no ledger",
                 discarded_run=DISCARDED_RUN, confirmed_known_cost_cny=float(CONFIRMED_COST),
                 console_reported_cost_cny=float(CONSOLE_REPORTED_COST),
                 unconfirmed_calls_reserve=UNCONFIRMED_CALLS, prior_max_call_cost_cny=float(PRIOR_MAX_CALL_COST),
@@ -127,33 +131,58 @@ def build_preflight(questions):
                 estimate_method="Six cells use original 98x3 usage/fix rates only for estimates, never U2 labels; new baseline output=ceil(original mean), treatment output=max(original mean,T29 C mean)+64; include each prompt delta and one extra cold prefix per cell.",
                 max_input_tokens_estimate=maximum_input, max_output_tokens_estimate=maximum_output,
                 max_call_cost_cny=max_cost,
-                spend_note="Admission reserves each in-flight request; new-run spend plus the conservative deduction of 1.12892908 CNY stays within 40 CNY (new-run allowance 38.87107092 CNY) if individual actual costs do not exceed the estimate. An actual cost above the estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+                spend_note="Old ledgers are archives only. After every cell, sum all logged turn usage plus the prior 1.12892908 CNY deduction; stop and ask if above 40 CNY. No in-flight reservations or hard per-request cap; missing response usage remains unconfirmed.",
                 d4_free_baselines=["SQL-L0", "SQL-L1"], d4_extra_api_calls=0,
                 d1_dependency="Collection may precede D1; analysis requires completed D1 full content adjudication for the new-fingerprint baseline and treatments, never v2 or sampled extrapolation.",
                 baseline_system_sha256=baseline_hashes, treatment_system_sha256=treatment_hashes,
                 source_sha256=sources, rows=rows)
 
 
-def verify_prior_spend(data):
-    evidence = json.loads((ROOT / "reports/validation/t29-u2-collection-stop.json").read_text())
-    ledger = data / "runs-raw" / PRIOR_RUN / "spend-ledger.jsonl"
-    if sha(ledger.read_bytes()) != evidence["spend_ledger_sha256"]:
-        raise ValueError("prior U2 spend ledger changed; reconcile before starting")
-    previous = ConcurrentSpendGuard(ledger, 30, MODEL, 0.120675)
-    if previous.total != PRIOR_COST or evidence["actual_cost_cny"] != str(PRIOR_COST):
-        raise ValueError("prior U2 spend differs from the approved budget deduction")
+def logged_cost():
+    total = Decimal(0)
+    for cell in COLLECTION_CELLS:
+        path = R.log_path(RUN_ID, cell)
+        if not path.exists():
+            continue
+        for line in path.read_text().splitlines():
+            record = json.loads(line)
+            if not record.get("turns"):
+                continue
+            peak = record.get("peak")
+            if peak is None:
+                peak = R.is_peak(R.datetime.fromisoformat(record["started_at"]))
+            for turn in record["turns"]:
+                total += Decimal(str(R.cost_cny(MODEL, turn["usage"], peak)))
+    print(f"logged usage: {total} CNY; with prior deduction: {total+BUDGET_DEDUCTION} / {BUDGET} CNY")
+    return total+BUDGET_DEDUCTION
 
 
-def verify_discarded_spend(data):
-    evidence = json.loads((ROOT / "reports/validation/t29-u2-v2-collection-stop.json").read_text())
-    if (evidence["run_id"] != DISCARDED_RUN or evidence["saved_responses"] != 33
-            or Decimal(evidence["known_total_including_prior_cny"]) != CONFIRMED_COST):
-        raise ValueError("discarded U2 usage evidence differs from the approved deduction")
-    for record in evidence["response_manifest"]:
-        path = data / "runs-raw" / DISCARDED_RUN / record["relative_path"]
-        if (sha(path.read_bytes()) != record["raw_sha256"]
-                or sha(path.with_name(path.stem+".exec.json").read_bytes()) != record["exec_sha256"]):
-            raise ValueError("discarded U2 response/execution evidence changed")
+def stopped_permanently():
+    for cell in COLLECTION_CELLS:
+        path = R.log_path(RUN_ID, cell)
+        if not path.exists():
+            continue
+        for line in path.read_text().splitlines():
+            record = json.loads(line)
+            if any(x in record.get("error", "") for x in ("HTTP 401:", "HTTP 402:", "system_fingerprint mismatch")):
+                return True
+            if any(t.get("system_fingerprint") != FINGERPRINT for t in record.get("turns", [])):
+                return True
+    return False
+
+
+def resume_logs(data):
+    source = data / "t29-u2-runtime-v3" / "runs" / RUN_ID
+    target = ROOT / "runs" / RUN_ID
+    target.mkdir(parents=True, exist_ok=True)
+    for cell in COLLECTION_CELLS:
+        old, new = source / f"{cell}.jsonl", target / f"{cell}.jsonl"
+        if old.exists():
+            if not new.exists():
+                shutil.copyfile(old, new)
+            elif not new.read_bytes().startswith(old.read_bytes()):
+                raise ValueError("resume log no longer preserves the v3 prefix")
+        R.done_pairs(new)
 
 
 def verify_harness():
@@ -179,8 +208,8 @@ def main(argv=None):
         ap.error("paid collection needs user approval, --execute-approved, --run-id and --approved-preflight-sha256")
     if args.run_id and (Path(args.run_id).name != args.run_id or args.run_id in (".", "..")):
         ap.error("invalid run id")
-    if args.run_id in (PRIOR_RUN, DISCARDED_RUN, ESTIMATE_BASELINE_RUN):
-        ap.error("U2 v3 requires a new run-id; stopped and historical runs stay immutable")
+    if not args.dry_run and args.run_id != RUN_ID:
+        ap.error(f"U2 v4 must resume {RUN_ID}")
     verify_eval_tag(EVAL)
     verify_semantic_tag(SEMANTIC, ["SQL-L0.yaml", "SQL-L1.yaml"], root=ROOT, contexts_dir=R.CONTEXTS)
     questions = load_questions(lang="zh")
@@ -188,7 +217,7 @@ def main(argv=None):
     print(json.dumps(pre, ensure_ascii=False, indent=2))
     if pre["estimated_total_with_deduction_cny"] > BUDGET:
         print(f"STOP: combined estimate exceeds the {BUDGET} CNY design ceiling; ask user")
-        return 2
+        return 5
     if args.dry_run:
         return 0
     verify_harness()
@@ -201,12 +230,13 @@ def main(argv=None):
     data = Path(os.environ["SEMDEBT_DATA_DIR"])
     if not ROOT.resolve().is_relative_to(data.resolve()):
         raise ValueError("paid U2 collection requires a tagged runtime checkout under SEMDEBT_DATA_DIR so detailed logs stay private")
-    verify_prior_spend(data)
-    verify_discarded_spend(data)
-    guard = ConcurrentSpendGuard(data / "runs-raw" / args.run_id / "spend-ledger.jsonl", RUN_BUDGET, MODEL, pre["max_call_cost_cny"])
-    if guard.reached:
-        print("STOP: saved admission ledger is closed")
-        return 3
+    lock = (data / "runs-raw" / RUN_ID / "collector.lock").open("a")
+    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    resume_logs(data)
+    if logged_cost() > BUDGET:
+        return 5
+    if stopped_permanently():
+        return 4
     copy = data / "chdb-t29"
     if not copy.is_dir():
         raise ValueError("missing independent T29 chDB copy")
@@ -217,15 +247,18 @@ def main(argv=None):
         if not result.ok:
             raise ValueError("database precheck failed; build the frozen L0 views on the private copy before paid collection")
     common = ["--run-id", args.run_id, "--model", MODEL, "--reps", "3", "--concurrency", "8",
-              "--budget", str(RUN_BUDGET), "--max-call-cost", str(pre["max_call_cost_cny"]),
-              "--semantic-tag", SEMANTIC, "--eval-tag", EVAL, "--skip-judge", "--est-from-args", "--stop-on-error", "--require-spend-reservation",
+              "--semantic-tag", SEMANTIC, "--eval-tag", EVAL, "--skip-judge", "--est-from-args",
               "--questions", ",".join(pre["qids"]), "--expected-fingerprint", FINGERPRINT]
     for row in pre["rows"]:
         result = R.main(common+["--cell", row["cell"], "--est-fix-rate", str(row["observed_fix_rate"]),
                                "--est-output-tokens", str(row["estimated_output_tokens"]),
-                               "--est-hit-ratio", str(row["observed_cache_hit_ratio"])], spend_guard=guard)
-        if result:
-            return result
+                               "--est-hit-ratio", str(row["observed_cache_hit_ratio"])])
+        if logged_cost() > BUDGET:
+            return 5
+        if stopped_permanently():
+            return 4
+        if result or len(R.done_pairs(R.log_path(RUN_ID, row["cell"]))) != 294:
+            return 1  # The detached wrapper repeats the same command, filling missing pairs only.
     return 0
 
 
