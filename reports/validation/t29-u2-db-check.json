@@ -1,0 +1,8 @@
+{
+  "semantic_tag": "semantic-v1.2",
+  "sql_sha256": "ab924518f8107fa50142333b38672a4367a15e072a89d3415510b4654d34baa3",
+  "database_copy": "SEMDEBT_DATA_DIR/chdb-t29",
+  "views": 25,
+  "column_row_fingerprint_check": "passed",
+  "failures": []
+}

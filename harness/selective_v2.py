@@ -9,6 +9,7 @@ from harness import prompt as P
 
 THRESHOLDS = {1: "50%", 3: "75%", 5: "83%", 10: "91%", 20: "95%", 100: "99%"}
 CONFIDENCE_RULE = "作答格式仍按上述要求；作答时另起一行输出「把握：0–100」，用0到100之间的数表示你判断本次答对的概率。只输出一个把握值。只输出 CANNOT_ANSWER 时不需要把握行。"
+U2_CONFIDENCE_RULE = CONFIDENCE_RULE + "有作答时，把握行必须放在整份回复的最后一行。"
 OLD_FOUR = "4. 如果根据语义上下文无法回答这个问题，只输出 CANNOT_ANSWER，不要输出其他内容。"
 NEW_FOUR = "4. 无法回答或没有把握时只输出 CANNOT_ANSWER"
 GATES = (50, 75, 90)
@@ -23,6 +24,11 @@ def scoring_rule(k: int) -> str:
 
 
 def system_variant(base: str, variant: str, k: int | None) -> str:
+    if variant == "uncertainty":
+        if k not in (None, 10) or base.count(OLD_FOUR) != 1:
+            raise ValueError("U2 requires the frozen fourth instruction and k=None or 10")
+        system = base.replace(OLD_FOUR, NEW_FOUR) + "\n" + U2_CONFIDENCE_RULE + "\n"
+        return scoring_rule(k)+"\n\n"+system if k is not None else system
     if variant == "front":
         if base.count(OLD_FOUR) != 1:
             raise ValueError("the frozen fourth instruction changed")
@@ -32,6 +38,30 @@ def system_variant(base: str, variant: str, k: int | None) -> str:
             raise ValueError("confidence variant must not include a scoring rule")
         return base + "\n" + CONFIDENCE_RULE + "\n"
     raise ValueError(f"unknown selective variant: {variant}")
+
+
+def u2_confidence_record(content: str, final: dict) -> dict:
+    parsed = confidence_record(content, final)
+    value = parsed["value"]
+    if parsed["native_refusal"]:
+        status, value = "native_refusal", None
+    elif value is not None:
+        status = "valid"
+    else:
+        lines = re.findall(r"^\s*把握\s*[:：](.*?)$", content, re.MULTILINE)
+        status = "missing" if not lines or (len(lines) == 1 and not lines[0].strip()) else "duplicate" if len(lines) > 1 else "invalid_format"
+        if len(lines) == 1:
+            try:
+                number = float(lines[0].strip())
+            except ValueError:
+                pass
+            else:
+                if not math.isfinite(number) or not 0 <= number <= 100:
+                    status = "out_of_range"
+    # Missing confidence does not turn an attempted answer into native refusal.
+    return {"value": value, "status": status, "format_error": parsed["format_error"],
+            "native_refusal": parsed["native_refusal"],
+            "gate90": {"answered": not parsed["native_refusal"] and value is not None and value >= 90}}
 
 
 def confidence_record(content: str, final: dict) -> dict:
