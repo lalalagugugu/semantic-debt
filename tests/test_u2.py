@@ -29,7 +29,10 @@ def test_u2_combines_only_fourth_instruction_and_confidence(tmp_path, monkeypatc
         assert R.system_for(penalty) == scoring_rule(10)+"\n\n"+treatment
         assert penalty.selective_k == 10 and penalty.context == cell.context
         assert penalty.allowed == cell.allowed and penalty.name not in CELLS
-    assert U.BUDGET == 30 and len(U2_CELLS) == 4
+    assert U.BUDGET == 40 and len(U2_CELLS) == 4
+    assert list(U.COLLECTION_CELLS) == ["SQL-L0", "SQL-L1", "SQL-L0-u2", "SQL-L1-u2", "SQL-L0-u2p", "SQL-L1-u2p"]
+    assert U.TAG == "harness-u2-v3"
+    assert all(U.COLLECTION_CELLS[base] is CELLS[base] for base in ("SQL-L0", "SQL-L1"))
 
 
 def test_u2_scope_contains_both_halves_and_never_judge_or_low():
@@ -85,13 +88,13 @@ def test_refusal_and_confidence_are_independent_conclusions():
     baseline = {f"Q{i}": [i >= 2]*3 for i in range(4)}
     rows = [dict(qid=q, rep=rep, refused=False, correct=i < 2, confidence=95 if i < 2 else 10)
             for i, q in enumerate(baseline) for rep in (1, 2, 3)]
-    result = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=4, draws=100)
+    result = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=4, draws=100)
     assert result["refusal_conclusion"] == "该单元未见取舍"
     assert result["refusal_error_difference"] is None and result["refusal_error_difference_ci"] is None
     assert result["confidence_success"] and not result["refusal_success"]
     rows = [dict(qid=q, rep=rep, refused=i < 2, correct=i == 2, confidence=None if i < 2 else 70)
             for i, q in enumerate(baseline) for rep in (1, 2, 3)]
-    result = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=4, draws=100)
+    result = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=4, draws=100)
     assert result["refusal_success"] and not result["confidence_success"]
     assert result["auc"] == .5 and result["refusal_error_difference_ci"] == [1, 1]
 
@@ -107,7 +110,7 @@ def test_refusal_uses_per_question_baseline_mean_and_cluster_bootstrap(monkeypat
         assert all(len({counts[q, rep] for rep in (1, 2, 3)}) == 1 for q in baseline)
         return original(sample, errors)
     monkeypatch.setattr(A, "_difference", check_clusters)
-    result = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=2, draws=50)
+    result = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=2, draws=50)
     assert result["refusal_error_difference"] == pytest.approx(.2)
     assert result["bootstrap"]["unit"] == "question"
 
@@ -117,25 +120,25 @@ def test_auc_uses_treatment_content_labels_and_missing_is_not_zero():
     rows = [dict(qid=q, rep=rep, refused=False, correct=q == "Q1",
                  confidence=None if rep == 3 else 95 if q == "Q1" else 50)
             for q in baseline for rep in (1, 2, 3)]
-    result = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=2, draws=100)
+    result = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=2, draws=100)
     assert result["auc"] == 1 and result["confidence_missing"] == 2
     assert result["gate90"]["coverage"] == pytest.approx(2/6)
     assert result["gate90"]["accuracy_answered"] == 1
     with pytest.raises(ValueError, match="D1"):
-        A.analyze_cell(rows, baseline, expected_questions=2)
+        A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", expected_questions=2)
     with pytest.raises(ValueError, match="scope incomplete"):
-        A.analyze_cell(rows[:-1], baseline, d1_complete=True, expected_questions=2)
+        A.analyze_cell(rows[:-1], baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=2)
 
 
-def test_u2_unexpected_warmup_error_stops_before_other_attempts(tmp_path):
-    cell = U2_CELLS["SQL-L0-u2"]
+@pytest.mark.parametrize("cell", [U2_CELLS["SQL-L0-u2"], CELLS["SQL-L0"]])
+def test_u2_unexpected_warmup_error_stops_before_other_attempts(tmp_path, cell):
     ctx = SimpleNamespace(run_id="synthetic", cell=cell, boundary=R.CallBoundary(None, allow_peak=True))
     calls = []
     def fail(ctx, q, rep):
         calls.append(q.qid)
         raise TypeError("synthetic startup failure")
     qs = [Question(f"Q{i}", "synthetic", None, None) for i in range(3)]
-    path = R.run_cell(ctx, qs, 1, 8, runs_root=tmp_path, progress=lambda *a: None, attempt=fail)
+    path = R.run_cell(ctx, qs, 1, 8, runs_root=tmp_path, progress=lambda *a: None, attempt=fail, stop_on_error=True)
     assert calls == ["Q0"] and ctx.boundary.stopped.is_set()
     assert json.loads(path.read_text())["status"] == "harness_error"
 
@@ -144,13 +147,13 @@ def test_five_percent_boundary_and_all_refused_are_not_misinterpreted():
     baseline = {f"Q{i}": [i != 0]*3 for i in range(20)}
     rows = [dict(qid=q, rep=rep, refused=q == "Q0", correct=rep != 1, confidence=80)
             for q in baseline for rep in (1, 2, 3)]
-    exactly = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=20, draws=40)
+    exactly = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=20, draws=40)
     assert exactly["refusal_rate"] == .05 and exactly["refusal_error_difference"] == 1
     rows[2] = {**rows[2], "refused": False}
-    below = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=20, draws=40)
+    below = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=20, draws=40)
     assert below["refusal_rate"] < .05 and below["refusal_error_difference"] is None
     rows = [{**r, "refused": True, "confidence": None, "correct": None} for r in rows]
-    all_refused = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=20, draws=40)
+    all_refused = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=20, draws=40)
     assert all_refused["refusal_conclusion"] == "无法比较" and all_refused["auc"] is None
 
 
@@ -158,7 +161,7 @@ def test_equal_baseline_error_rates_do_not_succeed_due_to_roundoff():
     baseline = {f"Q{i}": [True, True, False] for i in range(20)}
     rows = [dict(qid=q, rep=rep, refused=q == "Q0", correct=rep != 1, confidence=80)
             for q in baseline for rep in (1, 2, 3)]
-    result = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=20, draws=100)
+    result = A.analyze_cell(rows, baseline, baseline_fingerprint=U.FINGERPRINT, treatment_fingerprint=U.FINGERPRINT, baseline_run_id="synthetic", treatment_run_id="synthetic", d1_complete=True, expected_questions=20, draws=100)
     assert result["refusal_error_difference_ci"] == [0, 0] and not result["refusal_success"]
 
 
@@ -184,12 +187,12 @@ def test_paired_penalty_contrast_keeps_matching_clusters_and_direction():
         A.compare_refusal_arms(no_refusals, renamed, d1_complete=True, expected_questions=4)
 
 
-def test_four_cells_dispatch_against_one_30_yuan_budget(tmp_path, monkeypatch):
+def test_six_cells_dispatch_in_order_against_budget_net_of_prior_spend(tmp_path, monkeypatch):
     import hashlib
     from harness.executors import ExecResult
 
     pre = json.loads((U.ROOT / U.PREFLIGHT).read_text())
-    assert len(pre["rows"]) == 4 and pre["first_calls"] == 1176 and pre["budget_ceiling_cny"] == 30
+    assert len(pre["rows"]) == 6 and pre["first_calls"] == 1764 and pre["budget_ceiling_cny"] == 40
     runtime = tmp_path / "runtime"
     stored = runtime / U.PREFLIGHT
     stored.parent.mkdir(parents=True)
@@ -202,15 +205,24 @@ def test_four_cells_dispatch_against_one_30_yuan_budget(tmp_path, monkeypatch):
     monkeypatch.setattr(U, "load_questions", lambda **kw: [])
     monkeypatch.setattr(U, "build_preflight", lambda q: pre)
     monkeypatch.setattr(U, "verify_harness", lambda: None)
+    monkeypatch.setattr(U, "verify_prior_spend", lambda data: None)
+    monkeypatch.setattr(U, "verify_discarded_spend", lambda data: None)
     monkeypatch.setattr(R, "is_peak", lambda *a: False)
     monkeypatch.setattr(U.executors, "default_chdb_path", lambda: "unused")
     monkeypatch.setattr(R, "make_executor", lambda *a: SimpleNamespace(execute=lambda q: ExecResult(rows=[[1]])))
     dispatched = []
-    monkeypatch.setattr(R, "main", lambda argv: dispatched.append(R.parse_args(argv)) or 0)
+    shared = []
+    def dispatch(argv, spend_guard=None):
+        shared.append(spend_guard)
+        dispatched.append(R.parse_args(argv))
+        return 0
+    monkeypatch.setattr(R, "main", dispatch)
     assert U.main(["--execute-approved", "--run-id", "synthetic", "--approved-preflight-sha256",
                    hashlib.sha256(stored.read_bytes()).hexdigest()]) == 0
-    assert [a.cell for a in dispatched] == [[c] for c in U2_CELLS]
-    assert all(a.budget == 30 and a.reps == 3 and a.concurrency == 8 and a.run_id == "synthetic" for a in dispatched)
+    assert [a.cell for a in dispatched] == [[c] for c in U.COLLECTION_CELLS]
+    assert len(shared) == 6 and all(g is shared[0] for g in shared)
+    assert shared[0].path == tmp_path / "runs-raw/synthetic/spend-ledger.jsonl"
+    assert all(a.budget == 38.87107092 and a.reps == 3 and a.concurrency == 8 and a.run_id == "synthetic" and a.stop_on_error and a.require_spend_reservation and a.expected_fingerprint == U.FINGERPRINT for a in dispatched)
 
 
 def test_paid_u2_requires_explicit_approval_flags_and_a_user_tag(monkeypatch):
@@ -222,3 +234,194 @@ def test_paid_u2_requires_explicit_approval_flags_and_a_user_tag(monkeypatch):
     monkeypatch.setattr(U.subprocess, "run", missing_tag)
     with pytest.raises(subprocess.CalledProcessError):
         U.verify_harness()
+
+
+def test_u2_rejects_old_or_mixed_baseline_provenance():
+    for base_fp, treatment_fp, base_run, treatment_run in (
+        (None, None, None, None),
+        ("e72d3c7f663d3e1383b00b3884cb4501", U.FINGERPRINT, "new", "new"),
+        (U.FINGERPRINT, "other", "new", "new"),
+        (U.FINGERPRINT, U.FINGERPRINT, "old", "new"),
+        (U.FINGERPRINT, U.FINGERPRINT, U.PRIOR_RUN, U.PRIOR_RUN),
+        (U.FINGERPRINT, U.FINGERPRINT, U.DISCARDED_RUN, U.DISCARDED_RUN),
+        (U.FINGERPRINT, U.FINGERPRINT, U.ESTIMATE_BASELINE_RUN, U.ESTIMATE_BASELINE_RUN),
+    ):
+        with pytest.raises(ValueError, match="same new run"):
+            A.analyze_cell([], {}, d1_complete=True, baseline_fingerprint=base_fp,
+                           treatment_fingerprint=treatment_fp, baseline_run_id=base_run, treatment_run_id=treatment_run)
+
+
+def test_new_minus_old_baseline_drift_is_paired_and_descriptive():
+    old = {"Q1": [True, False, False], "Q2": [True, True, False]}
+    same = A.compare_baseline_accuracy(old, dict(reversed(list(old.items()))), d1_complete=True,
+                                       expected_questions=2, draws=100)
+    assert same["new_minus_old"] == 0 and same["ci95"] == [0, 0] and same["descriptive_only"]
+    assert "success" not in same
+    new = {q: [True, True, True] for q in old}
+    positive = A.compare_baseline_accuracy(old, new, d1_complete=True, expected_questions=2, draws=100)
+    assert positive["new_minus_old"] == .5 and positive["ci95"] == pytest.approx([1/3, 2/3])
+    reverse = A.compare_baseline_accuracy(new, old, d1_complete=True, expected_questions=2, draws=100)
+    assert reverse["new_minus_old"] == -.5 and reverse["ci95"] == pytest.approx([-2/3, -1/3])
+    assert positive["bootstrap"] == dict(unit="paired_question", draws=100, seed=20261019)
+    with pytest.raises(ValueError, match="D1"):
+        A.compare_baseline_accuracy(old, new, expected_questions=2)
+    with pytest.raises(ValueError, match="scope"):
+        A.compare_baseline_accuracy(old, {"Q1": [True]*3}, d1_complete=True, expected_questions=2)
+    with pytest.raises(ValueError, match="three final"):
+        A.compare_baseline_accuracy(old, {q: [True]*2 for q in old}, d1_complete=True, expected_questions=2)
+
+
+def test_prior_spend_is_settled_verified_and_not_reset(tmp_path, monkeypatch):
+    import hashlib
+    from harness.spend import ConcurrentSpendGuard, SpendLimit
+    ledger = tmp_path / "runs-raw" / U.PRIOR_RUN / "spend-ledger.jsonl"
+    prior = ConcurrentSpendGuard(ledger, 30, U.MODEL, .120675)
+    ticket = prior.begin("SQL-L0-u2", "Q01", 1, 0)
+    usage = dict(prompt_tokens=10, cache_hit_tokens=0, cache_miss_tokens=10, completion_tokens=10)
+    prior.charge(ticket, .006272, usage)
+    evidence = tmp_path / "reports/validation/t29-u2-collection-stop.json"
+    evidence.parent.mkdir(parents=True)
+    evidence.write_text(json.dumps(dict(actual_cost_cny="0.006272",
+                                       spend_ledger_sha256=hashlib.sha256(ledger.read_bytes()).hexdigest())))
+    monkeypatch.setattr(U, "ROOT", tmp_path)
+    U.verify_prior_spend(tmp_path)
+    from decimal import Decimal
+    assert Decimal(str(U.RUN_BUDGET))+U.BUDGET_DEDUCTION == Decimal(40)
+    remaining = ConcurrentSpendGuard(tmp_path / "new-ledger.jsonl", U.RUN_BUDGET, U.MODEL, .120675)
+    remaining.total = U.PRIOR_COST + remaining.limit - remaining.max_call_cost
+    with pytest.raises(SpendLimit):
+        remaining.begin("SQL-L0", "Q01", 1, 0)
+    ledger.write_text(ledger.read_text()+"\n")
+    with pytest.raises(ValueError, match="ledger changed"):
+        U.verify_prior_spend(tmp_path)
+    ledger.write_text(ledger.read_text().rstrip()+"\n")
+    prior.begin("SQL-L0-u2", "Q01", 2, 0)
+    evidence.write_text(json.dumps(dict(actual_cost_cny="0.006272",
+                                       spend_ledger_sha256=hashlib.sha256(ledger.read_bytes()).hexdigest())))
+    with pytest.raises(ValueError, match="unresolved"):
+        U.verify_prior_spend(tmp_path)
+
+
+def test_u2_v3_refuses_reusing_stopped_discarded_or_historical_runs():
+    for run_id in (U.PRIOR_RUN, U.DISCARDED_RUN, U.ESTIMATE_BASELINE_RUN):
+        with pytest.raises(SystemExit):
+            U.main(["--dry-run", "--run-id", run_id])
+
+
+@pytest.mark.parametrize("name", list(U.COLLECTION_CELLS))
+@pytest.mark.parametrize("fault", [None, "auto_guard", "detached_guard", "missing_reservation", "transport_error"])
+def test_each_collection_cell_reserves_before_real_client_dispatch(tmp_path, monkeypatch, name, fault):
+    import io
+    from harness import client as C, questions as QL
+    from harness.executors import ExecResult
+    from harness.spend import ConcurrentSpendGuard
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    monkeypatch.setattr(R, "REPO", tmp_path)
+    monkeypatch.setattr(R, "raw_root", lambda: tmp_path / "raw")
+    monkeypatch.setattr(R, "harness_commit", lambda: "synthetic")
+    monkeypatch.setattr(QL, "eval_commit", lambda: "synthetic")
+    monkeypatch.setattr(R, "system_for", lambda cell: "synthetic system")
+    monkeypatch.setattr(R, "is_peak", lambda *a: False)
+    guard = ConcurrentSpendGuard(tmp_path / "raw/synthetic/spend-ledger.jsonl", U.RUN_BUDGET, U.MODEL, .120675)
+    calls, executions = [], []
+    def execute(sql):
+        executions.append(sql)
+        return (ExecResult(error="synthetic engine error", error_class="engine_error") if len(executions) == 1
+                else ExecResult(rows=[[1]], columns=[dict(name="n", type="UInt64")]))
+    monkeypatch.setattr(R, "make_executor", lambda *a: SimpleNamespace(execute=execute))
+    def urlopen(request, timeout):
+        events = [json.loads(s) for s in guard.path.read_text().splitlines()]
+        assert events[-1]["event"] == "request" and events[-1]["cell"] == name
+        assert events[-1]["request_id"] in guard.outstanding
+        assert events[-1]["turn"] == len(calls)
+        assert len([e for e in events if e["event"] == "request"]) == len(calls)+1
+        assert len([e for e in events if e["event"] == "charge"]) == len(calls)
+        assert guard.dispatch.sent and guard.exposure <= guard.limit
+        calls.append(json.loads(request.data))
+        if fault == "transport_error":
+            raise OSError("synthetic transport failure")
+        payload = dict(model=U.MODEL, system_fingerprint=U.FINGERPRINT,
+                       choices=[dict(message=dict(content="```sql\nSELECT 1\n```\n把握：90"), finish_reason="stop")],
+                       usage=dict(prompt_tokens=10, prompt_cache_hit_tokens=0, prompt_cache_miss_tokens=10,
+                                  completion_tokens=10))
+        return io.BytesIO(json.dumps(payload).encode())
+    monkeypatch.setattr(C.urllib.request, "urlopen", urlopen)
+    if fault == "auto_guard":
+        boundary = R.CallBoundary
+        def capture_boundary(expected, allow_peak, spend):
+            nonlocal guard
+            guard = spend
+            return boundary(expected, allow_peak, spend=spend)
+        monkeypatch.setattr(R, "CallBoundary", capture_boundary)
+    elif fault == "detached_guard":
+        boundary = R.CallBoundary
+        monkeypatch.setattr(R, "CallBoundary", lambda expected, allow_peak, spend: boundary(expected, allow_peak, spend=None))
+    elif fault == "missing_reservation":
+        monkeypatch.setattr(guard, "begin", lambda *a: 1)
+    q = Question("Q_SYNTH", "synthetic question", None, None, meta=dict(split="tuning"))
+    argv = ["--cell", name, "--run-id", "synthetic", "--reps", "1", "--concurrency", "8",
+            "--budget", str(U.RUN_BUDGET), "--max-call-cost", ".120675", "--stop-on-error",
+            "--require-spend-reservation", "--expected-fingerprint", U.FINGERPRINT]
+    result = R.main(argv, load=lambda **kw: [q], spend_guard=None if fault == "auto_guard" else guard)
+    record = json.loads((tmp_path / "runs/synthetic" / f"{name}.jsonl").read_text())
+    if fault in ("detached_guard", "missing_reservation"):
+        assert result == 3 and len(calls) == 0 and not guard.outstanding
+        assert "unused in-flight reservation" in record["error"]
+    elif fault == "transport_error":
+        assert result == 3 and len(calls) == 1 and len(guard.outstanding) == 1
+        assert record["status"] == "api_error"  # No transport retry or silent settlement.
+        with pytest.raises(ValueError, match="unresolved"):
+            ConcurrentSpendGuard(guard.path, U.RUN_BUDGET, U.MODEL, .120675)
+    else:
+        assert result == 0 and len(calls) == 2 and not guard.outstanding and guard.total > 0
+        assert record["status"] == "done" and record["fixed"]
+        events = [json.loads(s) for s in guard.path.read_text().splitlines()]
+        assert [r["event"] for r in events] == ["request", "charge", "request", "charge"]
+        assert [r["turn"] for r in events if r["event"] == "request"] == [0, 1]
+
+
+def test_http_gate_rejects_unreserved_reused_or_other_thread_ticket(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from harness.spend import ConcurrentSpendGuard, SpendLimit
+
+    guard = ConcurrentSpendGuard(tmp_path / "ledger.jsonl", 1, U.MODEL, .1)
+    with pytest.raises(SpendLimit, match="unused in-flight"):
+        guard.before_dispatch()
+    ticket = guard.begin("SQL-L0", "Q_SYNTH", 1, 0)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        with pytest.raises(SpendLimit):
+            pool.submit(guard.before_dispatch).result()
+    guard.before_dispatch()
+    with pytest.raises(SpendLimit):
+        guard.before_dispatch()
+    guard.charge(ticket, .01, dict(prompt_tokens=10, cache_hit_tokens=0, cache_miss_tokens=10, completion_tokens=10))
+    with pytest.raises(SpendLimit):
+        guard.before_dispatch()
+
+
+def test_budget_deduction_reserves_unknown_cost_without_claiming_settlement():
+    from decimal import Decimal
+
+    assert U.CONSOLE_REPORTED_COST == Decimal("0.28")
+    assert U.CONFIRMED_COST == Decimal("0.16352908")
+    assert U.UNCONFIRMED_CALLS*U.PRIOR_MAX_CALL_COST == Decimal("0.965400")
+    assert U.BUDGET_DEDUCTION == max(Decimal("0.28"), Decimal("1.12892908"))
+    assert U.RUN_BUDGET == 38.87107092
+
+
+@pytest.mark.parametrize("missing", ["--budget", "--max-call-cost"])
+def test_required_reservation_configuration_fails_before_client(tmp_path, monkeypatch, missing):
+    from harness import client as C
+
+    monkeypatch.setattr(R, "system_for", lambda cell: "synthetic system")
+    monkeypatch.setattr(R, "is_peak", lambda *a: False)
+    def forbidden_client(*args, **kwargs):
+        pytest.fail("client must not be constructed without reservation configuration")
+    monkeypatch.setattr(C, "DeepSeekClient", forbidden_client)
+    args = ["--cell", "SQL-L0", "--run-id", "synthetic", "--budget", "1", "--max-call-cost", ".1",
+            "--require-spend-reservation"]
+    i = args.index(missing)
+    del args[i:i+2]
+    q = Question("Q_SYNTH", "synthetic question", None, None)
+    assert R.main(args, load=lambda **kw: [q]) == 2

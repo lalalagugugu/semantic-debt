@@ -74,9 +74,10 @@ def compare_refusal_arms(unpenalized, penalty, *, d1_complete=False, draws=10_00
                 ci95=_interval(boot), bootstrap=dict(unit="paired_question", draws=draws, seed=seed))
 
 
-def analyze_cell(attempts, baseline, *, d1_complete=False, draws=10_000,
+def analyze_cell(attempts, baseline, *, baseline_fingerprint=None, treatment_fingerprint=None,
+                 baseline_run_id=None, treatment_run_id=None, d1_complete=False, draws=10_000,
                  seed=20261019, expected_questions=98):
-    """One cell, exactly three attempts per question; baseline holds three D1 bools.
+    """One cell, exactly three attempts per question; same-run baseline holds three D1 bools.
 
     The caller must supply final D1 content labels for the baseline and the
     same adjudication for treatment answers. No sampled/extrapolated labels.
@@ -84,6 +85,11 @@ def analyze_cell(attempts, baseline, *, d1_complete=False, draws=10_000,
     """
     if not d1_complete:
         raise ValueError("analysis waits for completed D1 full content adjudication")
+    if (baseline_fingerprint != "bc19ba97cbe016479903222bb1578db6"
+            or treatment_fingerprint != baseline_fingerprint or not baseline_run_id
+            or baseline_run_id != treatment_run_id
+            or baseline_run_id in ("20261030-T29-u2-01", "20261030-T29-u2-v2-01", "20261018-T13-sql-direct-01")):
+        raise ValueError("U2 baseline and treatment must come from the same new run and approved fingerprint")
     if draws <= 0 or len(baseline) != expected_questions:
         raise ValueError("invalid bootstrap or question scope")
     if any(len(v) != 3 or any(type(x) is not bool for x in v) for v in baseline.values()):
@@ -146,3 +152,27 @@ def analyze_cell(attempts, baseline, *, d1_complete=False, draws=10_000,
                             accuracy_answered=sum(r["correct"] for r in gate90)/len(gate90) if gate90 else None),
                 bootstrap=dict(unit="question", draws=draws, seed=seed,
                                difference_valid=len(differences), auc_valid=len(aucs)))
+
+
+def compare_baseline_accuracy(old, new, *, d1_complete=False, draws=10_000,
+                              seed=20261019, expected_questions=98):
+    """Descriptive new-minus-old baseline accuracy drift, paired by question.
+
+    Each value is the three final content verdicts; no success threshold.
+    These historical labels never feed the U2 refusal criterion.
+    """
+    if not d1_complete:
+        raise ValueError("analysis waits for completed D1 full content adjudication")
+    if draws <= 0 or len(old) != expected_questions or set(old) != set(new):
+        raise ValueError("paired baseline scope incomplete")
+    if any(len(v) != 3 or any(type(x) is not bool for x in v) for data in (old, new) for v in data.values()):
+        raise ValueError("baselines require three final content verdicts per question")
+    qids = sorted(old)
+    differences = {q: sum(new[q])-sum(old[q]) for q in qids}
+    rng = random.Random(seed)
+    boot = [sum(differences[q] for q in rng.choices(qids, k=len(qids)))/(3*len(qids)) for _ in range(draws)]
+    return dict(questions=len(qids), attempts_per_baseline=3*len(qids),
+                old_accuracy=sum(sum(v) for v in old.values())/(3*len(qids)),
+                new_accuracy=sum(sum(v) for v in new.values())/(3*len(qids)),
+                new_minus_old=sum(differences.values())/(3*len(qids)), ci95=_interval(boot),
+                descriptive_only=True, bootstrap=dict(unit="paired_question", draws=draws, seed=seed))

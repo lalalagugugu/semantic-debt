@@ -60,6 +60,6 @@ cards:
   - {id: T26,  owner: claude, mode: open,          repo: main, card: tasks/T26-ontology-validation.md, after: G3, note: "L3a 本体质量校验：语法、推理、建模、SHACL、数据回测；免费；跨厂商"}
   - {id: T27,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T27-combo-conflict-check.md, note: "叠加单元（L1+ + 调优 + 指令）冲突核对；免费；运行等用户"}
   - {id: T28,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T28-midterm-v3-data.md, note: "中期报告 v3 补数：只用现有日志，免费；协调会话重算验收"}
-  - {id: T29,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T29-selective-answering.md, note: "会取舍（+1/−k/0，k=1、3）与声明假设的服务层单元；扩展169次完成1.76856564元、v2筛选无达标；D/B2完成，等内容口径复算后再定正式；续项U2预登记，L0/L1两臂各98×3，合计30元设计上限、预算/出站已批、等合并及用户tag"}
+  - {id: T29,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T29-selective-answering.md, note: "会取舍（+1/−k/0，k=1、3）与声明假设的服务层单元；扩展169次完成1.76856564元、v2筛选无达标；D/B2完成，等内容口径复算后再定正式；续项U2预登记，L0/L1两臂各98×3，v1停于指纹变化，0.006272元已结算；v2补同指纹原样L0/L1新基线，v2预算漏洞32作答废弃；v3六单元统一账本/HTTP预留修复与逐单元集成测试，扣除1.12892908元后额度38.87107092元，等协调复审/用户tag，从头采集；分析等D1"}
   - {id: T30,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T30-combo-cell.md, note: "叠加单元 L1+ + 调优（去掉 T27 的 12 条冲突）+ 作答要求；≤6 元待用户批"}
   - {id: T31,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T31-reference-and-presentation-review.md, note: "可疑参考答案集中核对 + 呈现差异逐类盘点（是否进一步放宽评分）；免费，只读题库"}
