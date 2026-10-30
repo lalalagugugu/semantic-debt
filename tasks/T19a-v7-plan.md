@@ -69,3 +69,15 @@
 | U1 | 不做 |
 | U2 | 修复 PR #215；采集后还要全量判定 1,764 次；不挡 v7 |
 | 许可核查 | 未做 |
+
+## 六、写作会话启动说明（2026-10-31）
+
+v7 由一个新的 Claude Code 写作会话起草（普通模式，`scripts/start-card.sh T19a`），协调会话继续管 D1、U2 和审稿。
+
+1. 先读 `AGENTS.md`、本文件、`decisions/2026-10-30-midterm-v7-plan.md`、`decisions/2026-10-31-series-wrap-up.md`。
+2. 通读 v6 全文，包括 `[yh:]` 批注、删除线和用户新加的字。方法：`read` 正文 node，`projection: "outline"` 拿块 id；再用 `{"kind":"search","blocks":{"first":…,"last":…}}` 按节读。短 id 的前缀取它上方最近的完整 id。批注是写作要求，不进 v7。
+3. v7 开新 tab「中期报告 v7」，v6 不动。先建骨架，再一节一节写，每写完一节给用户一行进度。
+4. 数字：用分支 `origin/T31-v7-data` 的 accuracy-v5 候选值（`reports/results/accuracy-v5.md`、`accuracy-v5-cells.csv`、`accuracy-v5-comparisons.csv`、`t31-v7-followups.md`）。文首注明「数字为候选，D1 定稿后统一替换」。同时在本地维护一张「数字—出处」清单，供定稿替换和 Codex 复核；不要在正文留【待补】。结论只写定稿后也不会翻的：差只有一两次作答的比较，一律写「看不出差别」，不写谁高谁低。
+5. L1c 对照和 D3、D5、D7 的素材在 `$SEMDEBT_DATA_DIR/v7-eval-20261030/report.md`、`discoverability-review.md`（含题面，不进仓库；读不到时请用户 `/add-dir` 这个目录）。
+6. 第 10 节不含 U2。第 11 节不写。模型角色里 Codex 型号等用户确认。
+7. 不改冻结内容，不调用模型 API，不执行 SQL。仓库里不放题面。

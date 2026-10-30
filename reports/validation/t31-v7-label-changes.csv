@@ -1,0 +1,14 @@
+source,cell,qid,rep,old_label,new_label,reason
+existing_sample,SQL-L2-E,Q18,1,内容错误,内容正确,完整无LIMIT明细逐行明示分组，直接相加一致
+existing_sample,SQL-L1,Q47,2,内容错误,内容正确,完整各组总量和次数可无歧义推出所问均值
+existing_sample,SQL-L0,Q60,2,内容错误,内容正确,所问部门人数已明示，辅助部门另列
+census_first_pass,SQL-L3a,Q37,2,内容正确,内容错误,全表百分位有实质偏差，超过舍入误差
+census_first_pass,JSON-L2,Q34,3,内容错误,内容正确,产品编码逐一对应，完整周转率核验一致
+census_first_pass,JSON-L2,Q65,1,内容错误,内容正确,用户裁决：源数据空姓名不罚，逐行金额一致
+census_first_pass,JSON-L2,Q65,2,内容错误,内容正确,用户裁决：源数据空姓名不罚，逐行金额一致
+census_first_pass,JSON-L2,Q65,3,内容错误,内容正确,用户裁决：源数据空姓名不罚，逐行金额一致
+census_first_pass,SQL-L2-E,Q65,1,内容错误,内容正确,用户裁决：源数据空姓名不罚，逐行金额一致
+census_first_pass,SQL-L2,Q65,1,内容错误,内容正确,同标准全扫：源数据空姓名不罚，逐行金额一致
+census_first_pass,SQL-L2,Q65,2,内容错误,内容正确,同标准全扫：源数据空姓名不罚，逐行金额一致
+census_first_pass,SQL-L1c,Q112,1,内容错误,内容正确,全表编码人数及缺口一致，名称编码差异不罚
+census_first_pass,SQL-R,Q112,3,内容错误,内容正确,全表编码人数及缺口一致，名称编码差异不罚
