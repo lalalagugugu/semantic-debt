@@ -361,6 +361,8 @@ def _save_numbered(path: Path, payload: bytes) -> str:
                 out.write(payload)
             return sha256(payload)
         except FileExistsError:
+            if target.read_bytes() == payload:  # the same response saved again: nothing new to keep
+                return sha256(payload)
             index += 1
 
 
@@ -398,7 +400,7 @@ def _turn_record(ctx: RunContext, q: Question, rep: int, turn: int, reply: Reply
         "usage": reply.usage,
         "latency_s": round(reply.latency_s, 3),
         "transport_retries": reply.transport_retries,
-        "raw_sha256": saved[0] if saved else sha256(reply.raw),  # _chat already saved the response.
+        "raw_sha256": saved[0] if saved else _save_raw(ctx, q, rep, turn, reply),
     }
 
 
