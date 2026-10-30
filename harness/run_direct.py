@@ -601,7 +601,7 @@ def backfill_cell(ctx: RunContext, questions: list[Question], pairs: list[tuple[
 
 def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency: int,
              runs_root: Path | None = None, progress=print, guard: FingerprintGuard | None = None,
-             attempt=None, only: set[tuple[str, int]] | None = None) -> Path:
+             attempt=None, only: set[tuple[str, int]] | None = None, stop_on_error: bool = False) -> Path:
     """Run every missing (question, rep) of one cell.
 
     The first attempt runs alone so that it writes the prefix cache before the
@@ -629,9 +629,9 @@ def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency:
         except Exception as exc:  # recorded, never swallowed
             record = {"run_id": ctx.run_id, "cell": ctx.cell.name, "qid": qid, "rep": rep,
                       "status": "harness_error", "error": f"{type(exc).__name__}: {exc}"[:500]}
-        if (ctx.cell.selective_variant == "uncertainty" and ctx.boundary is not None
+        if ((stop_on_error or ctx.cell.selective_variant == "uncertainty") and ctx.boundary is not None
                 and record["status"] not in ("done", "stopped")):
-            ctx.boundary.reason = f"U2 attempt stopped: {record['status']}"
+            ctx.boundary.reason = f"attempt stopped: {record['status']}"
             ctx.boundary.stopped.set()
         with lock:
             out.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -847,6 +847,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--max-call-cost", type=float,
                     help="T29 concurrent admission: maximum estimated CNY per in-flight request")
     ap.add_argument("--allow-peak", action="store_true", help="allow starting in DeepSeek peak hours")
+    ap.add_argument("--stop-on-error", action="store_true", help="stop admission on any attempt API/harness failure")
     ap.add_argument("--expected-fingerprint", help="stop on any differing or missing response fingerprint")
     ap.add_argument("--est-output-tokens", type=int, default=3000)
     ap.add_argument("--est-fix-rate", type=float, default=0.10)
@@ -1036,7 +1037,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
                          timeout_s=args.exec_timeout, raw_dir=raw_root() / args.run_id / cell.name,
                          limits={"max_result_rows": DEFAULT_MAX_RESULT_ROWS, "max_memory_bytes": DEFAULT_MAX_MEMORY_BYTES},
                          eval_tag=args.eval_tag, semantic_tag=args.semantic_tag, boundary=boundary)
-        path = run_cell(ctx, per_cell[cell.name], args.reps, args.concurrency, guard=guard)
+        path = run_cell(ctx, per_cell[cell.name], args.reps, args.concurrency, guard=guard, stop_on_error=args.stop_on_error)
         print(json.dumps(summarize(path), ensure_ascii=False, indent=2))
         if boundary.stopped.is_set():
             print(f"STOP: {boundary.reason}")
