@@ -117,13 +117,16 @@ def main():
         row(name, l, r, n, signed(d), f"[{signed(lo)}, {signed(hi)}]")
 
     print("\n覆盖外（标注为答不了的题）的作答结果，按内容判定：\n")
-    row("单元", "覆盖外作答", "拒答", "给出结果", "内容对", "内容错或执行失败")
-    row(*["---"] * 6)
+    row("单元", "覆盖外作答", "拒答", "给出结果", "内容对", "内容错", "执行失败")
+    row(*["---"] * 7)
     for c, qids in (("JSON-L2", cov37), ("SQL-L1.5S", cov42)):
         out = [r for r in data[c] if r["qid"] not in qids]
         ref = sum(r["historical_outcome"] == "refused" for r in out)
+        res = sum(r["has_result"] for r in out)
         ok = sum(r["content_correct"] for r in out)
-        row(c, len(out), ref, len(out) - ref, ok, len(out) - ref - ok)
+        fail = sum(r["historical_outcome"] == "exec_error" for r in out)
+        assert ref + res + fail == len(out), c
+        row(c, len(out), ref, res, ok, res - ok, fail)
 
     print("\n## 第 8 节：叠加相关比较\n")
     row("题集", "左", "右", "题数", "差值", "95% 区间")
