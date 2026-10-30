@@ -52,3 +52,15 @@
 ## 仓库外的私有材料（云端会话读不到）
 
 `$SEMDEBT_DATA_DIR/` 下：`t31-reference-check-20261028/`（五题对照页，含题面）、`recompute_eval_v13_refs.py`、`eval-v1.3-recompute-handoff.md`、`t31-final-review-list-strict.json`、`t31-residual-review-materials.json`。需要这些的工作，写成给 Codex 的消息，由用户转发。
+
+## L1c 与 L1 对比的素材（Codex 2026-10-29 整理，供报告第 4 节）
+
+- **条目性质不同，不能写成覆盖率**：L1c 的 13 条是写给 agent 的混合规则，含业务口径（产品价格用标价、库存取最新快照、按客户所在地）、查询写法（去重客户用 countDistinct、Top N 截断）、结果形式（总额返回一行、周末/工作日比较输出百分比列）。我们的 15 条（`semantic/conventions.md`）主要是业务与数据口径，没有展示要求（展示要求在系统作答要求里）。两者有交叉，谁也不包含谁。
+- **按主题对齐的 15 项**（L1c 看整份文档）：默认渠道、门店与全渠道、时间基准、不同日子比较（节假日日均；周末/工作日两边表述不同）、地理口径、币种、销售/净额/毛利（L1 多写了销售额已扣折扣未扣退货、净销售额定义）、订单与客单价、产品价格与利润率、无折扣交易（促销键 1）、库存（L1 多写门店×产品粒度）、计划与销售目标（L1 多写正式目标取预算场景、达成率公式、收入科目）、客户活跃分层、新客（L1 多写截止日前 90 天首次购买及截止日规则）、同店（两边写法相同，而它正是后来发现的 14 个歧义之一，适合「卖关子」）。
+- **枚举**：L1c 两张表 11 行（字符串枚举 5 行 + 隐含默认值 6 行），逐值展开为 16 个取值/键值；L1 是 77 个字段、568 个 value—meaning 条目，部分附频次、默认口径、字段写法差异与脏数据提醒（如客户性别 M/F 对员工表 Male/Female；颜色 Blue 148 个产品、blue 2 个且为同色、Silver Grey 不是 Silver/Grey 的子集）。568 不是 568 个互不重复的概念；L1c 正文另有少量枚举说明，16 也不是它全文总量。
+- **待核实的矛盾**：科目键 L1c 写 `AccountKey=50` 为 Sales Amount，L1 写收入科目 `Sale Revenue` 键 4。
+- 出处：题库 `vendor/cube/fixtures/semantic_layer.md`（约第 38、124 行）；主仓库 `semantic/conventions.md`、`semantic/source.yaml`（字段说明约第 343 行起）。
+
+## 读 Claude Docs 长文的方法
+
+v6 全文一次 `view` 会超出单次返回上限，存到的临时文件在沙箱里读不到。改用 `search` + `blocks: {first, last}` 按章节分段读（先用 `projection: "outline"` 拿到各章节首块 id；`last` 必须是块 id，不能是字符 id）；读用户改动用 `view` + `sinceRev`，同样可能超长，分段即可。
