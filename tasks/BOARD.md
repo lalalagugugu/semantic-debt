@@ -50,7 +50,7 @@
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：中期报告写在 Claude Docs（见 `tasks/COORDINATION-HANDOFF.md`），最新稿 v6（准确率版，数字已复核），用户已批注待通盘处理；PR #149 草稿已过时可关 |
 | T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **完成**（#153，2026-10-23）：117 条，Flash 4.42 元；类别 κ 0.70、根因 κ 0.37；根因 3（模型没理解）11%–46%；两家都判根因 5 的 26 条 / 15 题待题库负责方核对（`reports/results/l1-error-attribution.md`） |
 | T19c | 模型知不知道自己会不会（`tasks/T19c-abstention-signals.md`，2026-10-23 改写）：隐含信号 + 自评把握的校准，判定规则先写死 | Claude Code | 普通 | T13 SQL-L1 最终日志 | 5 元（Flash；`decisions/2026-10-23-l1plus-l3a.md` 第四节） | **完成**（2026-10-23，实花 1.02 元）：思考 token AUC 0.755（参照）；自评把握判定「介于两者之间」，不建议新单元。报告 `reports/results/confidence-calibration.md`；待 PR 合并 |
-| T31 | 可疑参考答案核对与呈现差异盘点（`tasks/T31-reference-and-presentation-review.md`） | Codex | 主仓库 clone（只读题库） | T22b、T28 | 0 | **完成**（2026-10-28）：R1–R11 用户审定、303 次放行独立复核全过（#195）；残余抽样 200 次两家判定 200/200 一致（#194、#197、#199）；五题参考修正为题库 eval-v1.3=5b65e0c（题库 #22）；全单元双口径重算 #200，跨厂商核对 #201 |
+| T31 | 可疑参考答案核对与呈现差异盘点（`tasks/T31-reference-and-presentation-review.md`） | Codex | 主仓库 clone（只读题库） | T22b、T28 | 0 | v4 **完成**（#195、#194、#197、#199、题库 #22、#200、#201）；2026-10-30 按 #206 追加 v7：1,411 次残余全判、accuracy-v5 与 D4/D6/D8 首轮完成；九个关键单元 423 次待 Claude Code 独立复核、分歧交用户，待用户合并 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
 ## 2026-10-22 刷新：第一期 SQL 线运行完成
