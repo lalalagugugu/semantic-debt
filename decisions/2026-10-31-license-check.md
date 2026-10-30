@@ -1,0 +1,26 @@
+# 2026-10-31 公开前的许可核查（协调会话，不是法律意见）
+
+| 材料 | 查到的情况 | 结论 |
+|---|---|---|
+| Cube 基准（100 道题的来源、L1c、`retail_schema.sql`） | 最新提交仍是 `4c37310`（2026-04-26）。README 末尾写「MIT.」，没有 LICENSE 文件，也没有版权声明；GitHub API 的 license 为空 | 可以改写、引用、随项目公开，要注明来源并保留 `vendor/cube/NOTICE.md` 的原话。依据只有 README 一句话，建议公开前请上游补 LICENSE（待用户决定是否开 issue） |
+| 22 道新题、参考答案、语义层、代码 | 我们自己写的 | 公开时由用户选许可证；由 Cube 题改写的部分保留其来源说明 |
+| 数据（Kaggle Cleaned Contoso Dataset） | Kaggle 页标 CC0，是用户 2026-10-14 抄录的（协调会话访问 Kaggle 被拦，未能复查）。上传者不是微软；微软下载页没有任何许可文本 | CC0 只是转载者的声明，来源链不完整。**不分发数据**（现状就是不入库）：给链接、sha256 和导入脚本 |
+| 查询结果片段（作答对照页） | 虚构数据的少量行 | 风险低；对照页只展示作答需要的行，建议限制行数 |
+| DeepSeek 输出 | 条款（2026-04-22 更新）把输出权利转让给用户，允许学术研究等广泛用途；没有明文提及公开评测结果 | 可以公开作答和评测结果 |
+
+报告里的原题示例：Q06 改写自 Cube，要注明；Q104、Q117 是我们新写的。
+
+用户 2026-10-31 确认：Kaggle 页仍标 CC0: Public Domain。
+
+## 待办（用户，公开前做，不挡 v7）
+
+- [ ] 向 Cube 开 issue，请其补 LICENSE 文件，并告知科目键 50 不存在。网页操作：打开 https://github.com/cubedevinc/semantic-layer-benchmark/issues/new ，贴下面的标题和正文，点 Submit。对方补了 LICENSE 就更新 `vendor/cube/NOTICE.md`。
+- [ ] 公开时选许可证（初步建议：代码 MIT，报告和语义层 CC BY 4.0）。
+
+标题：`Add a LICENSE file? Also a possible AccountKey typo`
+
+正文：
+
+> Hi, thanks for publishing this benchmark. The README says "MIT." but the repo has no LICENSE file or copyright line. We adapted some of the questions in a Chinese-language study and plan to publish it with attribution. Could you add a LICENSE file so we can carry the correct notice?
+>
+> Separately, fixtures/semantic_layer.md mentions AccountKey = 50 as the Sales Amount account; in the dataset we downloaded, DimAccount only has keys 1–24 and Sale Revenue is key 4. Might be worth a look.
