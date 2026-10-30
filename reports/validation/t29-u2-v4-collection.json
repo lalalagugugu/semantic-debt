@@ -1,0 +1,190 @@
+{
+  "run_id": "20261031-T29-u2-v3-01",
+  "status": "collection_complete; content adjudication and analysis deferred until final D1",
+  "harness_tags": [
+    "harness-u2-v3",
+    "harness-u2-v4"
+  ],
+  "v4_harness_commit": "2163228a76037d5f12c98b820bf40abb1b71ec8a",
+  "preflight_sha256": "258f97a5f547445af4fb331a714d2d9c8f09e5da243748192176ebca19ca800d",
+  "completed_attempts": 1764,
+  "retained_v3_attempts": 56,
+  "new_v4_completed_attempts": 1708,
+  "duplicate_done_identities": 0,
+  "logged_response_calls": 2112,
+  "logged_http_attempts": 2128,
+  "extra_transport_retries": 14,
+  "raw_transport_retries_field_sum": 16,
+  "new_v4_response_calls": 2053,
+  "new_v4_http_attempts": 2068,
+  "new_v4_extra_transport_retries": 14,
+  "known_logged_usage_cost_cny": "25.65389048",
+  "new_v4_known_usage_cost_cny": "25.01596200",
+  "prior_deduction_cny": "1.12892908",
+  "known_logged_cost_plus_deduction_cny": "26.78281956",
+  "budget_ceiling_cny": 40,
+  "complete_billed_cost_cny": null,
+  "billing_note": "Log usage only; failed HTTP attempts without usage and prior unconfirmed costs are not declared settled; old ledger is archive only",
+  "fingerprints": {
+    "bc19ba97cbe016479903222bb1578db6": 2112
+  },
+  "non_done_statuses": {
+    "api_error": 2,
+    "stopped": 6
+  },
+  "new_v4_non_done_statuses": {
+    "api_error": 1
+  },
+  "unaccounted_harness_errors": [],
+  "rows": [
+    {
+      "cell": "SQL-L0",
+      "completed_attempts": 294,
+      "logged_response_calls": 330,
+      "logged_http_attempts": 331,
+      "extra_transport_retries": 0,
+      "known_usage_cost_cny": "4.65690352",
+      "statuses": {
+        "done": 294,
+        "api_error": 1,
+        "stopped": 6
+      },
+      "execution_error_classes": {
+        "engine_error": 37
+      },
+      "final_execution_error_classes": {
+        "engine_error": 1
+      },
+      "source_log_sha256": "7aacbc8572a1a65bad3eabe575278238d710d3e9d173f1471b51643ddc32621d",
+      "logical_model_calls": 331
+    },
+    {
+      "cell": "SQL-L1",
+      "completed_attempts": 294,
+      "logged_response_calls": 398,
+      "logged_http_attempts": 398,
+      "extra_transport_retries": 0,
+      "known_usage_cost_cny": "2.94925732",
+      "statuses": {
+        "done": 294
+      },
+      "execution_error_classes": {
+        "engine_error": 105
+      },
+      "final_execution_error_classes": {
+        "engine_error": 1
+      },
+      "source_log_sha256": "cf56ddacd8e555b7add289678ea9eddc549707d709b09bef42498f1957f62b46",
+      "logical_model_calls": 398
+    },
+    {
+      "cell": "SQL-L0-u2",
+      "completed_attempts": 294,
+      "logged_response_calls": 327,
+      "logged_http_attempts": 328,
+      "extra_transport_retries": 1,
+      "known_usage_cost_cny": "4.25330400",
+      "statuses": {
+        "done": 294
+      },
+      "execution_error_classes": {
+        "engine_error": 36
+      },
+      "final_execution_error_classes": {
+        "engine_error": 3
+      },
+      "source_log_sha256": "b71bd2ca3a71c1d9787b12ac6c9f748e73e64cf917da486c4e298bfced3950e9",
+      "logical_model_calls": 327
+    },
+    {
+      "cell": "SQL-L1-u2",
+      "completed_attempts": 294,
+      "logged_response_calls": 394,
+      "logged_http_attempts": 408,
+      "extra_transport_retries": 13,
+      "known_usage_cost_cny": "3.16647380",
+      "statuses": {
+        "done": 294,
+        "api_error": 1
+      },
+      "execution_error_classes": {
+        "engine_error": 100
+      },
+      "final_execution_error_classes": {},
+      "source_log_sha256": "2945ee0bc4cf90392951569fe491d5dc30ae18b6117b2a37c4b6e8536cabf550",
+      "logical_model_calls": 395
+    },
+    {
+      "cell": "SQL-L0-u2p",
+      "completed_attempts": 294,
+      "logged_response_calls": 314,
+      "logged_http_attempts": 314,
+      "extra_transport_retries": 0,
+      "known_usage_cost_cny": "6.23668012",
+      "statuses": {
+        "done": 294
+      },
+      "execution_error_classes": {
+        "engine_error": 21
+      },
+      "final_execution_error_classes": {
+        "engine_error": 1
+      },
+      "source_log_sha256": "a5f30879608f2bc8c9ddf6fec3abe2cc372e37f1f4eb9d2942ffcf29b625e519",
+      "logical_model_calls": 314
+    },
+    {
+      "cell": "SQL-L1-u2p",
+      "completed_attempts": 294,
+      "logged_response_calls": 349,
+      "logged_http_attempts": 349,
+      "extra_transport_retries": 0,
+      "known_usage_cost_cny": "4.39127172",
+      "statuses": {
+        "done": 294
+      },
+      "execution_error_classes": {
+        "engine_error": 55
+      },
+      "final_execution_error_classes": {},
+      "source_log_sha256": "f7baae80e747982523edec5325ac6c31809a2c00fe7effc93432f995c5e9ccec",
+      "logical_model_calls": 349
+    }
+  ],
+  "private_console_sha256": "e0216d93f7da3980922b4e04f88466af9b4e9f6c620d11a5835b5b0d59f12b67",
+  "old_ledger_sha256": "20b00014ca3600f786387818f56938d42f9372668e943b9abbd3352427c3dc2c",
+  "public_metadata_sha256": "1becb4604c4271ebee81a96d9cc524f0ebde5bdaded8d13dbe3f125d051f6699",
+  "wrapper_exit_code": 0,
+  "content_adjudication_performed": false,
+  "analysis_performed": false,
+  "logical_model_calls": 2114,
+  "new_v4_logical_model_calls": 2054,
+  "finished_at": "2026-10-31T03:00:28+08:00",
+  "wrapper_entry_rounds": 2,
+  "exit_6_seen": false,
+  "old_ledger_unchanged": true,
+  "api_error_episodes": [
+    {
+      "cell": "SQL-L0",
+      "qid": "Q01",
+      "rep": 2,
+      "category": "Connection reset by peer",
+      "client_error_counter": 1,
+      "prior_complete_turns": 0,
+      "error_type": "URLError"
+    },
+    {
+      "cell": "SQL-L1-u2",
+      "qid": "Q121",
+      "rep": 3,
+      "category": "transport_error",
+      "client_error_counter": 6,
+      "prior_complete_turns": 0,
+      "error_type": "URLError"
+    }
+  ],
+  "verified_response_refs": 2112,
+  "verified_exec_refs": 1984,
+  "failed_logical_calls_without_complete_usage": 2,
+  "all_logged_system_and_version_hashes_verified": true
+}
