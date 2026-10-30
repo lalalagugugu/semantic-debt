@@ -1,6 +1,6 @@
 # T32 开源准备
 
-- 状态：进行中（2026-10-31）。主仓库扫描已完成；题库仓库和原始回包未扫；公开方式待用户定。
+- 状态：进行中（2026-10-31）。两个仓库的历史已扫，没有发现密钥；公开方式已定（`decisions/2026-10-31-publication-choices.md`）；原始回包和 PR 评论未扫。
 - 负责：协调会话统筹；题库侧 Codex；公开操作由用户执行
 - 依赖：`decisions/2026-10-31-series-wrap-up.md`、`decisions/2026-10-31-license-check.md`
 - 预算：0
@@ -12,7 +12,7 @@
 
 | 查什么 | 结果 |
 |---|---|
-| 密钥（DeepSeek/OpenAI 式 `sk-`、GitHub、AWS、Slack、私钥、写死的 Bearer） | 无命中。用的是正则，尚未跑 gitleaks |
+| 密钥（DeepSeek/OpenAI 式 `sk-`、GitHub、AWS、Slack、私钥、写死的 Bearer） | 正则无命中。gitleaks 报 2 处，都是 `runs/20261018-T13-sql-direct-01*/SQL-R.jsonl` 第 202 行模型 SQL 里的 `q.ScenarioKey =`，判定误报 |
 | 被忽略的数据（Parquet、chDB、原始回包、`.env`） | 历史里没有提交过 |
 | 个人信息：本机路径 | `/Users/yuhuang` 共 8 处，都在 `decisions/isolation-check.md` |
 | 个人信息：账号名 | `lalalagugugu` 4 处（`decisions/open-questions.md`、`reports/validation/t16_pr114_claude_review.md`、`reports/validation/t29-b1.md`、`tasks/T22b-l1plus-render-run.md`）；公开后本来可见 |
@@ -22,26 +22,26 @@
 | `docker-compose.yml` | 没有密码 |
 | 仓库体积 | 工作区 939 个文件，GitHub 上约 13.7 MB |
 
-未覆盖：PR 评论和 review、题库仓库、`$SEMDEBT_DATA_DIR`（包括原始回包）。
+未覆盖：PR 评论和 review、`$SEMDEBT_DATA_DIR`（包括原始回包）。gitleaks 不扫合并提交和提交信息。
 
-## 二、待用户决定（协调会话的建议）
+题库侧扫描见题库仓库 PR #23：密钥 0 命中；Cube 100 题都能追溯。主仓库 30 个文件含完整题面或参考 SQL：`runs/` 里是模型写出的 SQL 恰好包含相同字串；测试和 T16 校验文件里的短 SQL 没有逐个核对，题库公开后也无需隐藏；`semantic/tuning/` 和 T4 示例是设计内的调优题，核对 `reports/tuning/leakage-audit.md` 的题号，都不在留出集；`decisions/2026-10-17-semantic-gaps-and-realistic-questions.md` 含 Q14、Q36、Q89 的题面（Q13、Q28 为近似命中），盲模式设置没有禁读这个文件，T22 盲写是否读过待查（第三节）。
 
-| 事项 | 建议 | 理由 | 代价 |
-|---|---|---|---|
-| 主仓库保留历史吗 | 保留，把现有仓库转公开 | 日志里的 `harness_commit`、`semantic-v1` 等 tag 要能对上；历史能证明语义层在看题前已冻结 | 个人邮箱和全部 PR 讨论公开。改写邮箱会改变提交号，日志里的引用就失效了 |
-| 题库和主仓库合并吗 | 不合并，题库单独转公开 | 日志里的 `eval_commit` 指向题库提交，合并要动历史；两库分开也是隔离设计的一部分 | 读者要看两个仓库，README 互相链接 |
-| 原始回包公开范围 | 只放 19 个正式单元，做成 GitHub Release 压缩包，不进仓库 | 仓库日志已有查询和哈希，压缩包供有需要的人核对 | 含思考内容；要先扫密钥并看体积 |
-| 许可证 | 代码 MIT；报告、语义层、日志、题库新题 CC BY 4.0；Cube 改写部分保留其 MIT 说明；数据不分发 | 见许可核查 | — |
+## 二、公开方式
+
+用户已定，见 `decisions/2026-10-31-publication-choices.md`。
 
 ## 三、公开前要做的事
 
-- [ ] gitleaks 扫主仓库（用户跑）
-- [ ] 查原始回包体积（用户跑）
-- [ ] 题库侧扫描：密钥、个人信息、题库外泄（题库侧 Codex）
-- [ ] 用户定第二节四项
-- [ ] 删掉工作区里的本机路径（`decisions/isolation-check.md` 改成 `<home>`；是历史记录，只改路径）
+- [x] gitleaks 扫主仓库（用户跑）
+- [x] 查原始回包体积（用户跑）
+- [x] 题库侧扫描：密钥、个人信息、题库外泄（题库侧 Codex）
+- [x] 用户定第二节四项
+- [x] 删掉工作区里的本机路径（`decisions/isolation-check.md` 改成 `<home>`；是历史记录，只改路径）
 - [ ] 重写 `README.md`：现在写的是「搭建中」。要有结论、报告链接、两库关系、复现步骤、许可证和致谢
-- [ ] 加 `LICENSE`，补 `vendor/cube/NOTICE.md` 的适用范围
+- [x] 主仓库加 `LICENSE`、`LICENSE-CONTENT.md`；`vendor/cube/NOTICE.md` 不用改
+- [ ] 题库仓库：加许可文件，当前文件里的本机路径改成 `<home>`（题库侧 Codex）
+- [ ] 查 T22 盲写是否读过 `decisions/2026-10-17-semantic-gaps-and-realistic-questions.md`（用户跑一条命令）；读过就写进报告局限
+- [ ] 扫 PR 评论和 review（协调会话）
 - [ ] 干净环境复现：新 clone，只靠 README 从下载数据到离线重评一个单元，不调用模型
 - [ ] 作答对照页：静态页面，同一题在各单元的查询、判定和不超过 20 行的结果并排；由脚本从日志和题库生成
 - [ ] 原始回包打包并扫密钥（取决于第二节）
