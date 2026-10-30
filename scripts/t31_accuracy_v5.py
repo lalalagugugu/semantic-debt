@@ -120,6 +120,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--decisions-file',type=Path,help='use a preserved private verdict snapshot')
+    parser.add_argument('--rescan-audit',type=Path,help='validate the full positive-residual rescan against its preserved baseline')
     args = parser.parse_args()
     if Path(args.run_id).name != args.run_id:
         raise ValueError('run-id must be a single directory name')
@@ -131,6 +132,16 @@ def main():
     assert manifest['eval_commit'] == COMMIT
     assert digest(private/'materials.json') == manifest['materials_sha256']
     assert sum(m['scope'] == 'D1' for m in materials) == 1411
+    rescan=None
+    if args.rescan_audit:
+        from scripts.t31_v7_rescan import validate_audit
+        rescan=json.loads(args.rescan_audit.read_text())
+        baseline_path=args.rescan_audit.parent/'baseline-decisions.json'
+        assert digest(baseline_path)==rescan['baseline_decisions_sha256']
+        baseline=json.loads(baseline_path.read_text())
+        checked=validate_audit(materials,baseline,rescan)
+        assert len(checked)==420
+        assert all(decisions[k]['label']==r['label'] for k,r in checked.items())
     base=ROOT/'runs/20261028-T31-v4-rescore-02'
     frozen=json.loads((base/'manifest.json').read_text())
     assert frozen['eval_commit']==COMMIT
@@ -158,6 +169,7 @@ def main():
                  'd4-content-equivalence-audit.json','frozen-context-index.json'):
         source=decisions_file if name=='codex-decisions.json' else private/name
         (snapshots/name).write_bytes(source.read_bytes())
+    if args.rescan_audit:(snapshots/'rescan-audit.json').write_bytes(args.rescan_audit.read_bytes())
     for cell in sorted({r['stratum'] for r in formal}):
         (run/(cell+'.jsonl')).write_text(''.join(json.dumps(r, ensure_ascii=False)+'\n' for r in formal if r['stratum'] == cell))
     provenance = dict(eval_tag='eval-v1.3', eval_commit=COMMIT, formal_attempts=len(formal),
@@ -170,7 +182,13 @@ def main():
                               [ROOT/'scripts/t31_accuracy_v5.py', ROOT/'scripts/t31_v4_recompute.py',
                                ROOT/'reports/validation/t31-v7-label-changes.csv']},
                       model_calls=0, query_executions=0, bootstrap_replicates=5000, bootstrap_seed=0,
-                      status='Codex candidate; nine key cells await independent Claude Code review')
+                      status='Post-user-ruling recomputation; PR214 reviewed 194 prior positive residuals, additional rescan changes await numeric recheck' if rescan else 'Codex candidate; nine key cells await independent Claude Code review')
+    if rescan:
+        provenance['rescan_audit_sha256']=digest(args.rescan_audit)
+        provenance['rescan_scope']=dict(reviewed=len(checked),changed=sum(r['label']!=r['old_label'] for r in checked.values()),baseline_run=rescan['baseline_run'])
+        provenance['inputs'].update({str(p.relative_to(ROOT)):digest(p) for p in
+                                    [ROOT/'scripts/t31_v7_rescan.py',ROOT/'decisions/2026-10-31-v7-content-review-rulings.md',
+                                     ROOT/'reports/validation/t31-v7-rescan-changes.csv']})
     (run/'manifest.json').write_text(json.dumps(provenance, ensure_ascii=False, indent=2)+'\n')
     for filename, table in [('accuracy-v5-cells.csv', result), ('accuracy-v5-comparisons.csv', comps)]:
         write_table(ROOT/'reports/results'/filename, table)
@@ -192,10 +210,10 @@ def main():
     (packets/'index.json').write_text(json.dumps(dict(counts=packet_counts, materials='*-materials.json',
         labels='*-codex.json', semantic_documents='semantic_directory in each material record',
         delivered_system_contexts=json.loads((private/'frozen-context-index.json').read_text()),
-        ruling='decisions/2026-10-30-complete-detail-aggregation.md',
+        ruling='decisions/2026-10-31-v7-content-review-rulings.md' if rescan else 'decisions/2026-10-30-complete-detail-aggregation.md',
         no_outbound=True), ensure_ascii=False, indent=2)+'\n')
-    lines = ['# accuracy-v5：残余全量判定（待跨厂商复核）', '',
-             '状态：Codex 首轮候选。九个关键单元尚待 Claude Code 独立复核，分歧交用户；这些数不能直接作为已核定报告数字。', '',
+    lines = ['# accuracy-v5：残余全量判定（用户裁决后重算）' if rescan else '# accuracy-v5：残余全量判定（待跨厂商复核）', '',
+             '状态：PR #214 已独立复核九单元原判对的 194 次，用户于 2026-10-31 裁决分歧；本轮按统一规则重扫 19 单元的 420 次原判对残余。该复核不等于全部 1,411 次都已跨厂商复核；本轮新表仍供数字核对，不直接更新已核定中期正文。' if rescan else '状态：Codex 首轮候选。九个关键单元尚待 Claude Code 独立复核，分歧交用户；这些数不能直接作为已核定报告数字。', '',
              '主表 98 题、19 个正式单元，共 5,439 次作答。T4 只覆盖留出 49 题。', '',
              '准确率 = v2 判对 + R1–R11 已审定放行 + 残余逐次内容判定；不再抽样外推。按约定交付率保持 eval-v1.3 下的 v2 原值。', '',
              '残余 1,411 次包含原样本中仍残余的 180 次、已知错误 15 次，以及新增判定 1,216 次。原样本 200 次另做双向复查，逐次变更见 `../validation/t31-v7-label-changes.csv`。已转为 v2 或规则放行的 20 条不重复计入残余。', '',
@@ -209,8 +227,10 @@ def main():
               '只看结果，声明的假设不参与评分。遵守 A/B/C 与五题裁决；空值不等于零。完整明细推导须无截断或 LIMIT，且每行明确所属分组。原 v2 和规则放行不撤销，脚本逐次断言准确率不低于按约定交付率。', '',
               '本轮全量内容准确率仅覆盖主表 98 题。低区分度题未全量复判，不能把主表比例套用于这 11 题；D4 所需的 L1／L1plus 补充判定另列，不据此声称全部单元的 109 题准确率。', '',
               '全部判断来自既有日志、最终执行结果和所在单元冻结语义材料；没有模型调用、没有 SQL 执行。完整材料、依据和九单元复核包均在 SEMDEBT_DATA_DIR 内，仓库只含题号、单元、标签、类别、次数与比例。', '',
-              f'可复现：`uv run --offline python scripts/t31_accuracy_v5.py --run-id <new-run-id> --decisions-file "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/{args.run_id}/codex-decisions.json"`。本次追加目录：`runs/{args.run_id}`。已有日志、评分器 v2、参考答案和冻结文档均不修改。',
+              f'可复现：`uv run --offline python scripts/t31_accuracy_v5.py --run-id <new-run-id> --decisions-file "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/{args.run_id}/codex-decisions.json"'+(' --rescan-audit "$SEMDEBT_DATA_DIR/t31-v7-rescan-20261031/approved-rescan.json"' if rescan else '')+f'`。本次追加目录：`runs/{args.run_id}`。已有日志、评分器 v2、参考答案和冻结文档均不修改。',
               '私有材料导出命令：`uv run --offline python scripts/t31_v7_materials.py --output <new-private-directory>`；实际系统提示重建：`uv run --offline python scripts/t31_v7_materials.py --contexts-for "$SEMDEBT_DATA_DIR/t31-v7-census-20261030"`。导出不产生判断标签，必须使用人工审定账或其保存的快照；缺标签或需用户裁定时脚本拒绝重算。', '']
+    if rescan:
+        lines += ['', '2026-10-31 规则优先：所缺数必须一步算术无歧义可得，且不能与作答已给的所问结果矛盾；已给另一口径结果或需要多步跨期累计的判错。零组逐值核实，窗口数值按期间逐行核实。旧样本 Q47 的改对撤销；Q110 SQL-L2 第 3 次保留正确。完整变更及原因计数见 `../validation/t31-v7-rescan.md`、`t31-v7-rescan-changes.csv`。', '']
     (ROOT/'reports/results/accuracy-v5.md').write_text('\n'.join(lines))
     print(json.dumps(dict(run=args.run_id, main_attempts=len(main_rows), packets=packet_counts,
                           labels=Counter(r['label'] for r in labels if r['scope']=='D1')), ensure_ascii=False))

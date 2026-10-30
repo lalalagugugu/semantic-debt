@@ -1,4 +1,6 @@
-# T31 v7：D4、D6、D8（待独立复核）
+# T31 v7：D4、D6、D8（用户裁决后重算）
+
+已按 2026-10-31 统一规则更新内容标签及 D4／D6。D8 分类不变；本轮依据见 `../../decisions/2026-10-31-v7-content-review-rulings.md`，复扫覆盖与变更见 `../validation/t31-v7-rescan.md`。
 
 D4 对三次最终结果逐题比较所问对象、分组及指标；仅辅助列、长宽表、名称编码、期间、比例和允许的并列边界变化不算内容不一致。正确性与一致性分开：三次一致但都答错仍可被选中。空值和零不同，执行失败不一致。
 
@@ -6,16 +8,16 @@ D4 对三次最终结果逐题比较所问对象、分组及指标；仅辅助�
 
 |单元|方法|范围|题数|选择次数|选择单位|已答|覆盖率|已答内容正确|已答准确率|已答交付率|基线准确率|
 |---|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|
-|SQL-L1plus|original_result_multiset|main98|98|98|question|44|44.9%|41|93.2%|81.8%|93.5%|
-|SQL-L1plus|content_equivalent|main98|98|98|question|90|91.8%|87|96.7%|80.0%|93.5%|
+|SQL-L1plus|original_result_multiset|main98|98|98|question|44|44.9%|41|93.2%|81.8%|93.2%|
+|SQL-L1plus|content_equivalent|main98|98|98|question|89|90.8%|86|96.6%|79.8%|93.2%|
 |SQL-L1plus|original_result_multiset|heldout49|49|49|question|24|49.0%|22|91.7%|79.2%|93.2%|
 |SQL-L1plus|content_equivalent|heldout49|49|49|question|46|93.9%|44|95.7%|80.4%|93.2%|
-|SQL-L1plus|original_result_multiset|tuning20|20|20|question|8|40.0%|8|100.0%|100.0%|100.0%|
-|SQL-L1plus|content_equivalent|tuning20|20|20|question|20|100.0%|20|100.0%|85.0%|100.0%|
-|SQL-L1plus|original_result_multiset|all109|109|109|question|48|44.0%|45|93.8%|83.3%|93.6%|
-|SQL-L1plus|content_equivalent|all109|109|109|question|100|91.7%|97|97.0%|80.0%|93.6%|
-|SQL-L1|early_confidence_A|main98|98|294|attempt|59|20.1%|59|100.0%|84.7%|85.4%|
-|SQL-L1|early_confidence_A|all109|109|327|attempt|64|19.6%|64|100.0%|84.4%|84.4%|
+|SQL-L1plus|original_result_multiset|tuning20|20|20|question|8|40.0%|8|100.0%|100.0%|98.3%|
+|SQL-L1plus|content_equivalent|tuning20|20|20|question|19|95.0%|19|100.0%|84.2%|98.3%|
+|SQL-L1plus|original_result_multiset|all109|109|109|question|48|44.0%|45|93.8%|83.3%|93.3%|
+|SQL-L1plus|content_equivalent|all109|109|109|question|99|90.8%|96|97.0%|79.8%|93.3%|
+|SQL-L1|early_confidence_A|main98|98|294|attempt|59|20.1%|59|100.0%|84.7%|85.0%|
+|SQL-L1|early_confidence_A|all109|109|327|attempt|64|19.6%|64|100.0%|84.4%|84.1%|
 
 早期“有把握”为原 T19c 的 A 档，只重评原回答，不重新追问；覆盖率分母为该范围全部追问记录，无法解析的记录不选中。全部 109 题的内容复判只为 D4 的 L1／L1plus 对照，不外推到其他单元。
 
@@ -24,7 +26,7 @@ D6 按相同题号和第几次作答配对，列出 L1plus 内容正确而 L3a �
 |D6 类别|次数|
 |---|---:|
 |是什么/属于谁|3|
-|怎么算|9|
+|怎么算|11|
 |执行失败|2|
 
 D6 逐次清单见 `../validation/t31-v7-d6.csv`。Q73 第 3 次与 Q117 第 3 次直接原因均为 SQL 同名别名解析引起的非法聚合，与本体格式无关；已核对系统提示哈希，没有发现出错片段照抄本体注解或将类／属性名当列名的证据。是否受长上下文间接影响，既有日志无法确认。
