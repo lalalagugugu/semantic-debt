@@ -1,0 +1,20 @@
+{
+  "eval_tag": "eval-v1.3",
+  "eval_commit": "5b65e0c450ba36d83707c00dc9443be16b08d086",
+  "formal_attempts": 6051,
+  "main_attempts": 5439,
+  "census_attempts": 1411,
+  "materials_sha256": "2068e3f02ad697aa7cad1a463f65b577d8631806817ff5b25f204e29fe5f2ea2",
+  "decisions_sha256": "0b362a7c90cd8b7ce146523ebd801eb49da08808df43061368a3248a22e565a9",
+  "sample_audit_sha256": "3ba15515130819102a6af005d07a0224118a75704dbde9634b25cfb28dc53224",
+  "inputs": {
+    "scripts/t31_accuracy_v5.py": "bd39da62c11d504b7d418caa3db6fbae2f4f6e85dc6c88e4ff135afcfeeac59f",
+    "scripts/t31_v4_recompute.py": "ad85aced54017325be788a846fdd16a7b6779ebe1d962ff06e13e1875eb5da85",
+    "reports/validation/t31-v7-label-changes.csv": "4368cf51ee11758eb6b35e035ff61b2eb90dc86e0276954b5c7b4199c6d80445"
+  },
+  "model_calls": 0,
+  "query_executions": 0,
+  "bootstrap_replicates": 5000,
+  "bootstrap_seed": 0,
+  "status": "Codex candidate; nine key cells await independent Claude Code review"
+}

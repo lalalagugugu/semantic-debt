@@ -1,0 +1,21 @@
+{
+  "run_id": "20261030-T31-v5-census-02",
+  "model_calls": 0,
+  "query_executions": 0,
+  "inputs": {
+    "scripts/t31_v7_followups.py": "8c6b3bd61a69b40ee0770c334e81dc77b081b21c53885ae2f537a42effa2864c",
+    "runs/20261023-T19c-confidence-01/confidence.jsonl": "744bc12565b95a5b83e13143ec83f53a6bd2388e0dad5c4c9837ad335a151616",
+    "reports/validation/metric-text-vs-impl.md": "c897e5343f814965cafaf4450f9a74ea5efb1406c04c5787121f53b2a43bb970",
+    "reports/validation/t29-pilot-preflight.json": "9678feee85adbc46aab8a6a5c1688c483d0614e75147636de6253dbb231c2d51"
+  },
+  "equivalence_audit_sha256": "978001a3a35313e134968402a49211651ef20db018ea8a3114a3c397d32a4ecc",
+  "d6": {
+    "是什么/属于谁": 3,
+    "怎么算": 9,
+    "执行失败": 2
+  },
+  "d8": {
+    "怎么算": 10,
+    "是什么/属于谁": 4
+  }
+}

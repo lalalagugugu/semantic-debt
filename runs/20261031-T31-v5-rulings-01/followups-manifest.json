@@ -1,0 +1,21 @@
+{
+  "run_id": "20261031-T31-v5-rulings-01",
+  "model_calls": 0,
+  "query_executions": 0,
+  "inputs": {
+    "scripts/t31_v7_followups.py": "8adfb537b7fd65b50a382cb1069d811873d3c3c2063e6da0d3e15721320c4fe9",
+    "runs/20261023-T19c-confidence-01/confidence.jsonl": "744bc12565b95a5b83e13143ec83f53a6bd2388e0dad5c4c9837ad335a151616",
+    "reports/validation/metric-text-vs-impl.md": "c897e5343f814965cafaf4450f9a74ea5efb1406c04c5787121f53b2a43bb970",
+    "reports/validation/t29-pilot-preflight.json": "9678feee85adbc46aab8a6a5c1688c483d0614e75147636de6253dbb231c2d51"
+  },
+  "equivalence_audit_sha256": "525454d42b52873e4bdfbf856829332d383abb3cad004f43c3460d4b06fbda3d",
+  "d6": {
+    "是什么/属于谁": 3,
+    "怎么算": 11,
+    "执行失败": 2
+  },
+  "d8": {
+    "怎么算": 10,
+    "是什么/属于谁": 4
+  }
+}
