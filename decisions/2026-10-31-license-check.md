@@ -14,13 +14,8 @@
 
 ## 待办（用户，公开前做，不挡 v7）
 
-- [ ] 向 Cube 开 issue，请其补 LICENSE 文件，并告知科目键 50 不存在。网页操作：打开 https://github.com/cubedevinc/semantic-layer-benchmark/issues/new ，贴下面的标题和正文，点 Submit。对方补了 LICENSE 就更新 `vendor/cube/NOTICE.md`。
 - [ ] 公开时选许可证（初步建议：代码 MIT，报告和语义层 CC BY 4.0）。
 
-标题：`Add a LICENSE file? Also a possible AccountKey typo`
+## 不向 Cube 开 issue（2026-10-31）
 
-正文：
-
-> Hi, thanks for publishing this benchmark. The README says "MIT." but the repo has no LICENSE file or copyright line. We adapted some of the questions in a Chinese-language study and plan to publish it with attribution. Could you add a LICENSE file so we can carry the correct notice?
->
-> Separately, fixtures/semantic_layer.md mentions AccountKey = 50 as the Sales Amount account; in the dataset we downloaded, DimAccount only has keys 1–24 and Sale Revenue is key 4. Might be worth a look.
+用户打开新建 issue 页得到 404：该仓库关闭了 Issues（`gh repo view` 的 `hasIssuesEnabled` 为 false）。原待办取消，不再找其他渠道。README 写明「MIT.」，我们注明来源并保留 `vendor/cube/NOTICE.md` 的原话；科目键 50 的问题已写在报告第 2 节。
