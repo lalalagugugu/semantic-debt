@@ -50,7 +50,7 @@
 | T19a | SQL 线中期报告（`tasks/T19a-midterm-report.md`）；数字由 Codex 照 T20 复核 | Claude Code（可云端）+ 用户；复核 Codex | 普通 | 定稿数字等 `harness-v1.1` 重评；T14、T21、T16 赶上就纳入 | 0 | **进行中**：v6 已通读，v7 计划与裁决见 `decisions/2026-10-30-midterm-v7-plan.md`；数字改用 accuracy-v5 全量判定（PR #211 草稿，待 Claude 独立复核）；题库侧 D2/D3/D5/D7 已交（`$SEMDEBT_DATA_DIR/v7-eval-20261030/`）；详见 `tasks/COORDINATION-HANDOFF.md`「v7 进度」。PR #149 草稿已过时可关 |
 | T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **完成**（#153，2026-10-23）：117 条，Flash 4.42 元；类别 κ 0.70、根因 κ 0.37；根因 3（模型没理解）11%–46%；两家都判根因 5 的 26 条 / 15 题待题库负责方核对（`reports/results/l1-error-attribution.md`） |
 | T19c | 模型知不知道自己会不会（`tasks/T19c-abstention-signals.md`，2026-10-23 改写）：隐含信号 + 自评把握的校准，判定规则先写死 | Claude Code | 普通 | T13 SQL-L1 最终日志 | 5 元（Flash；`decisions/2026-10-23-l1plus-l3a.md` 第四节） | **完成**（2026-10-23，实花 1.02 元）：思考 token AUC 0.755（参照）；自评把握判定「介于两者之间」，不建议新单元。报告 `reports/results/confidence-calibration.md`；待 PR 合并 |
-| T31 | 可疑参考答案核对与呈现差异盘点（`tasks/T31-reference-and-presentation-review.md`） | Codex | 主仓库 clone（只读题库） | T22b、T28 | 0 | **v7 数据**：1,411 次残余全量判定 + accuracy-v5 + D4/D6/D8 在 PR #211（草稿）。Claude 独立复核 194 次完成（#214）：184 一致、8 改判错、2 待裁定；待用户裁定后由 Codex 按统一规则扫全部 19 单元、定稿，再合并 #211 |
+| T31 | 可疑参考答案核对与呈现差异盘点（`tasks/T31-reference-and-presentation-review.md`） | Codex | 主仓库 clone（只读题库） | T22b、T28 | 0 | v4 完成；v7 九单元194次判对已由 #214 独立复核，已按用户 2026-10-31 裁决复扫 19 单元 420 次判对残余，33 次改错；accuracy-v5／D4／D6 已重算，待新增变更数字核对与用户合并 #211 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
 ## 2026-10-22 刷新：第一期 SQL 线运行完成
