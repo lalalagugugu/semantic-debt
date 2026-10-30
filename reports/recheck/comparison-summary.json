@@ -1,0 +1,666 @@
+{
+  "checks": 893,
+  "point_count_differences": [],
+  "interval_differences": [
+    {
+      "item": "coverage L1.5S 能覆盖 SQL-L1 SQL-L1.5S lower",
+      "kind": "interval",
+      "reference": -0.19,
+      "independent": -0.19841269841269843,
+      "difference": -0.008412698412698427,
+      "status": "DIFF"
+    },
+    {
+      "item": "coverage 两者都覆盖 SQL-L1.5S JSON-L2 lower",
+      "kind": "interval",
+      "reference": -0.063,
+      "independent": -0.07936507936507936,
+      "difference": -0.01636507936507936,
+      "status": "DIFF"
+    },
+    {
+      "item": "coverage 两者都覆盖 SQL-L1.5S JSON-L2 upper",
+      "kind": "interval",
+      "reference": 0.23800000000000002,
+      "independent": 0.22222222222222224,
+      "difference": -0.01577777777777778,
+      "status": "DIFF"
+    },
+    {
+      "item": "combo 留出 49 题 SQL-L1-tuned-instr SQL-L1plus-tuned-instr lower",
+      "kind": "interval",
+      "reference": -0.027000000000000003,
+      "independent": -0.02040816326530612,
+      "difference": 0.006591836734693882,
+      "status": "DIFF"
+    },
+    {
+      "item": "D3 可从数据发现 SQL-L0→SQL-L1 lower",
+      "kind": "interval",
+      "reference": -0.037000000000000005,
+      "independent": -0.024691358024691364,
+      "difference": 0.012308641975308642,
+      "status": "DIFF"
+    },
+    {
+      "item": "D3 可从数据发现 SQL-L0→SQL-L1 upper",
+      "kind": "interval",
+      "reference": 0.247,
+      "independent": 0.23456790123456792,
+      "difference": -0.012432098765432081,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L1c heldout upper",
+      "kind": "interval",
+      "reference": 0.272108843537415,
+      "independent": 0.2653061224489796,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L1c tuning lower",
+      "kind": "interval",
+      "reference": 0.08163265306122448,
+      "independent": 0.07482993197278914,
+      "difference": -0.00680272108843534,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1c heldout upper",
+      "kind": "interval",
+      "reference": -0.061224489795918366,
+      "independent": -0.06802721088435373,
+      "difference": -0.006802721088435368,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L0 SQL-L0-E tuning lower",
+      "kind": "interval",
+      "reference": -0.0272108843537415,
+      "independent": -0.034013605442176874,
+      "difference": -0.006802721088435375,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L2 SQL-L2-E tuning lower",
+      "kind": "interval",
+      "reference": -0.108843537414966,
+      "independent": -0.10204081632653061,
+      "difference": 0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L2 SQL-L2-E tuning upper",
+      "kind": "interval",
+      "reference": 0.04761904761904762,
+      "independent": 0.040816326530612256,
+      "difference": -0.006802721088435368,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L2 heldout lower",
+      "kind": "interval",
+      "reference": -0.08163265306122448,
+      "independent": -0.07482993197278912,
+      "difference": 0.006802721088435368,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1plus heldout lower",
+      "kind": "interval",
+      "reference": -0.013605442176870743,
+      "independent": -0.020408163265306114,
+      "difference": -0.006802721088435371,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1plus heldout upper",
+      "kind": "interval",
+      "reference": 0.17687074829931976,
+      "independent": 0.1836734693877551,
+      "difference": 0.006802721088435354,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1-tuned-instr heldout upper",
+      "kind": "interval",
+      "reference": 0.1564625850340136,
+      "independent": 0.14965986394557823,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1-T2 heldout upper",
+      "kind": "interval",
+      "reference": 0.0272108843537415,
+      "independent": 0.02057823129251454,
+      "difference": -0.00663265306122696,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1-T2 tuning lower",
+      "kind": "interval",
+      "reference": -0.020408163265306128,
+      "independent": -0.013605442176870755,
+      "difference": 0.006802721088435373,
+      "status": "DIFF"
+    }
+  ],
+  "zero_differences": [],
+  "independent_sha256": "58eadb5336d4864a3edf1e1b3278e062402e12a47e888351e46371f6b6e59570",
+  "reference_sha256": "f77e9f4f147bd922befca87ff5cd514557517b60392e2bd1e297c4756a698d4a",
+  "exact_intervals": [
+    {
+      "label": "cmp.csv SQL-L0 SQL-L1 all",
+      "interval": [
+        0.2755102040816326,
+        0.46598639455782315
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-L1 heldout",
+      "interval": [
+        0.20408163265306123,
+        0.46938775510204084
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-L1 tuning",
+      "interval": [
+        0.272108843537415,
+        0.54421768707483
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-R all",
+      "interval": [
+        -0.027210884353741496,
+        0.10204081632653061
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-R heldout",
+      "interval": [
+        -0.047619047619047616,
+        0.11564625850340136
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-R tuning",
+      "interval": [
+        -0.05442176870748299,
+        0.1360544217687075
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-R SQL-L1c all",
+      "interval": [
+        0.08503401360544217,
+        0.2585034013605442
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-R SQL-L1c heldout",
+      "interval": [
+        0.027210884353741496,
+        0.2653061224489796
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-R SQL-L1c tuning",
+      "interval": [
+        0.07482993197278912,
+        0.3197278911564626
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1.5W all",
+      "interval": [
+        -0.08503401360544217,
+        0.003401360544217687
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1.5W heldout",
+      "interval": [
+        -0.14965986394557823,
+        -0.034013605442176874
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1.5W tuning",
+      "interval": [
+        -0.05442176870748299,
+        0.07482993197278912
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1c all",
+      "interval": [
+        -0.23809523809523808,
+        -0.09523809523809523
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1c heldout",
+      "interval": [
+        -0.2585034013605442,
+        -0.06802721088435375
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1c tuning",
+      "interval": [
+        -0.2789115646258503,
+        -0.06802721088435375
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-L0-E all",
+      "interval": [
+        -0.047619047619047616,
+        0.08163265306122448
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-L0-E heldout",
+      "interval": [
+        -0.10884353741496598,
+        0.047619047619047616
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L0 SQL-L0-E tuning",
+      "interval": [
+        -0.034013605442176874,
+        0.17006802721088435
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-E all",
+      "interval": [
+        -0.034013605442176874,
+        0.047619047619047616
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-E heldout",
+      "interval": [
+        -0.06802721088435375,
+        0.04081632653061224
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-E tuning",
+      "interval": [
+        -0.034013605442176874,
+        0.09523809523809523
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L2 SQL-L2-E all",
+      "interval": [
+        -0.08163265306122448,
+        0.030612244897959183
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L2 SQL-L2-E heldout",
+      "interval": [
+        -0.10884353741496598,
+        0.061224489795918366
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L2 SQL-L2-E tuning",
+      "interval": [
+        -0.10204081632653061,
+        0.047619047619047616
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1plus SQL-L3a all",
+      "interval": [
+        -0.047619047619047616,
+        0.04421768707482993
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1plus SQL-L3a heldout",
+      "interval": [
+        -0.06802721088435375,
+        0.08843537414965986
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1plus SQL-L3a tuning",
+      "interval": [
+        -0.061224489795918366,
+        0.034013605442176874
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L2 all",
+      "interval": [
+        -0.07142857142857142,
+        0.047619047619047616
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L2 heldout",
+      "interval": [
+        -0.07482993197278912,
+        0.07482993197278912
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L2 tuning",
+      "interval": [
+        -0.10884353741496598,
+        0.06802721088435375
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1plus all",
+      "interval": [
+        0.02040816326530612,
+        0.14625850340136054
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1plus heldout",
+      "interval": [
+        -0.013605442176870748,
+        0.1836734693877551
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1plus tuning",
+      "interval": [
+        0.006802721088435374,
+        0.16326530612244897
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-tuned all",
+      "interval": [
+        0.05782312925170068,
+        0.16326530612244897
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-tuned heldout",
+      "interval": [
+        0.013605442176870748,
+        0.14285714285714285
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-tuned tuning",
+      "interval": [
+        0.061224489795918366,
+        0.23129251700680273
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-tuned-instr all",
+      "interval": [
+        0.05102040816326531,
+        0.16326530612244897
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-tuned-instr heldout",
+      "interval": [
+        0.013605442176870748,
+        0.1564625850340136
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-tuned-instr tuning",
+      "interval": [
+        0.04081632653061224,
+        0.22448979591836735
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1-tuned-instr SQL-L1plus-tuned-instr all",
+      "interval": [
+        -0.013605442176870748,
+        0.05102040816326531
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1-tuned-instr SQL-L1plus-tuned-instr heldout",
+      "interval": [
+        -0.02040816326530612,
+        0.08843537414965986
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1-tuned-instr SQL-L1plus-tuned-instr tuning",
+      "interval": [
+        -0.027210884353741496,
+        0.047619047619047616
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1plus-tuned-instr all",
+      "interval": [
+        0.06802721088435375,
+        0.18027210884353742
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1plus-tuned-instr heldout",
+      "interval": [
+        0.034013605442176874,
+        0.19727891156462585
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1plus-tuned-instr tuning",
+      "interval": [
+        0.061224489795918366,
+        0.21768707482993196
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1plus SQL-L1plus-tuned-instr all",
+      "interval": [
+        0.003401360544217687,
+        0.08163265306122448
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1plus SQL-L1plus-tuned-instr heldout",
+      "interval": [
+        -0.02040816326530612,
+        0.08843537414965986
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1plus SQL-L1plus-tuned-instr tuning",
+      "interval": [
+        0.006802721088435374,
+        0.11564625850340136
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T2 all",
+      "interval": [
+        -0.030612244897959183,
+        0.04421768707482993
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T2 heldout",
+      "interval": [
+        -0.06802721088435375,
+        0.027210884353741496
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T2 tuning",
+      "interval": [
+        -0.02040816326530612,
+        0.08843537414965986
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T3 all",
+      "interval": [
+        -0.05102040816326531,
+        0.03741496598639456
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T3 heldout",
+      "interval": [
+        -0.034013605442176874,
+        0.061224489795918366
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T3 tuning",
+      "interval": [
+        -0.10204081632653061,
+        0.047619047619047616
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T4 all",
+      "interval": [
+        -0.04081632653061224,
+        0.05442176870748299
+      ]
+    },
+    {
+      "label": "cmp.csv SQL-L1 SQL-L1-T4 heldout",
+      "interval": [
+        -0.04081632653061224,
+        0.05442176870748299
+      ]
+    },
+    {
+      "label": "D3 可从数据发现 SQL-L0→SQL-L0-E",
+      "interval": [
+        -0.16049382716049382,
+        0.037037037037037035
+      ]
+    },
+    {
+      "label": "D3 可从数据发现 SQL-L0→SQL-L1",
+      "interval": [
+        -0.024691358024691357,
+        0.24691358024691357
+      ]
+    },
+    {
+      "label": "D3 可从数据发现 SQL-L1→SQL-L1-E",
+      "interval": [
+        -0.1111111111111111,
+        0.024691358024691357
+      ]
+    },
+    {
+      "label": "D3 只能由业务告知 SQL-L0→SQL-L0-E",
+      "interval": [
+        -0.03286384976525822,
+        0.1267605633802817
+      ]
+    },
+    {
+      "label": "D3 只能由业务告知 SQL-L0→SQL-L1",
+      "interval": [
+        0.3615023474178404,
+        0.5868544600938967
+      ]
+    },
+    {
+      "label": "D3 只能由业务告知 SQL-L1→SQL-L1-E",
+      "interval": [
+        -0.023474178403755867,
+        0.07511737089201878
+      ]
+    },
+    {
+      "label": "D3 可从数据发现（去掉 7 道可疑题） SQL-L0→SQL-L0-E",
+      "interval": [
+        -0.11666666666666667,
+        0.1
+      ]
+    },
+    {
+      "label": "D3 可从数据发现（去掉 7 道可疑题） SQL-L0→SQL-L1",
+      "interval": [
+        0.0,
+        0.3
+      ]
+    },
+    {
+      "label": "D3 可从数据发现（去掉 7 道可疑题） SQL-L1→SQL-L1-E",
+      "interval": [
+        -0.06666666666666667,
+        0.03333333333333333
+      ]
+    },
+    {
+      "label": "D3 只能由业务告知（加入 7 道可疑题） SQL-L0→SQL-L0-E",
+      "interval": [
+        -0.05128205128205128,
+        0.10256410256410256
+      ]
+    },
+    {
+      "label": "D3 只能由业务告知（加入 7 道可疑题） SQL-L0→SQL-L1",
+      "interval": [
+        0.32051282051282054,
+        0.5384615384615384
+      ]
+    },
+    {
+      "label": "D3 只能由业务告知（加入 7 道可疑题） SQL-L1→SQL-L1-E",
+      "interval": [
+        -0.03418803418803419,
+        0.0641025641025641
+      ]
+    },
+    {
+      "label": "coverage JSON-L2 能覆盖 SQL-L1 JSON-L2",
+      "interval": [
+        -0.12612612612612611,
+        0.02702702702702703
+      ]
+    },
+    {
+      "label": "coverage JSON-L2 能覆盖 SQL-L1 SQL-L2",
+      "interval": [
+        -0.06306306306306306,
+        0.09009009009009009
+      ]
+    },
+    {
+      "label": "coverage L1.5S 能覆盖 SQL-L1 SQL-L1.5S",
+      "interval": [
+        -0.1984126984126984,
+        0.031746031746031744
+      ]
+    },
+    {
+      "label": "coverage L1.5S 能覆盖 SQL-L1 SQL-L2",
+      "interval": [
+        -0.07936507936507936,
+        0.007936507936507936
+      ]
+    },
+    {
+      "label": "coverage 两者都覆盖 SQL-L1.5S JSON-L2",
+      "interval": [
+        -0.07936507936507936,
+        0.2222222222222222
+      ]
+    }
+  ]
+}

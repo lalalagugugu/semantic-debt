@@ -1,0 +1,5695 @@
+{
+  "eval_commit": "5b65e0c450ba36d83707c00dc9443be16b08d086",
+  "model_calls": 0,
+  "bootstrap_seed": 20261031,
+  "bootstrap_replicates": 10000,
+  "cell_metrics": [
+    {
+      "cell": "JSON-L2",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 123,
+      "accuracy": 0.41836734693877553,
+      "interval": [
+        0.32653061224489793,
+        0.5136054421768707
+      ],
+      "delivery": 0.30952380952380953,
+      "outcomes": {
+        "refused": 121,
+        "correct": 123,
+        "wrong": 49,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 37,
+      "all_three_correct": 37
+    },
+    {
+      "cell": "JSON-L2",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 63,
+      "accuracy": 0.42857142857142855,
+      "interval": [
+        0.2925170068027211,
+        0.5646258503401361
+      ],
+      "delivery": 0.3333333333333333,
+      "outcomes": {
+        "refused": 53,
+        "correct": 63,
+        "wrong": 31
+      },
+      "all_repetitions_correct": 19,
+      "all_three_correct": 19
+    },
+    {
+      "cell": "JSON-L2",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 60,
+      "accuracy": 0.40816326530612246,
+      "interval": [
+        0.2789115646258503,
+        0.5374149659863946
+      ],
+      "delivery": 0.2857142857142857,
+      "outcomes": {
+        "correct": 60,
+        "refused": 68,
+        "wrong": 18,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 18,
+      "all_three_correct": 18
+    },
+    {
+      "cell": "SQL-L0-E",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 146,
+      "accuracy": 0.4965986394557823,
+      "interval": [
+        0.4081632653061225,
+        0.5850340136054422
+      ],
+      "delivery": 0.40476190476190477,
+      "outcomes": {
+        "correct": 146,
+        "wrong": 133,
+        "exec_error": 10,
+        "refused": 5
+      },
+      "all_repetitions_correct": 37,
+      "all_three_correct": 37
+    },
+    {
+      "cell": "SQL-L0-E",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 71,
+      "accuracy": 0.48299319727891155,
+      "interval": [
+        0.3605442176870748,
+        0.6054421768707483
+      ],
+      "delivery": 0.3877551020408163,
+      "outcomes": {
+        "correct": 71,
+        "wrong": 68,
+        "refused": 3,
+        "exec_error": 5
+      },
+      "all_repetitions_correct": 18,
+      "all_three_correct": 18
+    },
+    {
+      "cell": "SQL-L0-E",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 75,
+      "accuracy": 0.5102040816326531,
+      "interval": [
+        0.3877551020408163,
+        0.6326530612244898
+      ],
+      "delivery": 0.4217687074829932,
+      "outcomes": {
+        "correct": 75,
+        "wrong": 65,
+        "exec_error": 5,
+        "refused": 2
+      },
+      "all_repetitions_correct": 19,
+      "all_three_correct": 19
+    },
+    {
+      "cell": "SQL-L0",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 141,
+      "accuracy": 0.47959183673469385,
+      "interval": [
+        0.39115646258503395,
+        0.5748299319727891
+      ],
+      "delivery": 0.3945578231292517,
+      "outcomes": {
+        "correct": 141,
+        "wrong": 145,
+        "refused": 8
+      },
+      "all_repetitions_correct": 40,
+      "all_three_correct": 40
+    },
+    {
+      "cell": "SQL-L0",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 76,
+      "accuracy": 0.5170068027210885,
+      "interval": [
+        0.380952380952381,
+        0.6530612244897959
+      ],
+      "delivery": 0.40816326530612246,
+      "outcomes": {
+        "correct": 76,
+        "wrong": 67,
+        "refused": 4
+      },
+      "all_repetitions_correct": 23,
+      "all_three_correct": 23
+    },
+    {
+      "cell": "SQL-L0",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 65,
+      "accuracy": 0.4421768707482993,
+      "interval": [
+        0.31972789115646255,
+        0.5714285714285714
+      ],
+      "delivery": 0.38095238095238093,
+      "outcomes": {
+        "correct": 65,
+        "wrong": 78,
+        "refused": 4
+      },
+      "all_repetitions_correct": 17,
+      "all_three_correct": 17
+    },
+    {
+      "cell": "SQL-L1-E",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 252,
+      "accuracy": 0.8571428571428571,
+      "interval": [
+        0.7993197278911565,
+        0.91156462585034
+      ],
+      "delivery": 0.6938775510204082,
+      "outcomes": {
+        "correct": 252,
+        "wrong": 40,
+        "exec_error": 2
+      },
+      "all_repetitions_correct": 74,
+      "all_three_correct": 74
+    },
+    {
+      "cell": "SQL-L1-E",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 123,
+      "accuracy": 0.8367346938775511,
+      "interval": [
+        0.7414965986394558,
+        0.9183673469387755
+      ],
+      "delivery": 0.6326530612244898,
+      "outcomes": {
+        "correct": 123,
+        "wrong": 23,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 36,
+      "all_three_correct": 36
+    },
+    {
+      "cell": "SQL-L1-E",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 129,
+      "accuracy": 0.8775510204081632,
+      "interval": [
+        0.8027210884353742,
+        0.9387755102040818
+      ],
+      "delivery": 0.7551020408163265,
+      "outcomes": {
+        "correct": 129,
+        "exec_error": 1,
+        "wrong": 17
+      },
+      "all_repetitions_correct": 38,
+      "all_three_correct": 38
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 252,
+      "accuracy": 0.8571428571428571,
+      "interval": [
+        0.7993197278911565,
+        0.91156462585034
+      ],
+      "delivery": 0.7006802721088435,
+      "outcomes": {
+        "correct": 252,
+        "wrong": 42
+      },
+      "all_repetitions_correct": 74,
+      "all_three_correct": 74
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 122,
+      "accuracy": 0.8299319727891157,
+      "interval": [
+        0.7346938775510204,
+        0.9183673469387755
+      ],
+      "delivery": 0.6666666666666666,
+      "outcomes": {
+        "correct": 122,
+        "wrong": 25
+      },
+      "all_repetitions_correct": 37,
+      "all_three_correct": 37
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 130,
+      "accuracy": 0.8843537414965986,
+      "interval": [
+        0.8163265306122449,
+        0.945578231292517
+      ],
+      "delivery": 0.7346938775510204,
+      "outcomes": {
+        "correct": 130,
+        "wrong": 17
+      },
+      "all_repetitions_correct": 37,
+      "all_three_correct": 37
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 248,
+      "accuracy": 0.8435374149659864,
+      "interval": [
+        0.7823129251700681,
+        0.8980442176870737
+      ],
+      "delivery": 0.673469387755102,
+      "outcomes": {
+        "correct": 248,
+        "wrong": 46
+      },
+      "all_repetitions_correct": 72,
+      "all_three_correct": 72
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 127,
+      "accuracy": 0.8639455782312925,
+      "interval": [
+        0.7823129251700679,
+        0.9387755102040817
+      ],
+      "delivery": 0.6870748299319728,
+      "outcomes": {
+        "correct": 127,
+        "wrong": 20
+      },
+      "all_repetitions_correct": 38,
+      "all_three_correct": 38
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 121,
+      "accuracy": 0.8231292517006803,
+      "interval": [
+        0.7346938775510204,
+        0.9047619047619048
+      ],
+      "delivery": 0.6598639455782312,
+      "outcomes": {
+        "correct": 121,
+        "wrong": 26
+      },
+      "all_repetitions_correct": 34,
+      "all_three_correct": 34
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 126,
+      "accuracy": 0.8571428571428571,
+      "interval": [
+        0.7687074829931974,
+        0.9319727891156464
+      ],
+      "delivery": 0.6462585034013606,
+      "outcomes": {
+        "correct": 126,
+        "wrong": 21
+      },
+      "all_repetitions_correct": 38,
+      "all_three_correct": 38
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 126,
+      "accuracy": 0.8571428571428571,
+      "interval": [
+        0.7687074829931974,
+        0.9319727891156464
+      ],
+      "delivery": 0.6462585034013606,
+      "outcomes": {
+        "correct": 126,
+        "wrong": 21
+      },
+      "all_repetitions_correct": 38,
+      "all_three_correct": 38
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 281,
+      "accuracy": 0.95578231292517,
+      "interval": [
+        0.9217687074829931,
+        0.9829931972789115
+      ],
+      "delivery": 0.9149659863945578,
+      "outcomes": {
+        "correct": 281,
+        "wrong": 12,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 89,
+      "all_three_correct": 89
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 137,
+      "accuracy": 0.9319727891156463,
+      "interval": [
+        0.8707482993197279,
+        0.9795918367346939
+      ],
+      "delivery": 0.8639455782312925,
+      "outcomes": {
+        "correct": 137,
+        "wrong": 9,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 42,
+      "all_three_correct": 42
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 144,
+      "accuracy": 0.9795918367346939,
+      "interval": [
+        0.945578231292517,
+        1.0
+      ],
+      "delivery": 0.9659863945578231,
+      "outcomes": {
+        "correct": 144,
+        "wrong": 3
+      },
+      "all_repetitions_correct": 47,
+      "all_three_correct": 47
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 282,
+      "accuracy": 0.9591836734693877,
+      "interval": [
+        0.9183673469387755,
+        0.9897959183673469
+      ],
+      "delivery": 0.8639455782312925,
+      "outcomes": {
+        "correct": 282,
+        "wrong": 12
+      },
+      "all_repetitions_correct": 93,
+      "all_three_correct": 93
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 136,
+      "accuracy": 0.9251700680272109,
+      "interval": [
+        0.850170068027211,
+        0.9863945578231291
+      ],
+      "delivery": 0.7959183673469388,
+      "outcomes": {
+        "correct": 136,
+        "wrong": 11
+      },
+      "all_repetitions_correct": 45,
+      "all_three_correct": 45
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 146,
+      "accuracy": 0.9931972789115646,
+      "interval": [
+        0.9795918367346937,
+        1.0
+      ],
+      "delivery": 0.9319727891156463,
+      "outcomes": {
+        "correct": 146,
+        "wrong": 1
+      },
+      "all_repetitions_correct": 48,
+      "all_three_correct": 48
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 117,
+      "accuracy": 0.3979591836734694,
+      "interval": [
+        0.3061224489795919,
+        0.4897959183673469
+      ],
+      "delivery": 0.2925170068027211,
+      "outcomes": {
+        "correct": 117,
+        "refused": 97,
+        "wrong": 70,
+        "exec_error": 10
+      },
+      "all_repetitions_correct": 34,
+      "all_three_correct": 34
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 63,
+      "accuracy": 0.42857142857142855,
+      "interval": [
+        0.29931972789115646,
+        0.564625850340136
+      ],
+      "delivery": 0.2925170068027211,
+      "outcomes": {
+        "correct": 63,
+        "wrong": 29,
+        "exec_error": 6,
+        "refused": 49
+      },
+      "all_repetitions_correct": 19,
+      "all_three_correct": 19
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 54,
+      "accuracy": 0.3673469387755102,
+      "interval": [
+        0.24489795918367346,
+        0.4965986394557823
+      ],
+      "delivery": 0.2925170068027211,
+      "outcomes": {
+        "correct": 54,
+        "refused": 48,
+        "wrong": 41,
+        "exec_error": 4
+      },
+      "all_repetitions_correct": 15,
+      "all_three_correct": 15
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 238,
+      "accuracy": 0.8095238095238095,
+      "interval": [
+        0.7448979591836735,
+        0.8707482993197279
+      ],
+      "delivery": 0.6666666666666666,
+      "outcomes": {
+        "correct": 238,
+        "wrong": 52,
+        "exec_error": 4
+      },
+      "all_repetitions_correct": 69,
+      "all_three_correct": 69
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 112,
+      "accuracy": 0.7619047619047619,
+      "interval": [
+        0.6598639455782312,
+        0.8639455782312924
+      ],
+      "delivery": 0.5986394557823129,
+      "outcomes": {
+        "correct": 112,
+        "wrong": 32,
+        "exec_error": 3
+      },
+      "all_repetitions_correct": 33,
+      "all_three_correct": 33
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 126,
+      "accuracy": 0.8571428571428571,
+      "interval": [
+        0.7823129251700679,
+        0.9251700680272108
+      ],
+      "delivery": 0.7346938775510204,
+      "outcomes": {
+        "correct": 126,
+        "wrong": 20,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 36,
+      "all_three_correct": 36
+    },
+    {
+      "cell": "SQL-L1",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 250,
+      "accuracy": 0.8503401360544217,
+      "interval": [
+        0.7891156462585034,
+        0.9047619047619048
+      ],
+      "delivery": 0.6870748299319728,
+      "outcomes": {
+        "correct": 250,
+        "wrong": 42,
+        "exec_error": 2
+      },
+      "all_repetitions_correct": 73,
+      "all_three_correct": 73
+    },
+    {
+      "cell": "SQL-L1",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 125,
+      "accuracy": 0.8503401360544217,
+      "interval": [
+        0.7687074829931972,
+        0.9251700680272109
+      ],
+      "delivery": 0.6394557823129252,
+      "outcomes": {
+        "correct": 125,
+        "wrong": 21,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 36,
+      "all_three_correct": 36
+    },
+    {
+      "cell": "SQL-L1",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 125,
+      "accuracy": 0.8503401360544217,
+      "interval": [
+        0.7619047619047619,
+        0.9251700680272109
+      ],
+      "delivery": 0.7346938775510204,
+      "outcomes": {
+        "correct": 125,
+        "wrong": 21,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 37,
+      "all_three_correct": 37
+    },
+    {
+      "cell": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 202,
+      "accuracy": 0.6870748299319728,
+      "interval": [
+        0.6020408163265306,
+        0.7721088435374148
+      ],
+      "delivery": 0.5680272108843537,
+      "outcomes": {
+        "correct": 202,
+        "wrong": 91,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 60,
+      "all_three_correct": 60
+    },
+    {
+      "cell": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 102,
+      "accuracy": 0.6938775510204082,
+      "interval": [
+        0.5714285714285714,
+        0.8095238095238094
+      ],
+      "delivery": 0.5510204081632653,
+      "outcomes": {
+        "correct": 102,
+        "wrong": 45
+      },
+      "all_repetitions_correct": 30,
+      "all_three_correct": 30
+    },
+    {
+      "cell": "SQL-L1c",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 100,
+      "accuracy": 0.6802721088435374,
+      "interval": [
+        0.5578231292517006,
+        0.7959183673469388
+      ],
+      "delivery": 0.5850340136054422,
+      "outcomes": {
+        "correct": 100,
+        "wrong": 46,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 30,
+      "all_three_correct": 30
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 286,
+      "accuracy": 0.9727891156462585,
+      "interval": [
+        0.9489795918367349,
+        0.989795918367347
+      ],
+      "delivery": 0.9115646258503401,
+      "outcomes": {
+        "correct": 286,
+        "wrong": 7,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 91,
+      "all_three_correct": 91
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 141,
+      "accuracy": 0.9591836734693877,
+      "interval": [
+        0.9183673469387755,
+        0.9931972789115646
+      ],
+      "delivery": 0.8503401360544217,
+      "outcomes": {
+        "correct": 141,
+        "wrong": 5,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 44,
+      "all_three_correct": 44
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 145,
+      "accuracy": 0.9863945578231292,
+      "interval": [
+        0.9659863945578232,
+        1.0
+      ],
+      "delivery": 0.9727891156462585,
+      "outcomes": {
+        "correct": 145,
+        "wrong": 2
+      },
+      "all_repetitions_correct": 47,
+      "all_three_correct": 47
+    },
+    {
+      "cell": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 274,
+      "accuracy": 0.9319727891156463,
+      "interval": [
+        0.8877551020408163,
+        0.9693877551020408
+      ],
+      "delivery": 0.7585034013605442,
+      "outcomes": {
+        "correct": 274,
+        "wrong": 18,
+        "exec_error": 2
+      },
+      "all_repetitions_correct": 86,
+      "all_three_correct": 86
+    },
+    {
+      "cell": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 137,
+      "accuracy": 0.9319727891156463,
+      "interval": [
+        0.8639455782312926,
+        0.9863945578231291
+      ],
+      "delivery": 0.7619047619047619,
+      "outcomes": {
+        "correct": 137,
+        "wrong": 9,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 44,
+      "all_three_correct": 44
+    },
+    {
+      "cell": "SQL-L1plus",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 137,
+      "accuracy": 0.9319727891156463,
+      "interval": [
+        0.870748299319728,
+        0.9795918367346939
+      ],
+      "delivery": 0.7551020408163265,
+      "outcomes": {
+        "correct": 137,
+        "wrong": 9,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 42,
+      "all_three_correct": 42
+    },
+    {
+      "cell": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 239,
+      "accuracy": 0.8129251700680272,
+      "interval": [
+        0.7448979591836735,
+        0.8741496598639457
+      ],
+      "delivery": 0.6632653061224489,
+      "outcomes": {
+        "correct": 239,
+        "wrong": 54,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 71,
+      "all_three_correct": 71
+    },
+    {
+      "cell": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 121,
+      "accuracy": 0.8231292517006803,
+      "interval": [
+        0.727891156462585,
+        0.91156462585034
+      ],
+      "delivery": 0.6326530612244898,
+      "outcomes": {
+        "correct": 121,
+        "wrong": 25,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 36,
+      "all_three_correct": 36
+    },
+    {
+      "cell": "SQL-L2-E",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 118,
+      "accuracy": 0.8027210884353742,
+      "interval": [
+        0.7074829931972788,
+        0.891156462585034
+      ],
+      "delivery": 0.6938775510204082,
+      "outcomes": {
+        "correct": 118,
+        "wrong": 29
+      },
+      "all_repetitions_correct": 35,
+      "all_three_correct": 35
+    },
+    {
+      "cell": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 246,
+      "accuracy": 0.8367346938775511,
+      "interval": [
+        0.772108843537415,
+        0.8945578231292517
+      ],
+      "delivery": 0.6768707482993197,
+      "outcomes": {
+        "correct": 246,
+        "wrong": 34,
+        "exec_error": 14
+      },
+      "all_repetitions_correct": 72,
+      "all_three_correct": 72
+    },
+    {
+      "cell": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 124,
+      "accuracy": 0.8435374149659864,
+      "interval": [
+        0.7551020408163265,
+        0.9251700680272109
+      ],
+      "delivery": 0.6802721088435374,
+      "outcomes": {
+        "correct": 124,
+        "exec_error": 7,
+        "wrong": 16
+      },
+      "all_repetitions_correct": 37,
+      "all_three_correct": 37
+    },
+    {
+      "cell": "SQL-L2",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 122,
+      "accuracy": 0.8299319727891157,
+      "interval": [
+        0.7414965986394558,
+        0.91156462585034
+      ],
+      "delivery": 0.673469387755102,
+      "outcomes": {
+        "correct": 122,
+        "wrong": 18,
+        "exec_error": 7
+      },
+      "all_repetitions_correct": 35,
+      "all_three_correct": 35
+    },
+    {
+      "cell": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 273,
+      "accuracy": 0.9285714285714286,
+      "interval": [
+        0.8877551020408163,
+        0.9625850340136054
+      ],
+      "delivery": 0.7585034013605442,
+      "outcomes": {
+        "correct": 273,
+        "wrong": 19,
+        "exec_error": 2
+      },
+      "all_repetitions_correct": 83,
+      "all_three_correct": 83
+    },
+    {
+      "cell": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 138,
+      "accuracy": 0.9387755102040817,
+      "interval": [
+        0.8843537414965987,
+        0.9795918367346941
+      ],
+      "delivery": 0.7210884353741497,
+      "outcomes": {
+        "correct": 138,
+        "wrong": 9
+      },
+      "all_repetitions_correct": 43,
+      "all_three_correct": 43
+    },
+    {
+      "cell": "SQL-L3a",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 135,
+      "accuracy": 0.9183673469387755,
+      "interval": [
+        0.8571428571428571,
+        0.9659863945578232
+      ],
+      "delivery": 0.7959183673469388,
+      "outcomes": {
+        "correct": 135,
+        "exec_error": 2,
+        "wrong": 10
+      },
+      "all_repetitions_correct": 40,
+      "all_three_correct": 40
+    },
+    {
+      "cell": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 152,
+      "accuracy": 0.5170068027210885,
+      "interval": [
+        0.4319727891156463,
+        0.6054421768707483
+      ],
+      "delivery": 0.43197278911564624,
+      "outcomes": {
+        "correct": 152,
+        "wrong": 137,
+        "exec_error": 3,
+        "refused": 2
+      },
+      "all_repetitions_correct": 35,
+      "all_three_correct": 35
+    },
+    {
+      "cell": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 81,
+      "accuracy": 0.5510204081632653,
+      "interval": [
+        0.42857142857142855,
+        0.673469387755102
+      ],
+      "delivery": 0.4217687074829932,
+      "outcomes": {
+        "correct": 81,
+        "wrong": 62,
+        "exec_error": 2,
+        "refused": 2
+      },
+      "all_repetitions_correct": 19,
+      "all_three_correct": 19
+    },
+    {
+      "cell": "SQL-R",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 71,
+      "accuracy": 0.48299319727891155,
+      "interval": [
+        0.36054421768707484,
+        0.6054421768707483
+      ],
+      "delivery": 0.4421768707482993,
+      "outcomes": {
+        "correct": 71,
+        "wrong": 75,
+        "exec_error": 1
+      },
+      "all_repetitions_correct": 16,
+      "all_three_correct": 16
+    }
+  ],
+  "strata": [
+    {
+      "cell": "JSON-L2",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 87,
+      "accuracy": 0.7631578947368421
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 28,
+      "accuracy": 0.2828282828282828
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 8,
+      "accuracy": 0.09876543209876543
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 49,
+      "accuracy": 0.3081761006289308
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 74,
+      "accuracy": 0.5481481481481482
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 71,
+      "accuracy": 0.3333333333333333
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 52,
+      "accuracy": 0.6419753086419753
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 13,
+      "accuracy": 0.7222222222222222
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 3,
+      "accuracy": 0.08333333333333333
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 3,
+      "accuracy": 0.08333333333333333
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 55,
+      "accuracy": 0.7971014492753623
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 16,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 11,
+      "accuracy": 0.3055555555555556
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 6,
+      "accuracy": 0.14285714285714285
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 16,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 77,
+      "accuracy": 0.6111111111111112
+    },
+    {
+      "cell": "JSON-L2",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 46,
+      "accuracy": 0.27380952380952384
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 69,
+      "accuracy": 0.6052631578947368
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 39,
+      "accuracy": 0.3939393939393939
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 38,
+      "accuracy": 0.4691358024691358
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 72,
+      "accuracy": 0.4528301886792453
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 74,
+      "accuracy": 0.5481481481481482
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 87,
+      "accuracy": 0.4084507042253521
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 59,
+      "accuracy": 0.7283950617283951
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 9,
+      "accuracy": 0.5
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 14,
+      "accuracy": 0.3888888888888889
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 20,
+      "accuracy": 0.5555555555555556
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 51,
+      "accuracy": 0.7391304347826086
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 8,
+      "accuracy": 0.3333333333333333
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 7,
+      "accuracy": 0.19444444444444445
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 22,
+      "accuracy": 0.5238095238095238
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 9,
+      "accuracy": 0.375
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 6,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 72,
+      "accuracy": 0.5714285714285714
+    },
+    {
+      "cell": "SQL-L0-E",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 74,
+      "accuracy": 0.44047619047619047
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 68,
+      "accuracy": 0.5964912280701754
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 33,
+      "accuracy": 0.3333333333333333
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 40,
+      "accuracy": 0.49382716049382713
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 69,
+      "accuracy": 0.4339622641509434
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 72,
+      "accuracy": 0.5333333333333333
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 77,
+      "accuracy": 0.3615023474178404
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 64,
+      "accuracy": 0.7901234567901234
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 7,
+      "accuracy": 0.3888888888888889
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 12,
+      "accuracy": 0.3333333333333333
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 24,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 54,
+      "accuracy": 0.782608695652174
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 7,
+      "accuracy": 0.2916666666666667
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 4,
+      "accuracy": 0.1111111111111111
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 23,
+      "accuracy": 0.5476190476190477
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 7,
+      "accuracy": 0.2916666666666667
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 3,
+      "accuracy": 0.3333333333333333
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 70,
+      "accuracy": 0.5555555555555556
+    },
+    {
+      "cell": "SQL-L0",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 71,
+      "accuracy": 0.4226190476190476
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 105,
+      "accuracy": 0.9210526315789473
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 76,
+      "accuracy": 0.7676767676767676
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 71,
+      "accuracy": 0.8765432098765432
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 133,
+      "accuracy": 0.8364779874213837
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 119,
+      "accuracy": 0.8814814814814815
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 183,
+      "accuracy": 0.8591549295774648
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 69,
+      "accuracy": 0.8518518518518519
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 17,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 30,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 35,
+      "accuracy": 0.9722222222222222
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 66,
+      "accuracy": 0.9565217391304348
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 19,
+      "accuracy": 0.7916666666666666
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 27,
+      "accuracy": 0.75
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 31,
+      "accuracy": 0.7380952380952381
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 20,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 7,
+      "accuracy": 0.7777777777777778
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 110,
+      "accuracy": 0.873015873015873
+    },
+    {
+      "cell": "SQL-L1-E",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 142,
+      "accuracy": 0.8452380952380952
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 106,
+      "accuracy": 0.9298245614035088
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 78,
+      "accuracy": 0.7878787878787878
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 68,
+      "accuracy": 0.8395061728395061
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 139,
+      "accuracy": 0.8742138364779874
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 113,
+      "accuracy": 0.837037037037037
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 179,
+      "accuracy": 0.8403755868544601
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 73,
+      "accuracy": 0.9012345679012346
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 18,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 29,
+      "accuracy": 0.8055555555555556
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 34,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 68,
+      "accuracy": 0.9855072463768116
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 17,
+      "accuracy": 0.7083333333333334
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 25,
+      "accuracy": 0.6944444444444444
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 34,
+      "accuracy": 0.8095238095238095
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 20,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 7,
+      "accuracy": 0.7777777777777778
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 115,
+      "accuracy": 0.9126984126984127
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 137,
+      "accuracy": 0.8154761904761905
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 101,
+      "accuracy": 0.8859649122807017
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 80,
+      "accuracy": 0.8080808080808081
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 67,
+      "accuracy": 0.8271604938271605
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 132,
+      "accuracy": 0.8301886792452831
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 116,
+      "accuracy": 0.8592592592592593
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 178,
+      "accuracy": 0.8356807511737089
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 70,
+      "accuracy": 0.8641975308641975
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 15,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 30,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 33,
+      "accuracy": 0.9166666666666666
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 64,
+      "accuracy": 0.927536231884058
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 19,
+      "accuracy": 0.7916666666666666
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 25,
+      "accuracy": 0.6944444444444444
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 36,
+      "accuracy": 0.8571428571428571
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 20,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 6,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 114,
+      "accuracy": 0.9047619047619048
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 134,
+      "accuracy": 0.7976190476190477
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 60,
+      "correct": 52,
+      "accuracy": 0.8666666666666667
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 48,
+      "correct": 39,
+      "accuracy": 0.8125
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 39,
+      "correct": 35,
+      "accuracy": 0.8974358974358975
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 81,
+      "correct": 67,
+      "accuracy": 0.8271604938271605
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 66,
+      "correct": 59,
+      "accuracy": 0.8939393939393939
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 105,
+      "correct": 89,
+      "accuracy": 0.8476190476190476
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 42,
+      "correct": 37,
+      "accuracy": 0.8809523809523809
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 6,
+      "correct": 6,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 18,
+      "correct": 17,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 15,
+      "correct": 15,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 33,
+      "correct": 31,
+      "accuracy": 0.9393939393939394
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 21,
+      "correct": 15,
+      "accuracy": 0.7142857142857143
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 12,
+      "correct": 8,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 24,
+      "correct": 19,
+      "accuracy": 0.7916666666666666
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 15,
+      "correct": 12,
+      "accuracy": 0.8
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 3,
+      "correct": 3,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 72,
+      "correct": 65,
+      "accuracy": 0.9027777777777778
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 75,
+      "correct": 61,
+      "accuracy": 0.8133333333333334
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 113,
+      "accuracy": 0.9912280701754386
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 96,
+      "accuracy": 0.9696969696969697
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 72,
+      "accuracy": 0.8888888888888888
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 147,
+      "accuracy": 0.9245283018867925
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 134,
+      "accuracy": 0.9925925925925926
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 201,
+      "accuracy": 0.9436619718309859
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 80,
+      "accuracy": 0.9876543209876543
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 18,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 33,
+      "accuracy": 0.9166666666666666
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 35,
+      "accuracy": 0.9722222222222222
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 68,
+      "accuracy": 0.9855072463768116
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 24,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 31,
+      "accuracy": 0.8611111111111112
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 41,
+      "accuracy": 0.9761904761904762
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 22,
+      "accuracy": 0.9166666666666666
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 9,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 124,
+      "accuracy": 0.9841269841269841
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 157,
+      "accuracy": 0.9345238095238095
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 114,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 90,
+      "accuracy": 0.9090909090909091
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 78,
+      "accuracy": 0.9629629629629629
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 151,
+      "accuracy": 0.949685534591195
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 131,
+      "accuracy": 0.9703703703703703
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 201,
+      "accuracy": 0.9436619718309859
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 81,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 18,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 36,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 36,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 69,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 24,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 29,
+      "accuracy": 0.8055555555555556
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 40,
+      "accuracy": 0.9523809523809523
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 21,
+      "accuracy": 0.875
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 9,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 123,
+      "accuracy": 0.9761904761904762
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 159,
+      "accuracy": 0.9464285714285714
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 69,
+      "accuracy": 0.6052631578947368
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 38,
+      "accuracy": 0.3838383838383838
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 10,
+      "accuracy": 0.12345679012345678
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 50,
+      "accuracy": 0.31446540880503143
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 67,
+      "accuracy": 0.4962962962962963
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 68,
+      "accuracy": 0.3192488262910798
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 49,
+      "accuracy": 0.6049382716049383
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 12,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 7,
+      "accuracy": 0.19444444444444445
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 50,
+      "accuracy": 0.7246376811594203
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 5,
+      "accuracy": 0.20833333333333334
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 20,
+      "accuracy": 0.5555555555555556
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 15,
+      "accuracy": 0.35714285714285715
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 8,
+      "accuracy": 0.3333333333333333
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 107,
+      "accuracy": 0.8492063492063492
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 10,
+      "accuracy": 0.05952380952380952
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 96,
+      "accuracy": 0.8421052631578947
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 76,
+      "accuracy": 0.7676767676767676
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 66,
+      "accuracy": 0.8148148148148148
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 130,
+      "accuracy": 0.8176100628930818
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 108,
+      "accuracy": 0.8
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 172,
+      "accuracy": 0.8075117370892019
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 66,
+      "accuracy": 0.8148148148148148
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 17,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 26,
+      "accuracy": 0.7222222222222222
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 34,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 63,
+      "accuracy": 0.9130434782608695
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 13,
+      "accuracy": 0.5416666666666666
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 25,
+      "accuracy": 0.6944444444444444
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 32,
+      "accuracy": 0.7619047619047619
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 21,
+      "accuracy": 0.875
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 7,
+      "accuracy": 0.7777777777777778
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 111,
+      "accuracy": 0.8809523809523809
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 127,
+      "accuracy": 0.7559523809523809
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 105,
+      "accuracy": 0.9210526315789473
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 80,
+      "accuracy": 0.8080808080808081
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 65,
+      "accuracy": 0.8024691358024691
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 134,
+      "accuracy": 0.8427672955974843
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 116,
+      "accuracy": 0.8592592592592593
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 178,
+      "accuracy": 0.8356807511737089
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 72,
+      "accuracy": 0.8888888888888888
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 17,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 26,
+      "accuracy": 0.7222222222222222
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 34,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 65,
+      "accuracy": 0.9420289855072463
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 20,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 28,
+      "accuracy": 0.7777777777777778
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 37,
+      "accuracy": 0.8809523809523809
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 19,
+      "accuracy": 0.7916666666666666
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 4,
+      "accuracy": 0.4444444444444444
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 117,
+      "accuracy": 0.9285714285714286
+    },
+    {
+      "cell": "SQL-L1",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 133,
+      "accuracy": 0.7916666666666666
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 92,
+      "accuracy": 0.8070175438596491
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 53,
+      "accuracy": 0.5353535353535354
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 57,
+      "accuracy": 0.7037037037037037
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 112,
+      "accuracy": 0.7044025157232704
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 90,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 134,
+      "accuracy": 0.6291079812206573
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 68,
+      "accuracy": 0.8395061728395061
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 15,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 20,
+      "accuracy": 0.5555555555555556
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 31,
+      "accuracy": 0.8611111111111112
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 60,
+      "accuracy": 0.8695652173913043
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 15,
+      "accuracy": 0.625
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 18,
+      "accuracy": 0.5
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 27,
+      "accuracy": 0.6428571428571429
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 12,
+      "accuracy": 0.5
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 4,
+      "accuracy": 0.4444444444444444
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 94,
+      "accuracy": 0.746031746031746
+    },
+    {
+      "cell": "SQL-L1c",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 108,
+      "accuracy": 0.6428571428571429
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 111,
+      "accuracy": 0.9736842105263158
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 97,
+      "accuracy": 0.9797979797979798
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 78,
+      "accuracy": 0.9629629629629629
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 153,
+      "accuracy": 0.9622641509433962
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 133,
+      "accuracy": 0.9851851851851852
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 208,
+      "accuracy": 0.9765258215962441
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 78,
+      "accuracy": 0.9629629629629629
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 18,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 34,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 34,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 67,
+      "accuracy": 0.9710144927536232
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 23,
+      "accuracy": 0.9583333333333334
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 36,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 41,
+      "accuracy": 0.9761904761904762
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 24,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 9,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 123,
+      "accuracy": 0.9761904761904762
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 163,
+      "accuracy": 0.9702380952380952
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 108,
+      "accuracy": 0.9473684210526315
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 92,
+      "accuracy": 0.9292929292929293
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 74,
+      "accuracy": 0.9135802469135802
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 140,
+      "accuracy": 0.8805031446540881
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 134,
+      "accuracy": 0.9925925925925926
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 201,
+      "accuracy": 0.9436619718309859
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 73,
+      "accuracy": 0.9012345679012346
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 18,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 34,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 31,
+      "accuracy": 0.8611111111111112
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 64,
+      "accuracy": 0.927536231884058
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 23,
+      "accuracy": 0.9583333333333334
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 35,
+      "accuracy": 0.9722222222222222
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 39,
+      "accuracy": 0.9285714285714286
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 23,
+      "accuracy": 0.9583333333333334
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 7,
+      "accuracy": 0.7777777777777778
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 123,
+      "accuracy": 0.9761904761904762
+    },
+    {
+      "cell": "SQL-L1plus",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 151,
+      "accuracy": 0.8988095238095238
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 102,
+      "accuracy": 0.8947368421052632
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 76,
+      "accuracy": 0.7676767676767676
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 61,
+      "accuracy": 0.7530864197530864
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 125,
+      "accuracy": 0.7861635220125787
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 114,
+      "accuracy": 0.8444444444444444
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 167,
+      "accuracy": 0.784037558685446
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 72,
+      "accuracy": 0.8888888888888888
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 17,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 26,
+      "accuracy": 0.7222222222222222
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 33,
+      "accuracy": 0.9166666666666666
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 67,
+      "accuracy": 0.9710144927536232
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 15,
+      "accuracy": 0.625
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 24,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 34,
+      "accuracy": 0.8095238095238095
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 18,
+      "accuracy": 0.75
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 5,
+      "accuracy": 0.5555555555555556
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 116,
+      "accuracy": 0.9206349206349206
+    },
+    {
+      "cell": "SQL-L2-E",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 123,
+      "accuracy": 0.7321428571428571
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 107,
+      "accuracy": 0.9385964912280702
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 83,
+      "accuracy": 0.8383838383838383
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 56,
+      "accuracy": 0.691358024691358
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 130,
+      "accuracy": 0.8176100628930818
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 116,
+      "accuracy": 0.8592592592592593
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 170,
+      "accuracy": 0.7981220657276995
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 76,
+      "accuracy": 0.9382716049382716
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 17,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 24,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 27,
+      "accuracy": 0.75
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 67,
+      "accuracy": 0.9710144927536232
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 20,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 26,
+      "accuracy": 0.7222222222222222
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 34,
+      "accuracy": 0.8095238095238095
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 24,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 7,
+      "accuracy": 0.7777777777777778
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 113,
+      "accuracy": 0.8968253968253969
+    },
+    {
+      "cell": "SQL-L2",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 133,
+      "accuracy": 0.7916666666666666
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 108,
+      "accuracy": 0.9473684210526315
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 92,
+      "accuracy": 0.9292929292929293
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 73,
+      "accuracy": 0.9012345679012346
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 145,
+      "accuracy": 0.9119496855345912
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 128,
+      "accuracy": 0.9481481481481482
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 196,
+      "accuracy": 0.92018779342723
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 77,
+      "accuracy": 0.9506172839506173
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 17,
+      "accuracy": 0.9444444444444444
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 31,
+      "accuracy": 0.8611111111111112
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 33,
+      "accuracy": 0.9166666666666666
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 68,
+      "accuracy": 0.9855072463768116
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 20,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 35,
+      "accuracy": 0.9722222222222222
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 39,
+      "accuracy": 0.9285714285714286
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 24,
+      "accuracy": 1.0
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 6,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 120,
+      "accuracy": 0.9523809523809523
+    },
+    {
+      "cell": "SQL-L3a",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 153,
+      "accuracy": 0.9107142857142857
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "q_level",
+      "group": "Q1",
+      "attempts": 114,
+      "correct": 76,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "q_level",
+      "group": "Q2",
+      "attempts": 99,
+      "correct": 42,
+      "accuracy": 0.42424242424242425
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "q_level",
+      "group": "Q3",
+      "attempts": 81,
+      "correct": 34,
+      "accuracy": 0.41975308641975306
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "persona",
+      "group": "分析师",
+      "attempts": 159,
+      "correct": 78,
+      "accuracy": 0.49056603773584906
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "persona",
+      "group": "管理层",
+      "attempts": 135,
+      "correct": 74,
+      "accuracy": 0.5481481481481482
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "semantic_dependency",
+      "group": "只能由业务告知",
+      "attempts": 213,
+      "correct": 84,
+      "accuracy": 0.39436619718309857
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "semantic_dependency",
+      "group": "可从数据发现",
+      "attempts": 81,
+      "correct": 68,
+      "accuracy": 0.8395061728395061
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "关联路径",
+      "attempts": 18,
+      "correct": 12,
+      "accuracy": 0.6666666666666666
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "多步依赖",
+      "attempts": 36,
+      "correct": 15,
+      "accuracy": 0.4166666666666667
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "实体级派生属性",
+      "attempts": 36,
+      "correct": 12,
+      "accuracy": 0.3333333333333333
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "直接汇总",
+      "attempts": 69,
+      "correct": 57,
+      "accuracy": 0.8260869565217391
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "筛选",
+      "attempts": 24,
+      "correct": 7,
+      "accuracy": 0.2916666666666667
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "粒度对齐与半可加",
+      "attempts": 36,
+      "correct": 10,
+      "accuracy": 0.2777777777777778
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "组合增长累计占比排名",
+      "attempts": 42,
+      "correct": 24,
+      "accuracy": 0.5714285714285714
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "组合比率",
+      "attempts": 24,
+      "correct": 10,
+      "accuracy": 0.4166666666666667
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "complexity_source",
+      "group": "超出查询语言",
+      "attempts": 9,
+      "correct": 5,
+      "accuracy": 0.5555555555555556
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "summary_coverage",
+      "group": "covered",
+      "attempts": 126,
+      "correct": 86,
+      "accuracy": 0.6825396825396826
+    },
+    {
+      "cell": "SQL-R",
+      "dimension": "summary_coverage",
+      "group": "not_covered",
+      "attempts": 168,
+      "correct": 66,
+      "accuracy": 0.39285714285714285
+    }
+  ],
+  "comparisons": [
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3707482993197279,
+      "interval": [
+        0.2755102040816326,
+        0.46258503401360546
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3333333333333333,
+      "interval": [
+        0.20408163265306123,
+        0.46938775510204084
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.40816326530612246,
+      "interval": [
+        0.272108843537415,
+        0.54421768707483
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.03741496598639455,
+      "interval": [
+        -0.0272108843537415,
+        0.09863945578231292
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.03401360544217687,
+      "interval": [
+        -0.04761904761904763,
+        0.11564625850340135
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-R",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.04081632653061224,
+      "interval": [
+        -0.054421768707483,
+        0.13605442176870747
+      ]
+    },
+    {
+      "left": "SQL-R",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.17006802721088435,
+      "interval": [
+        0.08503401360544219,
+        0.2551020408163266
+      ]
+    },
+    {
+      "left": "SQL-R",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.14285714285714285,
+      "interval": [
+        0.0272108843537415,
+        0.2653061224489796
+      ]
+    },
+    {
+      "left": "SQL-R",
+      "right": "SQL-L1c",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.19727891156462585,
+      "interval": [
+        0.07482993197278914,
+        0.32653061224489793
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.04081632653061225,
+      "interval": [
+        -0.08503401360544219,
+        0.003401360544217688
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.08843537414965986,
+      "interval": [
+        -0.14965986394557823,
+        -0.03401360544217687
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1.5W",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.006802721088435371,
+      "interval": [
+        -0.054421768707483,
+        0.07482993197278912
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.16326530612244897,
+      "interval": [
+        -0.23809523809523808,
+        -0.09523809523809523
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.1564625850340136,
+      "interval": [
+        -0.2585034013605442,
+        -0.06802721088435373
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1c",
+      "split": "tuning",
+      "questions": 49,
+      "delta": -0.17006802721088435,
+      "interval": [
+        -0.2789115646258503,
+        -0.06802721088435373
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.017006802721088433,
+      "interval": [
+        -0.04761904761904762,
+        0.08163265306122448
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.034013605442176874,
+      "interval": [
+        -0.108843537414966,
+        0.047619047619047616
+      ]
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.06802721088435375,
+      "interval": [
+        -0.034013605442176874,
+        0.17006802721088438
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.006802721088435375,
+      "interval": [
+        -0.034013605442176874,
+        0.05102040816326531
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.013605442176870746,
+      "interval": [
+        -0.06802721088435373,
+        0.040816326530612256
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.027210884353741496,
+      "interval": [
+        -0.034013605442176874,
+        0.08843537414965988
+      ]
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.02380952380952381,
+      "interval": [
+        -0.08163265306122448,
+        0.030612244897959183
+      ]
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.02040816326530612,
+      "interval": [
+        -0.10884353741496598,
+        0.061224489795918366
+      ]
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-L2-E",
+      "split": "tuning",
+      "questions": 49,
+      "delta": -0.0272108843537415,
+      "interval": [
+        -0.10204081632653061,
+        0.040816326530612256
+      ]
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.003401360544217689,
+      "interval": [
+        -0.04761904761904762,
+        0.044217687074829926
+      ]
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.006802721088435371,
+      "interval": [
+        -0.06802721088435375,
+        0.08843537414965988
+      ]
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L3a",
+      "split": "tuning",
+      "questions": 49,
+      "delta": -0.01360544217687075,
+      "interval": [
+        -0.061224489795918366,
+        0.03401360544217687
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.013605442176870748,
+      "interval": [
+        -0.06802721088435375,
+        0.04761904761904762
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.006802721088435373,
+      "interval": [
+        -0.07482993197278912,
+        0.07482993197278912
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "split": "tuning",
+      "questions": 49,
+      "delta": -0.020408163265306124,
+      "interval": [
+        -0.10884353741496598,
+        0.06802721088435375
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.0816326530612245,
+      "interval": [
+        0.02040816326530612,
+        0.14625850340136054
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        -0.020408163265306114,
+        0.1836734693877551
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        0.006802721088435377,
+        0.16326530612244897
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.108843537414966,
+      "interval": [
+        0.05782312925170068,
+        0.16335034013605323
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.07482993197278913,
+      "interval": [
+        0.013605442176870755,
+        0.14285714285714288
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.14285714285714288,
+      "interval": [
+        0.06122448979591838,
+        0.23129251700680273
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.1054421768707483,
+      "interval": [
+        0.05102040816326531,
+        0.16326530612244897
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        0.01360544217687075,
+        0.14965986394557823
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.1292517006802721,
+      "interval": [
+        0.04081632653061224,
+        0.22448979591836735
+      ]
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.017006802721088437,
+      "interval": [
+        -0.01360544217687075,
+        0.051020408163265314
+      ]
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0272108843537415,
+      "interval": [
+        -0.02040816326530612,
+        0.08843537414965988
+      ]
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.006802721088435375,
+      "interval": [
+        -0.0272108843537415,
+        0.04761904761904762
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.12244897959183675,
+      "interval": [
+        0.06802721088435375,
+        0.1836734693877551
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.108843537414966,
+      "interval": [
+        0.034013605442176874,
+        0.1904761904761905
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.1360544217687075,
+      "interval": [
+        0.061224489795918366,
+        0.22448979591836735
+      ]
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.04081632653061225,
+      "interval": [
+        0.0034013605442176874,
+        0.08163265306122448
+      ]
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.027210884353741496,
+      "interval": [
+        -0.02040816326530613,
+        0.08843537414965985
+      ]
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.054421768707483,
+      "interval": [
+        0.006802721088435375,
+        0.11564625850340136
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.006802721088435374,
+      "interval": [
+        -0.0272108843537415,
+        0.044217687074829926
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.02040816326530612,
+      "interval": [
+        -0.06802721088435375,
+        0.02057823129251454
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T2",
+      "split": "tuning",
+      "questions": 49,
+      "delta": 0.03401360544217687,
+      "interval": [
+        -0.013605442176870755,
+        0.08843537414965988
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.006802721088435375,
+      "interval": [
+        -0.05102040816326531,
+        0.03741496598639456
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.01360544217687075,
+      "interval": [
+        -0.034013605442176874,
+        0.06122448979591838
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T3",
+      "split": "tuning",
+      "questions": 49,
+      "delta": -0.0272108843537415,
+      "interval": [
+        -0.10204081632653061,
+        0.04761904761904762
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.006802721088435377,
+      "interval": [
+        -0.04081632653061224,
+        0.054421768707483
+      ]
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.006802721088435377,
+      "interval": [
+        -0.04081632653061224,
+        0.054421768707483
+      ]
+    }
+  ],
+  "d3": [
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L0",
+      "questions": 27,
+      "attempts": 81,
+      "correct": 64,
+      "accuracy": 0.7901234567901234
+    },
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L0-E",
+      "questions": 27,
+      "attempts": 81,
+      "correct": 59,
+      "accuracy": 0.7283950617283951
+    },
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L1",
+      "questions": 27,
+      "attempts": 81,
+      "correct": 72,
+      "accuracy": 0.8888888888888888
+    },
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L1-E",
+      "questions": 27,
+      "attempts": 81,
+      "correct": 69,
+      "accuracy": 0.8518518518518519
+    },
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "delta": -0.0617283950617284,
+      "interval": [
+        -0.16049382716049385,
+        0.03703703703703704
+      ]
+    },
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "delta": 0.09876543209876544,
+      "interval": [
+        -0.024691358024691364,
+        0.23456790123456792
+      ]
+    },
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "delta": -0.03703703703703704,
+      "interval": [
+        -0.11111111111111113,
+        0.02469135802469136
+      ]
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L0",
+      "questions": 71,
+      "attempts": 213,
+      "correct": 77,
+      "accuracy": 0.3615023474178404
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L0-E",
+      "questions": 71,
+      "attempts": 213,
+      "correct": 87,
+      "accuracy": 0.4084507042253521
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L1",
+      "questions": 71,
+      "attempts": 213,
+      "correct": 178,
+      "accuracy": 0.8356807511737089
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L1-E",
+      "questions": 71,
+      "attempts": 213,
+      "correct": 183,
+      "accuracy": 0.8591549295774648
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "delta": 0.046948356807511735,
+      "interval": [
+        -0.032863849765258225,
+        0.1267605633802817
+      ]
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "delta": 0.47417840375586856,
+      "interval": [
+        0.3615023474178404,
+        0.5821596244131456
+      ]
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "delta": 0.02347417840375587,
+      "interval": [
+        -0.02347417840375587,
+        0.07511737089201878
+      ]
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L0",
+      "questions": 20,
+      "attempts": 60,
+      "correct": 47,
+      "accuracy": 0.7833333333333333
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L0-E",
+      "questions": 20,
+      "attempts": 60,
+      "correct": 46,
+      "accuracy": 0.7666666666666667
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L1",
+      "questions": 20,
+      "attempts": 60,
+      "correct": 55,
+      "accuracy": 0.9166666666666666
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "cell": "SQL-L1-E",
+      "questions": 20,
+      "attempts": 60,
+      "correct": 54,
+      "accuracy": 0.9
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "delta": -0.016666666666666666,
+      "interval": [
+        -0.11666666666666667,
+        0.1
+      ]
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "delta": 0.13333333333333333,
+      "interval": [
+        0.0,
+        0.3
+      ]
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "delta": -0.01666666666666667,
+      "interval": [
+        -0.06666666666666668,
+        0.03333333333333334
+      ]
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L0",
+      "questions": 78,
+      "attempts": 234,
+      "correct": 94,
+      "accuracy": 0.4017094017094017
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L0-E",
+      "questions": 78,
+      "attempts": 234,
+      "correct": 100,
+      "accuracy": 0.42735042735042733
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L1",
+      "questions": 78,
+      "attempts": 234,
+      "correct": 195,
+      "accuracy": 0.8333333333333334
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "cell": "SQL-L1-E",
+      "questions": 78,
+      "attempts": 234,
+      "correct": 198,
+      "accuracy": 0.8461538461538461
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "delta": 0.025641025641025637,
+      "interval": [
+        -0.05128205128205128,
+        0.10256410256410256
+      ]
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "delta": 0.43162393162393164,
+      "interval": [
+        0.3247863247863248,
+        0.5384615384615384
+      ]
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "delta": 0.012820512820512822,
+      "interval": [
+        -0.03418803418803419,
+        0.0641025641025641
+      ]
+    }
+  ],
+  "coverage": [
+    {
+      "cell": "JSON-L2",
+      "covered": true,
+      "questions": 37,
+      "attempts": 111,
+      "accuracy": 0.8738738738738738,
+      "outcomes": {
+        "correct": 97,
+        "wrong": 14
+      },
+      "correct_qids": {
+        "Q02": 3,
+        "Q03": 3,
+        "Q04": 3,
+        "Q06": 3,
+        "Q08": 3,
+        "Q09": 3,
+        "Q101": 3,
+        "Q102": 3,
+        "Q105": 3,
+        "Q108": 3,
+        "Q11": 3,
+        "Q12": 3,
+        "Q13": 3,
+        "Q15": 3,
+        "Q16": 3,
+        "Q19": 3,
+        "Q21": 3,
+        "Q24": 3,
+        "Q25": 3,
+        "Q28": 3,
+        "Q31": 3,
+        "Q34": 1,
+        "Q41": 3,
+        "Q43": 3,
+        "Q52": 3,
+        "Q53": 3,
+        "Q54": 3,
+        "Q58": 1,
+        "Q61": 2,
+        "Q62": 2,
+        "Q63": 3,
+        "Q64": 3,
+        "Q66": 3,
+        "Q65": 3,
+        "Q75": 1
+      },
+      "baselines": {
+        "SQL-L1": 0.918918918918919,
+        "SQL-L2": 0.9279279279279279,
+        "SQL-L1.5W": 0.8288288288288288
+      }
+    },
+    {
+      "cell": "JSON-L2",
+      "covered": false,
+      "questions": 61,
+      "attempts": 183,
+      "accuracy": 0.14207650273224043,
+      "outcomes": {
+        "refused": 121,
+        "wrong": 35,
+        "correct": 26,
+        "exec_error": 1
+      },
+      "correct_qids": {
+        "Q10": 3,
+        "Q106": 1,
+        "Q27": 3,
+        "Q36": 3,
+        "Q47": 1,
+        "Q51": 3,
+        "Q50": 1,
+        "Q55": 3,
+        "Q57": 3,
+        "Q67": 1,
+        "Q71": 1,
+        "Q77": 3
+      },
+      "baselines": {
+        "SQL-L1": 0.8087431693989071,
+        "SQL-L2": 0.7814207650273224,
+        "SQL-L1.5W": 0.7978142076502732
+      }
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "covered": true,
+      "questions": 42,
+      "attempts": 126,
+      "accuracy": 0.8492063492063492,
+      "outcomes": {
+        "correct": 107,
+        "wrong": 13,
+        "exec_error": 6
+      },
+      "correct_qids": {
+        "Q01": 3,
+        "Q02": 3,
+        "Q04": 3,
+        "Q05": 3,
+        "Q06": 3,
+        "Q09": 3,
+        "Q10": 1,
+        "Q101": 3,
+        "Q105": 3,
+        "Q106": 3,
+        "Q110": 3,
+        "Q111": 3,
+        "Q113": 3,
+        "Q117": 3,
+        "Q12": 3,
+        "Q13": 2,
+        "Q15": 3,
+        "Q16": 2,
+        "Q21": 3,
+        "Q23": 3,
+        "Q28": 2,
+        "Q31": 3,
+        "Q37": 1,
+        "Q38": 3,
+        "Q41": 3,
+        "Q43": 3,
+        "Q50": 3,
+        "Q51": 3,
+        "Q52": 3,
+        "Q53": 3,
+        "Q54": 3,
+        "Q55": 3,
+        "Q56": 3,
+        "Q57": 3,
+        "Q64": 1,
+        "Q70": 3,
+        "Q72": 2,
+        "Q77": 3,
+        "Q94": 3
+      },
+      "baselines": {
+        "SQL-L1": 0.9285714285714286,
+        "SQL-L2": 0.8968253968253969,
+        "SQL-L1.5W": 0.8809523809523809
+      }
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "covered": false,
+      "questions": 56,
+      "attempts": 168,
+      "accuracy": 0.05952380952380952,
+      "outcomes": {
+        "refused": 97,
+        "wrong": 57,
+        "correct": 10,
+        "exec_error": 4
+      },
+      "correct_qids": {
+        "Q03": 1,
+        "Q108": 3,
+        "Q112": 1,
+        "Q19": 1,
+        "Q27": 3,
+        "Q61": 1
+      },
+      "baselines": {
+        "SQL-L1": 0.7916666666666666,
+        "SQL-L2": 0.7916666666666666,
+        "SQL-L1.5W": 0.7559523809523809
+      }
+    }
+  ],
+  "coverage_comparisons": [
+    {
+      "coverage": "JSON-L2",
+      "left": "SQL-L1",
+      "right": "JSON-L2",
+      "delta": -0.04504504504504505,
+      "interval": [
+        -0.12612612612612614,
+        0.027027027027027025
+      ]
+    },
+    {
+      "coverage": "JSON-L2",
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "delta": 0.00900900900900901,
+      "interval": [
+        -0.06306306306306307,
+        0.0900900900900901
+      ]
+    },
+    {
+      "coverage": "SQL-L1.5S",
+      "left": "SQL-L1",
+      "right": "SQL-L1.5S",
+      "delta": -0.07936507936507936,
+      "interval": [
+        -0.19841269841269843,
+        0.03174603174603175
+      ]
+    },
+    {
+      "coverage": "SQL-L1.5S",
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "delta": -0.031746031746031744,
+      "interval": [
+        -0.07936507936507936,
+        0.00793650793650794
+      ]
+    },
+    {
+      "coverage": "intersection",
+      "left": "SQL-L1.5S",
+      "right": "JSON-L2",
+      "delta": 0.07936507936507937,
+      "interval": [
+        -0.07936507936507936,
+        0.22222222222222224
+      ]
+    }
+  ],
+  "coverage_intersection": {
+    "SQL-L1": {
+      "correct": 61,
+      "attempts": 63
+    },
+    "SQL-L2": {
+      "correct": 60,
+      "attempts": 63
+    },
+    "SQL-L1.5S": {
+      "correct": 55,
+      "attempts": 63
+    },
+    "JSON-L2": {
+      "correct": 60,
+      "attempts": 63
+    }
+  },
+  "d4": {
+    "baseline_n": 98,
+    "baseline_correct": 92,
+    "selected_n": 89,
+    "selected_correct": 86,
+    "blocked_wrong": [
+      "Q05",
+      "Q73",
+      "Q82"
+    ],
+    "blocked_correct": [
+      "Q112",
+      "Q122",
+      "Q18",
+      "Q26",
+      "Q64",
+      "Q98"
+    ]
+  },
+  "confidence": {
+    "A": 59,
+    "B": 228,
+    "C": 5,
+    "unparsed": 2
+  },
+  "confidence_selected": {
+    "attempts": 59,
+    "correct": 59
+  },
+  "d6_records": [
+    {
+      "qid": "Q113",
+      "rep": 3,
+      "has_result": true
+    },
+    {
+      "qid": "Q117",
+      "rep": 3,
+      "has_result": false
+    },
+    {
+      "qid": "Q122",
+      "rep": 1,
+      "has_result": true
+    },
+    {
+      "qid": "Q18",
+      "rep": 1,
+      "has_result": true
+    },
+    {
+      "qid": "Q37",
+      "rep": 1,
+      "has_result": true
+    },
+    {
+      "qid": "Q37",
+      "rep": 2,
+      "has_result": true
+    },
+    {
+      "qid": "Q47",
+      "rep": 2,
+      "has_result": true
+    },
+    {
+      "qid": "Q49",
+      "rep": 3,
+      "has_result": true
+    },
+    {
+      "qid": "Q61",
+      "rep": 3,
+      "has_result": true
+    },
+    {
+      "qid": "Q65",
+      "rep": 1,
+      "has_result": true
+    },
+    {
+      "qid": "Q72",
+      "rep": 3,
+      "has_result": true
+    },
+    {
+      "qid": "Q73",
+      "rep": 3,
+      "has_result": false
+    },
+    {
+      "qid": "Q82",
+      "rep": 2,
+      "has_result": true
+    },
+    {
+      "qid": "Q89",
+      "rep": 1,
+      "has_result": true
+    },
+    {
+      "qid": "Q89",
+      "rep": 3,
+      "has_result": true
+    },
+    {
+      "qid": "Q98",
+      "rep": 1,
+      "has_result": true
+    }
+  ],
+  "combo_errors": [
+    {
+      "qid": "Q05",
+      "rep": 2,
+      "has_result": true
+    },
+    {
+      "qid": "Q05",
+      "rep": 1,
+      "has_result": true
+    },
+    {
+      "qid": "Q115",
+      "rep": 2,
+      "has_result": true
+    },
+    {
+      "qid": "Q37",
+      "rep": 2,
+      "has_result": true
+    },
+    {
+      "qid": "Q61",
+      "rep": 3,
+      "has_result": true
+    },
+    {
+      "qid": "Q84",
+      "rep": 3,
+      "has_result": false
+    },
+    {
+      "qid": "Q96",
+      "rep": 3,
+      "has_result": true
+    },
+    {
+      "qid": "Q98",
+      "rep": 2,
+      "has_result": true
+    }
+  ],
+  "covered_error_categories": {
+    "JSON-L2": {
+      "categories": {
+        "原判沿用": 2,
+        "数值错误": 3,
+        "口径不同": 3,
+        "缺行或多行": 6
+      },
+      "without_private_decision": []
+    },
+    "SQL-L1.5S": {
+      "categories": {
+        "口径不同": 7,
+        "原判沿用": 2,
+        "缺行或多行": 3,
+        "数值错误": 1
+      },
+      "without_private_decision": [
+        [
+          "Q10",
+          3,
+          "exec_error"
+        ],
+        [
+          "Q13",
+          1,
+          "exec_error"
+        ],
+        [
+          "Q16",
+          3,
+          "exec_error"
+        ],
+        [
+          "Q28",
+          3,
+          "exec_error"
+        ],
+        [
+          "Q64",
+          1,
+          "exec_error"
+        ],
+        [
+          "Q64",
+          2,
+          "exec_error"
+        ]
+      ]
+    }
+  },
+  "original_logs": {
+    "JSON-L2": {
+      "source_runs": [
+        "20261019-T16-full-v14-json-01"
+      ],
+      "main_cost": 2.2282776,
+      "physical_cost": 2.58393312,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "refused": 121,
+        "correct": 88,
+        "wrong": 79,
+        "exec_error": 6
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 48099.69387755102,
+      "mean_prompt_total": 49084.58163265306
+    },
+    "SQL-L0-E": {
+      "source_runs": [
+        "20261019-T15-explorer-01"
+      ],
+      "main_cost": 3.8432694,
+      "physical_cost": 5.05323232,
+      "physical_attempts": 366,
+      "first_outcomes": {
+        "correct": 93,
+        "exec_error": 60,
+        "wrong": 131,
+        "pending": 5,
+        "refused": 5
+      },
+      "tool_calls": 1890,
+      "step_tool_records": 1977,
+      "tool_executed": 1890,
+      "mean_steps": 3.173469387755102,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 8549.683673469388,
+      "mean_prompt_total": 34137.69727891157
+    },
+    "SQL-L0": {
+      "source_runs": [
+        "20261018-T13-sql-direct-01"
+      ],
+      "main_cost": 4.45284724,
+      "physical_cost": 5.66385196,
+      "physical_attempts": 366,
+      "first_outcomes": {
+        "correct": 95,
+        "exec_error": 28,
+        "wrong": 163,
+        "refused": 8
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 5978.693877551021,
+      "mean_prompt_total": 6591.010204081633
+    },
+    "SQL-L1-E": {
+      "source_runs": [
+        "20261019-T15-explorer-01"
+      ],
+      "main_cost": 3.73158004,
+      "physical_cost": 5.08447602,
+      "physical_attempts": 366,
+      "first_outcomes": {
+        "correct": 146,
+        "exec_error": 63,
+        "wrong": 83,
+        "pending": 2
+      },
+      "tool_calls": 719,
+      "step_tool_records": 720,
+      "tool_executed": 719,
+      "mean_steps": 2.2108843537414966,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 48843.602040816324,
+      "mean_prompt_total": 165497.37074829932
+    },
+    "SQL-L1-T2": {
+      "source_runs": [
+        "20261019-C13-ladder-02"
+      ],
+      "main_cost": 2.6471223999999998,
+      "physical_cost": 2.9899116,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "correct": 203,
+        "wrong": 83,
+        "exec_error": 8
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 47037.69387755102,
+      "mean_prompt_total": 48334.50340136055
+    },
+    "SQL-L1-T3": {
+      "source_runs": [
+        "20261019-C13-ladder-02"
+      ],
+      "main_cost": 2.53723288,
+      "physical_cost": 2.88709644,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "correct": 194,
+        "wrong": 95,
+        "exec_error": 5
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 47618.69387755102,
+      "mean_prompt_total": 48439.64965986394
+    },
+    "SQL-L1-T4": {
+      "source_runs": [
+        "20261019-C13-ladder-02"
+      ],
+      "main_cost": 1.12349724,
+      "physical_cost": 1.2885672000000001,
+      "physical_attempts": 165,
+      "first_outcomes": {
+        "correct": 89,
+        "wrong": 53,
+        "exec_error": 5
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 48554.816326530614,
+      "mean_prompt_total": 50225
+    },
+    "SQL-L1-tuned-instr": {
+      "source_runs": [
+        "20261025-T14-tuned-01"
+      ],
+      "main_cost": 2.25296744,
+      "physical_cost": 2.50244016,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "correct": 253,
+        "wrong": 33,
+        "exec_error": 8
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 56398.69387755102,
+      "mean_prompt_total": 57944.78231292517
+    },
+    "SQL-L1-tuned": {
+      "source_runs": [
+        "20261025-T14-tuned-01"
+      ],
+      "main_cost": 2.04233684,
+      "physical_cost": 2.26933676,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "correct": 239,
+        "wrong": 48,
+        "exec_error": 7
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 55118.69387755102,
+      "mean_prompt_total": 56441.010204081635
+    },
+    "SQL-L1.5S": {
+      "source_runs": [
+        "20261019-T13-l15s-v14-01"
+      ],
+      "main_cost": 2.4234474599999998,
+      "physical_cost": 2.69970058,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "exec_error": 107,
+        "correct": 46,
+        "refused": 97,
+        "wrong": 44
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 33805.69387755102,
+      "mean_prompt_total": 46208.97619047619
+    },
+    "SQL-L1.5W": {
+      "source_runs": [
+        "20261018-T13-sql-direct-01"
+      ],
+      "main_cost": 3.116294,
+      "physical_cost": 4.14535684,
+      "physical_attempts": 366,
+      "first_outcomes": {
+        "exec_error": 110,
+        "correct": 120,
+        "wrong": 64
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 53027.69387755102,
+      "mean_prompt_total": 72982.71428571429
+    },
+    "SQL-L1": {
+      "source_runs": [
+        "20261018-T13-sql-direct-01"
+      ],
+      "main_cost": 2.77415788,
+      "physical_cost": 3.63064812,
+      "physical_attempts": 366,
+      "first_outcomes": {
+        "exec_error": 93,
+        "correct": 123,
+        "wrong": 78
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 46495.69387755102,
+      "mean_prompt_total": 61316.268707482996
+    },
+    "SQL-L1c": {
+      "source_runs": [
+        "20261018-T13-sql-direct-01"
+      ],
+      "main_cost": 2.52956776,
+      "physical_cost": 3.50877192,
+      "physical_attempts": 366,
+      "first_outcomes": {
+        "correct": 143,
+        "exec_error": 36,
+        "wrong": 115
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 6843.693877551021,
+      "mean_prompt_total": 7734.687074829932
+    },
+    "SQL-L1plus-tuned-instr": {
+      "source_runs": [
+        "20261025-T30-combo-01"
+      ],
+      "main_cost": 2.56438624,
+      "physical_cost": 2.89061402,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "correct": 248,
+        "wrong": 35,
+        "exec_error": 11
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 81293.69387755102,
+      "mean_prompt_total": 84352.83673469388
+    },
+    "SQL-L1plus": {
+      "source_runs": [
+        "20261025-T22b-l1plus-l3a-03"
+      ],
+      "main_cost": 2.82213942,
+      "physical_cost": 3.21187542,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "exec_error": 62,
+        "correct": 167,
+        "wrong": 65
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 75257.69387755102,
+      "mean_prompt_total": 91195.79931972788
+    },
+    "SQL-L2-E": {
+      "source_runs": [
+        "20261020-T15-explorer-l2e-02",
+        "20261020-T15-explorer-l2e-03"
+      ],
+      "main_cost": 5.1540172,
+      "physical_cost": 5.80127672,
+      "physical_attempts": 329,
+      "first_outcomes": {
+        "correct": 183,
+        "exec_error": 17,
+        "wrong": 94
+      },
+      "tool_calls": 837,
+      "step_tool_records": 838,
+      "tool_executed": 837,
+      "mean_steps": 2.6020408163265305,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 52638.94217687075,
+      "mean_prompt_total": 190952.80952380953
+    },
+    "SQL-L2": {
+      "source_runs": [
+        "20261019-T16-full-v14-sql-new-01"
+      ],
+      "main_cost": 4.65377536,
+      "physical_cost": 5.2876588,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "correct": 169,
+        "exec_error": 56,
+        "wrong": 69
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 49607.69387755102,
+      "mean_prompt_total": 59189.12925170068
+    },
+    "SQL-L3a": {
+      "source_runs": [
+        "20261025-T22b-l1plus-l3a-03"
+      ],
+      "main_cost": 4.26337336,
+      "physical_cost": 4.84710628,
+      "physical_attempts": 327,
+      "first_outcomes": {
+        "exec_error": 76,
+        "correct": 157,
+        "wrong": 61
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 219863.693877551,
+      "mean_prompt_total": 276783.36734693876
+    },
+    "SQL-R": {
+      "source_runs": [
+        "20261018-T13-sql-direct-01"
+      ],
+      "main_cost": 3.8575263200000003,
+      "physical_cost": 5.1227982,
+      "physical_attempts": 366,
+      "first_outcomes": {
+        "exec_error": 37,
+        "correct": 99,
+        "wrong": 156,
+        "refused": 2
+      },
+      "tool_calls": 0,
+      "step_tool_records": 0,
+      "tool_executed": 0,
+      "mean_steps": 0,
+      "fingerprints": [
+        "e72d3c7f663d3e1383b00b3884cb4501"
+      ],
+      "first_prompt_mean": 4520.693877551021,
+      "mean_prompt_total": 5128.034013605442
+    }
+  },
+  "question_counts": {
+    "deterministic": 109,
+    "judge": 13
+  },
+  "low_qids": [
+    "Q07",
+    "Q17",
+    "Q29",
+    "Q59",
+    "Q68",
+    "Q69",
+    "Q76",
+    "Q79",
+    "Q83",
+    "Q85",
+    "Q99"
+  ],
+  "total_formal_attempts": 6051,
+  "total_main_attempts": 5439,
+  "input_hashes": {
+    "$SEMDEBT_EVAL_DIR@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/cube_100.yaml": "9f08510d1bf86104458d0e5fd66b787d60f9d50e1cbe0df5e2d128ade24b26cd",
+    "$SEMDEBT_EVAL_DIR@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/new.yaml": "a42925ee9631250aef0f40c8a539fa28f2a36d6effa5e86c27360b23bcf97a6c",
+    "runs/20261031-T31-v5-rulings-01/JSON-L2.jsonl": "3f20f1598f16be0138babb64c1de0c02079b8dc42d1497ee8c6524159ab76188",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0-E.jsonl": "79ed656e3150f3124db0e1d7d7c2636e719b0a69355b0acbc222c761e7ca2ad6",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0.jsonl": "be5785873c78bb5bb2efbc3ec31ba9490e89793d40d211e9e2097b3543112011",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-E.jsonl": "03ee8734785d216720d9115bbdbe87f5f87e78836203238599aed77067fac5aa",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T2.jsonl": "7a56993607ab8dbde164f77ff00eea54104fa382eb30b600f5b70ab4abefb5ac",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T3.jsonl": "7610200351491774c82b5bc8288667fea82060e23f50736b31db656701ae3ee3",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T4.jsonl": "bf98674cf34172299b4380850e75f857ce524490bbd0a537ab70ae950dbe453a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned-instr.jsonl": "71ae56b1d4e738aa26664f0686d228a0a8cf37c04c8cc7fda5d66f2d904a977e",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned.jsonl": "8de7ef70b8f2f29d0b4ed179ee77d5e72bd3844d6b9cb88b9159dbcf5728be19",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5S.jsonl": "190dd5d0c8529595388d854bd1086d9f414e9cb00cb4d36d6df3075559cfd340",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5W.jsonl": "271b48a20bbcd920602c1073bf423970ea3899645e83127437695264ee5fa090",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl": "10054c729b82c91504922b73f70bddbbf97700847427d3a709c73f8dfd578f2a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1c.jsonl": "1535d2304ebbdc0d6bba32ab4699a8302c4bf59f7e949b5219443e9fc194aed6",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus-tuned-instr.jsonl": "e0cd78d6b6153d8aca70804a9705c879649dd870dff47c289cda3fbfef451464",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus.jsonl": "48af0eab88f6b09d0502a15cac6d7f3543f325e70118542193c367828635bfb1",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2-E.jsonl": "e0aca16c51617846b65f03178f35b58fb68022c0c68b8220f8a1d465e96f223a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2.jsonl": "189c4d3ad52ebd03ab17ea15bbaf5c2595f10cf2e67b0df77bf667bcf6099bb0",
+    "runs/20261031-T31-v5-rulings-01/SQL-L3a.jsonl": "98aeb013c46be903aec2405ae0397d18276160d92aeaa6b5af81f3b19425a06c",
+    "runs/20261031-T31-v5-rulings-01/SQL-R.jsonl": "21bce20f6503f1e85e9b01f850bb92aeb886ba8372eb4e26e6922baac6e8c713",
+    "reports/validation/t16-v14-8836110/coverage.json": "54d88eb347548023521ee0ede1c7e8788669a4612b13c35f4dfc158a60102329",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/d4-content-equivalence-audit.json": "525454d42b52873e4bdfbf856829332d383abb3cad004f43c3460d4b06fbda3d",
+    "runs/20261023-T19c-confidence-01/confidence.jsonl": "744bc12565b95a5b83e13143ec83f53a6bd2388e0dad5c4c9837ad335a151616",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/codex-decisions.json": "a6a8e5f734fa307f24644852ede317b4615a7cbbb456aefd4f349b6c6a9e3723",
+    "runs/20261019-T16-full-v14-json-01/JSON-L2.jsonl": "10a1ab5c480b8708c81f6bd9fa61a947cbaf81ed45194a205db23808f3a4c7cf",
+    "runs/20261019-T15-explorer-01/SQL-L0-E.jsonl": "f0c4d2bc3a7c70a129b1f80b2b918f508ee6904bde57a92dc6b2e6c0bf5c9461",
+    "runs/20261018-T13-sql-direct-01/SQL-L0.jsonl": "cd18674fad7a222339802f982a7f94a16feec25f06f304c8e27e1dbb4f73ce8c",
+    "runs/20261019-T15-explorer-01/SQL-L1-E.jsonl": "a09ce03bb899e739939c7fa3763d21ede9f8b47fdd076973ab88ca482d9227be",
+    "runs/20261019-C13-ladder-02/SQL-L1-T2.jsonl": "9a28982d4079f0188161afc2d87d9d345bde8ec9bb2b722c3d236c426b8a4965",
+    "runs/20261019-C13-ladder-02/SQL-L1-T3.jsonl": "e59be1041f960897f670da39ecb0c329f7ba1b0a8331592c42ad3dc2ec99b39e",
+    "runs/20261019-C13-ladder-02/SQL-L1-T4.jsonl": "459032ff2dec16d0225bc173e2df96142b2977ba3550eeddb4d19898cf4697ff",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned-instr.jsonl": "1be51e0952e64a3ae5f274c9e2b1b2c22e7d1040de02b18232ca7466133fe532",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned.jsonl": "e65be80548af9fdcdc818258ad7430f90f42e9dc212c245e78cec3a25f9ceb9b",
+    "runs/20261019-T13-l15s-v14-01/SQL-L1.5S.jsonl": "c7e465c42eddf564ad5a2c622651713aaa916db4e1e8bd1fb1e97d53a63f9c8a",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.5W.jsonl": "c063cd130288d105c7f061c705beae9801dcbb6cb8b2f51bc290cb64bbe1a2c3",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.jsonl": "9d8a6b7ee75de9211642b7a94f88dc1be11f3823b50592b024c388fde897ead6",
+    "runs/20261018-T13-sql-direct-01/SQL-L1c.jsonl": "6deb1a4a0c03f68d879794ee09c73a26f2987b8fac0361c1b37a30f42ff2b802",
+    "runs/20261025-T30-combo-01/SQL-L1plus-tuned-instr.jsonl": "41546aff0de2dcb4d050cd27efd13b47de0797fe445ee48d668dc280bc1a16f2",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L1plus.jsonl": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592",
+    "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl": "c9122c04dd556268dcf5fbcae57631405ba61aab037feb2c58826524ab77d746",
+    "runs/20261020-T15-explorer-l2e-03/SQL-L2-E.jsonl": "44628d83f320dd6fd64313ffac4d124754b6f3dbf014831ff453853e45aadf4f",
+    "runs/20261019-T16-full-v14-sql-new-01/SQL-L2.jsonl": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L3a.jsonl": "67f282deddb1a92b4406133da746e8ba6250cf99c9f81c78127ccbe4dec7a2c6",
+    "runs/20261018-T13-sql-direct-01/SQL-R.jsonl": "27ab95f5761450501912ebda3922bb9dd37e4a195b730678b88e95e175757e97"
+  }
+}

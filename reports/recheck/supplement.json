@@ -1,0 +1,713 @@
+{
+  "tools": {
+    "SQL-L0-E": {
+      "calls": 1977,
+      "per_attempt": 6.724489795918367,
+      "purposes": {
+        "聚合或候选答案核验": 1018,
+        "枚举或分组查值": 186,
+        "明细或样例查值": 682,
+        "行数或存在性检查": 89,
+        "结构或执行计划": 2
+      }
+    },
+    "SQL-L1-E": {
+      "calls": 720,
+      "per_attempt": 2.4489795918367347,
+      "purposes": {
+        "行数或存在性检查": 26,
+        "聚合或候选答案核验": 599,
+        "枚举或分组查值": 43,
+        "明细或样例查值": 52
+      }
+    },
+    "SQL-L2-E": {
+      "calls": 838,
+      "per_attempt": 2.8503401360544216,
+      "purposes": {
+        "行数或存在性检查": 11,
+        "聚合或候选答案核验": 710,
+        "枚举或分组查值": 66,
+        "明细或样例查值": 51
+      }
+    }
+  },
+  "first_execution": {
+    "JSON-L2": {
+      "attempts": 327,
+      "exec_error": 8,
+      "rate": 0.024464831804281346
+    },
+    "SQL-L0-E": {
+      "attempts": 327,
+      "exec_error": 66,
+      "rate": 0.2018348623853211
+    },
+    "SQL-L0": {
+      "attempts": 327,
+      "exec_error": 31,
+      "rate": 0.09480122324159021
+    },
+    "SQL-L1-E": {
+      "attempts": 327,
+      "exec_error": 70,
+      "rate": 0.21406727828746178
+    },
+    "SQL-L1-T2": {
+      "attempts": 327,
+      "exec_error": 9,
+      "rate": 0.027522935779816515
+    },
+    "SQL-L1-T3": {
+      "attempts": 327,
+      "exec_error": 8,
+      "rate": 0.024464831804281346
+    },
+    "SQL-L1-T4": {
+      "attempts": 165,
+      "exec_error": 8,
+      "rate": 0.048484848484848485
+    },
+    "SQL-L1-tuned-instr": {
+      "attempts": 327,
+      "exec_error": 8,
+      "rate": 0.024464831804281346
+    },
+    "SQL-L1-tuned": {
+      "attempts": 327,
+      "exec_error": 7,
+      "rate": 0.021406727828746176
+    },
+    "SQL-L1.5S": {
+      "attempts": 327,
+      "exec_error": 119,
+      "rate": 0.363914373088685
+    },
+    "SQL-L1.5W": {
+      "attempts": 327,
+      "exec_error": 123,
+      "rate": 0.3761467889908257
+    },
+    "SQL-L1": {
+      "attempts": 327,
+      "exec_error": 106,
+      "rate": 0.3241590214067278
+    },
+    "SQL-L1c": {
+      "attempts": 327,
+      "exec_error": 43,
+      "rate": 0.13149847094801223
+    },
+    "SQL-L1plus-tuned-instr": {
+      "attempts": 327,
+      "exec_error": 12,
+      "rate": 0.03669724770642202
+    },
+    "SQL-L1plus": {
+      "attempts": 327,
+      "exec_error": 69,
+      "rate": 0.21100917431192662
+    },
+    "SQL-L2-E": {
+      "attempts": 329,
+      "exec_error": 19,
+      "rate": 0.057750759878419454
+    },
+    "SQL-L2": {
+      "attempts": 327,
+      "exec_error": 59,
+      "rate": 0.18042813455657492
+    },
+    "SQL-L3a": {
+      "attempts": 327,
+      "exec_error": 88,
+      "rate": 0.2691131498470948
+    },
+    "SQL-R": {
+      "attempts": 327,
+      "exec_error": 41,
+      "rate": 0.12538226299694188
+    }
+  },
+  "first_delivery": {
+    "JSON-L2": {
+      "attempts": 294,
+      "correct": 88
+    },
+    "SQL-L0-E": {
+      "attempts": 294,
+      "correct": 93
+    },
+    "SQL-L0": {
+      "attempts": 294,
+      "correct": 95
+    },
+    "SQL-L1-E": {
+      "attempts": 294,
+      "correct": 146
+    },
+    "SQL-L1-T2": {
+      "attempts": 294,
+      "correct": 203
+    },
+    "SQL-L1-T3": {
+      "attempts": 294,
+      "correct": 194
+    },
+    "SQL-L1-T4": {
+      "attempts": 147,
+      "correct": 89
+    },
+    "SQL-L1-tuned-instr": {
+      "attempts": 294,
+      "correct": 253
+    },
+    "SQL-L1-tuned": {
+      "attempts": 294,
+      "correct": 239
+    },
+    "SQL-L1.5S": {
+      "attempts": 294,
+      "correct": 46
+    },
+    "SQL-L1.5W": {
+      "attempts": 294,
+      "correct": 120
+    },
+    "SQL-L1": {
+      "attempts": 294,
+      "correct": 123
+    },
+    "SQL-L1c": {
+      "attempts": 294,
+      "correct": 143
+    },
+    "SQL-L1plus-tuned-instr": {
+      "attempts": 294,
+      "correct": 248
+    },
+    "SQL-L1plus": {
+      "attempts": 294,
+      "correct": 167
+    },
+    "SQL-L2-E": {
+      "attempts": 294,
+      "correct": 183
+    },
+    "SQL-L2": {
+      "attempts": 294,
+      "correct": 169
+    },
+    "SQL-L3a": {
+      "attempts": 294,
+      "correct": 157
+    },
+    "SQL-R": {
+      "attempts": 294,
+      "correct": 99
+    }
+  },
+  "historical_tokens": {
+    "SQL-L0": {
+      "requests": 366,
+      "min": 5966,
+      "max": 6024,
+      "mean": 5978.401639344263,
+      "characters": 11973,
+      "heuristic_tokens": 3592,
+      "system_hashes": [
+        "c7d4d21fb5621fc0d8475236da10d48bb94195766b4e32fcba3c8208224ca96c"
+      ]
+    },
+    "SQL-L1c": {
+      "requests": 366,
+      "min": 6831,
+      "max": 6889,
+      "mean": 6843.401639344263,
+      "characters": 20214,
+      "heuristic_tokens": 6064,
+      "system_hashes": [
+        "a61668486bf0d15e885367085000b6046244193df0106db36f1823c9bd84e23d"
+      ]
+    },
+    "SQL-L1": {
+      "requests": 366,
+      "min": 46483,
+      "max": 46541,
+      "mean": 46495.401639344265,
+      "characters": 111008,
+      "heuristic_tokens": 39829,
+      "system_hashes": [
+        "8df43ae0552cab461d8bd490ff4e21114995681ff0ccd38cf85115f65e44f6a6"
+      ]
+    }
+  },
+  "semantic_counts": {
+    "conventions": 15,
+    "metrics": 69,
+    "synonyms": 56,
+    "plus": {
+      "general_rules": 1,
+      "clarifications": 41,
+      "concepts": 37,
+      "aliases": 17,
+      "hierarchies": 13
+    }
+  },
+  "correspondence": {
+    "注解保留": 79,
+    "形式化": 30
+  },
+  "ontology_model": {
+    "properties_without_domain_or_range": [
+      ":CostType",
+      ":IsWorkDay",
+      ":MachineType",
+      ":OnHandQuantity",
+      ":PromotionKey",
+      ":SalesQuantity",
+      ":ScenarioKey",
+      ":Status",
+      ":StoreType",
+      ":Title",
+      ":channelKey",
+      ":parentAccount",
+      ":value"
+    ]
+  },
+  "ontology_missed": {
+    "formalized_entries": 30,
+    "formalizable_annotation_entries": 16,
+    "questions": [
+      "Q05",
+      "Q08",
+      "Q102",
+      "Q104",
+      "Q11",
+      "Q112",
+      "Q115",
+      "Q117",
+      "Q120",
+      "Q121",
+      "Q18",
+      "Q20",
+      "Q24",
+      "Q31",
+      "Q35",
+      "Q36",
+      "Q38",
+      "Q49",
+      "Q56",
+      "Q60",
+      "Q65",
+      "Q66",
+      "Q69",
+      "Q71",
+      "Q73",
+      "Q76",
+      "Q78",
+      "Q82",
+      "Q89",
+      "Q90",
+      "Q98",
+      "Q99"
+    ],
+    "questions_n": 32,
+    "main_questions_n": 29,
+    "historical_l3a_wrong": [
+      "Q104",
+      "Q117",
+      "Q18",
+      "Q31",
+      "Q35",
+      "Q36",
+      "Q49",
+      "Q65",
+      "Q69",
+      "Q71",
+      "Q73",
+      "Q82",
+      "Q89",
+      "Q98"
+    ],
+    "historical_l1plus_wrong": [
+      "Q05",
+      "Q104",
+      "Q112",
+      "Q117",
+      "Q18",
+      "Q31",
+      "Q36",
+      "Q65",
+      "Q69",
+      "Q71",
+      "Q73",
+      "Q82",
+      "Q98"
+    ],
+    "historical_l3a_correct": 69
+  },
+  "d6": {
+    "是什么/属于谁": 3,
+    "怎么算": 11,
+    "执行失败": 2
+  },
+  "d8": {
+    "怎么算": 10,
+    "是什么/属于谁": 4
+  },
+  "rescan_changed_rows": 33,
+  "explicit_user_changes": 9,
+  "rescan_expanded_changes": 24,
+  "independent_positive_review_rows": 194,
+  "census_original_positive": 420,
+  "census_reviewed": 1411,
+  "census_original_negative": 991,
+  "archive": {
+    "attempts": 7379,
+    "exclusions": {
+      "status:harness_error": 183,
+      "changed_or_missing_question_hash": 18,
+      "not_deterministic": 330
+    },
+    "source_count_totals": {
+      "status:harness_error": 183,
+      "changed_or_missing_question_hash": 18,
+      "eligible": 7379,
+      "not_deterministic": 330
+    }
+  },
+  "cost_ledger": [
+    {
+      "run": "20261016-T11-smoke-01",
+      "ledger_cny": 0.1,
+      "physical_cny": 0.10282176,
+      "records": 6
+    },
+    {
+      "run": "20261017-T11-smoke-1017-01",
+      "ledger_cny": 0.1,
+      "physical_cny": 0.10290935999999999,
+      "records": 6
+    },
+    {
+      "run": "20261018-T12-pilot-flash-01",
+      "ledger_cny": 1.29,
+      "physical_cny": 1.29493504,
+      "records": 144
+    },
+    {
+      "run": "20261018-T12-pilot-pro-01",
+      "ledger_cny": 9.62,
+      "physical_cny": 9.6209661,
+      "records": 144
+    },
+    {
+      "run": "20261018-T12-cache-flash-01",
+      "ledger_cny": 0.3324752,
+      "physical_cny": 0.33247519999999997,
+      "records": 14
+    },
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "ledger_cny": 24.8,
+      "physical_cny": 24.80484018,
+      "records": 2196
+    },
+    {
+      "run": "20261019-T15-pilot-01",
+      "ledger_cny": 0.67,
+      "physical_cny": 0.67126656,
+      "records": 48
+    },
+    {
+      "run": "20261019-T16-pilot-01",
+      "ledger_cny": 0.54510072,
+      "physical_cny": 0.54510072,
+      "records": 24
+    },
+    {
+      "run": "20261019-T15-pilot-l0e-02",
+      "ledger_cny": 0.34,
+      "physical_cny": 0.33519312,
+      "records": 24
+    },
+    {
+      "run": "20261019-T15-explorer-01",
+      "ledger_cny": 10.13,
+      "physical_cny": 10.13770834,
+      "records": 732
+    },
+    {
+      "run": "20261019-T21-pilot-01",
+      "ledger_cny": 1.18,
+      "physical_cny": 1.18482048,
+      "records": 48
+    },
+    {
+      "run": "20261019-T16-pilot-v13-02",
+      "ledger_cny": 1.41452904,
+      "physical_cny": 1.4145290400000001,
+      "records": 46
+    },
+    {
+      "run": "20261019-T15-explorer-l2e-01",
+      "ledger_cny": 0.07,
+      "physical_cny": 0.07163532,
+      "records": 7
+    },
+    {
+      "run": "20261019-T13-l15s-v14-01",
+      "ledger_cny": 2.7,
+      "physical_cny": 2.69970058,
+      "records": 327
+    },
+    {
+      "run": "20261019-C13-ladder-01",
+      "ledger_cny": 0.014,
+      "physical_cny": 0.0023947200000000004,
+      "records": 1
+    },
+    {
+      "run": "20261019-C13-ladder-02",
+      "ledger_cny": 7.17,
+      "physical_cny": 7.16557524,
+      "records": 819
+    },
+    {
+      "run": "20261019-T16-full-v14-sql-new-01",
+      "ledger_cny": 5.2876588,
+      "physical_cny": 5.2876588,
+      "records": 327
+    },
+    {
+      "run": "20261019-T16-full-v14-sql-old-01",
+      "ledger_cny": 5.45555508,
+      "physical_cny": 5.45555508,
+      "records": 327
+    },
+    {
+      "run": "20261019-T16-full-v14-json-01",
+      "ledger_cny": 2.58393312,
+      "physical_cny": 2.58393312,
+      "records": 327
+    },
+    {
+      "run": "20261020-T15-explorer-l2e-02",
+      "ledger_cny": 4.7,
+      "physical_cny": 4.70343852,
+      "records": 284
+    },
+    {
+      "run": "20261020-T15-explorer-l2e-03",
+      "ledger_cny": 1.1,
+      "physical_cny": 1.0978382,
+      "records": 45
+    },
+    {
+      "run": "20261020-T19b-attrib-01",
+      "ledger_cny": 4.42,
+      "physical_cny": 4.4209004,
+      "records": 117
+    },
+    {
+      "run": "20261023-T19c-confidence-01",
+      "ledger_cny": 1.02,
+      "physical_cny": 1.01880956,
+      "records": 327
+    },
+    {
+      "run": "20261025-T22b-l1plus-l3a-01",
+      "ledger_cny": 0.03272164,
+      "physical_cny": 0.03272164,
+      "records": 1
+    },
+    {
+      "run": "20261025-T22b-l1plus-l3a-02",
+      "ledger_cny": 0.00259616,
+      "physical_cny": 0.0025961599999999997,
+      "records": 1
+    },
+    {
+      "run": "20261025-T22b-l1plus-l3a-03",
+      "ledger_cny": 8.0589817,
+      "physical_cny": 8.0589817,
+      "records": 654
+    },
+    {
+      "run": "20261025-T14-tuned-01",
+      "ledger_cny": 4.77,
+      "physical_cny": 4.77177692,
+      "records": 654
+    },
+    {
+      "run": "20261025-T22b-attrib-01",
+      "ledger_cny": 1.72537972,
+      "physical_cny": 1.72537972,
+      "records": 82
+    }
+  ],
+  "cost_ledger_total": 99.63293118,
+  "physical_ledger_total": 99.64646158,
+  "post_ledger_cost": {
+    "20261025-T29-pilot-01": 0.3045816,
+    "20261026-T29-expanded-01": 1.76856564,
+    "20261025-T30-combo-01": 2.89061402
+  },
+  "known_cost_total": 104.61022283999999,
+  "value_field_counts": {
+    "values": 77
+  },
+  "value_meaning_entries": 568,
+  "external_table_rows_including_headers": {
+    "Fact tables — pick the right one": 7,
+    "String-boolean quirks": 6,
+    "Implicit defaults": 7
+  },
+  "external_metric_entries": 13,
+  "external_agent_rules": 13,
+  "d2_example_rows": 8,
+  "planning_pilot": {
+    "attempts": 48,
+    "python_calls": 0
+  },
+  "outside_groups": {
+    "JSON-L2": [
+      9,
+      8,
+      9
+    ],
+    "SQL-L1.5S": [
+      4,
+      3,
+      1,
+      1,
+      1
+    ]
+  },
+  "Q19_max_relative_value_difference": 0.0011712652459587617,
+  "account_keys": {
+    "rows": 24,
+    "min": 1,
+    "max": 24,
+    "key4": 1,
+    "key50": 0
+  },
+  "plan_accounts": {
+    "key4_rows": 253722,
+    "key50_rows": 0
+  },
+  "input_hashes": {
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl": "10054c729b82c91504922b73f70bddbbf97700847427d3a709c73f8dfd578f2a",
+    "reports/midterm/tool-audit.csv": "30a8532364a2446cdad4a4dbcb55947883567148d1604eb2ff4da2e087ad6ae4",
+    "runs/20261019-T15-explorer-01/SQL-L0-E.jsonl": "f0c4d2bc3a7c70a129b1f80b2b918f508ee6904bde57a92dc6b2e6c0bf5c9461",
+    "runs/20261019-T15-explorer-01/SQL-L1-E.jsonl": "a09ce03bb899e739939c7fa3763d21ede9f8b47fdd076973ab88ca482d9227be",
+    "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl": "c9122c04dd556268dcf5fbcae57631405ba61aab037feb2c58826524ab77d746",
+    "runs/20261020-T15-explorer-l2e-03/SQL-L2-E.jsonl": "44628d83f320dd6fd64313ffac4d124754b6f3dbf014831ff453853e45aadf4f",
+    "runs/20261019-T16-full-v14-json-01/JSON-L2.jsonl": "10a1ab5c480b8708c81f6bd9fa61a947cbaf81ed45194a205db23808f3a4c7cf",
+    "runs/20261031-T31-v5-rulings-01/JSON-L2.jsonl": "3f20f1598f16be0138babb64c1de0c02079b8dc42d1497ee8c6524159ab76188",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0-E.jsonl": "79ed656e3150f3124db0e1d7d7c2636e719b0a69355b0acbc222c761e7ca2ad6",
+    "runs/20261018-T13-sql-direct-01/SQL-L0.jsonl": "cd18674fad7a222339802f982a7f94a16feec25f06f304c8e27e1dbb4f73ce8c",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0.jsonl": "be5785873c78bb5bb2efbc3ec31ba9490e89793d40d211e9e2097b3543112011",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-E.jsonl": "03ee8734785d216720d9115bbdbe87f5f87e78836203238599aed77067fac5aa",
+    "runs/20261019-C13-ladder-02/SQL-L1-T2.jsonl": "9a28982d4079f0188161afc2d87d9d345bde8ec9bb2b722c3d236c426b8a4965",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T2.jsonl": "7a56993607ab8dbde164f77ff00eea54104fa382eb30b600f5b70ab4abefb5ac",
+    "runs/20261019-C13-ladder-02/SQL-L1-T3.jsonl": "e59be1041f960897f670da39ecb0c329f7ba1b0a8331592c42ad3dc2ec99b39e",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T3.jsonl": "7610200351491774c82b5bc8288667fea82060e23f50736b31db656701ae3ee3",
+    "runs/20261019-C13-ladder-02/SQL-L1-T4.jsonl": "459032ff2dec16d0225bc173e2df96142b2977ba3550eeddb4d19898cf4697ff",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T4.jsonl": "bf98674cf34172299b4380850e75f857ce524490bbd0a537ab70ae950dbe453a",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned-instr.jsonl": "1be51e0952e64a3ae5f274c9e2b1b2c22e7d1040de02b18232ca7466133fe532",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned-instr.jsonl": "71ae56b1d4e738aa26664f0686d228a0a8cf37c04c8cc7fda5d66f2d904a977e",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned.jsonl": "e65be80548af9fdcdc818258ad7430f90f42e9dc212c245e78cec3a25f9ceb9b",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned.jsonl": "8de7ef70b8f2f29d0b4ed179ee77d5e72bd3844d6b9cb88b9159dbcf5728be19",
+    "runs/20261019-T13-l15s-v14-01/SQL-L1.5S.jsonl": "c7e465c42eddf564ad5a2c622651713aaa916db4e1e8bd1fb1e97d53a63f9c8a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5S.jsonl": "190dd5d0c8529595388d854bd1086d9f414e9cb00cb4d36d6df3075559cfd340",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.5W.jsonl": "c063cd130288d105c7f061c705beae9801dcbb6cb8b2f51bc290cb64bbe1a2c3",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5W.jsonl": "271b48a20bbcd920602c1073bf423970ea3899645e83127437695264ee5fa090",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.jsonl": "9d8a6b7ee75de9211642b7a94f88dc1be11f3823b50592b024c388fde897ead6",
+    "runs/20261018-T13-sql-direct-01/SQL-L1c.jsonl": "6deb1a4a0c03f68d879794ee09c73a26f2987b8fac0361c1b37a30f42ff2b802",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1c.jsonl": "1535d2304ebbdc0d6bba32ab4699a8302c4bf59f7e949b5219443e9fc194aed6",
+    "runs/20261025-T30-combo-01/SQL-L1plus-tuned-instr.jsonl": "41546aff0de2dcb4d050cd27efd13b47de0797fe445ee48d668dc280bc1a16f2",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus-tuned-instr.jsonl": "e0cd78d6b6153d8aca70804a9705c879649dd870dff47c289cda3fbfef451464",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L1plus.jsonl": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus.jsonl": "48af0eab88f6b09d0502a15cac6d7f3543f325e70118542193c367828635bfb1",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2-E.jsonl": "e0aca16c51617846b65f03178f35b58fb68022c0c68b8220f8a1d465e96f223a",
+    "runs/20261019-T16-full-v14-sql-new-01/SQL-L2.jsonl": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2.jsonl": "189c4d3ad52ebd03ab17ea15bbaf5c2595f10cf2e67b0df77bf667bcf6099bb0",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L3a.jsonl": "67f282deddb1a92b4406133da746e8ba6250cf99c9f81c78127ccbe4dec7a2c6",
+    "runs/20261031-T31-v5-rulings-01/SQL-L3a.jsonl": "98aeb013c46be903aec2405ae0397d18276160d92aeaa6b5af81f3b19425a06c",
+    "runs/20261018-T13-sql-direct-01/SQL-R.jsonl": "27ab95f5761450501912ebda3922bb9dd37e4a195b730678b88e95e175757e97",
+    "runs/20261031-T31-v5-rulings-01/SQL-R.jsonl": "21bce20f6503f1e85e9b01f850bb92aeb886ba8372eb4e26e6922baac6e8c713",
+    "$SEMDEBT_DATA_DIR/v7-eval-20261030/SQL-L0-context.txt": "34878bf5acc157d9897e588bbb3bfc230182b5412a04fb1e3160d55d038eb5a4",
+    "$SEMDEBT_DATA_DIR/v7-eval-20261030/SQL-L1c-context.txt": "83193136293d17cfee7e3ac09a5e3cb78fa3e362ef4cd2c7a622b00f0f8c27a6",
+    "$SEMDEBT_DATA_DIR/v7-eval-20261030/SQL-L1-context.txt": "5585014ac612da15dd62c3d22bbf254608ee420311fa455a9f9a10612fd2b48e",
+    "semantic/source.yaml": "086f438b43600ffc003ecf11e95f9753a5ee915ae5494370725757ad160fcb65",
+    "semantic/l1plus.yaml": "983437b35be9a126e4aefca5aea2629d5df8d16a3a1af6db8a82b2b162d6da8a",
+    "reports/validation/l1plus-l3a-correspondence.md": "075ef23be8ba52b8bb5b685ef1c833b4685401e26e36d4f46cc3cf7b6efc2e64",
+    "reports/validation/l3a-ontology/model.json": "834f402e3a2925deb819e265a562bb6f85c2ceca7715d47ba71da1a415466892",
+    "reports/validation/l3a-ontology/missed.json": "b893f7c7bd92e1c65c657de6ae0c60f3bfe43e2412d1f773ca1f43dcc2112c89",
+    "reports/validation/t31-v7-d6.csv": "3d02bd98b1cb35b39d769a1cf64b1cb2006a26eb6545c8ba52fcd7ac9e871689",
+    "reports/validation/t31-v7-d8.csv": "e00bf6ae45f07164ef8b386d49cd72b45554f67867c4411eec3a777928aa4482",
+    "reports/validation/t31-v7-rescan-changes.csv": "0cbf77f39e2e325b2517fff43e99db6240243af88be21954cfe07048a0ede7e6",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/claude-review/claude-labels-194.csv": "34f30de15afb63e06b79181f2ae575f63ab5821a5aa39a1cfa809b28ddab4bd1",
+    "runs/20261030-T31-v5-census-03/JSON-L2.jsonl": "68c5e82cc779560d3fa3d955efa5ec96c5d17ec59858e482d9709a34e5c3a1a2",
+    "runs/20261030-T31-v5-census-03/SQL-L0-E.jsonl": "716b2d29227f28a7d2d0db8188791c3d68d4fdd40ff8c6dd2687496ba3de04d1",
+    "runs/20261030-T31-v5-census-03/SQL-L0.jsonl": "74e4c41aea80fa0c1e976f4b20f5c0200c606cbb11b2334a78c65c6052148504",
+    "runs/20261030-T31-v5-census-03/SQL-L1-E.jsonl": "a5ab750d00900c4198158f7f3d6354c0ce93b22adfb866e8ec7fb36d66c80a33",
+    "runs/20261030-T31-v5-census-03/SQL-L1-T2.jsonl": "4f6330e306b8c22e71dab4e0d27834adc8206d188e8ff55c9852de204d1598e6",
+    "runs/20261030-T31-v5-census-03/SQL-L1-T3.jsonl": "2f7a662cd01464e5fb94482b18e8622e5f88f9c9a5a48be5e38e1c97df90eab1",
+    "runs/20261030-T31-v5-census-03/SQL-L1-T4.jsonl": "bf98674cf34172299b4380850e75f857ce524490bbd0a537ab70ae950dbe453a",
+    "runs/20261030-T31-v5-census-03/SQL-L1-tuned-instr.jsonl": "2fea989b73ad1f5fcdcee604d687ad21e21ff0aa390e4d332c8f2c1f00e6ff88",
+    "runs/20261030-T31-v5-census-03/SQL-L1-tuned.jsonl": "8de7ef70b8f2f29d0b4ed179ee77d5e72bd3844d6b9cb88b9159dbcf5728be19",
+    "runs/20261030-T31-v5-census-03/SQL-L1.5S.jsonl": "190dd5d0c8529595388d854bd1086d9f414e9cb00cb4d36d6df3075559cfd340",
+    "runs/20261030-T31-v5-census-03/SQL-L1.5W.jsonl": "44a6924eb1afa0cb665e61c103d259670a3e7d713125105fdd26ebf71ee3e3fa",
+    "runs/20261030-T31-v5-census-03/SQL-L1.jsonl": "a1ccf69e53a72e1047df61dc18cf060690bb328d913ecd37e8f5896690765d75",
+    "runs/20261030-T31-v5-census-03/SQL-L1c.jsonl": "1168d776c746ad59295a7cf084d0ce162988a8ff198d39ab32c56636d4f197fc",
+    "runs/20261030-T31-v5-census-03/SQL-L1plus-tuned-instr.jsonl": "e0cd78d6b6153d8aca70804a9705c879649dd870dff47c289cda3fbfef451464",
+    "runs/20261030-T31-v5-census-03/SQL-L1plus.jsonl": "eded8b138ce9de740752a28e04135f1edd3d08a4eb2218479f1d5a746e01eb43",
+    "runs/20261030-T31-v5-census-03/SQL-L2-E.jsonl": "e0aca16c51617846b65f03178f35b58fb68022c0c68b8220f8a1d465e96f223a",
+    "runs/20261030-T31-v5-census-03/SQL-L2.jsonl": "63350b0e298c18162fed1a850822f19691232b006a5000df69ea570ee9e1fad3",
+    "runs/20261030-T31-v5-census-03/SQL-L3a.jsonl": "552b415c0411360699560485616d2da8a0bc44466c2ab46d8ff78d5007cb5fd4",
+    "runs/20261030-T31-v5-census-03/SQL-R.jsonl": "21bce20f6503f1e85e9b01f850bb92aeb886ba8372eb4e26e6922baac6e8c713",
+    "runs/20261028-T31-v4-rescore-02/manifest.json": "32280ad4e4c3b2c889fcce9053340441a66112963bfa14fd449692029388fe9c",
+    "reports/midterm/v3-cost-runs.csv": "98c75523c3159bf26b3412377b794aeb111d30dc7d0732073239c6718377b750",
+    "runs/20261016-T11-smoke-01/SQL-L1.jsonl": "7f4fb6df70ad6100bb15b05154e645208ac639cbca10b5ec8b93743712fad290",
+    "runs/20261017-T11-smoke-1017-01/SQL-L1.jsonl": "481d892b52eb3ec886de64ce47d58b58b76ff4c03eb32503a9b24bbc97e7cc4d",
+    "runs/20261018-T12-pilot-flash-01/SQL-L1.jsonl": "09c3371e350ab25f4533e3a05affab915e2b116bd4d141e9f8c16bf862a9c0eb",
+    "runs/20261018-T12-pilot-flash-01/SQL-R.jsonl": "4a1938a4e3723b07fbb68f0e0a748877130427803947eb5b661e062470edcd62",
+    "runs/20261018-T12-pilot-pro-01/SQL-L1.jsonl": "d44348a1a207aa2f6373dc1e57df26f92e480c057290d3bb7267cbee3b471aae",
+    "runs/20261018-T12-pilot-pro-01/SQL-R.jsonl": "a820f7d5f4d64f7f0697467702d3150c38050fc47688e0ebc1462683acb680f4",
+    "runs/20261018-T12-cache-flash-01/cache-probe.jsonl": "1a2a6d1a8845c445c9d1519d05c969270c8afd623841ed149598a79a38e180ce",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.5S.jsonl": "25ac3f16eb377ef7e2b195dac70e5543fcd27c1eb25fab390184dda40ea9e2fa",
+    "runs/20261019-T15-pilot-01/SQL-L0-E.jsonl": "c264a3b6b8ef1f78a8a53cf394046b0ed2606cf4a6ff1d817b8f5454b4d91930",
+    "runs/20261019-T15-pilot-01/SQL-L1-E.jsonl": "55e18dff94f4a919a05669cf5e40b54642d81d8300d21395cc103d2d6d6baeba",
+    "runs/20261019-T16-pilot-01/SQL-L2.jsonl": "60f2566162dcc895567a3eb5e445563027ccee03a9e76c1f5a6ff07822f28355",
+    "runs/20261019-T15-pilot-l0e-02/SQL-L0-E.jsonl": "9eb2aa72053bc6354a39f8fbea1ae993d7bf4f222d43a05c32b9b472e2c984ee",
+    "runs/20261019-T21-pilot-01/SQL-L0-P.jsonl": "f70f8081fdcae5358f78645b8d9b3e4cf2a6c3de9a57b037699f6f15b3e58dd1",
+    "runs/20261019-T21-pilot-01/SQL-L1-P.jsonl": "a065ff89b215ffe37842c7161bb6cdd2e4f058ff531d887e2aa909f50fe5f7d2",
+    "runs/20261019-T16-pilot-v13-02/JSON-L2.jsonl": "39b45621001d21574265d912c85e257303d4fe5ec074cb5b98c6b459572fab04",
+    "runs/20261019-T16-pilot-v13-02/SQL-L2.jsonl": "70a81ed10ea60194f7f4f99c77c665186c96f5e6dd2615f805f3a7ddbb8be959",
+    "runs/20261019-T15-explorer-l2e-01/SQL-L2-E.jsonl": "1b63f5e25e24de688130e865ed05cb3a8f263e543ae0279f57391b156826ecb5",
+    "runs/20261019-C13-ladder-01/SQL-L1-T2.jsonl": "60c89fd8e47ee21098be13c979055e1a28b66e45148a6a9e83964e7c8d5fd7c3",
+    "runs/20261019-T16-full-v14-sql-old-01/SQL-L2-notes-v12.jsonl": "f58926226ebb7031d806437c100b5db2196e05b91f68f9002c3ca45be500e2a4",
+    "runs/20261020-T19b-attrib-01/attribution.jsonl": "a87417ae1dd988efff18461f3fdbfee3ca058d1132e75b2a484bcfd6004aacf5",
+    "runs/20261023-T19c-confidence-01/confidence.jsonl": "744bc12565b95a5b83e13143ec83f53a6bd2388e0dad5c4c9837ad335a151616",
+    "runs/20261025-T22b-l1plus-l3a-01/SQL-L1plus.jsonl": "1c646177b881372d8df256d5924a02dd74b03dc97b9789a3fadd1cf668c566bf",
+    "runs/20261025-T22b-l1plus-l3a-01/incident-audit.jsonl": "79e07a5e81b1ce280c1d8070e2d6fc8452c346a4c1516a4e626edd7a2e8bf0c2",
+    "runs/20261025-T22b-l1plus-l3a-02/SQL-L1plus.jsonl": "ee48bd7c593327483983eec0aa43c3118c0e891e2a82dc9e8e901c2b8bd18cfc",
+    "runs/20261025-T22b-l1plus-l3a-02/incident-audit.jsonl": "6869ecea00b3b217eb492abda3436838429bb8860c426d7cd55e43c533f98573",
+    "runs/20261025-T22b-attrib-01/attribution.jsonl": "208efd979014f2fedf2ded577ac90db4b9a45449a0f2eb02524bbf7fbec28a0e",
+    "runs/20261025-T29-pilot-01/SQL-L1plus-sel-k1.jsonl": "201c7c01ebeb1fb7c6bc24fbac72d3422d1e62385d608231d8eed0302a83bf5f",
+    "runs/20261025-T29-pilot-01/SQL-L1plus-sel-k3.jsonl": "ca3beb8e4c4cc2e79b9138ebd2c73d23337e5b8ebcca5f7a4b9445a299ee00e9",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-confidence.jsonl": "536dd31c050b0f58192f64c3dc1555a16bbec967901d9e421e49143bc42c5160",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-front-k10.jsonl": "d11e3673cbd0b5ea454a513826424837fc758d555c3933159c2b44eb9b80100f",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-front-k3.jsonl": "5a622009e1732f4216142b29e23955f6f967c2639e16b544a26cb08bc354672b",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k10.jsonl": "f5f5fd77d23a535e4caf413814b446578323011011afba6feb3ab7e09f46f4f7",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k100.jsonl": "d7bf1f8705f2aae23d9937a44243b01df39a0dfb11689b7798ff39f6d6e41f84",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k20.jsonl": "fc52360ce55e4e33475c54689cac6e8bf1b4084358a8af4a58bd192fb123547e",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k5.jsonl": "5bb1555afecabacfe5ba52416e95b3de838741c5c6c083cf1e1e2da3db4e937c",
+    "$SEMDEBT_DATA_DIR/v7-eval-20261030/snapshot/semantic/source.yaml": "086f438b43600ffc003ecf11e95f9753a5ee915ae5494370725757ad160fcb65",
+    "$SEMDEBT_DATA_DIR/v7-eval-20261030/report.md": "7a909048b28b32b66d09fd7ccc50dfbc7b580da2d6cb480db36444f0369be3e6",
+    "$SEMDEBT_DATA_DIR/runs-raw/20261019-T13-l15s-v14-01/SQL-L1.5S/Q19_r2_t1.exec.json": "6df26d06b3dbfa3f5a6e67d9b6846f62d6ad7ffbd22bc5bf76a4b916b4af8975"
+  }
+}
