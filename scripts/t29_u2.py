@@ -20,7 +20,7 @@ TAG = "harness-u2-v1"
 SEMANTIC = "semantic-v1.2"
 EVAL = "eval-v1.3"
 BASELINE_RUN = "20261018-T13-sql-direct-01"
-BUDGET = 28
+BUDGET = 30
 MODEL = "deepseek-flash"
 FINGERPRINT = "e72d3c7f663d3e1383b00b3884cb4501"
 PREFLIGHT = Path("reports/validation/t29-u2-preflight.json")
@@ -88,7 +88,7 @@ def build_preflight(questions):
     maximum_output = max_output+64
     maximum_input = max_prompt+maximum_output+2000+max_delta
     max_cost = (maximum_input*price["miss"]+maximum_output*price["output"])/1e6
-    return dict(task="T29 continuation U2", status="dry-run; paid budget and outbound await user approval",
+    return dict(task="T29 continuation U2", status="dry-run; user approved 30 CNY and outbound; awaiting merge and user harness tag",
                 model=MODEL, expected_fingerprint=FINGERPRINT, proposed_harness_tag=TAG,
                 semantic_tag=SEMANTIC, eval_tag=EVAL, baseline_run=BASELINE_RUN,
                 qids=[q.qid for q in selected], questions=98, reps=3, cells=list(U2_CELLS),
@@ -100,7 +100,7 @@ def build_preflight(questions):
                 estimate_method="Both arms use each base cell's original 98x3 usage/fix rate, with no assumed penalty savings; output=max(baseline mean,T29 C mean)+64; include each arm's prompt delta and one extra cold prefix per cell.",
                 max_input_tokens_estimate=maximum_input, max_output_tokens_estimate=maximum_output,
                 max_call_cost_cny=max_cost,
-                spend_note="Admission reserves each in-flight request; total stays within 28 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+                spend_note="Admission reserves each in-flight request; total stays within 30 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
                 d4_free_baselines=["SQL-L0", "SQL-L1"], d4_extra_api_calls=0,
                 d1_dependency="Collection may precede D1; analysis requires completed D1 full baseline labels and treatment content labels, never v2 or sampled extrapolation.",
                 baseline_system_sha256=baseline_hashes, treatment_system_sha256=treatment_hashes,

@@ -1,6 +1,6 @@
 {
   "task": "T29 continuation U2",
-  "status": "dry-run; paid budget and outbound await user approval",
+  "status": "dry-run; user approved 30 CNY and outbound; awaiting merge and user harness tag",
   "model": "deepseek-flash",
   "expected_fingerprint": "e72d3c7f663d3e1383b00b3884cb4501",
   "proposed_harness_tag": "harness-u2-v1",
@@ -118,7 +118,7 @@
   "first_calls": 1176,
   "estimated_calls": 1418,
   "maximum_calls_one_fix_each": 2352,
-  "budget_ceiling_cny": 28,
+  "budget_ceiling_cny": 30,
   "concurrency": 8,
   "estimated_cost_cny": 15.014325768460917,
   "all_fixed_once_cost_cny": 25.54253827223705,
@@ -131,7 +131,7 @@
   "max_input_tokens_estimate": 63923,
   "max_output_tokens_estimate": 14188,
   "max_call_cost_cny": 0.120675,
-  "spend_note": "Admission reserves each in-flight request; total stays within 28 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+  "spend_note": "Admission reserves each in-flight request; total stays within 30 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
   "d4_free_baselines": [
     "SQL-L0",
     "SQL-L1"

@@ -29,7 +29,7 @@ def test_u2_combines_only_fourth_instruction_and_confidence(tmp_path, monkeypatc
         assert R.system_for(penalty) == scoring_rule(10)+"\n\n"+treatment
         assert penalty.selective_k == 10 and penalty.context == cell.context
         assert penalty.allowed == cell.allowed and penalty.name not in CELLS
-    assert U.BUDGET == 28 and len(U2_CELLS) == 4
+    assert U.BUDGET == 30 and len(U2_CELLS) == 4
 
 
 def test_u2_scope_contains_both_halves_and_never_judge_or_low():
@@ -184,12 +184,12 @@ def test_paired_penalty_contrast_keeps_matching_clusters_and_direction():
         A.compare_refusal_arms(no_refusals, renamed, d1_complete=True, expected_questions=4)
 
 
-def test_four_cells_dispatch_against_one_28_yuan_budget(tmp_path, monkeypatch):
+def test_four_cells_dispatch_against_one_30_yuan_budget(tmp_path, monkeypatch):
     import hashlib
     from harness.executors import ExecResult
 
     pre = json.loads((U.ROOT / U.PREFLIGHT).read_text())
-    assert len(pre["rows"]) == 4 and pre["first_calls"] == 1176 and pre["budget_ceiling_cny"] == 28
+    assert len(pre["rows"]) == 4 and pre["first_calls"] == 1176 and pre["budget_ceiling_cny"] == 30
     runtime = tmp_path / "runtime"
     stored = runtime / U.PREFLIGHT
     stored.parent.mkdir(parents=True)
@@ -210,7 +210,7 @@ def test_four_cells_dispatch_against_one_28_yuan_budget(tmp_path, monkeypatch):
     assert U.main(["--execute-approved", "--run-id", "synthetic", "--approved-preflight-sha256",
                    hashlib.sha256(stored.read_bytes()).hexdigest()]) == 0
     assert [a.cell for a in dispatched] == [[c] for c in U2_CELLS]
-    assert all(a.budget == 28 and a.reps == 3 and a.concurrency == 8 and a.run_id == "synthetic" for a in dispatched)
+    assert all(a.budget == 30 and a.reps == 3 and a.concurrency == 8 and a.run_id == "synthetic" for a in dispatched)
 
 
 def test_paid_u2_requires_explicit_approval_flags_and_a_user_tag(monkeypatch):
