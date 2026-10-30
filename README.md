@@ -2,12 +2,83 @@
 
 语义层欠的账，会让智能问数的准确率掉多少？
 
-本项目在一份公开的零售数仓（Contoso，25 张表）上，用中文问题测量：
+这个实验在一份公开的零售数仓（Contoso，25 张表）上，用 122 道中文问题测 DeepSeek Flash 写查询的准确率，比较语义层质量、查询接口和会自己查数据的 agent。98 道题计入主表，每题作答 3 次。
 
-- 语义层质量：L0 坏交付 → R 只给表结构 → L1 文档化 → L1.5W 明细宽表 / L1.5S 汇总层 → L2 指标编码
-- 查询语言与接口：SQL、DAX、开源指标层（Cube 的 SQL 与 JSON 接口）
-- 会自己查数据的 agent 能否替代一部分治理
+## 主要结果
 
-对每个对比，结论都写成「结果是这样，就做那件事」。
+| 模型读到的语义层 | 准确率（主表 98 题） |
+|---|---:|
+| L0：晦涩命名，没有描述，缺一部分表关系 | 48.0% |
+| L1：业务名、全部关系、描述、企业约定、文字版指标口径 | 85.0% |
+| L1+：在 L1 上补全内容、澄清歧义 | 93.2% |
+| L1+ 加调优和作答要求 | 97.3%（留出 49 题上 95.9%） |
 
-当前状态：搭建中。人看的操作手册见 `START-HERE.md`；给 coding agent 的规则见 `AGENTS.md`；任务见 `tasks/BOARD.md`；不含题目的设计摘要见 `docs/design-v5-public.md`。
+这些结果只来自一个模型和一份数据，换模型后绝对数字会变。准确率按结果内容判定，比较方法和局限见报告。
+
+完整报告：发布后补链接。
+
+## 两个仓库
+
+| 仓库 | 内容 |
+|---|---|
+| `semantic-debt`（本仓库） | 代码、语义层、运行日志、结果和决策记录 |
+| [`semantic-debt-eval`](https://github.com/lalalagugugu/semantic-debt-eval) | 题目、参考答案、题目划分和审计材料 |
+
+实验期间两个仓库分开，是为了让写语义层的会话看不到题目。
+
+本仓库主要目录：
+
+| 目录 | 内容 |
+|---|---|
+| `semantic/`、`render/` | 语义层源文件和渲染脚本 |
+| `harness/` | 调用模型、执行查询、评分 |
+| `runs/` | 每次运行的精简日志，索引见 `runs/INDEX.md` |
+| `reports/` | 结果表、校验报告和独立复核（`reports/final/recheck.md`） |
+| `decisions/`、`tasks/` | 设计决定、用户裁决和任务记录 |
+
+`AGENTS.md`、`START-HERE.md` 和 `templates/` 是实验期间给 coding agent 和操作者用的，保留下来作为过程记录。
+
+## 复现
+
+需要 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/)。先把两个仓库克隆到同一级目录，并设置环境变量：
+
+```bash
+git clone https://github.com/lalalagugugu/semantic-debt.git
+git clone https://github.com/lalalagugugu/semantic-debt-eval.git
+cd semantic-debt
+export SEMDEBT_MAIN_DIR="$PWD"
+export SEMDEBT_EVAL_DIR="$PWD/../semantic-debt-eval"
+export SEMDEBT_DATA_DIR="$PWD/../data"   # 放在仓库之外
+```
+
+**重算报告数字：** 不需要数据，也不调用模型。
+
+```bash
+python3 scripts/t19a_v7_numbers.py
+```
+
+逐次标签在 `runs/20261031-T31-v5-rulings-01/`，总表在 `reports/results/accuracy-v5.md`。独立复核的脚本在 `reports/recheck/`。
+
+**导入数据：** 数据不随仓库分发。按 [data/README.md](data/README.md) 从 Kaggle 下载并核对 sha256，然后导入：
+
+```bash
+uv run python data/load.py
+uv run python data/export_parquet.py
+```
+
+**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包的下载地址发布后补。
+
+```bash
+uv run python -m harness.rescore --source 20261018-T13-sql-direct-01 --cell SQL-L1 --run-id <新的-run-id>
+```
+
+**重新调用模型：** 需要付费的 DeepSeek API key，且只从环境变量 `DEEPSEEK_API_KEY` 读取。入口见 [harness/README.md](harness/README.md)。模型服务端会更新，结果不一定相同。
+
+## 许可
+
+代码用 [MIT](LICENSE)。报告、语义层、日志等内容用 CC BY 4.0，范围和例外见 [LICENSE-CONTENT.md](LICENSE-CONTENT.md)。
+
+## 致谢
+
+- 100 道题改写自 [Cube semantic-layer-benchmark](https://github.com/cubedevinc/semantic-layer-benchmark)。来源说明见 [vendor/cube/NOTICE.md](vendor/cube/NOTICE.md)。
+- 数据来自 Kaggle 上的 [Cleaned Contoso Dataset](https://www.kaggle.com/datasets/bhanuthakurr/cleaned-contoso-dataset)，底层是微软的 ContosoRetailDW 示例。
