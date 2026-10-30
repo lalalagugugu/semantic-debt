@@ -1422,11 +1422,12 @@ def test_dry_run_counts_each_cells_own_questions():
 
 @needs_eval
 def test_ladder_level4_examples_are_tuning_questions_only():
-    """Level 4's few-shot questions are tuning-split, deterministic, single-reference questions, picked
-    by the stated rule (per Q level, the two at the median reference-SQL length); never held-out."""
+    """Frozen examples follow the eval-v1.2 selection rule and remain tuning-only in the
+    current bank, which may add references without changing the frozen examples."""
+    import subprocess
     import yaml
     from harness.cells import LADDER_CELLS, syntax_path
-    from harness.questions import question_files
+    from harness.questions import NON_QUESTION_FILES, question_files
     recs = []
     for f in question_files(EVAL):
         d = yaml.safe_load(f.read_text(encoding="utf-8"))
@@ -1436,8 +1437,23 @@ def test_ladder_level4_examples_are_tuning_questions_only():
     asked = [line[2:].strip() for line in text.splitlines() if line.startswith("问：")]
     assert len(asked) == 6
     picked = [by_text[a] for a in asked]
-    assert all(r["split"] == "tuning" and r["scoring"] == "deterministic" and len(r["refs"]) == 1 for r in picked)
-    pool = [r for r in recs if r.get("split") == "tuning" and r["scoring"] == "deterministic"
+    assert all(r["split"] == "tuning" and r["scoring"] == "deterministic" and r["refs"] for r in picked)
+    # C13 selected and froze these examples against eval-v1.2, not today's reference count.
+    commit = _git_rev(EVAL, "eval-v1.2")
+    files = subprocess.check_output(
+        ["git", "-C", str(EVAL), "ls-tree", "--name-only", commit, "questions/"], text=True)
+    frozen = []
+    for name in sorted(files.splitlines()):
+        if not name.endswith(".yaml") or Path(name).name in NON_QUESTION_FILES:
+            continue
+        d = yaml.safe_load(subprocess.check_output(
+            ["git", "-C", str(EVAL), "show", f"{commit}:{name}"], text=True))
+        frozen += d["questions"] if isinstance(d, dict) else d
+    frozen_by_id = {r["id"]: r for r in frozen}
+    frozen_picked = [frozen_by_id[r["id"]] for r in picked]
+    assert all(r["text_zh"].strip() == a for r, a in zip(frozen_picked, asked))
+    assert all(len(r["refs"]) == 1 for r in frozen_picked)
+    pool = [r for r in frozen if r.get("split") == "tuning" and r["scoring"] == "deterministic"
             and len(r["refs"]) == 1 and not r["refs"][0].get("postprocess")]
     rule = []
     for lv in ("Q1", "Q2", "Q3"):
@@ -1447,7 +1463,7 @@ def test_ladder_level4_examples_are_tuning_questions_only():
         assert n % 2 == 0                      # the two middle positions; every level has an even count
         rule += [level[n // 2 - 1]["id"], level[n // 2]["id"]]
     assert [r["id"] for r in picked] == rule
-    for r in picked:
+    for r in frozen_picked:
         assert r["refs"][0]["sql"].strip() in text
 
 
