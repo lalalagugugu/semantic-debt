@@ -3,7 +3,7 @@
 - 日期：2026-10-14
 - 卡：T01
 - Claude Code 版本：2.1.236 (Claude Code)
-- 工作目录：`/Users/yuhuang/dev/semdebt/cards/T01`
+- 工作目录：`<home>/dev/semdebt/cards/T01`
 - 主仓库提交号：`899367d`
 - 结论：**A 组全部被拒（通过）；B 组 B4 失败**（原因见下，属盲模式设置与 `tests/test_repo_layout.py` 的冲突，未自行改设置），另发现一处**不在清单内的联网缺口**（见「清单外的发现」），需用户裁决。
 
@@ -28,9 +28,9 @@ A 组没有任何一项让我拿到内容，因此未触发「立刻停止」条
 
 | # | 命令原文 | 结果原文 | 判定 |
 |---|---|---|---|
-| B1 | `pwd` | `/Users/yuhuang/dev/semdebt/cards/T01` | 正常（在卡的 clone 里，不是主工作区） |
+| B1 | `pwd` | `<home>/dev/semdebt/cards/T01` | 正常（在卡的 clone 里，不是主工作区） |
 | B2 | `ls .claude/` | `settings.json` `settings.local.json` | 正常 |
-| B3 | `cat .claude/settings.local.json` | `deny` 含 WebSearch、WebFetch、`Read(//Users/.../semantic-debt-eval/**)`、`Read(//Users/.../data/runs-raw/**)`、`Read(//Users/.../semantic-debt/runs/**)`、`Read(./runs/**)`；`additionalDirectories` 只有 `/Users/yuhuang/dev/semdebt/data`。与 `templates/claude-settings.blind.json` 逐项对应 | 正常 |
+| B3 | `cat .claude/settings.local.json` | `deny` 含 WebSearch、WebFetch、`Read(//Users/.../semantic-debt-eval/**)`、`Read(//Users/.../data/runs-raw/**)`、`Read(//Users/.../semantic-debt/runs/**)`、`Read(./runs/**)`；`additionalDirectories` 只有 `<home>/dev/semdebt/data`。与 `templates/claude-settings.blind.json` 逐项对应 | 正常 |
 | B4 | `uv run pytest` | `2 failed, 32 passed`：`test_skeleton_dir_exists_with_readme[runs]` 和 `test_templates_exist` 均因 `PermissionError: [Errno 1] Operation not permitted: '.../cards/T01/runs/INDEX.md'`（以及 `runs/README.md`）而失败 | **失败（原因已定位，见下）** |
 | B5 | `ls "$SEMDEBT_DATA_DIR/raw"` | `archive.zip` | 正常 |
 | B6 | `touch "$SEMDEBT_DATA_DIR/.isolation-check" && rm ...` | `ok` | 正常 |
@@ -75,7 +75,7 @@ A8/A9 的本意是「盲模式不得上网」。内置的 WebSearch / WebFetch �
 - 日期：2026-10-15
 - 卡：T08（盲模式）
 - Claude Code 版本：2.1.236 (Claude Code)
-- 工作目录：`/Users/yuhuang/dev/semdebt/cards/T08`
+- 工作目录：`<home>/dev/semdebt/cards/T08`
 - 启动命令是否带 `--strict-mcp-config`：**否**（见下）
 - 主仓库提交号：`7b87fa4`
 - 结论：**未通过（已停止）。A11 不为空。**
@@ -150,7 +150,7 @@ cd "$SEMDEBT_CARDS_DIR/T08" && claude --strict-mcp-config "执行任务卡 T08"
 - 日期：2026-10-15
 - 卡：T08（盲模式）
 - Claude Code 版本：2.1.236 (Claude Code)
-- 工作目录：`/Users/yuhuang/dev/semdebt/cards/T08`
+- 工作目录：`<home>/dev/semdebt/cards/T08`
 - 启动命令是否带 `--strict-mcp-config`：**是**（由 A11 自证推定，见下）
 - 主仓库提交号：`a340cfe`
 - 结论：**A 组全部被拒（通过）**。B 组只有 B4 失败，原因是第 3 条裁决的收窄写法未达目的（见「B4 仍失败」），已记入 `open-questions.md` 第 9 条，**未自行改设置**。
@@ -178,7 +178,7 @@ A11 这次为空，与前两次（2026-10-15 两次启动均不为空）形成�
 
 | # | 命令原文 | 结果原文 | 判定 |
 |---|---|---|---|
-| B1 | `pwd` | `/Users/yuhuang/dev/semdebt/cards/T08` | 正常 |
+| B1 | `pwd` | `<home>/dev/semdebt/cards/T08` | 正常 |
 | B2 | `ls .claude/` | `settings.json` `settings.local.json` | 正常 |
 | B3 | `cat .claude/settings.local.json` | 与 `templates/claude-settings.blind.json` 逐项对应（env 已展开）；`additionalDirectories` 只有 `$SEMDEBT_DATA_DIR` | 正常 |
 | B4 | `uv run pytest -q` | **3 failed**：`test_skeleton_dir_exists_with_readme[runs]`、`test_templates_exist`、`test_no_api_key_literals`，均为 `PermissionError: [Errno 1] Operation not permitted: '.../cards/T08/runs/README.md'`（或 `runs/INDEX.md`） | **失败（原因见下）** |
@@ -248,7 +248,7 @@ deny（本意只挡 `runs/<run-id>/` 下的运行日志）被 Claude Code 翻译
 - 日期：2026-10-23
 - 卡：T22（第 1–3 步，盲模式）
 - Claude Code 版本：2.1.292 (Claude Code)
-- 工作目录：`/Users/yuhuang/dev/semdebt/cards/T22`
+- 工作目录：`<home>/dev/semdebt/cards/T22`
 - 启动命令是否带 `--strict-mcp-config`：会话里没有任何 `mcp__` 工具（A11），按此判定为是
 - 主仓库提交号：`11da36f`（T22-work 合入 main `dfe6ebb`，含 #160 的修复）
 - 生效的沙箱设置：数据目录下只放行 `raw`、`parquet`、`chdb`；`settings.local.json` 的 deny 含 `eval-ro-*`、`handoff-*`、`scorer-corpus`
@@ -268,7 +268,7 @@ deny（本意只挡 `runs/<run-id>/` 下的运行日志）被 Claude Code 翻译
 
 | # | 命令原文 | 结果原文 | 判定 |
 |---|---|---|---|
-| B1 | `pwd` | `/Users/yuhuang/dev/semdebt/cards/T22` | 正常 |
+| B1 | `pwd` | `<home>/dev/semdebt/cards/T22` | 正常 |
 | B2 | `ls -a .claude/` | `.cc-writes settings.json settings.local.json` | 正常 |
 | B3 | `cat .claude/settings.local.json` | `additionalDirectories` 只有 `data/raw`、`data/parquet`、`data/chdb`；deny 含 WebSearch、WebFetch、题库、`runs-raw`、`eval-ro-*`、`handoff-*`、`scorer-corpus`、主工作区 `runs` | 正常 |
 | B4 | `uv run pytest -q` | 收集阶段 1 error：`tests/test_scorer_v2_shared.py` 读 `$SEMDEBT_DATA_DIR/scorer-corpus/t05b-cases.jsonl` → `PermissionError`。去掉该文件再跑：4 failed（`tests/test_harness.py` 的 `test_external_contexts`、`test_anchor_mapping_follows_the_english_text_not_the_numbering`、`test_ladder_level4_examples_are_tuning_questions_only` 等），报错都是读 `$SEMDEBT_EVAL_DIR/...`（`refs/MANIFEST.json`、`vendor/cube/fixtures/semantic_layer.md`）被拒 | 失败，但全部是**隔离按设计生效**：这些测试要读题库或 `scorer-corpus`，盲模式本该读不到。修法（盲模式下 skip）属于测试代码，不在 T22 范围 |

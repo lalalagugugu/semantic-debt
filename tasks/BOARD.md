@@ -51,7 +51,7 @@
 | T19b | SQL-L1 失败归类：设计的 10 类 + 根因 5 选 1（`tasks/T19b-l1-error-attribution.md`）；Flash 初判，Codex 全量独立复核 | Claude Code（T13）+ Codex + 用户抽检 | 普通 | `harness-v1.1`、`eval-v1.2`；T13 重评 | 3 元（Flash） | **完成**（#153，2026-10-23）：117 条，Flash 4.42 元；类别 κ 0.70、根因 κ 0.37；根因 3（模型没理解）11%–46%；两家都判根因 5 的 26 条 / 15 题待题库负责方核对（`reports/results/l1-error-attribution.md`） |
 | T19c | 模型知不知道自己会不会（`tasks/T19c-abstention-signals.md`，2026-10-23 改写）：隐含信号 + 自评把握的校准，判定规则先写死 | Claude Code | 普通 | T13 SQL-L1 最终日志 | 5 元（Flash；`decisions/2026-10-23-l1plus-l3a.md` 第四节） | **完成**（2026-10-23，实花 1.02 元）：思考 token AUC 0.755（参照）；自评把握判定「介于两者之间」，不建议新单元。报告 `reports/results/confidence-calibration.md`；待 PR 合并 |
 | T31 | 可疑参考答案核对与呈现差异盘点（`tasks/T31-reference-and-presentation-review.md`） | Codex | 主仓库 clone（只读题库） | T22b、T28 | 0 | v4 完成；v7 九单元194次判对已由 #214 独立复核，已按用户 2026-10-31 裁决复扫 19 单元 420 次判对残余，33 次改错；accuracy-v5／D4／D6 已重算，待新增变更数字核对与用户合并 #211 |
-| T32 | 开源准备（`tasks/T32-open-source-prep.md`） | 协调会话 + 题库侧 Codex；转公开由用户执行 | 普通 | T19a 定稿后才公开 | 0 | **进行中**：主仓库和历史已扫，无密钥；题库和原始回包未扫；公开方式待用户定 |
+| T32 | 开源准备（`tasks/T32-open-source-prep.md`） | 协调会话 + 题库侧 Codex；转公开由用户执行 | 普通 | T19a 定稿后才公开 | 0 | **进行中**：两库历史已扫，无密钥；公开方式已定（`decisions/2026-10-31-publication-choices.md`）；主仓库已加许可文件；README、复现、对照页、回包打包待做 |
 | **G4** | **检查点：结论审定** | 用户 | — | T19、T20 | — | — |
 
 ## 2026-10-22 刷新：第一期 SQL 线运行完成
