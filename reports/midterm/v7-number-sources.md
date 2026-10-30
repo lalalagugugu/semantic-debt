@@ -52,7 +52,7 @@ T20 只对照了本清单的旧版。下面这些是它之后改的或新补出�
 | 4 | 46 条（不到一半） | 派生，文件里没有这个数：已形式化 30 条 + 注解里有现成写法的 16 条（`l3a-ontology-validation.md` 第 6.2 节，`l3a-ontology/missed.json` 的 formalized_entries、formalizable_annotation_entries）。分母 109，占 42.2% |
 | 4、9 | 线上销售表 14% 的行关联不上产品 | 派生，文件里没有这个数：FactOnlineSales 孤儿行 1,715,380（`l3a-ontology-validation.md` 第 5 节）÷ 总行数 12,627,608（同文第 5 节、`dataset-quality.md`）= 13.58% |
 | 4 | 费用高约一半 | 4.85 ÷ 3.21 = 1.51 |
-| 4 | 文字版 2 行、本体版约 75 行 | 沿用 v6。写作会话对 `frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt` 粗核：含 H10 的 46 行，连同场景类和别名相关共 81 行；75 的精确边界没有定义，只作「约」 |
+| 4 | 文字版 2 行、本体版几十行 | 取数：`$SEMDEBT_DATA_DIR/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt` 的 Turtle 部分每个三元组占一行，按行匹配。含 `H10` 的 46 行；匹配 `H10\|Actual\|Budget\|Forecast\|ScenarioKey` 的 81 行（含别名等相关行）。实测范围 46–81 行，条目边界没有唯一定义，所以不写具体行数。v6 的「约 75 行」已弃用 |
 | 5 | 37、42；92/93/87、93/90/85；覆盖内 85、87；−4.5、−7.9 | `derived` 第 5 节 |
 | 5 | 覆盖外：作答 183、168；拒答 121、97；给出结果 61、67（has_result=true）；答对 26、10；答错 35、57；执行失败 1、4 | `derived` 第 5 节。之前的 62、71 是「未拒答」，混入了执行失败，已改 |
 | 5 | 列出全部品牌后数出 11 个 | Q57 三次作答的执行结果都是 11 行（`$SEMDEBT_DATA_DIR/runs-raw/20261019-T16-full-v14-json-01/`） |
