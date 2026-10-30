@@ -91,6 +91,13 @@ SELECTIVE_V2_CELLS: dict[str, Cell] = {
                                      split="tuning", selective_variant="confidence"),
 }
 
+# T29 continuation U2: one combined treatment, explicit opt-in only.
+U2_CELLS: dict[str, Cell] = {
+    f"{base}-u2": replace(CELLS[base], name=f"{base}-u2", card="T29", skip_judge=True,
+                          selective_variant="uncertainty")
+    for base in ("SQL-L0", "SQL-L1")
+}
+
 
 # T30 is opt-in; --cell all continues to select only the original cells.
 COMBO_CELLS = {

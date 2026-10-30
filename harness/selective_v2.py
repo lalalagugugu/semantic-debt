@@ -23,6 +23,10 @@ def scoring_rule(k: int) -> str:
 
 
 def system_variant(base: str, variant: str, k: int | None) -> str:
+    if variant == "uncertainty":
+        if k is not None or base.count(OLD_FOUR) != 1:
+            raise ValueError("U2 requires the frozen fourth instruction and no scoring rule")
+        return base.replace(OLD_FOUR, NEW_FOUR) + "\n" + CONFIDENCE_RULE + "\n"
     if variant == "front":
         if base.count(OLD_FOUR) != 1:
             raise ValueError("the frozen fourth instruction changed")
@@ -32,6 +36,30 @@ def system_variant(base: str, variant: str, k: int | None) -> str:
             raise ValueError("confidence variant must not include a scoring rule")
         return base + "\n" + CONFIDENCE_RULE + "\n"
     raise ValueError(f"unknown selective variant: {variant}")
+
+
+def u2_confidence_record(content: str, final: dict) -> dict:
+    parsed = confidence_record(content, final)
+    value = parsed["value"]
+    if parsed["native_refusal"]:
+        status, value = "native_refusal", None
+    elif value is not None:
+        status = "valid"
+    else:
+        lines = re.findall(r"^\s*把握\s*[:：](.*?)$", content, re.MULTILINE)
+        status = "missing" if not lines else "duplicate" if len(lines) > 1 else "invalid_format"
+        if len(lines) == 1:
+            try:
+                number = float(lines[0].strip())
+            except ValueError:
+                pass
+            else:
+                if not math.isfinite(number) or not 0 <= number <= 100:
+                    status = "out_of_range"
+    # Missing confidence does not turn an attempted answer into native refusal.
+    return {"value": value, "status": status, "format_error": parsed["format_error"],
+            "native_refusal": parsed["native_refusal"],
+            "gate90": {"answered": not parsed["native_refusal"] and value is not None and value >= 90}}
 
 
 def confidence_record(content: str, final: dict) -> dict:

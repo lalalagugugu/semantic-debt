@@ -55,7 +55,7 @@ if __package__ in (None, ""):
 from harness import prompt as P  # noqa: E402
 from harness.cells import (  # noqa: E402
     CELLS, CONTEXTS, DEFAULT_CONCURRENCY, DEFAULT_EXEC_TIMEOUT_S, DEFAULT_REPS, PEAK_MULTIPLIER,
-    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, SELECTIVE_CELLS, SELECTIVE_V2_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
+    DAX_CELLS, LADDER_CELLS, L1PLUS_CELLS, SELECTIVE_CELLS, SELECTIVE_V2_CELLS, U2_CELLS, PRICES_OFFPEAK, REPO, SYNTAX, Cell, instructions_path, syntax_path,
 )
 from harness.client import APIError, ModelClient, Reply  # noqa: E402
 from harness.executors import (  # noqa: E402
@@ -465,6 +465,10 @@ def _done_line(ctx: RunContext, q: Question, base: dict, turns: list[dict], repl
         from harness.selective_v2 import confidence_record
 
         record["confidence"] = confidence_record(replies[-1].content, final)
+    elif ctx.cell.selective_variant == "uncertainty":
+        from harness.selective_v2 import u2_confidence_record
+
+        record["confidence"] = u2_confidence_record(replies[-1].content, final)
     return record
 
 
@@ -625,6 +629,10 @@ def run_cell(ctx: RunContext, questions: list[Question], reps: int, concurrency:
         except Exception as exc:  # recorded, never swallowed
             record = {"run_id": ctx.run_id, "cell": ctx.cell.name, "qid": qid, "rep": rep,
                       "status": "harness_error", "error": f"{type(exc).__name__}: {exc}"[:500]}
+        if (ctx.cell.selective_variant == "uncertainty" and ctx.boundary is not None
+                and record["status"] not in ("done", "stopped")):
+            ctx.boundary.reason = f"U2 attempt stopped: {record['status']}"
+            ctx.boundary.stopped.set()
         with lock:
             out.write(json.dumps(record, ensure_ascii=False) + "\n")
             out.flush()
@@ -882,7 +890,7 @@ def questions_for(cell: Cell, questions: list[Question], skip_judge: bool = Fals
     out = [q for q in questions if cell.split == "all" or q.meta.get("split") == cell.split]
     if skip_judge or cell.skip_judge:
         out = [q for q in out if q.scoring != "judge"]
-    if cell.selective_variant == "confidence":
+    if cell.selective_variant in ("confidence", "uncertainty"):
         out = [q for q in out if not q.meta.get("low_discrimination")]
     return out
 
@@ -909,7 +917,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
     names = args.cell or ["all"]
     from harness.cells import COMBO_CELLS
 
-    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS, **COMBO_CELLS, **SELECTIVE_CELLS, **SELECTIVE_V2_CELLS}
+    known = {**CELLS, **LADDER_CELLS, **DAX_CELLS, **L1PLUS_CELLS, **COMBO_CELLS, **SELECTIVE_CELLS, **SELECTIVE_V2_CELLS, **U2_CELLS}
     cells = list(CELLS.values()) if "all" in names else [known[n] for n in names]
     if not args.dry_run and sum(c.stack == "dax" for c in cells) > 1:
         print("refusing to start: Power BI Desktop serves one model at a time; run one DAX cell per invocation")

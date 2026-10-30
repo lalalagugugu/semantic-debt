@@ -171,3 +171,16 @@ B2边界测试：`uv run --offline pytest tests/test_t29_reports.py`：4 passed�
 - 等内容准确率新口径确定后，对相同结果和基线按相同规则复算；两口径不一致交用户裁决，正式运行等两种口径均算完。B目前未达标，不触发拆分；若后续所需复算B达标，先按登记另PR、另tag、另批拆分试跑，不能将位置与措辞效应分别归因。
 - 产出：`scripts/t29_expanded_report.py`、`reports/validation/t29-expanded.md`、`t29-expanded-audit.json`、`t29-expanded-attempts.csv`、同run-id公开精简日志及不可改写manifest。源原包/最终执行哈希、usage、指纹、费用账本均逐项核对；最大单次实际0.076586元低于预估0.133522元，无API异常、传输重试、指纹变化或超预估调用。早间169条失败日志原样保留。
 - 复现：设置SEMDEBT_DATA_DIR及eval-v1.2题库环境，`uv run --offline python scripts/t29_expanded_report.py`。无API或查询执行。测试`uv run --offline pytest tests/test_t29_reports.py tests/test_selective_v2.py tests/test_repo_layout.py`：70 passed、1 skipped。
+
+## 续项 U2（用户2026-10-30批准准备，付费另批）
+
+- 依据：`decisions/2026-10-30-midterm-v7-plan.md`第5项；完整结果前预登记见`decisions/2026-10-30-t29-u2-low-accuracy.md`。原L1plus调优20题内容准确率基线96.7%，错误机会少；改在SQL-L0和SQL-L1全部98题各3次上重测。
+- 工作位置：用户授权沿用本T29 clone，从最新main新开`T29-u2-low-acc`，不接着T29-work修改。负责Codex，仍是一张T29卡，不新建U2卡或自动化。
+- 样本与处理：两单元各98主表题×3次，共588首轮；包括49调优和49留出，排除低区分度和judge。一个合并臂：第4条改为「无法回答或没有把握时只输出 CANNOT_ANSWER」，末尾追加T29 C的0–100把握说明；不加计分规则，其余冻结内容不变。基线用两单元现有正式结果，不重跑。
+- 指标：原生拒答率；拒答侧与作答侧的原基线平均错误率差；已答内容准确率；处理臂自身对错的原始把握AUC及区间；≥90门控覆盖率与已答准确率。缺把握不算模型拒答，不进AUC，单列缺失和非法条数。
+- 判定：两个单元分别报告，拒答和把握是两个独立结论。拒答率<5%不计算差值，直接记「该单元未见取舍」；否则差值95%区间下界>0才达到拒答判据。把握AUC区间下界>0.5才达到把握判据。按题成簇bootstrap 10,000次、种子20261019，每题保留3次处理重复，基线用该题原3次平均错误率。
+- D1依赖：基线与处理臂均用D1全量内容判定口径，不用v2交付率、确定下限或抽样外推。用户允许D1完成前在另批后采集，分析等D1完成；未决标签不出结论。
+- 版本：基线语义`semantic-v1.2`；题库`eval-v1.3`；显式单元`SQL-L0-u2`、`SQL-L1-u2`。新tag提议`harness-u2-v1`，由用户打；现有单元、语义、评分器和旧tag不改。
+- 预算与授权：设计上限12元，dry-run先报调用数和费用后由用户批准实际预算与出站。拟仅将98题题面及各自冻结上下文发DeepSeek官方API，不发参考答案、人工标签或D1评语。并发8、错峰、已有在途费用预留保护；自己的chDB副本同进程使用，付费前需核验冻结L0视图。当前只准备PR和dry-run，付费调用0。
+- 产出：处理臂与把握记录、`harness/u2_analysis.py`、`scripts/t29_u2.py`、`tests/test_u2.py`、决定记录及待生成的`reports/validation/t29-u2-preflight.json`。
+- 用户确认：审PR/预登记；dry-run后批预算和出站；合并后打新tag。工时未自动计时。
