@@ -1,0 +1,116 @@
+{
+  "run_id": "20261031-T29-u2-v3-01",
+  "status": "stopped_on_connection_reset; incomplete; no automatic resume",
+  "harness_tag": "harness-u2-v3",
+  "harness_commit": "ee3f0c0ce3312d56ecc7b06516defe2fe7969cc0",
+  "preflight_sha256": "d4f56f424e18ab3714379582de2586dd0711d8a433210d67802b0e027a4aa4fc",
+  "semantic_tag": "semantic-v1.2",
+  "eval_tag": "eval-v1.3",
+  "started_at": "2026-10-31T00:28:51+08:00",
+  "planned_attempts": 1764,
+  "completed_attempts": 56,
+  "remaining_attempts": 1708,
+  "http_request_attempts": 60,
+  "first_request_attempts": 57,
+  "fix_request_attempts": 3,
+  "settled_responses": 59,
+  "unsettled_requests": 1,
+  "unsettled_request_identities": [
+    {
+      "request_id": 2,
+      "cell": "SQL-L0",
+      "qid": "Q01",
+      "rep": 2,
+      "turn": 0
+    }
+  ],
+  "actual_total_cost_cny": null,
+  "known_settled_usage_cost_cny": "0.63792848",
+  "ledger_settled_cost_cny": "0.6379284800000000062",
+  "current_unsettled_reservation_cny": "0.120675",
+  "new_run_budget_cny": "38.87107092",
+  "prior_budget_deduction_cny": "1.12892908",
+  "current_budget_occupied_with_prior_deduction_cny": "1.88753256",
+  "budget_ceiling_cny": 40,
+  "prior_billing_status": "prior deduction includes unconfirmed reserve, not settled cost",
+  "process_exit_code": 3,
+  "active_collection_process": false,
+  "fingerprints": {
+    "bc19ba97cbe016479903222bb1578db6": 59
+  },
+  "expected_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+  "statuses": {
+    "done": 56,
+    "api_error": 1,
+    "stopped": 6
+  },
+  "execution_error_classes": {
+    "engine_error": 3
+  },
+  "automatic_transport_retries": 0,
+  "client_error_counter": 1,
+  "client_error_counter_note": "The client increments transport_retries on the sole failed attempt; max_attempts=1 means no repeat HTTP attempt",
+  "max_in_flight": 8,
+  "max_admission_exposure_cny": "1.3643260800000000102",
+  "budget_admission_closed": false,
+  "new_requests_stopped": true,
+  "raw_response_count": 59,
+  "exec_package_count": 59,
+  "rows": [
+    {
+      "cell": "SQL-L0",
+      "completed_attempts": 56,
+      "requests": 60,
+      "settled_responses": 59,
+      "known_usage_cost_cny": "0.63792848",
+      "unsettled_requests": 1
+    },
+    {
+      "cell": "SQL-L1",
+      "completed_attempts": 0,
+      "requests": 0,
+      "settled_responses": 0,
+      "known_usage_cost_cny": "0",
+      "unsettled_requests": 0
+    },
+    {
+      "cell": "SQL-L0-u2",
+      "completed_attempts": 0,
+      "requests": 0,
+      "settled_responses": 0,
+      "known_usage_cost_cny": "0",
+      "unsettled_requests": 0
+    },
+    {
+      "cell": "SQL-L1-u2",
+      "completed_attempts": 0,
+      "requests": 0,
+      "settled_responses": 0,
+      "known_usage_cost_cny": "0",
+      "unsettled_requests": 0
+    },
+    {
+      "cell": "SQL-L0-u2p",
+      "completed_attempts": 0,
+      "requests": 0,
+      "settled_responses": 0,
+      "known_usage_cost_cny": "0",
+      "unsettled_requests": 0
+    },
+    {
+      "cell": "SQL-L1-u2p",
+      "completed_attempts": 0,
+      "requests": 0,
+      "settled_responses": 0,
+      "known_usage_cost_cny": "0",
+      "unsettled_requests": 0
+    }
+  ],
+  "spend_ledger_sha256": "20b00014ca3600f786387818f56938d42f9372668e943b9abbd3352427c3dc2c",
+  "private_source_log_sha256": "6e5db66a063b758a32c53b92e8c87c74b62085cae6a92c0cacfc0301adea74a5",
+  "private_console_sha256": "ff44bdfe2c1d8663441dfc36e11b76851c338bbdd2d6ce4d5c7a2d87cca89c99",
+  "private_manifest_sha256": "bdd08f250731852c4d5bf80acffcf42a8418251c2d5337de61178beb4146fb28",
+  "public_metadata_sha256": "c0505faa7a9e32b38d1d6e3ebf6b57038c31a9f1bfb1434dc3f393d871957169",
+  "resume_status": "constructor rejects unresolved request; user reconciliation/ruling required",
+  "analysis_status": "full content adjudication and analysis wait for final D1; no effect conclusions"
+}
