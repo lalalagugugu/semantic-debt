@@ -1,6 +1,6 @@
 # T19a SQL 线中期报告
 
-- 状态：未开始
+- 状态：进行中，当前稿见 `tasks/T19a-v7-plan.md`
 - 负责：Claude Code（可在 Claude Code 云端会话里做，见「云端会话」一节）+ 用户审阅；数字由 Codex 复核
 - 模式：普通（只读 `runs/`、`reports/`、`decisions/`，不读题库）
 - 依赖：G3；**定稿数字**要等 `harness-v1.1` 离线重评（T13、T15）；T14 调优与 T21 规划 agent 赶上就纳入，没赶上就注明待补
