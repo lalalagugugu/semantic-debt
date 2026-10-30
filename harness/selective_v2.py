@@ -25,9 +25,10 @@ def scoring_rule(k: int) -> str:
 
 def system_variant(base: str, variant: str, k: int | None) -> str:
     if variant == "uncertainty":
-        if k is not None or base.count(OLD_FOUR) != 1:
-            raise ValueError("U2 requires the frozen fourth instruction and no scoring rule")
-        return base.replace(OLD_FOUR, NEW_FOUR) + "\n" + U2_CONFIDENCE_RULE + "\n"
+        if k not in (None, 10) or base.count(OLD_FOUR) != 1:
+            raise ValueError("U2 requires the frozen fourth instruction and k=None or 10")
+        system = base.replace(OLD_FOUR, NEW_FOUR) + "\n" + U2_CONFIDENCE_RULE + "\n"
+        return scoring_rule(k)+"\n\n"+system if k is not None else system
     if variant == "front":
         if base.count(OLD_FOUR) != 1:
             raise ValueError("the frozen fourth instruction changed")

@@ -38,6 +38,42 @@ def _interval(values):
     return [values[int(.025*len(values))], values[max(0, int(.975*len(values))-1)]]
 
 
+def compare_refusal_arms(unpenalized, penalty, *, d1_complete=False, draws=10_000,
+                         seed=20261019, expected_questions=98):
+    """Paired question-cluster CI for penalty minus unpenalized native refusal.
+
+    The individual-arm <5% rule does not suppress this registered contrast.
+    Both arms' three repeats stay together in each resampled question.
+    """
+    if not d1_complete:
+        raise ValueError("analysis waits for completed D1 full content adjudication")
+    if draws <= 0:
+        raise ValueError("invalid bootstrap")
+    arms = []
+    for rows in (unpenalized, penalty):
+        by_id = {}
+        for r in rows:
+            key = r["qid"], r["rep"]
+            if key in by_id or r["rep"] not in (1, 2, 3) or type(r["refused"]) is not bool:
+                raise ValueError("duplicate or invalid arm identity/refusal")
+            by_id[key] = r["refused"]
+        qids = {q for q, rep in by_id}
+        if len(qids) != expected_questions or set(by_id) != {(q, rep) for q in qids for rep in (1, 2, 3)}:
+            raise ValueError("arm scope incomplete")
+        arms.append(by_id)
+    if set(arms[0]) != set(arms[1]):
+        raise ValueError("paired arms must have identical question/repeat identities")
+    qids = sorted({q for q, rep in arms[0]})
+    differences = {q: sum(int(arms[1][q, rep])-int(arms[0][q, rep]) for rep in (1, 2, 3)) for q in qids}
+    rng = random.Random(seed)
+    boot = [sum(differences[q] for q in rng.choices(qids, k=len(qids)))/(3*len(qids)) for _ in range(draws)]
+    return dict(questions=len(qids), attempts_per_arm=3*len(qids),
+                unpenalized_refusal_rate=sum(arms[0].values())/len(arms[0]),
+                penalty_refusal_rate=sum(arms[1].values())/len(arms[1]),
+                penalty_minus_unpenalized=sum(differences.values())/(3*len(qids)),
+                ci95=_interval(boot), bootstrap=dict(unit="paired_question", draws=draws, seed=seed))
+
+
 def analyze_cell(attempts, baseline, *, d1_complete=False, draws=10_000,
                  seed=20261019, expected_questions=98):
     """One cell, exactly three attempts per question; baseline holds three D1 bools.

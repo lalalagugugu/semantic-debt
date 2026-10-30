@@ -111,25 +111,32 @@
   "reps": 3,
   "cells": [
     "SQL-L0-u2",
-    "SQL-L1-u2"
+    "SQL-L1-u2",
+    "SQL-L0-u2p",
+    "SQL-L1-u2p"
   ],
-  "first_calls": 588,
-  "estimated_calls": 709,
-  "maximum_calls_one_fix_each": 1176,
-  "budget_ceiling_cny": 12,
+  "first_calls": 1176,
+  "estimated_calls": 1418,
+  "maximum_calls_one_fix_each": 2352,
+  "budget_ceiling_cny": 28,
   "concurrency": 8,
-  "estimated_cost_cny": 7.50600095190331,
-  "all_fixed_once_cost_cny": 12.769319343936518,
+  "estimated_cost_cny": 15.014325768460917,
+  "all_fixed_once_cost_cny": 25.54253827223705,
   "prices_offpeak_cny_per_million": {
     "hit": 0.02,
     "miss": 1.0,
     "output": 4.0
   },
-  "estimate_method": "Per-cell original 98x3 usage/fix rate; output=max(baseline mean,T29 C mean)+64; one extra cold prefix per cell conservatively added to observed cache costs.",
-  "max_input_tokens_estimate": 63851,
+  "estimate_method": "Both arms use each base cell's original 98x3 usage/fix rate, with no assumed penalty savings; output=max(baseline mean,T29 C mean)+64; include each arm's prompt delta and one extra cold prefix per cell.",
+  "max_input_tokens_estimate": 63923,
   "max_output_tokens_estimate": 14188,
-  "max_call_cost_cny": 0.120603,
-  "spend_note": "Admission reserves each in-flight request; total stays within 12 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+  "max_call_cost_cny": 0.120675,
+  "spend_note": "Admission reserves each in-flight request; total stays within 28 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+  "d4_free_baselines": [
+    "SQL-L0",
+    "SQL-L1"
+  ],
+  "d4_extra_api_calls": 0,
   "d1_dependency": "Collection may precede D1; analysis requires completed D1 full baseline labels and treatment content labels, never v2 or sampled extrapolation.",
   "baseline_system_sha256": {
     "SQL-L0": "c7d4d21fb5621fc0d8475236da10d48bb94195766b4e32fcba3c8208224ca96c",
@@ -137,7 +144,9 @@
   },
   "treatment_system_sha256": {
     "SQL-L0-u2": "4b3683308332b306ca54ce018647c80ae3c6047bbf1d3b1e342941e653503f4d",
-    "SQL-L1-u2": "3f5efa6980306d3171b1baa614f554f18cf2e6a14920c4e6490c75b875e97bcd"
+    "SQL-L1-u2": "3f5efa6980306d3171b1baa614f554f18cf2e6a14920c4e6490c75b875e97bcd",
+    "SQL-L0-u2p": "228b8ae7ffb691ed0ddf049b3e018806f05ddb1ef60a3839c87604b252e97f1c",
+    "SQL-L1-u2p": "0136747de6202152c3d9eb87c9e8d6bc2b717d1d6a9b008ed5f6d2ebc87a4ef5"
   },
   "source_sha256": {
     "reports/validation/t29-expanded-audit.json": "185c062afa76fa5083ba161830d9c7a5cfc52d15bc2abcdb639689e9f7f71228",
@@ -148,6 +157,7 @@
     {
       "cell": "SQL-L0-u2",
       "baseline_cell": "SQL-L0",
+      "arm": "no_penalty",
       "questions": 98,
       "reps": 3,
       "first_calls": 294,
@@ -165,6 +175,7 @@
     {
       "cell": "SQL-L1-u2",
       "baseline_cell": "SQL-L1",
+      "arm": "no_penalty",
       "questions": 98,
       "reps": 3,
       "first_calls": 294,
@@ -178,6 +189,42 @@
       "extra_cold_prefix_allowance_cny": 0.04536974529252732,
       "estimated_cost_cny": 2.9638353170844542,
       "all_fixed_once_cost_cny": 4.479627513286463
+    },
+    {
+      "cell": "SQL-L0-u2p",
+      "baseline_cell": "SQL-L0",
+      "arm": "penalty_k10",
+      "questions": 98,
+      "reps": 3,
+      "first_calls": 294,
+      "estimated_calls": 322,
+      "maximum_calls_one_fix_each": 588,
+      "observed_fix_rate": 0.09523809523809523,
+      "observed_mean_output_tokens": 3362.8385093167703,
+      "estimated_output_tokens": 3427,
+      "estimated_prompt_tokens": 6138,
+      "observed_cache_hit_ratio": 0.956421264379383,
+      "extra_cold_prefix_allowance_cny": 0.00575310344634544,
+      "estimated_cost_cny": 4.543665793723114,
+      "all_fixed_once_cost_cny": 8.292376276995226
+    },
+    {
+      "cell": "SQL-L1-u2p",
+      "baseline_cell": "SQL-L1",
+      "arm": "penalty_k10",
+      "questions": 98,
+      "reps": 3,
+      "first_calls": 294,
+      "estimated_calls": 387,
+      "maximum_calls_one_fix_each": 588,
+      "observed_fix_rate": 0.3163265306122449,
+      "observed_mean_output_tokens": 1477.1136950904393,
+      "estimated_output_tokens": 1570,
+      "estimated_prompt_tokens": 46703,
+      "observed_cache_hit_ratio": 0.9928086136210369,
+      "extra_cold_prefix_allowance_cny": 0.04543979786830442,
+      "estimated_cost_cny": 2.9646590228344936,
+      "all_fixed_once_cost_cny": 4.480842651305306
     }
   ]
 }

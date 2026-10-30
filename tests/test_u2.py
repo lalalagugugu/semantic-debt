@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from harness import run_direct as R, u2_analysis as A
 from harness.cells import CELLS, U2_CELLS
 from harness.questions import Question
-from harness.selective_v2 import U2_CONFIDENCE_RULE, NEW_FOUR, OLD_FOUR, u2_confidence_record
+from harness.selective_v2 import U2_CONFIDENCE_RULE, NEW_FOUR, OLD_FOUR, scoring_rule, u2_confidence_record
 from scripts import t29_u2 as U
 
 
@@ -25,6 +25,11 @@ def test_u2_combines_only_fourth_instruction_and_confidence(tmp_path, monkeypatc
         assert "计分规则" not in treatment and R.system_for(CELLS[base]) == original
         assert cell.name not in CELLS and cell.context == CELLS[base].context
         assert cell.allowed == CELLS[base].allowed
+        penalty = U2_CELLS[f"{base}-u2p"]
+        assert R.system_for(penalty) == scoring_rule(10)+"\n\n"+treatment
+        assert penalty.selective_k == 10 and penalty.context == cell.context
+        assert penalty.allowed == cell.allowed and penalty.name not in CELLS
+    assert U.BUDGET == 28 and len(U2_CELLS) == 4
 
 
 def test_u2_scope_contains_both_halves_and_never_judge_or_low():
@@ -155,6 +160,57 @@ def test_equal_baseline_error_rates_do_not_succeed_due_to_roundoff():
             for q in baseline for rep in (1, 2, 3)]
     result = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=20, draws=100)
     assert result["refusal_error_difference_ci"] == [0, 0] and not result["refusal_success"]
+
+
+def test_paired_penalty_contrast_keeps_matching_clusters_and_direction():
+    unpenalized = [dict(qid=f"Q{i}", rep=rep, refused=i < 2)
+                   for i in range(4) for rep in (1, 2, 3)]
+    # Same per-question refusal pattern produces exactly zero paired variance.
+    same = A.compare_refusal_arms(unpenalized, list(reversed(unpenalized)), d1_complete=True,
+                                 expected_questions=4, draws=100)
+    assert same["ci95"] == [0, 0] and same["penalty_minus_unpenalized"] == 0
+    no_refusals = [{**r, "refused": False} for r in unpenalized]
+    all_refusals = [{**r, "refused": True} for r in unpenalized]
+    increased = A.compare_refusal_arms(no_refusals, all_refusals, d1_complete=True, expected_questions=4, draws=100)
+    assert increased["penalty_minus_unpenalized"] == 1 and increased["ci95"] == [1, 1]
+    zero = A.compare_refusal_arms(no_refusals, no_refusals, d1_complete=True, expected_questions=4, draws=100)
+    assert zero["ci95"] == [0, 0]  # Still reported when both rates are <5%.
+    with pytest.raises(ValueError, match="D1"):
+        A.compare_refusal_arms(no_refusals, all_refusals, expected_questions=4)
+    with pytest.raises(ValueError, match="scope incomplete"):
+        A.compare_refusal_arms(no_refusals, all_refusals[:-1], d1_complete=True, expected_questions=4)
+    renamed = [{**r, "qid": "OTHER" if r["qid"] == "Q0" else r["qid"]} for r in all_refusals]
+    with pytest.raises(ValueError, match="identical"):
+        A.compare_refusal_arms(no_refusals, renamed, d1_complete=True, expected_questions=4)
+
+
+def test_four_cells_dispatch_against_one_28_yuan_budget(tmp_path, monkeypatch):
+    import hashlib
+    from harness.executors import ExecResult
+
+    pre = json.loads((U.ROOT / U.PREFLIGHT).read_text())
+    assert len(pre["rows"]) == 4 and pre["first_calls"] == 1176 and pre["budget_ceiling_cny"] == 28
+    runtime = tmp_path / "runtime"
+    stored = runtime / U.PREFLIGHT
+    stored.parent.mkdir(parents=True)
+    stored.write_text(json.dumps(pre))
+    (tmp_path / "chdb-t29").mkdir()
+    monkeypatch.setenv("SEMDEBT_DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(U, "ROOT", runtime)
+    monkeypatch.setattr(U, "verify_eval_tag", lambda *a: None)
+    monkeypatch.setattr(U, "verify_semantic_tag", lambda *a, **kw: None)
+    monkeypatch.setattr(U, "load_questions", lambda **kw: [])
+    monkeypatch.setattr(U, "build_preflight", lambda q: pre)
+    monkeypatch.setattr(U, "verify_harness", lambda: None)
+    monkeypatch.setattr(R, "is_peak", lambda *a: False)
+    monkeypatch.setattr(U.executors, "default_chdb_path", lambda: "unused")
+    monkeypatch.setattr(R, "make_executor", lambda *a: SimpleNamespace(execute=lambda q: ExecResult(rows=[[1]])))
+    dispatched = []
+    monkeypatch.setattr(R, "main", lambda argv: dispatched.append(R.parse_args(argv)) or 0)
+    assert U.main(["--execute-approved", "--run-id", "synthetic", "--approved-preflight-sha256",
+                   hashlib.sha256(stored.read_bytes()).hexdigest()]) == 0
+    assert [a.cell for a in dispatched] == [[c] for c in U2_CELLS]
+    assert all(a.budget == 28 and a.reps == 3 and a.concurrency == 8 and a.run_id == "synthetic" for a in dispatched)
 
 
 def test_paid_u2_requires_explicit_approval_flags_and_a_user_tag(monkeypatch):

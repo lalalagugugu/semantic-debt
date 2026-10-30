@@ -1,4 +1,4 @@
-"""T29 continuation U2: fixed 98 x 3 x 2 collection, approval-gated paid entry."""
+"""T29 continuation U2: fixed 98 x 3 x 2 cells x 2 arms, approval-gated paid entry."""
 import argparse
 import hashlib
 import json
@@ -20,7 +20,7 @@ TAG = "harness-u2-v1"
 SEMANTIC = "semantic-v1.2"
 EVAL = "eval-v1.3"
 BASELINE_RUN = "20261018-T13-sql-direct-01"
-BUDGET = 12
+BUDGET = 28
 MODEL = "deepseek-flash"
 FINGERPRINT = "e72d3c7f663d3e1383b00b3884cb4501"
 PREFLIGHT = Path("reports/validation/t29-u2-preflight.json")
@@ -48,7 +48,7 @@ def build_preflight(questions):
     max_prompt, max_output, max_delta = 0, 0, 0
     price = PRICES_OFFPEAK[MODEL]
     for name, cell in U2_CELLS.items():
-        base = name.removesuffix("-u2")
+        base = name.rsplit("-", 1)[0]
         source = ROOT / "runs" / BASELINE_RUN / f"{base}.jsonl"
         content = source.read_bytes()
         sources[str(source.relative_to(ROOT))] = sha(content)
@@ -73,7 +73,8 @@ def build_preflight(questions):
         estimated_calls = len(turns)
         per_call = (prompt*(hit_ratio*price["hit"]+(1-hit_ratio)*price["miss"])+output*price["output"])/1e6
         cold = prompt*hit_ratio*(price["miss"]-price["hit"])/1e6
-        rows.append(dict(cell=name, baseline_cell=base, questions=98, reps=3, first_calls=294,
+        rows.append(dict(cell=name, baseline_cell=base, arm="penalty_k10" if cell.selective_k == 10 else "no_penalty",
+                         questions=98, reps=3, first_calls=294,
                          estimated_calls=estimated_calls, maximum_calls_one_fix_each=588,
                          observed_fix_rate=(len(turns)-294)/294,
                          observed_mean_output_tokens=output_mean, estimated_output_tokens=output,
@@ -91,15 +92,16 @@ def build_preflight(questions):
                 model=MODEL, expected_fingerprint=FINGERPRINT, proposed_harness_tag=TAG,
                 semantic_tag=SEMANTIC, eval_tag=EVAL, baseline_run=BASELINE_RUN,
                 qids=[q.qid for q in selected], questions=98, reps=3, cells=list(U2_CELLS),
-                first_calls=588, estimated_calls=sum(r["estimated_calls"] for r in rows),
-                maximum_calls_one_fix_each=1176, budget_ceiling_cny=BUDGET, concurrency=8,
+                first_calls=1176, estimated_calls=sum(r["estimated_calls"] for r in rows),
+                maximum_calls_one_fix_each=2352, budget_ceiling_cny=BUDGET, concurrency=8,
                 estimated_cost_cny=sum(r["estimated_cost_cny"] for r in rows),
                 all_fixed_once_cost_cny=sum(r["all_fixed_once_cost_cny"] for r in rows),
                 prices_offpeak_cny_per_million=price,
-                estimate_method="Per-cell original 98x3 usage/fix rate; output=max(baseline mean,T29 C mean)+64; one extra cold prefix per cell conservatively added to observed cache costs.",
+                estimate_method="Both arms use each base cell's original 98x3 usage/fix rate, with no assumed penalty savings; output=max(baseline mean,T29 C mean)+64; include each arm's prompt delta and one extra cold prefix per cell.",
                 max_input_tokens_estimate=maximum_input, max_output_tokens_estimate=maximum_output,
                 max_call_cost_cny=max_cost,
-                spend_note="Admission reserves each in-flight request; total stays within 12 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+                spend_note="Admission reserves each in-flight request; total stays within 28 CNY if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+                d4_free_baselines=["SQL-L0", "SQL-L1"], d4_extra_api_calls=0,
                 d1_dependency="Collection may precede D1; analysis requires completed D1 full baseline labels and treatment content labels, never v2 or sampled extrapolation.",
                 baseline_system_sha256=baseline_hashes, treatment_system_sha256=treatment_hashes,
                 source_sha256=sources, rows=rows)
@@ -134,7 +136,7 @@ def main(argv=None):
     pre = build_preflight(questions)
     print(json.dumps(pre, ensure_ascii=False, indent=2))
     if pre["estimated_cost_cny"] > BUDGET:
-        print("STOP: combined estimate exceeds the 12 CNY design ceiling; ask user")
+        print(f"STOP: combined estimate exceeds the {BUDGET} CNY design ceiling; ask user")
         return 2
     if args.dry_run:
         return 0
