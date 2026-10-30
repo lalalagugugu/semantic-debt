@@ -88,7 +88,7 @@ def analyze_cell(attempts, baseline, *, baseline_fingerprint=None, treatment_fin
     if (baseline_fingerprint != "bc19ba97cbe016479903222bb1578db6"
             or treatment_fingerprint != baseline_fingerprint or not baseline_run_id
             or baseline_run_id != treatment_run_id
-            or baseline_run_id in ("20261030-T29-u2-01", "20261018-T13-sql-direct-01")):
+            or baseline_run_id in ("20261030-T29-u2-01", "20261030-T29-u2-v2-01", "20261018-T13-sql-direct-01")):
         raise ValueError("U2 baseline and treatment must come from the same new run and approved fingerprint")
     if draws <= 0 or len(baseline) != expected_questions:
         raise ValueError("invalid bootstrap or question scope")

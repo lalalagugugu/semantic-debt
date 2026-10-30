@@ -17,15 +17,21 @@ from harness.questions import load_questions, verify_eval_tag
 from harness.semantic_version import verify_semantic_tag
 from harness.spend import ConcurrentSpendGuard
 
-TAG = "harness-u2-v2"
+TAG = "harness-u2-v3"
 SEMANTIC = "semantic-v1.2"
 EVAL = "eval-v1.3"
 ESTIMATE_BASELINE_RUN = "20261018-T13-sql-direct-01"
 PRIOR_RUN = "20261030-T29-u2-01"
 PRIOR_COST = Decimal("0.006272")
+DISCARDED_RUN = "20261030-T29-u2-v2-01"
+CONFIRMED_COST = Decimal("0.16352908")
+CONSOLE_REPORTED_COST = Decimal("0.28")
+UNCONFIRMED_CALLS = 8
+PRIOR_MAX_CALL_COST = Decimal("0.120675")
+BUDGET_DEDUCTION = max(CONSOLE_REPORTED_COST, CONFIRMED_COST+UNCONFIRMED_CALLS*PRIOR_MAX_CALL_COST)
 COLLECTION_CELLS = {**{name: CELLS[name] for name in ("SQL-L0", "SQL-L1")}, **U2_CELLS}
 BUDGET = 40
-RUN_BUDGET = float(Decimal(BUDGET)-PRIOR_COST)
+RUN_BUDGET = float(Decimal(BUDGET)-BUDGET_DEDUCTION)
 MODEL = "deepseek-flash"
 FINGERPRINT = "bc19ba97cbe016479903222bb1578db6"
 PREFLIGHT = Path("reports/validation/t29-u2-preflight.json")
@@ -51,6 +57,8 @@ def build_preflight(questions):
     sources = {str(confidence_source.relative_to(ROOT)): sha(confidence_source.read_bytes())}
     prior_evidence = ROOT / "reports/validation/t29-u2-collection-stop.json"
     sources[str(prior_evidence.relative_to(ROOT))] = sha(prior_evidence.read_bytes())
+    discarded_evidence = ROOT / "reports/validation/t29-u2-v2-collection-stop.json"
+    sources[str(discarded_evidence.relative_to(ROOT))] = sha(discarded_evidence.read_bytes())
     rows, baseline_hashes, treatment_hashes = [], {}, {}
     max_prompt, max_output, max_delta = 0, 0, 0
     price = PRICES_OFFPEAK[MODEL]
@@ -103,16 +111,23 @@ def build_preflight(questions):
                 qids=[q.qid for q in selected], questions=98, reps=3, cells=list(COLLECTION_CELLS),
                 first_calls=1764, estimated_calls=sum(r["estimated_calls"] for r in rows),
                 maximum_calls_one_fix_each=3528, budget_ceiling_cny=BUDGET, prior_run=PRIOR_RUN, prior_cost_cny=float(PRIOR_COST),
-                run_budget_cny=RUN_BUDGET, concurrency=8,
+                run_budget_cny=RUN_BUDGET, concurrency=8, required_spend_reservation=True,
+                discarded_run=DISCARDED_RUN, confirmed_known_cost_cny=float(CONFIRMED_COST),
+                console_reported_cost_cny=float(CONSOLE_REPORTED_COST),
+                unconfirmed_calls_reserve=UNCONFIRMED_CALLS, prior_max_call_cost_cny=float(PRIOR_MAX_CALL_COST),
+                unconfirmed_call_reserve_cny=float(UNCONFIRMED_CALLS*PRIOR_MAX_CALL_COST),
+                budget_deduction_cny=float(BUDGET_DEDUCTION),
+                budget_deduction_basis="max(0.28 console report, 0.16352908 confirmed known usage + 8 * 0.120675 prior maximum call estimate); unconfirmed reserve is not settled cost",
+                billing_status="v1 0.006272 settled; v2 0.15725708 saved-usage cost known; remaining cost unconfirmed; no fabricated ledger",
                 estimated_cost_cny=sum(r["estimated_cost_cny"] for r in rows),
                 all_fixed_once_cost_cny=sum(r["all_fixed_once_cost_cny"] for r in rows),
-                estimated_total_including_prior_cny=float(PRIOR_COST)+sum(r["estimated_cost_cny"] for r in rows),
-                all_fixed_total_including_prior_cny=float(PRIOR_COST)+sum(r["all_fixed_once_cost_cny"] for r in rows),
+                estimated_total_with_deduction_cny=float(BUDGET_DEDUCTION)+sum(r["estimated_cost_cny"] for r in rows),
+                all_fixed_total_with_deduction_cny=float(BUDGET_DEDUCTION)+sum(r["all_fixed_once_cost_cny"] for r in rows),
                 prices_offpeak_cny_per_million=price,
                 estimate_method="Six cells use original 98x3 usage/fix rates only for estimates, never U2 labels; new baseline output=ceil(original mean), treatment output=max(original mean,T29 C mean)+64; include each prompt delta and one extra cold prefix per cell.",
                 max_input_tokens_estimate=maximum_input, max_output_tokens_estimate=maximum_output,
                 max_call_cost_cny=max_cost,
-                spend_note="Admission reserves each in-flight request; total including the prior 0.006272 CNY stays within 40 CNY (new-run allowance 39.993728 CNY) if individual actual costs do not exceed the estimate. An over-estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
+                spend_note="Admission reserves each in-flight request; new-run spend plus the conservative deduction of 1.12892908 CNY stays within 40 CNY (new-run allowance 38.87107092 CNY) if individual actual costs do not exceed the estimate. An actual cost above the estimate or unknown bill stops new requests; admitted calls settle and raw responses are retained.",
                 d4_free_baselines=["SQL-L0", "SQL-L1"], d4_extra_api_calls=0,
                 d1_dependency="Collection may precede D1; analysis requires completed D1 full content adjudication for the new-fingerprint baseline and treatments, never v2 or sampled extrapolation.",
                 baseline_system_sha256=baseline_hashes, treatment_system_sha256=treatment_hashes,
@@ -127,6 +142,18 @@ def verify_prior_spend(data):
     previous = ConcurrentSpendGuard(ledger, 30, MODEL, 0.120675)
     if previous.total != PRIOR_COST or evidence["actual_cost_cny"] != str(PRIOR_COST):
         raise ValueError("prior U2 spend differs from the approved budget deduction")
+
+
+def verify_discarded_spend(data):
+    evidence = json.loads((ROOT / "reports/validation/t29-u2-v2-collection-stop.json").read_text())
+    if (evidence["run_id"] != DISCARDED_RUN or evidence["saved_responses"] != 33
+            or Decimal(evidence["known_total_including_prior_cny"]) != CONFIRMED_COST):
+        raise ValueError("discarded U2 usage evidence differs from the approved deduction")
+    for record in evidence["response_manifest"]:
+        path = data / "runs-raw" / DISCARDED_RUN / record["relative_path"]
+        if (sha(path.read_bytes()) != record["raw_sha256"]
+                or sha(path.with_name(path.stem+".exec.json").read_bytes()) != record["exec_sha256"]):
+            raise ValueError("discarded U2 response/execution evidence changed")
 
 
 def verify_harness():
@@ -152,14 +179,14 @@ def main(argv=None):
         ap.error("paid collection needs user approval, --execute-approved, --run-id and --approved-preflight-sha256")
     if args.run_id and (Path(args.run_id).name != args.run_id or args.run_id in (".", "..")):
         ap.error("invalid run id")
-    if args.run_id in (PRIOR_RUN, ESTIMATE_BASELINE_RUN):
-        ap.error("U2 v2 requires a new run-id; stopped and historical runs stay immutable")
+    if args.run_id in (PRIOR_RUN, DISCARDED_RUN, ESTIMATE_BASELINE_RUN):
+        ap.error("U2 v3 requires a new run-id; stopped and historical runs stay immutable")
     verify_eval_tag(EVAL)
     verify_semantic_tag(SEMANTIC, ["SQL-L0.yaml", "SQL-L1.yaml"], root=ROOT, contexts_dir=R.CONTEXTS)
     questions = load_questions(lang="zh")
     pre = build_preflight(questions)
     print(json.dumps(pre, ensure_ascii=False, indent=2))
-    if pre["estimated_total_including_prior_cny"] > BUDGET:
+    if pre["estimated_total_with_deduction_cny"] > BUDGET:
         print(f"STOP: combined estimate exceeds the {BUDGET} CNY design ceiling; ask user")
         return 2
     if args.dry_run:
@@ -175,6 +202,7 @@ def main(argv=None):
     if not ROOT.resolve().is_relative_to(data.resolve()):
         raise ValueError("paid U2 collection requires a tagged runtime checkout under SEMDEBT_DATA_DIR so detailed logs stay private")
     verify_prior_spend(data)
+    verify_discarded_spend(data)
     guard = ConcurrentSpendGuard(data / "runs-raw" / args.run_id / "spend-ledger.jsonl", RUN_BUDGET, MODEL, pre["max_call_cost_cny"])
     if guard.reached:
         print("STOP: saved admission ledger is closed")
@@ -190,12 +218,12 @@ def main(argv=None):
             raise ValueError("database precheck failed; build the frozen L0 views on the private copy before paid collection")
     common = ["--run-id", args.run_id, "--model", MODEL, "--reps", "3", "--concurrency", "8",
               "--budget", str(RUN_BUDGET), "--max-call-cost", str(pre["max_call_cost_cny"]),
-              "--semantic-tag", SEMANTIC, "--eval-tag", EVAL, "--skip-judge", "--est-from-args", "--stop-on-error",
+              "--semantic-tag", SEMANTIC, "--eval-tag", EVAL, "--skip-judge", "--est-from-args", "--stop-on-error", "--require-spend-reservation",
               "--questions", ",".join(pre["qids"]), "--expected-fingerprint", FINGERPRINT]
     for row in pre["rows"]:
         result = R.main(common+["--cell", row["cell"], "--est-fix-rate", str(row["observed_fix_rate"]),
                                "--est-output-tokens", str(row["estimated_output_tokens"]),
-                               "--est-hit-ratio", str(row["observed_cache_hit_ratio"])])
+                               "--est-hit-ratio", str(row["observed_cache_hit_ratio"])], spend_guard=guard)
         if result:
             return result
     return 0
