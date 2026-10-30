@@ -92,6 +92,7 @@ class ConcurrentSpendGuard:
         self.lock = threading.Lock()
         self.outstanding = set()
         self.sequence = 0
+        self.dispatch = threading.local()
         self.closed = False
         seen = set()
         if path.exists():
@@ -152,7 +153,17 @@ class ConcurrentSpendGuard:
             self._append("request", ticket, cell=cell, qid=qid, rep=rep, turn=turn, admission_closed=closes)
             self.outstanding.add(ticket)
             self.closed = closes
+            self.dispatch.ticket = ticket
+            self.dispatch.sent = False
             return ticket
+
+    def before_dispatch(self):
+        """The HTTP client may send only once against this thread's reservation."""
+        with self.lock:
+            ticket = getattr(self.dispatch, "ticket", None)
+            if ticket not in self.outstanding or getattr(self.dispatch, "sent", True):
+                raise SpendLimit("paid dispatch requires an unused in-flight reservation")
+            self.dispatch.sent = True
 
     def charge(self, ticket, cost, usage):
         required = ("prompt_tokens", "cache_hit_tokens", "cache_miss_tokens", "completion_tokens")

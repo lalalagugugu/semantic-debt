@@ -44,6 +44,7 @@ import threading
 import time
 from contextlib import nullcontext
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from decimal import Decimal
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -224,7 +225,7 @@ def _chat(ctx: RunContext, q: Question, rep: int, turn: int, messages: list[dict
                 ctx.boundary.check_reply(reply)
             return reply
         except Exception as exc:
-            if spend is not None:
+            if ctx.boundary is not None and (spend is not None or isinstance(exc, SpendLimit)):
                 ctx.boundary.reason = str(exc)
                 ctx.boundary.stopped.set()
             if isinstance(exc, SpendLimit):
@@ -847,6 +848,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--max-call-cost", type=float,
                     help="T29 concurrent admission: maximum estimated CNY per in-flight request")
     ap.add_argument("--allow-peak", action="store_true", help="allow starting in DeepSeek peak hours")
+    ap.add_argument("--require-spend-reservation", action="store_true",
+                    help="refuse paid dispatch without a concurrent in-flight reservation")
     ap.add_argument("--stop-on-error", action="store_true", help="stop admission on any attempt API/harness failure")
     ap.add_argument("--expected-fingerprint", help="stop on any differing or missing response fingerprint")
     ap.add_argument("--est-output-tokens", type=int, default=3000)
@@ -911,7 +914,7 @@ def select_questions(questions: list[Question], args: argparse.Namespace, pilot:
     return questions[: args.limit] if args.limit else questions
 
 
-def main(argv: list[str] | None = None, load=None) -> int:
+def main(argv: list[str] | None = None, load=None, spend_guard: ConcurrentSpendGuard | None = None) -> int:
     from harness.questions import EvalVersionError, eval_commit, load_questions, pilot_ids, verify_eval_tag
 
     args = parse_args(argv)
@@ -989,6 +992,10 @@ def main(argv: list[str] | None = None, load=None) -> int:
     if selective and args.budget is None:
         print("refusing to start: selective cells require --budget for the shared runtime spend threshold")
         return 2
+    if ((args.max_call_cost is not None and args.budget is None)
+            or (args.require_spend_reservation and (args.budget is None or args.max_call_cost is None))):
+        print("refusing to start: in-flight reservations require --budget and --max-call-cost")
+        return 2
     if is_peak() and not args.allow_peak:
         print("DeepSeek peak hours (weekdays 09-12, 14-18 Beijing): batch runs go off-peak (hard rule 6); "
               "pass --allow-peak for a deliberate small run")
@@ -1009,11 +1016,18 @@ def main(argv: list[str] | None = None, load=None) -> int:
     from harness.client import DeepSeekClient
 
     try:
-        spend = None
-        if selective:
+        spend = spend_guard
+        if selective or args.max_call_cost is not None or spend is not None:
             ledger = raw_root() / args.run_id / "spend-ledger.jsonl"
-            spend = (ConcurrentSpendGuard(ledger, args.budget, args.model, args.max_call_cost)
-                     if args.max_call_cost is not None else SpendGuard(ledger, args.budget, args.model))
+            if spend is None:
+                spend = (ConcurrentSpendGuard(ledger, args.budget, args.model, args.max_call_cost)
+                         if args.max_call_cost is not None else SpendGuard(ledger, args.budget, args.model))
+            elif (not isinstance(spend, ConcurrentSpendGuard) or spend.path.resolve() != ledger.resolve()
+                  or spend.model != args.model or spend.limit != Decimal(str(args.budget))
+                  or spend.max_call_cost != Decimal(str(args.max_call_cost))):
+                raise ValueError("shared spend guard does not match this run's ledger/model/limits")
+        if args.require_spend_reservation and not isinstance(spend, ConcurrentSpendGuard):
+            raise ValueError("required concurrent spend guard is missing")
     except (ValueError, OSError, KeyError, TypeError, ArithmeticError) as exc:
         print(f"refusing to start: {exc}")
         return 2
@@ -1026,7 +1040,7 @@ def main(argv: list[str] | None = None, load=None) -> int:
             return 3
     # A transport failure can have unknown billable usage; the capped run must
     # stop for reconciliation instead of sending another unaccounted request.
-    client = DeepSeekClient(args.model, before_request=None if isinstance(spend, ConcurrentSpendGuard) else boundary.before_request,
+    client = DeepSeekClient(args.model, before_request=spend.before_dispatch if isinstance(spend, ConcurrentSpendGuard) else boundary.before_request,
                             **({"max_attempts": 1} if spend is not None else {}))
     commit = eval_commit()
     guard = FingerprintGuard.from_logs(log_path(args.run_id, "x").parent, args.model)

@@ -31,7 +31,7 @@ def test_u2_combines_only_fourth_instruction_and_confidence(tmp_path, monkeypatc
         assert penalty.allowed == cell.allowed and penalty.name not in CELLS
     assert U.BUDGET == 40 and len(U2_CELLS) == 4
     assert list(U.COLLECTION_CELLS) == ["SQL-L0", "SQL-L1", "SQL-L0-u2", "SQL-L1-u2", "SQL-L0-u2p", "SQL-L1-u2p"]
-    assert U.TAG == "harness-u2-v2"
+    assert U.TAG == "harness-u2-v3"
     assert all(U.COLLECTION_CELLS[base] is CELLS[base] for base in ("SQL-L0", "SQL-L1"))
 
 
@@ -206,15 +206,23 @@ def test_six_cells_dispatch_in_order_against_budget_net_of_prior_spend(tmp_path,
     monkeypatch.setattr(U, "build_preflight", lambda q: pre)
     monkeypatch.setattr(U, "verify_harness", lambda: None)
     monkeypatch.setattr(U, "verify_prior_spend", lambda data: None)
+    monkeypatch.setattr(U, "verify_discarded_spend", lambda data: None)
     monkeypatch.setattr(R, "is_peak", lambda *a: False)
     monkeypatch.setattr(U.executors, "default_chdb_path", lambda: "unused")
     monkeypatch.setattr(R, "make_executor", lambda *a: SimpleNamespace(execute=lambda q: ExecResult(rows=[[1]])))
     dispatched = []
-    monkeypatch.setattr(R, "main", lambda argv: dispatched.append(R.parse_args(argv)) or 0)
+    shared = []
+    def dispatch(argv, spend_guard=None):
+        shared.append(spend_guard)
+        dispatched.append(R.parse_args(argv))
+        return 0
+    monkeypatch.setattr(R, "main", dispatch)
     assert U.main(["--execute-approved", "--run-id", "synthetic", "--approved-preflight-sha256",
                    hashlib.sha256(stored.read_bytes()).hexdigest()]) == 0
     assert [a.cell for a in dispatched] == [[c] for c in U.COLLECTION_CELLS]
-    assert all(a.budget == 39.993728 and a.reps == 3 and a.concurrency == 8 and a.run_id == "synthetic" and a.stop_on_error and a.expected_fingerprint == U.FINGERPRINT for a in dispatched)
+    assert len(shared) == 6 and all(g is shared[0] for g in shared)
+    assert shared[0].path == tmp_path / "runs-raw/synthetic/spend-ledger.jsonl"
+    assert all(a.budget == 38.87107092 and a.reps == 3 and a.concurrency == 8 and a.run_id == "synthetic" and a.stop_on_error and a.require_spend_reservation and a.expected_fingerprint == U.FINGERPRINT for a in dispatched)
 
 
 def test_paid_u2_requires_explicit_approval_flags_and_a_user_tag(monkeypatch):
@@ -235,6 +243,7 @@ def test_u2_rejects_old_or_mixed_baseline_provenance():
         (U.FINGERPRINT, "other", "new", "new"),
         (U.FINGERPRINT, U.FINGERPRINT, "old", "new"),
         (U.FINGERPRINT, U.FINGERPRINT, U.PRIOR_RUN, U.PRIOR_RUN),
+        (U.FINGERPRINT, U.FINGERPRINT, U.DISCARDED_RUN, U.DISCARDED_RUN),
         (U.FINGERPRINT, U.FINGERPRINT, U.ESTIMATE_BASELINE_RUN, U.ESTIMATE_BASELINE_RUN),
     ):
         with pytest.raises(ValueError, match="same new run"):
@@ -277,7 +286,7 @@ def test_prior_spend_is_settled_verified_and_not_reset(tmp_path, monkeypatch):
     monkeypatch.setattr(U, "ROOT", tmp_path)
     U.verify_prior_spend(tmp_path)
     from decimal import Decimal
-    assert Decimal(str(U.RUN_BUDGET))+U.PRIOR_COST == Decimal(40)
+    assert Decimal(str(U.RUN_BUDGET))+U.BUDGET_DEDUCTION == Decimal(40)
     remaining = ConcurrentSpendGuard(tmp_path / "new-ledger.jsonl", U.RUN_BUDGET, U.MODEL, .120675)
     remaining.total = U.PRIOR_COST + remaining.limit - remaining.max_call_cost
     with pytest.raises(SpendLimit):
@@ -293,7 +302,126 @@ def test_prior_spend_is_settled_verified_and_not_reset(tmp_path, monkeypatch):
         U.verify_prior_spend(tmp_path)
 
 
-def test_u2_v2_refuses_reusing_old_run_ids():
-    for run_id in (U.PRIOR_RUN, U.ESTIMATE_BASELINE_RUN):
+def test_u2_v3_refuses_reusing_stopped_discarded_or_historical_runs():
+    for run_id in (U.PRIOR_RUN, U.DISCARDED_RUN, U.ESTIMATE_BASELINE_RUN):
         with pytest.raises(SystemExit):
             U.main(["--dry-run", "--run-id", run_id])
+
+
+@pytest.mark.parametrize("name", list(U.COLLECTION_CELLS))
+@pytest.mark.parametrize("fault", [None, "auto_guard", "detached_guard", "missing_reservation", "transport_error"])
+def test_each_collection_cell_reserves_before_real_client_dispatch(tmp_path, monkeypatch, name, fault):
+    import io
+    from harness import client as C, questions as QL
+    from harness.executors import ExecResult
+    from harness.spend import ConcurrentSpendGuard
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    monkeypatch.setattr(R, "REPO", tmp_path)
+    monkeypatch.setattr(R, "raw_root", lambda: tmp_path / "raw")
+    monkeypatch.setattr(R, "harness_commit", lambda: "synthetic")
+    monkeypatch.setattr(QL, "eval_commit", lambda: "synthetic")
+    monkeypatch.setattr(R, "system_for", lambda cell: "synthetic system")
+    monkeypatch.setattr(R, "is_peak", lambda *a: False)
+    guard = ConcurrentSpendGuard(tmp_path / "raw/synthetic/spend-ledger.jsonl", U.RUN_BUDGET, U.MODEL, .120675)
+    calls, executions = [], []
+    def execute(sql):
+        executions.append(sql)
+        return (ExecResult(error="synthetic engine error", error_class="engine_error") if len(executions) == 1
+                else ExecResult(rows=[[1]], columns=[dict(name="n", type="UInt64")]))
+    monkeypatch.setattr(R, "make_executor", lambda *a: SimpleNamespace(execute=execute))
+    def urlopen(request, timeout):
+        events = [json.loads(s) for s in guard.path.read_text().splitlines()]
+        assert events[-1]["event"] == "request" and events[-1]["cell"] == name
+        assert events[-1]["request_id"] in guard.outstanding
+        assert events[-1]["turn"] == len(calls)
+        assert len([e for e in events if e["event"] == "request"]) == len(calls)+1
+        assert len([e for e in events if e["event"] == "charge"]) == len(calls)
+        assert guard.dispatch.sent and guard.exposure <= guard.limit
+        calls.append(json.loads(request.data))
+        if fault == "transport_error":
+            raise OSError("synthetic transport failure")
+        payload = dict(model=U.MODEL, system_fingerprint=U.FINGERPRINT,
+                       choices=[dict(message=dict(content="```sql\nSELECT 1\n```\n把握：90"), finish_reason="stop")],
+                       usage=dict(prompt_tokens=10, prompt_cache_hit_tokens=0, prompt_cache_miss_tokens=10,
+                                  completion_tokens=10))
+        return io.BytesIO(json.dumps(payload).encode())
+    monkeypatch.setattr(C.urllib.request, "urlopen", urlopen)
+    if fault == "auto_guard":
+        boundary = R.CallBoundary
+        def capture_boundary(expected, allow_peak, spend):
+            nonlocal guard
+            guard = spend
+            return boundary(expected, allow_peak, spend=spend)
+        monkeypatch.setattr(R, "CallBoundary", capture_boundary)
+    elif fault == "detached_guard":
+        boundary = R.CallBoundary
+        monkeypatch.setattr(R, "CallBoundary", lambda expected, allow_peak, spend: boundary(expected, allow_peak, spend=None))
+    elif fault == "missing_reservation":
+        monkeypatch.setattr(guard, "begin", lambda *a: 1)
+    q = Question("Q_SYNTH", "synthetic question", None, None, meta=dict(split="tuning"))
+    argv = ["--cell", name, "--run-id", "synthetic", "--reps", "1", "--concurrency", "8",
+            "--budget", str(U.RUN_BUDGET), "--max-call-cost", ".120675", "--stop-on-error",
+            "--require-spend-reservation", "--expected-fingerprint", U.FINGERPRINT]
+    result = R.main(argv, load=lambda **kw: [q], spend_guard=None if fault == "auto_guard" else guard)
+    record = json.loads((tmp_path / "runs/synthetic" / f"{name}.jsonl").read_text())
+    if fault in ("detached_guard", "missing_reservation"):
+        assert result == 3 and len(calls) == 0 and not guard.outstanding
+        assert "unused in-flight reservation" in record["error"]
+    elif fault == "transport_error":
+        assert result == 3 and len(calls) == 1 and len(guard.outstanding) == 1
+        assert record["status"] == "api_error"  # No transport retry or silent settlement.
+        with pytest.raises(ValueError, match="unresolved"):
+            ConcurrentSpendGuard(guard.path, U.RUN_BUDGET, U.MODEL, .120675)
+    else:
+        assert result == 0 and len(calls) == 2 and not guard.outstanding and guard.total > 0
+        assert record["status"] == "done" and record["fixed"]
+        events = [json.loads(s) for s in guard.path.read_text().splitlines()]
+        assert [r["event"] for r in events] == ["request", "charge", "request", "charge"]
+        assert [r["turn"] for r in events if r["event"] == "request"] == [0, 1]
+
+
+def test_http_gate_rejects_unreserved_reused_or_other_thread_ticket(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from harness.spend import ConcurrentSpendGuard, SpendLimit
+
+    guard = ConcurrentSpendGuard(tmp_path / "ledger.jsonl", 1, U.MODEL, .1)
+    with pytest.raises(SpendLimit, match="unused in-flight"):
+        guard.before_dispatch()
+    ticket = guard.begin("SQL-L0", "Q_SYNTH", 1, 0)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        with pytest.raises(SpendLimit):
+            pool.submit(guard.before_dispatch).result()
+    guard.before_dispatch()
+    with pytest.raises(SpendLimit):
+        guard.before_dispatch()
+    guard.charge(ticket, .01, dict(prompt_tokens=10, cache_hit_tokens=0, cache_miss_tokens=10, completion_tokens=10))
+    with pytest.raises(SpendLimit):
+        guard.before_dispatch()
+
+
+def test_budget_deduction_reserves_unknown_cost_without_claiming_settlement():
+    from decimal import Decimal
+
+    assert U.CONSOLE_REPORTED_COST == Decimal("0.28")
+    assert U.CONFIRMED_COST == Decimal("0.16352908")
+    assert U.UNCONFIRMED_CALLS*U.PRIOR_MAX_CALL_COST == Decimal("0.965400")
+    assert U.BUDGET_DEDUCTION == max(Decimal("0.28"), Decimal("1.12892908"))
+    assert U.RUN_BUDGET == 38.87107092
+
+
+@pytest.mark.parametrize("missing", ["--budget", "--max-call-cost"])
+def test_required_reservation_configuration_fails_before_client(tmp_path, monkeypatch, missing):
+    from harness import client as C
+
+    monkeypatch.setattr(R, "system_for", lambda cell: "synthetic system")
+    monkeypatch.setattr(R, "is_peak", lambda *a: False)
+    def forbidden_client(*args, **kwargs):
+        pytest.fail("client must not be constructed without reservation configuration")
+    monkeypatch.setattr(C, "DeepSeekClient", forbidden_client)
+    args = ["--cell", "SQL-L0", "--run-id", "synthetic", "--budget", "1", "--max-call-cost", ".1",
+            "--require-spend-reservation"]
+    i = args.index(missing)
+    del args[i:i+2]
+    q = Question("Q_SYNTH", "synthetic question", None, None)
+    assert R.main(args, load=lambda **kw: [q]) == 2
