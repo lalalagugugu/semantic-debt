@@ -1,0 +1,463 @@
+{
+  "run_id": "20261030-T29-u2-v2-01",
+  "status": "terminated_on_missing_baseline_runtime_spend_guard",
+  "harness_tag": "harness-u2-v2",
+  "harness_commit": "a60ba8521e322f356c1ec3f656e702d117252677",
+  "preflight_sha256": "ea84ecbcf3e6f64da725dfb7782f8756f45e54ca5f2a57efd2b26495c40a9d06",
+  "budget_ceiling_including_prior_cny": 40,
+  "prior_run": "20261030-T29-u2-01",
+  "prior_confirmed_cost_cny": "0.006272",
+  "first_started_at": "2026-10-30T22:34:34+08:00",
+  "completed_attempts": 32,
+  "saved_responses": 33,
+  "saved_first_responses": 32,
+  "saved_fix_responses": 1,
+  "known_response_cost_cny": "0.15725708",
+  "known_total_including_prior_cny": "0.16352908",
+  "actual_api_requests_total": null,
+  "actual_cost_total_cny": null,
+  "unresolved_possible_in_flight_logical_calls_max": 8,
+  "outstanding_requests_exact": null,
+  "spend_ledger_exists": false,
+  "process_exit_code": 143,
+  "observed_fingerprints": {
+    "bc19ba97cbe016479903222bb1578db6": 33
+  },
+  "transport_retries_in_saved_turns": 0,
+  "unrecorded_calls_transport_retry_limit": 6,
+  "private_source_log_sha256": "9aba68247c2248f8d42bae2d4b340246ffe9553ce8427c1c1006e8b71c669ca6",
+  "private_console_sha256": "d823242b1ad38fb26f2b15b12ffe7e238ccd4ce1b192036f5cc90187d9c0629f",
+  "response_manifest": [
+    {
+      "relative_path": "SQL-L0/Q01_r1_t0.json",
+      "raw_sha256": "fc81314f99d9dc24b94a2ddeadad197cbf782b57d7bd97905fd59d9006a028ba",
+      "exec_sha256": "9416658d8b743bf5a9150f53e5a0e31a3fb742bbf959c930db235cd07b2a1a08",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 5713,
+        "completion_tokens": 55
+      },
+      "cost_cny": "0.00593812"
+    },
+    {
+      "relative_path": "SQL-L0/Q01_r2_t0.json",
+      "raw_sha256": "c5216ddc41faa1bd988857a1462f8297799a73529b0fa039ee91d00a94039efc",
+      "exec_sha256": "9416658d8b743bf5a9150f53e5a0e31a3fb742bbf959c930db235cd07b2a1a08",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 67
+      },
+      "cost_cny": "0.0005922"
+    },
+    {
+      "relative_path": "SQL-L0/Q01_r3_t0.json",
+      "raw_sha256": "1d49cf6d224f50a9f7fb45451825dce8ee417114137a56da0c4035c21a06f9d6",
+      "exec_sha256": "9416658d8b743bf5a9150f53e5a0e31a3fb742bbf959c930db235cd07b2a1a08",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 64
+      },
+      "cost_cny": "0.0005802"
+    },
+    {
+      "relative_path": "SQL-L0/Q02_r1_t0.json",
+      "raw_sha256": "b629a96506347c92f36847a8cd6ba53e8277bb0354facc80c39cb9f59c62d6bf",
+      "exec_sha256": "5c86190c1a4e10557f81a8be30497d871d92953a43ea50bce97408d78eb8cb87",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5967,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 207,
+        "completion_tokens": 118
+      },
+      "cost_cny": "0.0007942"
+    },
+    {
+      "relative_path": "SQL-L0/Q02_r2_t0.json",
+      "raw_sha256": "196c04597be208071c7f9506ff11422dbeb3e7593c5a31d7de2a10b43a63838b",
+      "exec_sha256": "5f445a43065b38629ab8adada7fa6822ce310601e376624da85db799b129316c",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5967,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 207,
+        "completion_tokens": 814
+      },
+      "cost_cny": "0.0035782"
+    },
+    {
+      "relative_path": "SQL-L0/Q02_r2_t1.json",
+      "raw_sha256": "f64e4f014a6e758c9933e3bae514768d4e0929e9638271dfc146bbbf3dacb6c2",
+      "exec_sha256": "889f5318581f4edccf303fbfbcebba9e1dad58d278b4f355aed58d15e9de27a1",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 6089,
+        "prompt_cache_hit_tokens": 5888,
+        "prompt_cache_miss_tokens": 201,
+        "completion_tokens": 76
+      },
+      "cost_cny": "0.00062276"
+    },
+    {
+      "relative_path": "SQL-L0/Q02_r3_t0.json",
+      "raw_sha256": "58d44060ae6a50509c9073dc7a5360cc03ac1dbb2e1407edf978f8feb18a4624",
+      "exec_sha256": "ccdc8536668600ec44f58bc3d15cba96bffa15a841f5df3ddef76fd191e6bf4f",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5967,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 207,
+        "completion_tokens": 186
+      },
+      "cost_cny": "0.0010662"
+    },
+    {
+      "relative_path": "SQL-L0/Q03_r1_t0.json",
+      "raw_sha256": "241c33c7c7c35bd277bdd6086797174a729be31d113666ee5701db0087415406",
+      "exec_sha256": "76a42d8647d1d52a41d456fad060643f81208b46f7d50329fe537018ed848420",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5971,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 211,
+        "completion_tokens": 810
+      },
+      "cost_cny": "0.0035662"
+    },
+    {
+      "relative_path": "SQL-L0/Q03_r2_t0.json",
+      "raw_sha256": "fb23f88a13262cd6317697d0d784619b8e86118812de3de31257d349d7bcb4a1",
+      "exec_sha256": "31858437d1ede3c80a8a63debc21bd663124bdad8d44db4186661de3969aa1ea",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5971,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 211,
+        "completion_tokens": 629
+      },
+      "cost_cny": "0.0028422"
+    },
+    {
+      "relative_path": "SQL-L0/Q03_r3_t0.json",
+      "raw_sha256": "25b5461d498d31a7c638296828acc0a2a86795086ee08866d7f57c14e3854fbb",
+      "exec_sha256": "31858437d1ede3c80a8a63debc21bd663124bdad8d44db4186661de3969aa1ea",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5971,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 211,
+        "completion_tokens": 135
+      },
+      "cost_cny": "0.0008662"
+    },
+    {
+      "relative_path": "SQL-L0/Q04_r1_t0.json",
+      "raw_sha256": "ff3fa06911195dade77a41a7fe2d926bcf322c864a9d363062d18aff28c5ed2f",
+      "exec_sha256": "86cb6a1482df4e4fd58b73518a0f40a8aa88df93ac9f04371863bc68a7bf6c3c",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 111
+      },
+      "cost_cny": "0.0007692"
+    },
+    {
+      "relative_path": "SQL-L0/Q04_r2_t0.json",
+      "raw_sha256": "e6ee881b582c0eaaebcd951f7f30939b7a5d1b7e1c97abbe6740a970059272a3",
+      "exec_sha256": "86cb6a1482df4e4fd58b73518a0f40a8aa88df93ac9f04371863bc68a7bf6c3c",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 181
+      },
+      "cost_cny": "0.0010492"
+    },
+    {
+      "relative_path": "SQL-L0/Q04_r3_t0.json",
+      "raw_sha256": "5cdac5b560338c5e02ffe1debd7007327ea0ab4a8365ec3701399e726271face",
+      "exec_sha256": "b0d1ceaee063ec41e8e494b1e198bf32cfd852c8d1baff9ecdc23cb7a89df402",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 167
+      },
+      "cost_cny": "0.0009932"
+    },
+    {
+      "relative_path": "SQL-L0/Q05_r1_t0.json",
+      "raw_sha256": "33f16032677d54e4c38fc22d55b247c55ff2a779f9bd654bb6fcb139acfc003e",
+      "exec_sha256": "357d5ac9e608300dbf03307b7d479352cde4cd53e95ca723ca77985a9d9d0852",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 1756
+      },
+      "cost_cny": "0.0073492"
+    },
+    {
+      "relative_path": "SQL-L0/Q05_r2_t0.json",
+      "raw_sha256": "cb3ff47a7203ed43d981be040c20f6089d4354e83e49798fa80ed34d4a0ff81b",
+      "exec_sha256": "666310da8512ed4e9bd6b243d0cdc131b40622f0007f56151ac28cd783b059ad",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 899
+      },
+      "cost_cny": "0.0039212"
+    },
+    {
+      "relative_path": "SQL-L0/Q05_r3_t0.json",
+      "raw_sha256": "795e12489c6590f4693a53dc8c8a81aca8580feac9bd25053286db5a20d97ced",
+      "exec_sha256": "77bed122a2094fed5d6b4e0104431f3ef97a62392782ac4ec6ced453771f4050",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 2586
+      },
+      "cost_cny": "0.0106692"
+    },
+    {
+      "relative_path": "SQL-L0/Q06_r1_t0.json",
+      "raw_sha256": "6a92ffaa4dd125299d8cac4e5cc8401037160f77ed4d7f4d51ac2742409da703",
+      "exec_sha256": "11933149979c04cbb482b65feca8055e92b79189038b1fda0be48469daa55510",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 456
+      },
+      "cost_cny": "0.0021492"
+    },
+    {
+      "relative_path": "SQL-L0/Q06_r2_t0.json",
+      "raw_sha256": "3340aaae7f6fa7bb0e03308cfcfea234247342e0e8826c67710fa7698f78922d",
+      "exec_sha256": "e7a58499c5d880522fb53a0ff0a1376cf2e9266a10e3ed4894dcef1c46413ca4",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 247
+      },
+      "cost_cny": "0.0013132"
+    },
+    {
+      "relative_path": "SQL-L0/Q06_r3_t0.json",
+      "raw_sha256": "013a92108a05e187ae2ededc69bc0346c8a7af48d8d476bdb6a5ddd9a750f0fa",
+      "exec_sha256": "9164977a558f9451a340b768beb27377c9ab4da8ae95f22ec0ed468345342db7",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5970,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 210,
+        "completion_tokens": 942
+      },
+      "cost_cny": "0.0040932"
+    },
+    {
+      "relative_path": "SQL-L0/Q08_r1_t0.json",
+      "raw_sha256": "900938538e6d7da4bd885193534435da23cf6782f3a68748b1cfed518501e203",
+      "exec_sha256": "272f8db650c1bf4d156269c8e1e5d731e0368077ea32f27e9c735bcbfbf8aa1c",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5966,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 206,
+        "completion_tokens": 889
+      },
+      "cost_cny": "0.0038772"
+    },
+    {
+      "relative_path": "SQL-L0/Q08_r2_t0.json",
+      "raw_sha256": "209e7a8aac84a1687c8cc9c480b9c6739d547e7223683ea36677a1d8ec957444",
+      "exec_sha256": "17487422ece65cae12911a2ed64205c406565b2818d763308e4e6d7b164e4eae",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5966,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 206,
+        "completion_tokens": 704
+      },
+      "cost_cny": "0.0031372"
+    },
+    {
+      "relative_path": "SQL-L0/Q08_r3_t0.json",
+      "raw_sha256": "cd3d586b0bc0f1d47c5549e45be9f59c490d0b9123933cfe0a3d626f7450782f",
+      "exec_sha256": "af7b3aa21c245d460191dd4ca124eb15591a82742e6972075f8028ad428fb494",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5966,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 206,
+        "completion_tokens": 1070
+      },
+      "cost_cny": "0.0046012"
+    },
+    {
+      "relative_path": "SQL-L0/Q09_r1_t0.json",
+      "raw_sha256": "ec6a3beeef680d89224b168060bb69c841f4acd6440fde9696dd3dc583120970",
+      "exec_sha256": "01a98e711c0546cd296bcbdf20483f427cef52a470c98c18ec7fceb64a9fde91",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 475
+      },
+      "cost_cny": "0.0022242"
+    },
+    {
+      "relative_path": "SQL-L0/Q09_r2_t0.json",
+      "raw_sha256": "0d3b37072aa22d1679d04afffb5e7b6b5a5ccc7562aa3254d8402db7a6e32df6",
+      "exec_sha256": "b71807edd1212f9fce6fc5ac96d22aa250afb0f87d0e20c24e7b0b42d15c0c59",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 188
+      },
+      "cost_cny": "0.0010762"
+    },
+    {
+      "relative_path": "SQL-L0/Q09_r3_t0.json",
+      "raw_sha256": "ef7ed2b4dd88351a945b092cf7933280f6f625395913cfd43803921a4ceb6172",
+      "exec_sha256": "039e6f84b8afc03b911ac6de682d800a79992ee46c30dbc2fc50bc9ec6f8d6cf",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 462
+      },
+      "cost_cny": "0.0021722"
+    },
+    {
+      "relative_path": "SQL-L0/Q100_r1_t0.json",
+      "raw_sha256": "0291eb1454b2228e5c8f7ae2a42287d6f19b4770f6d08aa5bc0041881547ed8f",
+      "exec_sha256": "f368dc605865e56cdabe4e353644500fc8003ca92345c00e3783bd83e9383ecc",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5987,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 227,
+        "completion_tokens": 3486
+      },
+      "cost_cny": "0.0142862"
+    },
+    {
+      "relative_path": "SQL-L0/Q100_r2_t0.json",
+      "raw_sha256": "06db249d16355e15af1497c94229f87aa4501eaa6d5b6f33db13dbf41e76d8f9",
+      "exec_sha256": "4307a7e32e3341783d5fdd926719d7f07ddc297da37dda339a1c0af066d41d5a",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5987,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 227,
+        "completion_tokens": 3640
+      },
+      "cost_cny": "0.0149022"
+    },
+    {
+      "relative_path": "SQL-L0/Q100_r3_t0.json",
+      "raw_sha256": "6ef0aa30e3e453a3f3b30908246c5ddba3122af384e99105d9d5bcf3294e2cfb",
+      "exec_sha256": "4343ddd07cd49c64346124837583e05ecb940a81843507e75ba85bb15590f0e0",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5987,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 227,
+        "completion_tokens": 4617
+      },
+      "cost_cny": "0.0188102"
+    },
+    {
+      "relative_path": "SQL-L0/Q101_r2_t0.json",
+      "raw_sha256": "a8a40dd7c0550a032c1f14b1042640e599aaae15290ac063f0cdde632fcd5a31",
+      "exec_sha256": "89347d0805ac834569755541c546a4e487fb978ae61ac777689aba808b514980",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 5039
+      },
+      "cost_cny": "0.0204802"
+    },
+    {
+      "relative_path": "SQL-L0/Q101_r3_t0.json",
+      "raw_sha256": "9de1d7e9b9d29153cbcb10f1cde8fc46828dc9f67dc9148521af97c63b229cd4",
+      "exec_sha256": "89347d0805ac834569755541c546a4e487fb978ae61ac777689aba808b514980",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 1602
+      },
+      "cost_cny": "0.0067322"
+    },
+    {
+      "relative_path": "SQL-L0/Q10_r1_t0.json",
+      "raw_sha256": "3ae153c6f1aa52188aded838032f129e99401c7ccb6cf2c02504ac74bcfc389e",
+      "exec_sha256": "f7ac906ed85209f8e7c134943b737e938b3b4f53e57cc183a5937ad6aa3dbb16",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 915
+      },
+      "cost_cny": "0.0039842"
+    },
+    {
+      "relative_path": "SQL-L0/Q10_r2_t0.json",
+      "raw_sha256": "5ec018600257a0272309b1d02feaeac8ba8bb28ceaff676654c3e034cf7bb646",
+      "exec_sha256": "fed2c7e48bd41adbd1a0775cf7e837ceae373f385ad257e7f975b00f4a271fa4",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 454
+      },
+      "cost_cny": "0.0021402"
+    },
+    {
+      "relative_path": "SQL-L0/Q10_r3_t0.json",
+      "raw_sha256": "8ad36e83bb1f2052531cdd5e67d53132b617c43ef1b7ebee334845bd10602a67",
+      "exec_sha256": "04c373c710273c7aaed5def877cdd21e0a0aeb5aa54d995c86a5bdb410387115",
+      "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "usage": {
+        "prompt_tokens": 5969,
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 209,
+        "completion_tokens": 1439
+      },
+      "cost_cny": "0.0060802"
+    }
+  ],
+  "analysis_status": "not_started; full content adjudication and analysis await final D1",
+  "next_step": "user ruling required for frozen harness fix/new tag and unresolved billing; no automatic resume"
+}
