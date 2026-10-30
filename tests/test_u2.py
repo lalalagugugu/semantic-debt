@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from harness import run_direct as R, u2_analysis as A
 from harness.cells import CELLS, U2_CELLS
 from harness.questions import Question
-from harness.selective_v2 import CONFIDENCE_RULE, NEW_FOUR, OLD_FOUR, u2_confidence_record
+from harness.selective_v2 import U2_CONFIDENCE_RULE, NEW_FOUR, OLD_FOUR, u2_confidence_record
 from scripts import t29_u2 as U
 
 
@@ -21,7 +21,7 @@ def test_u2_combines_only_fourth_instruction_and_confidence(tmp_path, monkeypatc
         original = R.system_for(CELLS[base])
         cell = U2_CELLS[f"{base}-u2"]
         treatment = R.system_for(cell)
-        assert treatment == original.replace(OLD_FOUR, NEW_FOUR)+"\n"+CONFIDENCE_RULE+"\n"
+        assert treatment == original.replace(OLD_FOUR, NEW_FOUR)+"\n"+U2_CONFIDENCE_RULE+"\n"
         assert "计分规则" not in treatment and R.system_for(CELLS[base]) == original
         assert cell.name not in CELLS and cell.context == CELLS[base].context
         assert cell.allowed == CELLS[base].allowed
@@ -41,7 +41,7 @@ def test_u2_scope_contains_both_halves_and_never_judge_or_low():
 
 @pytest.mark.parametrize("line,status,score,gate", [
     ("把握：90", "valid", 90, True), ("把握：89.9", "valid", 89.9, False),
-    ("", "missing", None, False), ("把握：101", "out_of_range", None, False),
+    ("", "missing", None, False), ("把握：", "missing", None, False), ("把握：101", "out_of_range", None, False),
     ("把握：90%", "invalid_format", None, False),
     ("把握：90\n把握：80", "duplicate", None, False),
 ])
@@ -56,6 +56,24 @@ def test_u2_native_refusal_needs_no_confidence():
     result = u2_confidence_record("CANNOT_ANSWER", {"outcome": "refused"})
     assert result["status"] == "native_refusal" and not result["format_error"]
     assert result["value"] is None and not result["gate90"]["answered"]
+
+
+def test_collection_records_missing_confidence_without_rejecting_or_sending_refs(tmp_path):
+    from harness.client import MockClient
+    from harness.executors import ExecResult
+
+    sent = []
+    client = MockClient(lambda messages: sent.extend(messages) or "```sql\nSELECT 1\n```")
+    rules = dict(ordered=False, top_n=None, tie_columns=[], value_kinds=["count"],
+                 value_types=["UInt64"], required_columns=[0])
+    q = Question("Q1", "synthetic question", [[[987654321]]], rules)
+    executor = SimpleNamespace(execute=lambda query: ExecResult(rows=[[987654321]], columns=[dict(name="n", type="UInt64")]))
+    ctx = R.RunContext("synthetic", U2_CELLS["SQL-L0-u2"], client, executor,
+                       "synthetic system", "bank", "code", 120, tmp_path / "raw")
+    record = R.run_attempt(ctx, q, 1)
+    assert record["status"] == "done" and record["final"]["outcome"] == "correct"
+    assert record["confidence"]["status"] == "missing" and not record["confidence"]["native_refusal"]
+    assert len(client.requests) == 1 and "987654321" not in json.dumps(sent)
 
 
 def test_refusal_and_confidence_are_independent_conclusions():
@@ -129,6 +147,14 @@ def test_five_percent_boundary_and_all_refused_are_not_misinterpreted():
     rows = [{**r, "refused": True, "confidence": None, "correct": None} for r in rows]
     all_refused = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=20, draws=40)
     assert all_refused["refusal_conclusion"] == "无法比较" and all_refused["auc"] is None
+
+
+def test_equal_baseline_error_rates_do_not_succeed_due_to_roundoff():
+    baseline = {f"Q{i}": [True, True, False] for i in range(20)}
+    rows = [dict(qid=q, rep=rep, refused=q == "Q0", correct=rep != 1, confidence=80)
+            for q in baseline for rep in (1, 2, 3)]
+    result = A.analyze_cell(rows, baseline, d1_complete=True, expected_questions=20, draws=100)
+    assert result["refusal_error_difference_ci"] == [0, 0] and not result["refusal_success"]
 
 
 def test_paid_u2_requires_explicit_approval_flags_and_a_user_tag(monkeypatch):

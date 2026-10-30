@@ -9,6 +9,7 @@ from harness import prompt as P
 
 THRESHOLDS = {1: "50%", 3: "75%", 5: "83%", 10: "91%", 20: "95%", 100: "99%"}
 CONFIDENCE_RULE = "作答格式仍按上述要求；作答时另起一行输出「把握：0–100」，用0到100之间的数表示你判断本次答对的概率。只输出一个把握值。只输出 CANNOT_ANSWER 时不需要把握行。"
+U2_CONFIDENCE_RULE = CONFIDENCE_RULE + "有作答时，把握行必须放在整份回复的最后一行。"
 OLD_FOUR = "4. 如果根据语义上下文无法回答这个问题，只输出 CANNOT_ANSWER，不要输出其他内容。"
 NEW_FOUR = "4. 无法回答或没有把握时只输出 CANNOT_ANSWER"
 GATES = (50, 75, 90)
@@ -26,7 +27,7 @@ def system_variant(base: str, variant: str, k: int | None) -> str:
     if variant == "uncertainty":
         if k is not None or base.count(OLD_FOUR) != 1:
             raise ValueError("U2 requires the frozen fourth instruction and no scoring rule")
-        return base.replace(OLD_FOUR, NEW_FOUR) + "\n" + CONFIDENCE_RULE + "\n"
+        return base.replace(OLD_FOUR, NEW_FOUR) + "\n" + U2_CONFIDENCE_RULE + "\n"
     if variant == "front":
         if base.count(OLD_FOUR) != 1:
             raise ValueError("the frozen fourth instruction changed")
@@ -47,7 +48,7 @@ def u2_confidence_record(content: str, final: dict) -> dict:
         status = "valid"
     else:
         lines = re.findall(r"^\s*把握\s*[:：](.*?)$", content, re.MULTILINE)
-        status = "missing" if not lines else "duplicate" if len(lines) > 1 else "invalid_format"
+        status = "missing" if not lines or (len(lines) == 1 and not lines[0].strip()) else "duplicate" if len(lines) > 1 else "invalid_format"
         if len(lines) == 1:
             try:
                 number = float(lines[0].strip())

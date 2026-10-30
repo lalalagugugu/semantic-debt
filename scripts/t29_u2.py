@@ -106,7 +106,10 @@ def build_preflight(questions):
 
 
 def verify_harness():
-    subprocess.run(["git", "rev-parse", "--verify", f"{TAG}^{{commit}}"], cwd=ROOT, check=True, capture_output=True)
+    tagged = subprocess.run(["git", "rev-parse", "--verify", f"{TAG}^{{commit}}"], cwd=ROOT, check=True, capture_output=True, text=True)
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    if head != tagged.stdout.strip():
+        raise ValueError("paid collection must use a checkout of the user-tagged harness commit")
     paths = ["harness", "scripts/t29_u2.py", str(PREFLIGHT)]
     subprocess.run(["git", "diff", "--exit-code", TAG, "--", *paths], cwd=ROOT, check=True)
     extra = subprocess.check_output(["git", "ls-files", "--others", "--exclude-standard", "--", *paths], cwd=ROOT)
@@ -143,6 +146,8 @@ def main(argv=None):
         print("STOP: peak hours; no new API requests")
         return 2
     data = Path(os.environ["SEMDEBT_DATA_DIR"])
+    if not ROOT.resolve().is_relative_to(data.resolve()):
+        raise ValueError("paid U2 collection requires a tagged runtime checkout under SEMDEBT_DATA_DIR so detailed logs stay private")
     guard = ConcurrentSpendGuard(data / "runs-raw" / args.run_id / "spend-ledger.jsonl", BUDGET, MODEL, pre["max_call_cost_cny"])
     if guard.reached:
         print("STOP: saved admission ledger is closed")

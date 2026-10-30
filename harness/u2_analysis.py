@@ -21,12 +21,14 @@ def _auc(rows):
     return wins / (positive*negative)
 
 
-def _difference(rows, baseline_error):
-    rejected = [baseline_error[r["qid"]] for r in rows if r["refused"]]
-    answered = [baseline_error[r["qid"]] for r in rows if not r["refused"]]
+def _difference(rows, baseline_error_counts):
+    rejected = [baseline_error_counts[r["qid"]] for r in rows if r["refused"]]
+    answered = [baseline_error_counts[r["qid"]] for r in rows if not r["refused"]]
     if not rejected or not answered:
         return None
-    return sum(rejected)/len(rejected) - sum(answered)/len(answered)
+    # Three baseline repeats: compare integer error totals before dividing so
+    # a true zero cannot turn into a positive CI bound through roundoff.
+    return (sum(rejected)*len(answered)-sum(answered)*len(rejected))/(3*len(rejected)*len(answered))
 
 
 def _interval(values):
@@ -66,12 +68,12 @@ def analyze_cell(attempts, baseline, *, d1_complete=False, draws=10_000,
     if set(grouped) != set(baseline) or any(len(v) != 3 for v in grouped.values()):
         raise ValueError("treatment scope incomplete")
     rows = list(attempts)
-    baseline_error = {q: 1-sum(v)/3 for q, v in baseline.items()}
+    baseline_error_counts = {q: 3-sum(v) for q, v in baseline.items()}
     answered = [r for r in rows if not r["refused"]]
     refused = len(rows)-len(answered)
     refusal_rate = refused/len(rows)
     compare_refusal = refusal_rate >= .05
-    delta = _difference(rows, baseline_error) if compare_refusal else None
+    delta = _difference(rows, baseline_error_counts) if compare_refusal else None
     auc = _auc(rows)
     gate90 = [r for r in answered if r["confidence"] is not None and r["confidence"] >= 90]
     rng = random.Random(seed)
@@ -82,7 +84,7 @@ def analyze_cell(attempts, baseline, *, d1_complete=False, draws=10_000,
         # shared baseline error rate, including missing-confidence patterns.
         sample = [r for q in rng.choices(qids, k=len(qids)) for r in grouped[q]]
         if delta is not None:
-            d = _difference(sample, baseline_error)
+            d = _difference(sample, baseline_error_counts)
             if d is not None:
                 differences.append(d)
         if auc is not None:
@@ -91,9 +93,9 @@ def analyze_cell(attempts, baseline, *, d1_complete=False, draws=10_000,
                 aucs.append(a)
     delta_ci, auc_ci = _interval(differences), _interval(aucs)
     return dict(questions=len(qids), attempts=len(rows), refused=refused, refusal_rate=refusal_rate,
-                baseline_error_refused=(sum(baseline_error[r["qid"]] for r in rows if r["refused"])/refused)
+                baseline_error_refused=(sum(baseline_error_counts[r["qid"]] for r in rows if r["refused"])/(3*refused))
                 if delta is not None else None,
-                baseline_error_answered=(sum(baseline_error[r["qid"]] for r in answered)/len(answered))
+                baseline_error_answered=(sum(baseline_error_counts[r["qid"]] for r in answered)/(3*len(answered)))
                 if delta is not None else None,
                 refusal_error_difference=delta, refusal_error_difference_ci=delta_ci,
                 refusal_success=bool(delta_ci and delta_ci[0] > 0),
