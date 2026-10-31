@@ -97,6 +97,27 @@ def apply_amendments(labels, amendments):
     return result
 
 
+def review_coverage(labels, reviewed, changed_ids):
+    """Keep manual independent review separate from deterministic credits."""
+    by_id={r['anon_id']:r for r in labels}
+    ids={r['anon_id'] for r in reviewed}
+    expected={r['anon_id'] for r in labels if r['method']=='manual'
+              and (r['correct'] or r['anon_id'] in changed_ids)}
+    if len(ids)!=len(reviewed) or ids!=expected or not changed_ids<=ids:
+        raise ValueError('independent review scope incomplete or duplicated')
+    for r in reviewed:
+        original=by_id[r['anon_id']]
+        if r['qid']!=original['qid']:
+            raise ValueError('independent review question mismatch')
+        if r['anon_id'] in changed_ids:
+            if original['correct']:
+                raise ValueError('user-adjudicated review change not applied')
+        elif r['label']!='内容正确' or not original['correct']:
+            raise ValueError('unresolved independent review verdict')
+    return dict(reviewed=len(ids),retained=len(ids-changed_ids),changed=len(changed_ids),
+                deterministic_credits=sum(r['method'] in ('v2','R1-R11') and r['correct'] for r in labels))
+
+
 def prepare(data, private):
     if private.exists():
         raise ValueError('preserve the existing private review; do not overwrite')
@@ -250,6 +271,18 @@ def export(data, private):
         expected=apply_amendments(expected,amendment['records'])
     if labels!=expected:
         raise ValueError('analysis labels are stale; rerun analysis before export')
+    review_info=None
+    if amendment_path.exists() and 'independent_review' in amendment:
+        metadata=amendment['independent_review']
+        review_path=private/'claude-review/claude-labels-u2-101.csv'
+        if (sha(review_path.read_bytes())!=metadata['labels_sha256'] or
+            sha((private/'claude-review/disagreements-u2.md').read_bytes())!=metadata['disagreements_sha256']):
+            raise ValueError('independent review evidence changed')
+        with review_path.open(newline='') as f:reviewed=list(csv.DictReader(f))
+        changed={r['anon_id'] for r in amendment['records'] if r.get('review_scope')=='claude-u2-101'}
+        review_info=review_coverage(labels,reviewed,changed)
+        if any(review_info[k]!=metadata[k] for k in ('reviewed','retained','changed')):
+            raise ValueError('independent review summary differs from user ruling')
     rows=[]
     for r in sorted(labels,key=lambda r:(r['cell'],int(r['qid'][1:]),r['rep'])):
         rows.append(dict(qid=r['qid'],cell=r['cell'],rep=r['rep'],anonymous_id=r['anon_id'],
@@ -269,6 +302,7 @@ def export(data, private):
           verdict_lock_sha256=sha((private/'verdict-lock.json').read_bytes()),
           adjudication_amendments_sha256=sha((private/'user-adjudication-amendments.json').read_bytes())
           if (private/'user-adjudication-amendments.json').exists() else None,
+          independent_review=review_info,
           summary=summary,**analysis))
     # A separate private packet lets the other vendor review all positives.
     # It deliberately contains neither arm identity nor the first reviewer's rationale.
@@ -297,15 +331,18 @@ def export(data, private):
           packet_sha256=sha((private/'claude-positive-materials.json').read_bytes()),
           labels_sha256=sha((ROOT/'reports/validation/t29-u2-content-labels.csv').read_bytes()),
           analysis_code_sha256=sha(Path(__file__).read_bytes()),
-          decisions_sha256=lock['judgments_sha256'],model_api_calls=0,query_executions=0))
+          decisions_sha256=lock['judgments_sha256'],independent_review=review_info,
+          model_api_calls=0,query_executions=0))
     pct=lambda v:'不可估计' if v is None else f'{100*v:.2f}%'
     interval=lambda v,scale=1:'不计算' if v is None else f'[{v[0]*scale:.3f}, {v[1]*scale:.3f}]'
-    lines=['# U2 全量内容判定与预登记分析（Codex 初判，待 Claude 独立复核）','',
+    lines=['# U2 全量内容判定与预登记分析（101次人工判对已独立复核并经用户裁决）','',
         '日期：2026-11-01。原始采集 run `'+RUN+'`，指纹 `'+FP+'`。六单元各98题×3次，共1764次；本次模型API调用0、SQL执行0。分析只用本次同指纹基线，旧指纹基线仅描述漂移。','',
         '## 判定与盲法','',
         f"沿用D1定稿的v2、R1–R11及内容规则：929次v2判对、90次规则放行、128次原生拒答、6次执行或协议失败；其余611次匿名逐条核对，用户改判后{sum(r['correct'] for r in labels if r['method']=='manual')}次判对、{sum(not r['correct'] for r in labels if r['method']=='manual')}次判错，总计{len(packet)}次内容正确。完整结果、SQL、题面及证据均留数据目录。公开逐次标签见 `../validation/t29-u2-content-labels.csv`。",'',
         '先用系统随机源打乱1764次作答并生成匿名编号。人工材料移除了单元/臂别、次数、系统提示、假设文本及把握分，仅含题号、题面、所交付基础上下文、SQL和结果/参考。按首次遇到题号的随机顺序分组审阅；所有标签完成后写入不可覆盖的verdict-lock，再接回身份。不是严格双盲：同一Codex会话构建材料并判定，SQL表名与基础上下文可提示L0/L1，但未依据惩罚臂或把握值判内容。','',
-        '用户2026-11-01以“所问格直接为NULL一律判错”取代此前NULL一步推导裁决，原因是19单元Q96同类均判错且含用户逐次裁定。本次只将Q110 SQL-L1第3次（U1437）由对改错；其余1763次标签不变。缺数但没有直接NULL的原一步推导许可不受影响，包括Q110 SQL-L2第3次。原匿名锁保留，改判发生于接回身份之后，以单独用户改判账及SHA记录；上一版私有标签、分析及判对材料包另存快照。历史新增及本次改判均列 `../validation/t29-u2-null-review-changes.csv`。19正式单元只读清单中的Q96四次标签及全部D1标签不改。','',
+        '此前用户以“所问格直接为NULL一律判错”取代原NULL一步推导裁决，前一轮仅将Q110 SQL-L1第3次（U1437）改错。缺数但没有直接NULL的一步推导许可不受影响。原匿名锁保留，用户改判发生于接回身份之后，以单独改判账及SHA记录，历次结果和材料包另存快照；NULL改判历史见 `../validation/t29-u2-null-review-changes.csv`。D1标签保持不动。','',
+        '本轮Claude独立复核101次人工判对，用户裁决U1396（Q107）及U1220（Q110）由对改错，其余99次逐项维持；只有这两次标签变化，其余1762次不变。U1220所问值的列名单位标错、字面差100倍，不算写法差异。依据见 `../../decisions/2026-11-01-u2-independent-review-rulings.md`；改判单列 `../validation/t29-u2-independent-review-changes.csv`。不改冻结评分器、R1–R11或统计判据。','',
+        'D1的单位问题只读核对见 `../validation/t29-u2-d1-unit-audit.md` 及同名CSV；25次pct字段名/比例数值线索分为13次所问列、12次辅助列，不直接作为25个新增错例，未改D1标签。未发现直接标明百分点或%且与本次U1220完全同形的条目。','',
         '## 六单元总计','',
         '|单元|次数|内容正确|准确率|原生拒答|执行/协议失败|',
         '|---|---:|---:|---:|---:|---:|']
@@ -336,7 +373,7 @@ def export(data, private):
     lines+=['','两侧均使用内容标签，旧基线来自D1最终快照 `'+D1_RUN+'`。这些差异只描述漂移，不进入U2拒答判据，不作为新的成功条件。','',
         '## 复现与独立复核','',
         '全部区间沿用冻结的 `harness/u2_analysis.py`：98题成簇、每题保留3次，10,000次、种子20261019、经验百分位95%区间；两臂差和新旧基线差按题配对。四臂Δ/AUC有效重采样次数在同名JSON中逐项报告，本次所有可计算指标均为10,000次；<5%臂Δ为0次。判据未改。','',
-        f'数据目录中的 `t29-u2-content-20261031/claude-positive-materials.json` 含{len(packet)}次当前判对材料及上下文哈希，不含臂别和Codex理由，供Claude独立核对；identity-key及初判理由另存，不应先交给独立判定者。上下文在同目录 `contexts/`。尚未声称已独立复核，后续分歧需单列，不覆盖本次匿名锁。','',
+        f'当前判对材料包 `t29-u2-content-20261031/claude-positive-materials.json` 含{len(packet)}次；原101次人工判对中的99次经Claude复核维持，2次经用户裁决改错。另1019次由v2或R1–R11确定性放行，未包含在这次101条的人工独立复核中，不能称全部判对作答已逐条跨厂商复核。复核CSV及分歧原文在同目录 `claude-review/`，SHA已绑定到用户改判账。原匿名锁和历次快照不覆盖。','',
         '离线复算（使用已锁定的私有证据目录；环境变量须已指向授权目录）：','',
         '```sh','uv run --offline python scripts/t29_u2_content.py analyze',
         'uv run --offline python scripts/t29_u2_content.py export','```','',
@@ -346,13 +383,42 @@ def export(data, private):
     print(json.dumps(dict(public_labels=len(rows),private_positive_materials=len(packet))))
 
 
+def audit_units(data, private):
+    """Publish read-only observations; never apply them as scoring changes."""
+    path=data/'t29-u2-unit-audit-20261101/read-only-findings.json'
+    audit=json.loads(path.read_text())
+    assert audit['model_api_calls']==audit['query_executions']==0
+    for name,digest in audit['final_labels_sha256'].items():
+        assert sha((ROOT/name).read_bytes())==digest
+    observations=audit['observations']
+    assert len(observations)==len({(r['cell'],r['qid'],r['rep']) for r in observations})==25
+    target=ROOT/'reports/validation/t29-u2-d1-unit-audit.csv'
+    with target.open('w',newline='') as f:
+        writer=csv.DictWriter(f,fieldnames=['qid','cell','rep','category','current_label'],lineterminator='\n')
+        writer.writeheader()
+        for r in sorted(observations,key=lambda r:(int(r['qid'][1:]),r['cell'],r['rep'])):
+            source=[json.loads(s) for s in (ROOT/'runs'/D1_RUN/(r['cell']+'.jsonl')).read_text().splitlines()]
+            score=next(x for x in source if x['qid']==r['qid'] and x['rep']==r['rep'])
+            assert score['content_correct']==1
+            writer.writerow(dict(qid=r['qid'],cell=r['cell'],rep=r['rep'],category=r['category'],current_label='内容正确'))
+    lines=['# D1定稿单位标记只读核对','',
+        '依据用户2026-11-01要求，核对19个正式单元的主表定稿标签。5439次主表作答中，4128次现判对；读取其原始执行结果并按SHA核对，筛查明示百分单位或pct列名及100倍数值关系，再核对全部所问期间/对象或辅助列。扫描召回只是线索，不自动打分。另核对了参考未定义百分数列的辅助输出。模型API调用0、SQL执行0。','',
+        '没有发现列名直接写“百分点”或“%/百分比”、且字面数值差100倍的同形条目；另发现25次列名含pct、数值以比例返回的现判对作答，见同名CSV：13次涉及所问数值列，12次仅涉及题面未问的辅助数值列。','',
+        '这些pct列中有指标字段标识符；不能未经裁决就把字段名当作明示展示单位，也不能因为辅助数值不符就撤销内容信用。因此本清单记录观察到的命名/缩放关系，不称25次都是新增错例。用户裁决的U1220则直接标明百分点，且是所问结果。D1所有原标签保留，本清单不改评分规则、不重算D1准确率。','',
+        '排除8次下降符号或近零容差造成的非100倍召回，及1次只写百分位、没有明示百分数单位的召回。另有参考本为比值而输出明确换成百分数的情况，属于一致单位换算，不列为单位标错；无需把所有100倍数值转换都判错。','',
+        '身份、类别、现有判定见 `t29-u2-d1-unit-audit.csv`；完整行级数字、列名、参考与私有判断在 `$SEMDEBT_DATA_DIR/t29-u2-unit-audit-20261101/`。原始内容不进公开文件。','',
+        '复现只读清单：`uv run --offline python scripts/t29_u2_content.py audit-units`。它读取已固定的私有核对证据，核验19个标签文件SHA并写出清单；不修改标签、不调用模型、不执行SQL。','']
+    (ROOT/'reports/validation/t29-u2-d1-unit-audit.md').write_text('\n'.join(lines))
+    print(json.dumps(dict(d1_units=19,correct_attempts=audit['correct_attempts'],pct_observations=25,display_unit_hits=0)))
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase',choices=['prepare','analyze','export'])
+    parser.add_argument('phase',choices=['prepare','analyze','export','audit-units'])
     args=parser.parse_args()
     data=Path(os.environ['SEMDEBT_DATA_DIR'])
     private=data/PRIVATE_NAME
-    {'prepare':prepare,'analyze':analyze,'export':export}[args.phase](data,private)
+    {'prepare':prepare,'analyze':analyze,'export':export,'audit-units':audit_units}[args.phase](data,private)
 
 
 if __name__=='__main__':main()

@@ -6,7 +6,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from scripts.t29_u2_content import blinded, final_labels, historical_baseline, lock_verdicts, apply_amendments
+from scripts.t29_u2_content import blinded, final_labels, historical_baseline, lock_verdicts, apply_amendments, review_coverage
 
 
 def test_review_view_excludes_arm_confidence_and_source_identity():
@@ -64,3 +64,16 @@ def test_user_amendment_changes_only_explicit_identity_and_preserves_original():
         apply_amendments(rows,[dict(patch,rep=3)])
     with pytest.raises(ValueError,match='duplicate adjudication'):
         apply_amendments(rows,[patch,patch])
+
+
+def test_review_scope_excludes_deterministic_credits_and_preserves_retained_verdict():
+    labels=[dict(anon_id='A',qid='synthetic',method='manual',correct=False),
+            dict(anon_id='B',qid='synthetic',method='manual',correct=True),
+            dict(anon_id='C',qid='synthetic',method='v2',correct=True)]
+    reviewed=[dict(anon_id='A',qid='synthetic',label='需用户裁定'),
+              dict(anon_id='B',qid='synthetic',label='内容正确')]
+    assert review_coverage(labels,reviewed,{'A'})==dict(reviewed=2,retained=1,changed=1,deterministic_credits=1)
+    with pytest.raises(ValueError,match='scope incomplete'):
+        review_coverage(labels,reviewed[:1],{'A'})
+    with pytest.raises(ValueError,match='not applied'):
+        review_coverage([dict(labels[0],correct=True),*labels[1:]],reviewed,{'A'})
