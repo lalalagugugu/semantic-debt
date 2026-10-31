@@ -833,7 +833,7 @@ Q105,SQL-L0-u2p,3,U0838,0,manual,缺少结果,False
 Q106,SQL-L0-u2p,1,U0349,1,v2,v2,False
 Q106,SQL-L0-u2p,2,U1629,1,manual,辅助列取舍,False
 Q106,SQL-L0-u2p,3,U1372,1,manual,辅助列取舍,False
-Q107,SQL-L0-u2p,1,U1396,1,manual,辅助列取舍,False
+Q107,SQL-L0-u2p,1,U1396,0,manual,原始口径不符,False
 Q107,SQL-L0-u2p,2,U1750,0,refused,refused,True
 Q107,SQL-L0-u2p,3,U0619,0,refused,refused,True
 Q108,SQL-L0-u2p,1,U1290,0,manual,国家集合错误,False
@@ -1136,7 +1136,7 @@ Q108,SQL-L1,3,U1312,1,v2,v2,False
 Q109,SQL-L1,1,U0267,1,v2,v2,False
 Q109,SQL-L1,2,U1733,1,manual,数值呈现,False
 Q109,SQL-L1,3,U0027,0,manual,数值错误,False
-Q110,SQL-L1,1,U1220,1,manual,数值呈现,False
+Q110,SQL-L1,1,U1220,0,manual,所问值单位标错100倍,False
 Q110,SQL-L1,2,U1333,1,v2,v2,False
 Q110,SQL-L1,3,U1437,0,manual,所问格直接NULL,False
 Q111,SQL-L1,1,U0973,1,v2,v2,False

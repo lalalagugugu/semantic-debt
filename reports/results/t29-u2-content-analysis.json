@@ -4,7 +4,13 @@
   "model_api_calls": 0,
   "query_executions": 0,
   "verdict_lock_sha256": "9436ea6d228c0c151f582315202a8ece40b2746daf060bab7934c8586fad39aa",
-  "adjudication_amendments_sha256": "74031791ded20d11db29ffa9cdeef236530e7b4d200167a144cc66de24725f5d",
+  "adjudication_amendments_sha256": "0d5384ab43a5476baa28bd4e3d15178e7970963bde493c7ed0c9ad91e6b5ed22",
+  "independent_review": {
+    "reviewed": 101,
+    "retained": 99,
+    "changed": 2,
+    "deterministic_credits": 1019
+  },
   "summary": {
     "SQL-L0": {
       "attempts": 294,
@@ -20,8 +26,8 @@
     },
     "SQL-L1": {
       "attempts": 294,
-      "correct": 236,
-      "accuracy": 0.8027210884353742,
+      "correct": 235,
+      "accuracy": 0.7993197278911565,
       "methods": {
         "v2": 194,
         "manual": 76,
@@ -53,8 +59,8 @@
     },
     "SQL-L0-u2p": {
       "attempts": 294,
-      "correct": 130,
-      "accuracy": 0.4421768707482993,
+      "correct": 129,
+      "accuracy": 0.4387755102040816,
       "methods": {
         "R1-R11": 7,
         "v2": 110,
@@ -161,20 +167,20 @@
       "refusal_success": true,
       "refusal_conclusion": "拒答偏向基线易错题",
       "answered": 198,
-      "accuracy_answered": 0.6565656565656566,
+      "accuracy_answered": 0.6515151515151515,
       "confidence_missing": 2,
       "confidence_invalid": 0,
       "confidence_valid": 196,
-      "auc": 0.6868681066176471,
+      "auc": 0.6925710373159877,
       "auc_ci": [
-        0.6004459308807135,
-        0.7672413793103449
+        0.6069296375266524,
+        0.7726010101010101
       ],
       "confidence_success": true,
       "gate90": {
         "answered": 192,
         "coverage": 0.6530612244897959,
-        "accuracy_answered": 0.6614583333333334
+        "accuracy_answered": 0.65625
       },
       "bootstrap": {
         "unit": "question",
@@ -190,11 +196,11 @@
       "refused": 16,
       "refusal_rate": 0.05442176870748299,
       "baseline_error_refused": 0.6666666666666666,
-      "baseline_error_answered": 0.17026378896882494,
-      "refusal_error_difference": 0.49640287769784175,
+      "baseline_error_answered": 0.17386091127098321,
+      "refusal_error_difference": 0.49280575539568344,
       "refusal_error_difference_ci": [
-        0.24483430799220274,
-        0.6998050682261209
+        0.24132553606237817,
+        0.6962962962962963
       ],
       "refusal_success": true,
       "refusal_conclusion": "拒答偏向基线易错题",
@@ -279,11 +285,11 @@
       "questions": 98,
       "attempts_per_baseline": 294,
       "old_accuracy": 0.8503401360544217,
-      "new_accuracy": 0.8027210884353742,
-      "new_minus_old": -0.047619047619047616,
+      "new_accuracy": 0.7993197278911565,
+      "new_minus_old": -0.05102040816326531,
       "ci95": [
-        -0.08843537414965986,
-        -0.01020408163265306
+        -0.09183673469387756,
+        -0.013605442176870748
       ],
       "descriptive_only": true,
       "bootstrap": {
