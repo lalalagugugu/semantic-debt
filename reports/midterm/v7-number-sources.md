@@ -45,11 +45,11 @@ T20 只对照了本清单的旧版。下面这些是它之后改的或新补出�
 | 3 | L0→L0-E +1.7；L1→L1-E +0.7 | `cmp` |
 | 3 | 6.7、2.4 次及用途占比；费用 0.9–1.3 倍 | `reports/midterm/tool-audit.csv`、`tokens-cost.md`；T20 已复现（0.863、1.345、1.107） |
 | 3 | 输入量 L1、SQL-L2 约 3 倍，L0 约 5 倍 | `reports/midterm/tokens-cost.md` 主表 98 行「平均输入」之比：L1-E/L1 2.70、L2-E/L2 3.23、L0-E/L0 5.18。v6 写的「约 3 倍」不含 L0，已改 |
-| 3 | 缓存没命中约 2–2.8 倍 | 同上「全冷元/作答」之比：L0 2.03、L1 2.51、L2 2.76。v6 写的 2–2.5 不含 L2，已改 |
+| 3 | 假设缓存完全没命中约 2–2.8 倍（把输入全按未命中价重算的假设费用，不是实付） | 同上「全冷元/作答」之比：L0 2.03、L1 2.51、L2 2.76。v6 写的 2–2.5 不含 L2，已改 |
 | 4 | L1+→L3a −0.3；3.2、4.8 元 | `cmp`；费用沿用 v6 |
 | 4 | 16 次 = 11 / 3 / 2；14 个 = 10 / 4 | `followups` D6、D8 |
 | 4 | 109、30、17、13、41、37、1、16 | `reports/validation/l1plus-l3a-correspondence.md`、`l3a-ontology-validation.md`；T20 已复现 |
-| 4 | 46 条（不到一半） | 派生，文件里没有这个数：已形式化 30 条 + 注解里有现成写法的 16 条（`l3a-ontology-validation.md` 第 6.2 节，`l3a-ontology/missed.json` 的 formalized_entries、formalizable_annotation_entries）。分母 109，占 42.2% |
+| 4 | 46 条（不到一半） | 派生，文件里没有这个数：已形式化 30 条 + 注解里有现成写法的 16 条（`l3a-ontology-validation.md` 第 6.2 节，`l3a-ontology/missed.json` 的 formal_entries、formalizable_annotation_entries）。分母 109，占 42.2% |
 | 4、9 | 线上销售表 14% 的行关联不上产品 | 派生，文件里没有这个数：FactOnlineSales 孤儿行 1,715,380（`l3a-ontology-validation.md` 第 5 节）÷ 总行数 12,627,608（同文第 5 节、`dataset-quality.md`）= 13.58% |
 | 4 | 费用高约一半 | 4.85 ÷ 3.21 = 1.51 |
 | 4 | 文字版 2 行、本体版几十行 | 取数：`$SEMDEBT_DATA_DIR/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt` 的 Turtle 部分每个三元组占一行，按行匹配。含 `H10` 的 46 行；匹配 `H10\|Actual\|Budget\|Forecast\|ScenarioKey` 的 81 行（含别名等相关行）。实测范围 46–81 行，条目边界没有唯一定义，所以不写具体行数。v6 的「约 75 行」已弃用 |
@@ -74,10 +74,10 @@ T20 只对照了本清单的旧版。下面这些是它之后改的或新补出�
 | 10 | 92/98、89、86、错 6 拦 3、误拦 6；答 89 题占 91% | `derived` D4；`followups`；89 ÷ 98 |
 | 10 | 59/59、20% | `followups` |
 | 局限 | 1,411、420、991、194、33、24 | `reports/validation/t31-v7-rescan.md`；`tasks/COORDINATION-HANDOFF.md` |
-| 局限 | Pro 贵约 7.5 倍 | `decisions/model.md` 第 76 行 |
+| 局限 | Pro 贵约 7 倍 | 实测 7.43 倍：T12 两单元（SQL-L1、SQL-R）全试跑日志，Flash 1.29493504 元、Pro 9.62096610 元（`reports/recheck/v7-fixes.json`，PR #235）。`decisions/model.md` 第 76 行的「约 7.5 倍」是约数，已弃用 |
 | 局限 | 19 道题 | `reports/T12-pilot.md` 选模型表：SQL-L1 主表 57 次 ÷ 3（24 题去掉 judge Q40 和 4 道低区分度题）。v6 写的 20 道不对，已改 |
 | 附录 | L1.5W 留出 −8.8（−15.0 到 −3.4）；全部 −4.1（−8.5 到 +0.3） | `cmp` |
-| 附录 | 11 条确定性规则 | `reports/results/accuracy-v5.md`（R1–R11） |
+| 附录 | 11 条确定性规则 | `reports/validation/reference-and-presentation-review.md`（R1–R11 逐条编号） |
 | 附录 | 单元表 | `derived`；`cells` |
 | 附录 | 7,379 = 5,439 + 612 + 约 1,330；排除 330、18、183 | `runs/20261028-T31-v4-rescore-02/manifest.json`；`runs/20261031-T31-v5-rulings-01/manifest.json` |
 | 附录 | 5 道修正、原则 A/B/C、统一规则 | `decisions/2026-10-28-reference-rulings-five-questions.md`、`2026-10-28-residual-content-principles.md`、`2026-10-31-v7-content-review-rulings.md` |
