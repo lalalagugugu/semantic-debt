@@ -1,0 +1,6692 @@
+{
+  "base_commit": "79a37d8f8ee7b03df3cee79e6902239004d153c1",
+  "eval_commit": "5b65e0c450ba36d83707c00dc9443be16b08d086",
+  "model_api_calls": 0,
+  "query_executions": 0,
+  "interval_method": "exact discrete percentile bootstrap by question",
+  "cells": [
+    {
+      "cell": "JSON-L2",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 123,
+      "accuracy": 0.41836734693877553,
+      "delivery": 0.30952380952380953,
+      "outcomes": {
+        "refused": 121,
+        "correct": 123,
+        "wrong": 49,
+        "exec_error": 1
+      },
+      "interval": [
+        0.32653061224489793,
+        0.5136054421768708
+      ]
+    },
+    {
+      "cell": "JSON-L2",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 63,
+      "accuracy": 0.42857142857142855,
+      "delivery": 0.3333333333333333,
+      "outcomes": {
+        "refused": 53,
+        "correct": 63,
+        "wrong": 31
+      },
+      "interval": [
+        0.29931972789115646,
+        0.564625850340136
+      ]
+    },
+    {
+      "cell": "JSON-L2",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 60,
+      "accuracy": 0.40816326530612246,
+      "delivery": 0.2857142857142857,
+      "outcomes": {
+        "correct": 60,
+        "refused": 68,
+        "wrong": 18,
+        "exec_error": 1
+      },
+      "interval": [
+        0.2789115646258503,
+        0.5374149659863946
+      ]
+    },
+    {
+      "cell": "SQL-L0-E",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 146,
+      "accuracy": 0.4965986394557823,
+      "delivery": 0.40476190476190477,
+      "outcomes": {
+        "correct": 146,
+        "wrong": 133,
+        "exec_error": 10,
+        "refused": 5
+      },
+      "interval": [
+        0.40816326530612246,
+        0.5850340136054422
+      ]
+    },
+    {
+      "cell": "SQL-L0-E",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 71,
+      "accuracy": 0.48299319727891155,
+      "delivery": 0.3877551020408163,
+      "outcomes": {
+        "correct": 71,
+        "wrong": 68,
+        "refused": 3,
+        "exec_error": 5
+      },
+      "interval": [
+        0.36054421768707484,
+        0.6054421768707483
+      ]
+    },
+    {
+      "cell": "SQL-L0-E",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 75,
+      "accuracy": 0.5102040816326531,
+      "delivery": 0.4217687074829932,
+      "outcomes": {
+        "correct": 75,
+        "wrong": 65,
+        "exec_error": 5,
+        "refused": 2
+      },
+      "interval": [
+        0.3877551020408163,
+        0.6326530612244898
+      ]
+    },
+    {
+      "cell": "SQL-L0",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 141,
+      "accuracy": 0.47959183673469385,
+      "delivery": 0.3945578231292517,
+      "outcomes": {
+        "correct": 141,
+        "wrong": 145,
+        "refused": 8
+      },
+      "interval": [
+        0.3877551020408163,
+        0.5714285714285714
+      ]
+    },
+    {
+      "cell": "SQL-L0",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 76,
+      "accuracy": 0.5170068027210885,
+      "delivery": 0.40816326530612246,
+      "outcomes": {
+        "correct": 76,
+        "wrong": 67,
+        "refused": 4
+      },
+      "interval": [
+        0.38095238095238093,
+        0.6530612244897959
+      ]
+    },
+    {
+      "cell": "SQL-L0",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 65,
+      "accuracy": 0.4421768707482993,
+      "delivery": 0.38095238095238093,
+      "outcomes": {
+        "correct": 65,
+        "wrong": 78,
+        "refused": 4
+      },
+      "interval": [
+        0.3197278911564626,
+        0.5714285714285714
+      ]
+    },
+    {
+      "cell": "SQL-L1-E",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 252,
+      "accuracy": 0.8571428571428571,
+      "delivery": 0.6938775510204082,
+      "outcomes": {
+        "correct": 252,
+        "wrong": 40,
+        "exec_error": 2
+      },
+      "interval": [
+        0.7993197278911565,
+        0.9115646258503401
+      ]
+    },
+    {
+      "cell": "SQL-L1-E",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 123,
+      "accuracy": 0.8367346938775511,
+      "delivery": 0.6326530612244898,
+      "outcomes": {
+        "correct": 123,
+        "wrong": 23,
+        "exec_error": 1
+      },
+      "interval": [
+        0.7414965986394558,
+        0.9183673469387755
+      ]
+    },
+    {
+      "cell": "SQL-L1-E",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 129,
+      "accuracy": 0.8775510204081632,
+      "delivery": 0.7551020408163265,
+      "outcomes": {
+        "correct": 129,
+        "exec_error": 1,
+        "wrong": 17
+      },
+      "interval": [
+        0.8027210884353742,
+        0.9455782312925171
+      ]
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 252,
+      "accuracy": 0.8571428571428571,
+      "delivery": 0.7006802721088435,
+      "outcomes": {
+        "correct": 252,
+        "wrong": 42
+      },
+      "interval": [
+        0.7993197278911565,
+        0.9115646258503401
+      ]
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 122,
+      "accuracy": 0.8299319727891157,
+      "delivery": 0.6666666666666666,
+      "outcomes": {
+        "correct": 122,
+        "wrong": 25
+      },
+      "interval": [
+        0.7346938775510204,
+        0.9183673469387755
+      ]
+    },
+    {
+      "cell": "SQL-L1-T2",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 130,
+      "accuracy": 0.8843537414965986,
+      "delivery": 0.7346938775510204,
+      "outcomes": {
+        "correct": 130,
+        "wrong": 17
+      },
+      "interval": [
+        0.8163265306122449,
+        0.9455782312925171
+      ]
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 248,
+      "accuracy": 0.8435374149659864,
+      "delivery": 0.673469387755102,
+      "outcomes": {
+        "correct": 248,
+        "wrong": 46
+      },
+      "interval": [
+        0.782312925170068,
+        0.8979591836734694
+      ]
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 127,
+      "accuracy": 0.8639455782312925,
+      "delivery": 0.6870748299319728,
+      "outcomes": {
+        "correct": 127,
+        "wrong": 20
+      },
+      "interval": [
+        0.7755102040816326,
+        0.9387755102040817
+      ]
+    },
+    {
+      "cell": "SQL-L1-T3",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 121,
+      "accuracy": 0.8231292517006803,
+      "delivery": 0.6598639455782312,
+      "outcomes": {
+        "correct": 121,
+        "wrong": 26
+      },
+      "interval": [
+        0.7346938775510204,
+        0.9047619047619048
+      ]
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 126,
+      "accuracy": 0.8571428571428571,
+      "delivery": 0.6462585034013606,
+      "outcomes": {
+        "correct": 126,
+        "wrong": 21
+      },
+      "interval": [
+        0.7687074829931972,
+        0.9319727891156463
+      ]
+    },
+    {
+      "cell": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 126,
+      "accuracy": 0.8571428571428571,
+      "delivery": 0.6462585034013606,
+      "outcomes": {
+        "correct": 126,
+        "wrong": 21
+      },
+      "interval": [
+        0.7687074829931972,
+        0.9319727891156463
+      ]
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 281,
+      "accuracy": 0.95578231292517,
+      "delivery": 0.9149659863945578,
+      "outcomes": {
+        "correct": 281,
+        "wrong": 12,
+        "exec_error": 1
+      },
+      "interval": [
+        0.9217687074829932,
+        0.9829931972789115
+      ]
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 137,
+      "accuracy": 0.9319727891156463,
+      "delivery": 0.8639455782312925,
+      "outcomes": {
+        "correct": 137,
+        "wrong": 9,
+        "exec_error": 1
+      },
+      "interval": [
+        0.8707482993197279,
+        0.9795918367346939
+      ]
+    },
+    {
+      "cell": "SQL-L1-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 144,
+      "accuracy": 0.9795918367346939,
+      "delivery": 0.9659863945578231,
+      "outcomes": {
+        "correct": 144,
+        "wrong": 3
+      },
+      "interval": [
+        0.9455782312925171,
+        1.0
+      ]
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 282,
+      "accuracy": 0.9591836734693877,
+      "delivery": 0.8639455782312925,
+      "outcomes": {
+        "correct": 282,
+        "wrong": 12
+      },
+      "interval": [
+        0.9183673469387755,
+        0.9897959183673469
+      ]
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 136,
+      "accuracy": 0.9251700680272109,
+      "delivery": 0.7959183673469388,
+      "outcomes": {
+        "correct": 136,
+        "wrong": 11
+      },
+      "interval": [
+        0.8435374149659864,
+        0.9863945578231292
+      ]
+    },
+    {
+      "cell": "SQL-L1-tuned",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 146,
+      "accuracy": 0.9931972789115646,
+      "delivery": 0.9319727891156463,
+      "outcomes": {
+        "correct": 146,
+        "wrong": 1
+      },
+      "interval": [
+        0.9795918367346939,
+        1.0
+      ]
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 117,
+      "accuracy": 0.3979591836734694,
+      "delivery": 0.2925170068027211,
+      "outcomes": {
+        "correct": 117,
+        "refused": 97,
+        "wrong": 70,
+        "exec_error": 10
+      },
+      "interval": [
+        0.30612244897959184,
+        0.4897959183673469
+      ]
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 63,
+      "accuracy": 0.42857142857142855,
+      "delivery": 0.2925170068027211,
+      "outcomes": {
+        "correct": 63,
+        "wrong": 29,
+        "exec_error": 6,
+        "refused": 49
+      },
+      "interval": [
+        0.29931972789115646,
+        0.564625850340136
+      ]
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 54,
+      "accuracy": 0.3673469387755102,
+      "delivery": 0.2925170068027211,
+      "outcomes": {
+        "correct": 54,
+        "refused": 48,
+        "wrong": 41,
+        "exec_error": 4
+      },
+      "interval": [
+        0.24489795918367346,
+        0.4965986394557823
+      ]
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 238,
+      "accuracy": 0.8095238095238095,
+      "delivery": 0.6666666666666666,
+      "outcomes": {
+        "correct": 238,
+        "wrong": 52,
+        "exec_error": 4
+      },
+      "interval": [
+        0.7448979591836735,
+        0.8707482993197279
+      ]
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 112,
+      "accuracy": 0.7619047619047619,
+      "delivery": 0.5986394557823129,
+      "outcomes": {
+        "correct": 112,
+        "wrong": 32,
+        "exec_error": 3
+      },
+      "interval": [
+        0.6530612244897959,
+        0.8639455782312925
+      ]
+    },
+    {
+      "cell": "SQL-L1.5W",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 126,
+      "accuracy": 0.8571428571428571,
+      "delivery": 0.7346938775510204,
+      "outcomes": {
+        "correct": 126,
+        "wrong": 20,
+        "exec_error": 1
+      },
+      "interval": [
+        0.782312925170068,
+        0.9251700680272109
+      ]
+    },
+    {
+      "cell": "SQL-L1",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 250,
+      "accuracy": 0.8503401360544217,
+      "delivery": 0.6870748299319728,
+      "outcomes": {
+        "correct": 250,
+        "wrong": 42,
+        "exec_error": 2
+      },
+      "interval": [
+        0.7891156462585034,
+        0.9047619047619048
+      ]
+    },
+    {
+      "cell": "SQL-L1",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 125,
+      "accuracy": 0.8503401360544217,
+      "delivery": 0.6394557823129252,
+      "outcomes": {
+        "correct": 125,
+        "wrong": 21,
+        "exec_error": 1
+      },
+      "interval": [
+        0.7619047619047619,
+        0.9251700680272109
+      ]
+    },
+    {
+      "cell": "SQL-L1",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 125,
+      "accuracy": 0.8503401360544217,
+      "delivery": 0.7346938775510204,
+      "outcomes": {
+        "correct": 125,
+        "wrong": 21,
+        "exec_error": 1
+      },
+      "interval": [
+        0.7619047619047619,
+        0.9251700680272109
+      ]
+    },
+    {
+      "cell": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 202,
+      "accuracy": 0.6870748299319728,
+      "delivery": 0.5680272108843537,
+      "outcomes": {
+        "correct": 202,
+        "wrong": 91,
+        "exec_error": 1
+      },
+      "interval": [
+        0.6020408163265306,
+        0.7687074829931972
+      ]
+    },
+    {
+      "cell": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 102,
+      "accuracy": 0.6938775510204082,
+      "delivery": 0.5510204081632653,
+      "outcomes": {
+        "correct": 102,
+        "wrong": 45
+      },
+      "interval": [
+        0.5714285714285714,
+        0.8095238095238095
+      ]
+    },
+    {
+      "cell": "SQL-L1c",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 100,
+      "accuracy": 0.6802721088435374,
+      "delivery": 0.5850340136054422,
+      "outcomes": {
+        "correct": 100,
+        "wrong": 46,
+        "exec_error": 1
+      },
+      "interval": [
+        0.5578231292517006,
+        0.7959183673469388
+      ]
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 286,
+      "accuracy": 0.9727891156462585,
+      "delivery": 0.9115646258503401,
+      "outcomes": {
+        "correct": 286,
+        "wrong": 7,
+        "exec_error": 1
+      },
+      "interval": [
+        0.9489795918367347,
+        0.9897959183673469
+      ]
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 141,
+      "accuracy": 0.9591836734693877,
+      "delivery": 0.8503401360544217,
+      "outcomes": {
+        "correct": 141,
+        "wrong": 5,
+        "exec_error": 1
+      },
+      "interval": [
+        0.9183673469387755,
+        0.9931972789115646
+      ]
+    },
+    {
+      "cell": "SQL-L1plus-tuned-instr",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 145,
+      "accuracy": 0.9863945578231292,
+      "delivery": 0.9727891156462585,
+      "outcomes": {
+        "correct": 145,
+        "wrong": 2
+      },
+      "interval": [
+        0.9659863945578231,
+        1.0
+      ]
+    },
+    {
+      "cell": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 274,
+      "accuracy": 0.9319727891156463,
+      "delivery": 0.7585034013605442,
+      "outcomes": {
+        "correct": 274,
+        "wrong": 18,
+        "exec_error": 2
+      },
+      "interval": [
+        0.8877551020408163,
+        0.9693877551020408
+      ]
+    },
+    {
+      "cell": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 137,
+      "accuracy": 0.9319727891156463,
+      "delivery": 0.7619047619047619,
+      "outcomes": {
+        "correct": 137,
+        "wrong": 9,
+        "exec_error": 1
+      },
+      "interval": [
+        0.8639455782312925,
+        0.9863945578231292
+      ]
+    },
+    {
+      "cell": "SQL-L1plus",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 137,
+      "accuracy": 0.9319727891156463,
+      "delivery": 0.7551020408163265,
+      "outcomes": {
+        "correct": 137,
+        "wrong": 9,
+        "exec_error": 1
+      },
+      "interval": [
+        0.8707482993197279,
+        0.9795918367346939
+      ]
+    },
+    {
+      "cell": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 239,
+      "accuracy": 0.8129251700680272,
+      "delivery": 0.6632653061224489,
+      "outcomes": {
+        "correct": 239,
+        "wrong": 54,
+        "exec_error": 1
+      },
+      "interval": [
+        0.7448979591836735,
+        0.8741496598639455
+      ]
+    },
+    {
+      "cell": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 121,
+      "accuracy": 0.8231292517006803,
+      "delivery": 0.6326530612244898,
+      "outcomes": {
+        "correct": 121,
+        "wrong": 25,
+        "exec_error": 1
+      },
+      "interval": [
+        0.7278911564625851,
+        0.9115646258503401
+      ]
+    },
+    {
+      "cell": "SQL-L2-E",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 118,
+      "accuracy": 0.8027210884353742,
+      "delivery": 0.6938775510204082,
+      "outcomes": {
+        "correct": 118,
+        "wrong": 29
+      },
+      "interval": [
+        0.7074829931972789,
+        0.891156462585034
+      ]
+    },
+    {
+      "cell": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 246,
+      "accuracy": 0.8367346938775511,
+      "delivery": 0.6768707482993197,
+      "outcomes": {
+        "correct": 246,
+        "wrong": 34,
+        "exec_error": 14
+      },
+      "interval": [
+        0.7721088435374149,
+        0.8945578231292517
+      ]
+    },
+    {
+      "cell": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 124,
+      "accuracy": 0.8435374149659864,
+      "delivery": 0.6802721088435374,
+      "outcomes": {
+        "correct": 124,
+        "exec_error": 7,
+        "wrong": 16
+      },
+      "interval": [
+        0.7551020408163265,
+        0.9251700680272109
+      ]
+    },
+    {
+      "cell": "SQL-L2",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 122,
+      "accuracy": 0.8299319727891157,
+      "delivery": 0.673469387755102,
+      "outcomes": {
+        "correct": 122,
+        "wrong": 18,
+        "exec_error": 7
+      },
+      "interval": [
+        0.7414965986394558,
+        0.9115646258503401
+      ]
+    },
+    {
+      "cell": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 273,
+      "accuracy": 0.9285714285714286,
+      "delivery": 0.7585034013605442,
+      "outcomes": {
+        "correct": 273,
+        "wrong": 19,
+        "exec_error": 2
+      },
+      "interval": [
+        0.8877551020408163,
+        0.9625850340136054
+      ]
+    },
+    {
+      "cell": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 138,
+      "accuracy": 0.9387755102040817,
+      "delivery": 0.7210884353741497,
+      "outcomes": {
+        "correct": 138,
+        "wrong": 9
+      },
+      "interval": [
+        0.8843537414965986,
+        0.9795918367346939
+      ]
+    },
+    {
+      "cell": "SQL-L3a",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 135,
+      "accuracy": 0.9183673469387755,
+      "delivery": 0.7959183673469388,
+      "outcomes": {
+        "correct": 135,
+        "exec_error": 2,
+        "wrong": 10
+      },
+      "interval": [
+        0.8571428571428571,
+        0.9659863945578231
+      ]
+    },
+    {
+      "cell": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "attempts": 294,
+      "correct": 152,
+      "accuracy": 0.5170068027210885,
+      "delivery": 0.43197278911564624,
+      "outcomes": {
+        "correct": 152,
+        "wrong": 137,
+        "exec_error": 3,
+        "refused": 2
+      },
+      "interval": [
+        0.43197278911564624,
+        0.6020408163265306
+      ]
+    },
+    {
+      "cell": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 81,
+      "accuracy": 0.5510204081632653,
+      "delivery": 0.4217687074829932,
+      "outcomes": {
+        "correct": 81,
+        "wrong": 62,
+        "exec_error": 2,
+        "refused": 2
+      },
+      "interval": [
+        0.42857142857142855,
+        0.673469387755102
+      ]
+    },
+    {
+      "cell": "SQL-R",
+      "split": "tuning",
+      "questions": 49,
+      "attempts": 147,
+      "correct": 71,
+      "accuracy": 0.48299319727891155,
+      "delivery": 0.4421768707482993,
+      "outcomes": {
+        "correct": 71,
+        "wrong": 75,
+        "exec_error": 1
+      },
+      "interval": [
+        0.36054421768707484,
+        0.6054421768707483
+      ]
+    }
+  ],
+  "process": {
+    "JSON-L2": {
+      "attempts": 294,
+      "first_execution_errors": 6,
+      "first_record_errors": 6,
+      "first_prompt_mean": 48099.69387755102,
+      "first_prompt_min": 48087,
+      "first_prompt_max": 48145,
+      "mean_total_prompt": 49084.58163265306,
+      "logged_cost": 2.2282776,
+      "cold_cost": 16.296991
+    },
+    "SQL-L0-E": {
+      "attempts": 294,
+      "first_execution_errors": 60,
+      "first_record_errors": 60,
+      "first_prompt_mean": 8549.683673469388,
+      "first_prompt_min": 6590,
+      "first_prompt_max": 13993,
+      "mean_total_prompt": 34137.69727891157,
+      "logged_cost": 3.8432694,
+      "cold_cost": 12.738847,
+      "tool_calls": 1977
+    },
+    "SQL-L0": {
+      "attempts": 294,
+      "first_execution_errors": 28,
+      "first_record_errors": 28,
+      "first_prompt_mean": 5978.693877551021,
+      "first_prompt_min": 5966,
+      "first_prompt_max": 6024,
+      "mean_total_prompt": 6591.010204081633,
+      "logged_cost": 4.45284724,
+      "cold_cost": 6.269093
+    },
+    "SQL-L1-E": {
+      "attempts": 294,
+      "first_execution_errors": 63,
+      "first_record_errors": 63,
+      "first_prompt_mean": 48843.602040816324,
+      "first_prompt_min": 47058,
+      "first_prompt_max": 60400,
+      "mean_total_prompt": 165497.37074829932,
+      "logged_cost": 3.73158004,
+      "cold_cost": 51.033095,
+      "tool_calls": 720
+    },
+    "SQL-L1-T2": {
+      "attempts": 294,
+      "first_execution_errors": 8,
+      "first_record_errors": 8,
+      "first_prompt_mean": 47037.69387755102,
+      "first_prompt_min": 47025,
+      "first_prompt_max": 47083,
+      "mean_total_prompt": 48334.50340136055,
+      "logged_cost": 2.6471223999999998,
+      "cold_cost": 16.51326
+    },
+    "SQL-L1-T3": {
+      "attempts": 294,
+      "first_execution_errors": 5,
+      "first_record_errors": 5,
+      "first_prompt_mean": 47618.69387755102,
+      "first_prompt_min": 47606,
+      "first_prompt_max": 47664,
+      "mean_total_prompt": 48439.64965986394,
+      "logged_cost": 2.53723288,
+      "cold_cost": 16.429021
+    },
+    "SQL-L1-T4": {
+      "attempts": 147,
+      "first_execution_errors": 5,
+      "first_record_errors": 5,
+      "first_prompt_mean": 48554.816326530614,
+      "first_prompt_min": 48543,
+      "first_prompt_max": 48600,
+      "mean_total_prompt": 50225,
+      "logged_cost": 1.12349724,
+      "cold_cost": 8.330527
+    },
+    "SQL-L1-tuned-instr": {
+      "attempts": 294,
+      "first_execution_errors": 8,
+      "first_record_errors": 8,
+      "first_prompt_mean": 56398.69387755102,
+      "first_prompt_min": 56386,
+      "first_prompt_max": 56444,
+      "mean_total_prompt": 57944.78231292517,
+      "logged_cost": 2.25296744,
+      "cold_cost": 18.829738
+    },
+    "SQL-L1-tuned": {
+      "attempts": 294,
+      "first_execution_errors": 7,
+      "first_record_errors": 7,
+      "first_prompt_mean": 55118.69387755102,
+      "first_prompt_min": 55106,
+      "first_prompt_max": 55164,
+      "mean_total_prompt": 56441.010204081635,
+      "logged_cost": 2.04233684,
+      "cold_cost": 18.232125
+    },
+    "SQL-L1.5S": {
+      "attempts": 294,
+      "first_execution_errors": 107,
+      "first_record_errors": 107,
+      "first_prompt_mean": 33805.69387755102,
+      "first_prompt_min": 33793,
+      "first_prompt_max": 33851,
+      "mean_total_prompt": 46208.97619047619,
+      "logged_cost": 2.4234474599999998,
+      "cold_cost": 15.620787
+    },
+    "SQL-L1.5W": {
+      "attempts": 294,
+      "first_execution_errors": 110,
+      "first_record_errors": 110,
+      "first_prompt_mean": 53027.69387755102,
+      "first_prompt_min": 53015,
+      "first_prompt_max": 53073,
+      "mean_total_prompt": 72982.71428571429,
+      "logged_cost": 3.116294,
+      "cold_cost": 24.05223
+    },
+    "SQL-L1": {
+      "attempts": 294,
+      "first_execution_errors": 93,
+      "first_record_errors": 93,
+      "first_prompt_mean": 46495.69387755102,
+      "first_prompt_min": 46483,
+      "first_prompt_max": 46541,
+      "mean_total_prompt": 61316.268707482996,
+      "logged_cost": 2.77415788,
+      "cold_cost": 20.313555
+    },
+    "SQL-L1c": {
+      "attempts": 294,
+      "first_execution_errors": 36,
+      "first_record_errors": 36,
+      "first_prompt_mean": 6843.693877551021,
+      "first_prompt_min": 6831,
+      "first_prompt_max": 6889,
+      "mean_total_prompt": 7734.687074829932,
+      "logged_cost": 2.52956776,
+      "cold_cost": 4.680362
+    },
+    "SQL-L1plus-tuned-instr": {
+      "attempts": 294,
+      "first_execution_errors": 11,
+      "first_record_errors": 11,
+      "first_prompt_mean": 81293.69387755102,
+      "first_prompt_min": 81281,
+      "first_prompt_max": 81339,
+      "mean_total_prompt": 84352.83673469388,
+      "logged_cost": 2.56438624,
+      "cold_cost": 26.770594
+    },
+    "SQL-L1plus": {
+      "attempts": 294,
+      "first_execution_errors": 62,
+      "first_record_errors": 62,
+      "first_prompt_mean": 75257.69387755102,
+      "first_prompt_min": 75245,
+      "first_prompt_max": 75303,
+      "mean_total_prompt": 91195.79931972788,
+      "logged_cost": 2.82213942,
+      "cold_cost": 29.006437000000002
+    },
+    "SQL-L2-E": {
+      "attempts": 294,
+      "first_execution_errors": 17,
+      "first_record_errors": 17,
+      "first_prompt_mean": 52638.94217687075,
+      "first_prompt_min": 50182,
+      "first_prompt_max": 65208,
+      "mean_total_prompt": 190952.80952380953,
+      "logged_cost": 5.1540172,
+      "cold_cost": 59.729198,
+      "tool_calls": 838
+    },
+    "SQL-L2": {
+      "attempts": 294,
+      "first_execution_errors": 56,
+      "first_record_errors": 56,
+      "first_prompt_mean": 49607.69387755102,
+      "first_prompt_min": 49595,
+      "first_prompt_max": 49653,
+      "mean_total_prompt": 59189.12925170068,
+      "logged_cost": 4.65377536,
+      "cold_cost": 21.607744
+    },
+    "SQL-L3a": {
+      "attempts": 294,
+      "first_execution_errors": 76,
+      "first_record_errors": 76,
+      "first_prompt_mean": 219863.693877551,
+      "first_prompt_min": 219851,
+      "first_prompt_max": 219909,
+      "mean_total_prompt": 276783.36734693876,
+      "logged_cost": 4.26337336,
+      "cold_cost": 83.747418
+    },
+    "SQL-R": {
+      "attempts": 294,
+      "first_execution_errors": 37,
+      "first_record_errors": 37,
+      "first_prompt_mean": 4520.693877551021,
+      "first_prompt_min": 4508,
+      "first_prompt_max": 4566,
+      "mean_total_prompt": 5128.034013605442,
+      "logged_cost": 3.8575263200000003,
+      "cold_cost": 5.265214
+    }
+  },
+  "pairs": [
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L0",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.061224489795918366,
+      "interval": [
+        -0.06802721088435375,
+        0.19047619047619047
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L0",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.08843537414965986,
+      "interval": [
+        -0.10204081632653061,
+        0.2789115646258503
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L0-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.07823129251700679,
+      "interval": [
+        -0.047619047619047616,
+        0.20408163265306123
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L0-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.054421768707482984,
+      "interval": [
+        -0.1292517006802721,
+        0.23809523809523808
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.43197278911564624,
+      "interval": [
+        0.3401360544217687,
+        0.5238095238095238
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4217687074829932,
+      "interval": [
+        0.2925170068027211,
+        0.5510204081632653
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4387755102040816,
+      "interval": [
+        0.3469387755102041,
+        0.5306122448979592
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.40816326530612246,
+      "interval": [
+        0.2653061224489796,
+        0.5510204081632653
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4387755102040816,
+      "interval": [
+        0.3435374149659864,
+        0.5340136054421769
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4013605442176871,
+      "interval": [
+        0.25170068027210885,
+        0.5510204081632653
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.42517006802721086,
+      "interval": [
+        0.3299319727891156,
+        0.5204081632653061
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.43537414965986393,
+      "interval": [
+        0.2925170068027211,
+        0.5782312925170068
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.42857142857142855,
+      "interval": [
+        0.2925170068027211,
+        0.564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.42857142857142855,
+      "interval": [
+        0.2925170068027211,
+        0.564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5408163265306123,
+      "interval": [
+        0.445578231292517,
+        0.6360544217687075
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4965986394557823,
+      "interval": [
+        0.36054421768707484,
+        0.6326530612244898
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5374149659863946,
+      "interval": [
+        0.4421768707482993,
+        0.6292517006802721
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.5034013605442177,
+      "interval": [
+        0.3673469387755102,
+        0.6394557823129252
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.020408163265306124,
+      "interval": [
+        -0.11904761904761904,
+        0.0782312925170068
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -1.1328806373726086e-18,
+      "interval": [
+        -0.1360544217687075,
+        0.14285714285714285
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.391156462585034,
+      "interval": [
+        0.2925170068027211,
+        0.4897959183673469
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3333333333333333,
+      "interval": [
+        0.1836734693877551,
+        0.48299319727891155
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.2687074829931973,
+      "interval": [
+        0.15306122448979592,
+        0.3843537414965986
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.2653061224489796,
+      "interval": [
+        0.10204081632653061,
+        0.42857142857142855
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5136054421768708,
+      "interval": [
+        0.4217687074829932,
+        0.6054421768707483
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.5034013605442177,
+      "interval": [
+        0.3673469387755102,
+        0.6394557823129252
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5544217687074829,
+      "interval": [
+        0.46258503401360546,
+        0.6462585034013606
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.5306122448979592,
+      "interval": [
+        0.4013605442176871,
+        0.6598639455782312
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.41836734693877553,
+      "interval": [
+        0.3299319727891156,
+        0.5102040816326531
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.41496598639455784,
+      "interval": [
+        0.2857142857142857,
+        0.54421768707483
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3945578231292517,
+      "interval": [
+        0.29591836734693877,
+        0.4931972789115646
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3945578231292517,
+      "interval": [
+        0.25170068027210885,
+        0.5374149659863946
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5102040816326531,
+      "interval": [
+        0.41836734693877553,
+        0.6020408163265306
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.5102040816326531,
+      "interval": [
+        0.3741496598639456,
+        0.6462585034013606
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.09863945578231292,
+      "interval": [
+        -0.02040816326530612,
+        0.21768707482993196
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "JSON-L2",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.12244897959183673,
+      "interval": [
+        -0.05442176870748299,
+        0.2925170068027211
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.017006802721088433,
+      "interval": [
+        -0.047619047619047616,
+        0.08163265306122448
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.034013605442176874,
+      "interval": [
+        -0.10884353741496598,
+        0.047619047619047616
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3707482993197279,
+      "interval": [
+        0.2755102040816326,
+        0.46598639455782315
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3333333333333333,
+      "interval": [
+        0.20408163265306123,
+        0.46938775510204084
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.37755102040816324,
+      "interval": [
+        0.2755102040816326,
+        0.47959183673469385
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3197278911564626,
+      "interval": [
+        0.17006802721088435,
+        0.46938775510204084
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.37755102040816324,
+      "interval": [
+        0.282312925170068,
+        0.47278911564625853
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3129251700680272,
+      "interval": [
+        0.17006802721088435,
+        0.4557823129251701
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.36394557823129253,
+      "interval": [
+        0.2619047619047619,
+        0.46598639455782315
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3469387755102041,
+      "interval": [
+        0.20408163265306123,
+        0.4897959183673469
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.3401360544217687,
+      "interval": [
+        0.19047619047619047,
+        0.4897959183673469
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3401360544217687,
+      "interval": [
+        0.19047619047619047,
+        0.4897959183673469
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4795918367346939,
+      "interval": [
+        0.3843537414965986,
+        0.5748299319727891
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.40816326530612246,
+      "interval": [
+        0.272108843537415,
+        0.54421768707483
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4761904761904762,
+      "interval": [
+        0.38095238095238093,
+        0.5714285714285714
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.41496598639455784,
+      "interval": [
+        0.2789115646258503,
+        0.5510204081632653
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.08163265306122448,
+      "interval": [
+        -0.20408163265306123,
+        0.04081632653061224
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.08843537414965986,
+      "interval": [
+        -0.272108843537415,
+        0.09523809523809523
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3299319727891156,
+      "interval": [
+        0.22789115646258504,
+        0.43197278911564624
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.24489795918367346,
+      "interval": [
+        0.10204081632653061,
+        0.3877551020408163
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.20748299319727892,
+      "interval": [
+        0.11904761904761904,
+        0.29931972789115646
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.17687074829931973,
+      "interval": [
+        0.047619047619047616,
+        0.3129251700680272
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4523809523809524,
+      "interval": [
+        0.35034013605442177,
+        0.5544217687074829
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.41496598639455784,
+      "interval": [
+        0.2585034013605442,
+        0.564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4931972789115646,
+      "interval": [
+        0.3979591836734694,
+        0.5884353741496599
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4421768707482993,
+      "interval": [
+        0.30612244897959184,
+        0.5782312925170068
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.35714285714285715,
+      "interval": [
+        0.25510204081632654,
+        0.45918367346938777
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.32653061224489793,
+      "interval": [
+        0.1836734693877551,
+        0.46938775510204084
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3333333333333333,
+      "interval": [
+        0.24149659863945577,
+        0.42857142857142855
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.30612244897959184,
+      "interval": [
+        0.17687074829931973,
+        0.43537414965986393
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4489795918367347,
+      "interval": [
+        0.35374149659863946,
+        0.54421768707483
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4217687074829932,
+      "interval": [
+        0.2857142857142857,
+        0.5578231292517006
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.03741496598639455,
+      "interval": [
+        -0.027210884353741496,
+        0.10204081632653061
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.03401360544217687,
+      "interval": [
+        -0.047619047619047616,
+        0.11564625850340136
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.35374149659863946,
+      "interval": [
+        0.2619047619047619,
+        0.445578231292517
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3673469387755102,
+      "interval": [
+        0.25170068027210885,
+        0.4897959183673469
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.36054421768707484,
+      "interval": [
+        0.2619047619047619,
+        0.45918367346938777
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.35374149659863946,
+      "interval": [
+        0.21768707482993196,
+        0.4897959183673469
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.36054421768707484,
+      "interval": [
+        0.272108843537415,
+        0.4489795918367347
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3469387755102041,
+      "interval": [
+        0.22448979591836735,
+        0.47619047619047616
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3469387755102041,
+      "interval": [
+        0.24829931972789115,
+        0.4421768707482993
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.380952380952381,
+      "interval": [
+        0.2585034013605442,
+        0.5102040816326531
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.3741496598639456,
+      "interval": [
+        0.24489795918367346,
+        0.5034013605442177
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3741496598639456,
+      "interval": [
+        0.24489795918367346,
+        0.5034013605442177
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.46258503401360546,
+      "interval": [
+        0.3741496598639456,
+        0.5510204081632653
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4421768707482993,
+      "interval": [
+        0.3129251700680272,
+        0.5714285714285714
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.45918367346938777,
+      "interval": [
+        0.3707482993197279,
+        0.5476190476190477
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4489795918367347,
+      "interval": [
+        0.32653061224489793,
+        0.5714285714285714
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.09863945578231292,
+      "interval": [
+        -0.21428571428571427,
+        0.017006802721088437
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.054421768707482984,
+      "interval": [
+        -0.22448979591836735,
+        0.11564625850340136
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3129251700680272,
+      "interval": [
+        0.21428571428571427,
+        0.41156462585034015
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.27891156462585037,
+      "interval": [
+        0.1564625850340136,
+        0.40816326530612246
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.1904761904761905,
+      "interval": [
+        0.08843537414965986,
+        0.2925170068027211
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.2108843537414966,
+      "interval": [
+        0.08163265306122448,
+        0.3401360544217687
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.43537414965986393,
+      "interval": [
+        0.3401360544217687,
+        0.5306122448979592
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4489795918367347,
+      "interval": [
+        0.30612244897959184,
+        0.5918367346938775
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4761904761904762,
+      "interval": [
+        0.3877551020408163,
+        0.564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4761904761904762,
+      "interval": [
+        0.3469387755102041,
+        0.6054421768707483
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3401360544217687,
+      "interval": [
+        0.23809523809523808,
+        0.4421768707482993
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.36054421768707484,
+      "interval": [
+        0.23129251700680273,
+        0.4897959183673469
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.3163265306122449,
+      "interval": [
+        0.22108843537414966,
+        0.41156462585034015
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3401360544217687,
+      "interval": [
+        0.21768707482993196,
+        0.46258503401360546
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4319727891156463,
+      "interval": [
+        0.3401360544217687,
+        0.5238095238095238
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.4557823129251701,
+      "interval": [
+        0.3333333333333333,
+        0.5850340136054422
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.02040816326530612,
+      "interval": [
+        -0.05782312925170068,
+        0.09863945578231292
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0-E",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.06802721088435375,
+      "interval": [
+        -0.027210884353741496,
+        0.16326530612244897
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.006802721088435375,
+      "interval": [
+        -0.034013605442176874,
+        0.047619047619047616
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.013605442176870746,
+      "interval": [
+        -0.06802721088435375,
+        0.04081632653061224
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.006802721088435374,
+      "interval": [
+        -0.030612244897959183,
+        0.04421768707482993
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.02040816326530612,
+      "interval": [
+        -0.06802721088435375,
+        0.027210884353741496
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.006802721088435375,
+      "interval": [
+        -0.05102040816326531,
+        0.03741496598639456
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.01360544217687075,
+      "interval": [
+        -0.034013605442176874,
+        0.061224489795918366
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.006802721088435377,
+      "interval": [
+        -0.04081632653061224,
+        0.05442176870748299
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.006802721088435377,
+      "interval": [
+        -0.04081632653061224,
+        0.05442176870748299
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.108843537414966,
+      "interval": [
+        0.05782312925170068,
+        0.16326530612244897
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.07482993197278913,
+      "interval": [
+        0.013605442176870748,
+        0.14285714285714285
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.1054421768707483,
+      "interval": [
+        0.05102040816326531,
+        0.16326530612244897
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        0.013605442176870748,
+        0.1564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.4523809523809524,
+      "interval": [
+        -0.5510204081632653,
+        -0.35034013605442177
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.4217687074829932,
+      "interval": [
+        -0.5578231292517006,
+        -0.2789115646258503
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.04081632653061225,
+      "interval": [
+        -0.08503401360544217,
+        0.003401360544217687
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.08843537414965986,
+      "interval": [
+        -0.14965986394557823,
+        -0.034013605442176874
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.16326530612244897,
+      "interval": [
+        -0.23809523809523808,
+        -0.09523809523809523
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.1564625850340136,
+      "interval": [
+        -0.2585034013605442,
+        -0.06802721088435375
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.0816326530612245,
+      "interval": [
+        0.02040816326530612,
+        0.14625850340136054
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        -0.013605442176870748,
+        0.1836734693877551
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.12244897959183675,
+      "interval": [
+        0.06802721088435375,
+        0.18027210884353742
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.108843537414966,
+      "interval": [
+        0.034013605442176874,
+        0.19727891156462585
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.013605442176870748,
+      "interval": [
+        -0.07142857142857142,
+        0.047619047619047616
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.006802721088435373,
+      "interval": [
+        -0.07482993197278912,
+        0.07482993197278912
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.03741496598639456,
+      "interval": [
+        -0.08503401360544217,
+        0.003401360544217687
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.0272108843537415,
+      "interval": [
+        -0.08163265306122448,
+        0.02040816326530612
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.0782312925170068,
+      "interval": [
+        0.027210884353741496,
+        0.1360544217687075
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.08843537414965986,
+      "interval": [
+        0.013605442176870748,
+        0.17006802721088435
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.3333333333333333,
+      "interval": [
+        -0.4217687074829932,
+        -0.24489795918367346
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.29931972789115646,
+      "interval": [
+        -0.4217687074829932,
+        -0.17687074829931973
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-T2",
+      "split": "all",
+      "questions": 98,
+      "delta": -1.699320956058913e-18,
+      "interval": [
+        -0.04421768707482993,
+        0.04421768707482993
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-T2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.006802721088435376,
+      "interval": [
+        -0.07482993197278912,
+        0.05442176870748299
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.01360544217687075,
+      "interval": [
+        -0.06462585034013606,
+        0.03741496598639456
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.027210884353741496,
+      "interval": [
+        -0.034013605442176874,
+        0.09523809523809523
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.02040816326530612,
+      "interval": [
+        -0.034013605442176874,
+        0.06802721088435375
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.02040816326530612,
+      "interval": [
+        -0.034013605442176874,
+        0.06802721088435375
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.10204081632653061,
+      "interval": [
+        0.05782312925170068,
+        0.15306122448979592
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.08843537414965986,
+      "interval": [
+        0.027210884353741496,
+        0.1564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.09863945578231294,
+      "interval": [
+        0.04421768707482993,
+        0.1564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.09523809523809525,
+      "interval": [
+        0.02040816326530612,
+        0.17687074829931973
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.45918367346938777,
+      "interval": [
+        -0.5612244897959183,
+        -0.35374149659863946
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.40816326530612246,
+      "interval": [
+        -0.5510204081632653,
+        -0.2653061224489796
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.04761904761904762,
+      "interval": [
+        -0.09863945578231292,
+        0.0
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.07482993197278912,
+      "interval": [
+        -0.1564625850340136,
+        0.0
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.17006802721088435,
+      "interval": [
+        -0.25170068027210885,
+        -0.09183673469387756
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.14285714285714285,
+      "interval": [
+        -0.25170068027210885,
+        -0.04081632653061224
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.07482993197278912,
+      "interval": [
+        0.013605442176870748,
+        0.13945578231292516
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.09523809523809525,
+      "interval": [
+        -0.013605442176870748,
+        0.20408163265306123
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.11564625850340136,
+      "interval": [
+        0.061224489795918366,
+        0.17346938775510204
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.12244897959183673,
+      "interval": [
+        0.034013605442176874,
+        0.21768707482993196
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.02040816326530612,
+      "interval": [
+        -0.08163265306122448,
+        0.04081632653061224
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.006802721088435375,
+      "interval": [
+        -0.08843537414965986,
+        0.10204081632653061
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.04421768707482993,
+      "interval": [
+        -0.10204081632653061,
+        0.01020408163265306
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.013605442176870751,
+      "interval": [
+        -0.08843537414965986,
+        0.061224489795918366
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.07142857142857142,
+      "interval": [
+        0.017006802721088437,
+        0.1292517006802721
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.10204081632653061,
+      "interval": [
+        0.02040816326530612,
+        0.19727891156462585
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.3401360544217687,
+      "interval": [
+        -0.4387755102040816,
+        -0.24149659863945577
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-E",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.2857142857142857,
+      "interval": [
+        -0.42857142857142855,
+        -0.14285714285714285
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-T3",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.01360544217687075,
+      "interval": [
+        -0.061224489795918366,
+        0.034013605442176874
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-T3",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.034013605442176874,
+      "interval": [
+        -0.013605442176870748,
+        0.08843537414965986
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.027210884353741496,
+      "interval": [
+        -0.04081632653061224,
+        0.09523809523809523
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.027210884353741496,
+      "interval": [
+        -0.04081632653061224,
+        0.09523809523809523
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.10204081632653061,
+      "interval": [
+        0.05782312925170068,
+        0.15306122448979592
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.09523809523809525,
+      "interval": [
+        0.027210884353741496,
+        0.17687074829931973
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.09863945578231294,
+      "interval": [
+        0.04421768707482993,
+        0.1564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.10204081632653061,
+      "interval": [
+        0.02040816326530612,
+        0.19047619047619047
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.45918367346938777,
+      "interval": [
+        -0.5578231292517006,
+        -0.35714285714285715
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.4013605442176871,
+      "interval": [
+        -0.5374149659863946,
+        -0.2653061224489796
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.04761904761904762,
+      "interval": [
+        -0.08503401360544217,
+        -0.01020408163265306
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.06802721088435375,
+      "interval": [
+        -0.11564625850340136,
+        -0.027210884353741496
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.17006802721088435,
+      "interval": [
+        -0.24149659863945577,
+        -0.10204081632653061
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.1360544217687075,
+      "interval": [
+        -0.23809523809523808,
+        -0.04081632653061224
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.07482993197278912,
+      "interval": [
+        0.006802721088435374,
+        0.14625850340136054
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.10204081632653061,
+      "interval": [
+        -0.013605442176870748,
+        0.21768707482993196
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.11564625850340136,
+      "interval": [
+        0.05782312925170068,
+        0.17687074829931973
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.1292517006802721,
+      "interval": [
+        0.034013605442176874,
+        0.23129251700680273
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.020408163265306124,
+      "interval": [
+        -0.0782312925170068,
+        0.03741496598639456
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.013605442176870748,
+      "interval": [
+        -0.06802721088435375,
+        0.10204081632653061
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.04421768707482993,
+      "interval": [
+        -0.08503401360544217,
+        -0.006802721088435374
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.006802721088435377,
+      "interval": [
+        -0.05442176870748299,
+        0.04081632653061224
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.07142857142857142,
+      "interval": [
+        0.01020408163265306,
+        0.1360544217687075
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.10884353741496598,
+      "interval": [
+        0.02040816326530612,
+        0.20408163265306123
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.3401360544217687,
+      "interval": [
+        -0.42857142857142855,
+        -0.25170068027210885
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T2",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.27891156462585037,
+      "interval": [
+        -0.40816326530612246,
+        -0.14965986394557823
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1-T4",
+      "split": "all",
+      "questions": 49,
+      "delta": -0.006802721088435376,
+      "interval": [
+        -0.061224489795918366,
+        0.04081632653061224
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1-T4",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.006802721088435376,
+      "interval": [
+        -0.061224489795918366,
+        0.04081632653061224
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.11564625850340136,
+      "interval": [
+        0.061224489795918366,
+        0.17346938775510204
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.06122448979591837,
+      "interval": [
+        0.0,
+        0.1292517006802721
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.11224489795918369,
+      "interval": [
+        0.05782312925170068,
+        0.17006802721088435
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.06802721088435375,
+      "interval": [
+        0.0,
+        0.14285714285714285
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.445578231292517,
+      "interval": [
+        -0.54421768707483,
+        -0.3469387755102041
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.43537414965986393,
+      "interval": [
+        -0.5714285714285714,
+        -0.29931972789115646
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.034013605442176874,
+      "interval": [
+        -0.08843537414965986,
+        0.017006802721088437
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.10204081632653061,
+      "interval": [
+        -0.17687074829931973,
+        -0.04081632653061224
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.1564625850340136,
+      "interval": [
+        -0.24149659863945577,
+        -0.07142857142857142
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.17006802721088435,
+      "interval": [
+        -0.2857142857142857,
+        -0.061224489795918366
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.08843537414965986,
+      "interval": [
+        0.02040816326530612,
+        0.1598639455782313
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.06802721088435375,
+      "interval": [
+        -0.034013605442176874,
+        0.17687074829931973
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.1292517006802721,
+      "interval": [
+        0.07142857142857142,
+        0.19047619047619047
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.09523809523809525,
+      "interval": [
+        0.02040816326530612,
+        0.1836734693877551
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.006802721088435373,
+      "interval": [
+        -0.07142857142857142,
+        0.05782312925170068
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.02040816326530612,
+      "interval": [
+        -0.11564625850340136,
+        0.07482993197278912
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.030612244897959186,
+      "interval": [
+        -0.08163265306122448,
+        0.02040816326530612
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.04081632653061225,
+      "interval": [
+        -0.10204081632653061,
+        0.013605442176870748
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.08503401360544217,
+      "interval": [
+        0.023809523809523808,
+        0.14965986394557823
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.07482993197278912,
+      "interval": [
+        -0.013605442176870748,
+        0.17006802721088435
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.326530612244898,
+      "interval": [
+        -0.41836734693877553,
+        -0.23469387755102042
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T3",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.3129251700680272,
+      "interval": [
+        -0.43537414965986393,
+        -0.19047619047619047
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1-tuned",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.06802721088435375,
+      "interval": [
+        0.006802721088435374,
+        0.14285714285714285
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1-tuned",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.06802721088435375,
+      "interval": [
+        0.006802721088435374,
+        0.14285714285714285
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.07482993197278912,
+      "interval": [
+        0.013605442176870748,
+        0.14285714285714285
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.07482993197278912,
+      "interval": [
+        0.013605442176870748,
+        0.14285714285714285
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 49,
+      "delta": -0.42857142857142855,
+      "interval": [
+        -0.5714285714285714,
+        -0.2857142857142857
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.42857142857142855,
+      "interval": [
+        -0.5714285714285714,
+        -0.2857142857142857
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 49,
+      "delta": -0.09523809523809525,
+      "interval": [
+        -0.17006802721088435,
+        -0.027210884353741496
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.09523809523809525,
+      "interval": [
+        -0.17006802721088435,
+        -0.027210884353741496
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 49,
+      "delta": -0.163265306122449,
+      "interval": [
+        -0.2789115646258503,
+        -0.05442176870748299
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.163265306122449,
+      "interval": [
+        -0.2789115646258503,
+        -0.05442176870748299
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.07482993197278912,
+      "interval": [
+        -0.027210884353741496,
+        0.17687074829931973
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.07482993197278912,
+      "interval": [
+        -0.027210884353741496,
+        0.17687074829931973
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.10204081632653061,
+      "interval": [
+        0.034013605442176874,
+        0.1836734693877551
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.10204081632653061,
+      "interval": [
+        0.034013605442176874,
+        0.1836734693877551
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 49,
+      "delta": -0.013605442176870748,
+      "interval": [
+        -0.10884353741496598,
+        0.08163265306122448
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.013605442176870748,
+      "interval": [
+        -0.10884353741496598,
+        0.08163265306122448
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 49,
+      "delta": -0.034013605442176874,
+      "interval": [
+        -0.10204081632653061,
+        0.034013605442176874
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.034013605442176874,
+      "interval": [
+        -0.10204081632653061,
+        0.034013605442176874
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        0.006802721088435374,
+        0.16326530612244897
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        0.006802721088435374,
+        0.16326530612244897
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 49,
+      "delta": -0.30612244897959184,
+      "interval": [
+        -0.4421768707482993,
+        -0.17006802721088435
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-T4",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.30612244897959184,
+      "interval": [
+        -0.4421768707482993,
+        -0.17006802721088435
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.0034013605442176896,
+      "interval": [
+        -0.034013605442176874,
+        0.027210884353741496
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.00680272108843537,
+      "interval": [
+        -0.04081632653061224,
+        0.061224489795918366
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.5612244897959183,
+      "interval": [
+        -0.6564625850340136,
+        -0.46598639455782315
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.4965986394557823,
+      "interval": [
+        -0.6326530612244898,
+        -0.36054421768707484
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.14965986394557823,
+      "interval": [
+        -0.2108843537414966,
+        -0.09183673469387756
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.163265306122449,
+      "interval": [
+        -0.2585034013605442,
+        -0.07482993197278912
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.272108843537415,
+      "interval": [
+        -0.35374149659863946,
+        -0.19387755102040816
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.23129251700680273,
+      "interval": [
+        -0.3401360544217687,
+        -0.1292517006802721
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.0272108843537415,
+      "interval": [
+        -0.08503401360544217,
+        0.030612244897959183
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.006802721088435373,
+      "interval": [
+        -0.08843537414965986,
+        0.10884353741496598
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.013605442176870746,
+      "interval": [
+        -0.023809523809523808,
+        0.05782312925170068
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.03401360544217687,
+      "interval": [
+        -0.04081632653061224,
+        0.11564625850340136
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.12244897959183675,
+      "interval": [
+        -0.1870748299319728,
+        -0.061224489795918366
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.0816326530612245,
+      "interval": [
+        -0.17687074829931973,
+        0.006802721088435374
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.14625850340136057,
+      "interval": [
+        -0.2108843537414966,
+        -0.08503401360544217
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.10204081632653061,
+      "interval": [
+        -0.1836734693877551,
+        -0.027210884353741496
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.03061224489795919,
+      "interval": [
+        -0.08163265306122448,
+        0.02040816326530612
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.013605442176870743,
+      "interval": [
+        -0.061224489795918366,
+        0.10204081632653061
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.4421768707482993,
+      "interval": [
+        -0.5306122448979592,
+        -0.35374149659863946
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.3741496598639456,
+      "interval": [
+        -0.4965986394557823,
+        -0.25170068027210885
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1.5S",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.5578231292517006,
+      "interval": [
+        -0.6496598639455783,
+        -0.46598639455782315
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1.5S",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.5034013605442177,
+      "interval": [
+        -0.6326530612244898,
+        -0.3741496598639456
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.14625850340136054,
+      "interval": [
+        -0.2108843537414966,
+        -0.08843537414965986
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.17006802721088435,
+      "interval": [
+        -0.272108843537415,
+        -0.07482993197278912
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.2687074829931973,
+      "interval": [
+        -0.35374149659863946,
+        -0.1870748299319728
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.2380952380952381,
+      "interval": [
+        -0.36054421768707484,
+        -0.12244897959183673
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.023809523809523808,
+      "interval": [
+        -0.07482993197278912,
+        0.027210884353741496
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 3.398641912117826e-18,
+      "interval": [
+        -0.08163265306122448,
+        0.08163265306122448
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.017006802721088437,
+      "interval": [
+        -0.013605442176870748,
+        0.05102040816326531
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0272108843537415,
+      "interval": [
+        -0.02040816326530612,
+        0.08843537414965986
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.11904761904761905,
+      "interval": [
+        -0.1836734693877551,
+        -0.05782312925170068
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.08843537414965986,
+      "interval": [
+        -0.1836734693877551,
+        0.0
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.14285714285714288,
+      "interval": [
+        -0.20748299319727892,
+        -0.08163265306122448
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.108843537414966,
+      "interval": [
+        -0.19727891156462585,
+        -0.027210884353741496
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.0272108843537415,
+      "interval": [
+        -0.07482993197278912,
+        0.02040816326530612
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.006802721088435374,
+      "interval": [
+        -0.061224489795918366,
+        0.08163265306122448
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.4387755102040816,
+      "interval": [
+        -0.5272108843537415,
+        -0.35374149659863946
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-tuned-instr",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.380952380952381,
+      "interval": [
+        -0.5034013605442177,
+        -0.2653061224489796
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1.5W",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.41156462585034015,
+      "interval": [
+        0.30952380952380953,
+        0.5102040816326531
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1.5W",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3333333333333333,
+      "interval": [
+        0.19047619047619047,
+        0.47619047619047616
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.2891156462585034,
+      "interval": [
+        0.17687074829931973,
+        0.4013605442176871
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.2653061224489796,
+      "interval": [
+        0.10884353741496598,
+        0.4217687074829932
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5340136054421769,
+      "interval": [
+        0.4387755102040816,
+        0.6258503401360545
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.5034013605442177,
+      "interval": [
+        0.36054421768707484,
+        0.6394557823129252
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5748299319727891,
+      "interval": [
+        0.47959183673469385,
+        0.6666666666666666
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.5306122448979592,
+      "interval": [
+        0.3945578231292517,
+        0.6666666666666666
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.4387755102040816,
+      "interval": [
+        0.336734693877551,
+        0.5408163265306123
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.41496598639455784,
+      "interval": [
+        0.2653061224489796,
+        0.564625850340136
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.41496598639455784,
+      "interval": [
+        0.3129251700680272,
+        0.5136054421768708
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.3945578231292517,
+      "interval": [
+        0.25170068027210885,
+        0.5374149659863946
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.5306122448979592,
+      "interval": [
+        0.4387755102040816,
+        0.6224489795918368
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.5102040816326531,
+      "interval": [
+        0.3741496598639456,
+        0.6462585034013606
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.11904761904761904,
+      "interval": [
+        0.013605442176870748,
+        0.22108843537414966
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5S",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.12244897959183673,
+      "interval": [
+        -0.034013605442176874,
+        0.2789115646258503
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L1c",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.12244897959183673,
+      "interval": [
+        -0.19727891156462585,
+        -0.047619047619047616
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L1c",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.06802721088435373,
+      "interval": [
+        -0.17006802721088435,
+        0.034013605442176874
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.12244897959183675,
+      "interval": [
+        0.05782312925170068,
+        0.19047619047619047
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.17006802721088435,
+      "interval": [
+        0.061224489795918366,
+        0.2857142857142857
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.163265306122449,
+      "interval": [
+        0.10204081632653061,
+        0.22789115646258504
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.19727891156462585,
+      "interval": [
+        0.09523809523809523,
+        0.30612244897959184
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.0272108843537415,
+      "interval": [
+        -0.034013605442176874,
+        0.08843537414965986
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.0816326530612245,
+      "interval": [
+        -0.006802721088435374,
+        0.17687074829931973
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.003401360544217687,
+      "interval": [
+        -0.04421768707482993,
+        0.047619047619047616
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.061224489795918366,
+      "interval": [
+        0.0,
+        0.12244897959183673
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.11904761904761905,
+      "interval": [
+        0.061224489795918366,
+        0.1836734693877551
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.17687074829931973,
+      "interval": [
+        0.08163265306122448,
+        0.2789115646258503
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.2925170068027211,
+      "interval": [
+        -0.3877551020408163,
+        -0.19727891156462585
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1.5W",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.2108843537414966,
+      "interval": [
+        -0.3401360544217687,
+        -0.08163265306122448
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L1plus",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.24489795918367346,
+      "interval": [
+        0.15306122448979592,
+        0.3401360544217687
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L1plus",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.2380952380952381,
+      "interval": [
+        0.10204081632653061,
+        0.3741496598639456
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.2857142857142857,
+      "interval": [
+        0.20068027210884354,
+        0.3707482993197279
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.2653061224489796,
+      "interval": [
+        0.14285714285714285,
+        0.3877551020408163
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.14965986394557823,
+      "interval": [
+        0.06802721088435375,
+        0.23469387755102042
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.14965986394557823,
+      "interval": [
+        0.04081632653061224,
+        0.2653061224489796
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.12585034013605442,
+      "interval": [
+        0.05442176870748299,
+        0.19727891156462585
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.1292517006802721,
+      "interval": [
+        0.034013605442176874,
+        0.23129251700680273
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.24149659863945577,
+      "interval": [
+        0.1598639455782313,
+        0.32653061224489793
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.24489795918367346,
+      "interval": [
+        0.1292517006802721,
+        0.3673469387755102
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.17006802721088435,
+      "interval": [
+        -0.2585034013605442,
+        -0.08503401360544217
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1c",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.14285714285714285,
+      "interval": [
+        -0.2653061224489796,
+        -0.027210884353741496
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.04081632653061225,
+      "interval": [
+        0.003401360544217687,
+        0.08163265306122448
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L1plus-tuned-instr",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.027210884353741496,
+      "interval": [
+        -0.02040816326530612,
+        0.08843537414965986
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.09523809523809525,
+      "interval": [
+        -0.17006802721088435,
+        -0.023809523809523808
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.08843537414965986,
+      "interval": [
+        -0.19727891156462585,
+        0.02040816326530612
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.11904761904761905,
+      "interval": [
+        -0.19387755102040816,
+        -0.047619047619047616
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.108843537414966,
+      "interval": [
+        -0.21768707482993196,
+        0.0
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.003401360544217689,
+      "interval": [
+        -0.047619047619047616,
+        0.04421768707482993
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.006802721088435371,
+      "interval": [
+        -0.06802721088435375,
+        0.08843537414965986
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.41496598639455784,
+      "interval": [
+        -0.5136054421768708,
+        -0.3163265306122449
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.380952380952381,
+      "interval": [
+        -0.5238095238095238,
+        -0.23129251700680273
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-L2",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.1360544217687075,
+      "interval": [
+        -0.20408163265306123,
+        -0.07142857142857142
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-L2",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.11564625850340136,
+      "interval": [
+        -0.21768707482993196,
+        -0.02040816326530612
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.1598639455782313,
+      "interval": [
+        -0.23129251700680273,
+        -0.09523809523809523
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.1360544217687075,
+      "interval": [
+        -0.23809523809523808,
+        -0.04081632653061224
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.04421768707482993,
+      "interval": [
+        -0.08503401360544217,
+        -0.006802721088435374
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.020408163265306124,
+      "interval": [
+        -0.07482993197278912,
+        0.034013605442176874
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.4557823129251701,
+      "interval": [
+        -0.54421768707483,
+        -0.3673469387755102
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1plus-tuned-instr",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.40816326530612246,
+      "interval": [
+        -0.5374149659863946,
+        -0.2789115646258503
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-L2-E",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.02380952380952381,
+      "interval": [
+        -0.08163265306122448,
+        0.030612244897959183
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-L2-E",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.02040816326530612,
+      "interval": [
+        -0.10884353741496598,
+        0.061224489795918366
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.09183673469387756,
+      "interval": [
+        0.034013605442176874,
+        0.15306122448979592
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.09523809523809525,
+      "interval": [
+        0.02040816326530612,
+        0.17687074829931973
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.3197278911564626,
+      "interval": [
+        -0.41496598639455784,
+        -0.22448979591836735
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.2925170068027211,
+      "interval": [
+        -0.43537414965986393,
+        -0.14965986394557823
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2-E",
+      "right": "SQL-L3a",
+      "split": "all",
+      "questions": 98,
+      "delta": 0.11564625850340136,
+      "interval": [
+        0.05442176870748299,
+        0.18027210884353742
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2-E",
+      "right": "SQL-L3a",
+      "split": "heldout",
+      "questions": 49,
+      "delta": 0.11564625850340136,
+      "interval": [
+        0.034013605442176874,
+        0.20408163265306123
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2-E",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.29591836734693877,
+      "interval": [
+        -0.3843537414965986,
+        -0.2108843537414966
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L2-E",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.272108843537415,
+      "interval": [
+        -0.3945578231292517,
+        -0.14965986394557823
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L3a",
+      "right": "SQL-R",
+      "split": "all",
+      "questions": 98,
+      "delta": -0.41156462585034015,
+      "interval": [
+        -0.5034013605442177,
+        -0.3197278911564626
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L3a",
+      "right": "SQL-R",
+      "split": "heldout",
+      "questions": 49,
+      "delta": -0.3877551020408163,
+      "interval": [
+        -0.5170068027210885,
+        -0.2585034013605442
+      ],
+      "contains_zero": false
+    }
+  ],
+  "coverage": [
+    {
+      "cell": "JSON-L2",
+      "covered_questions": 37,
+      "covered_correct": 97,
+      "covered_attempts": 111,
+      "errors": 171,
+      "outside_errors": 157,
+      "fraction": 0.9181286549707602
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "covered_questions": 42,
+      "covered_correct": 107,
+      "covered_attempts": 126,
+      "errors": 177,
+      "outside_errors": 158,
+      "fraction": 0.8926553672316384
+    }
+  ],
+  "causes": {
+    "SQL-L1": {
+      "categories": {
+        "SQL 或执行问题": 3,
+        "是什么、属于谁（对象或范围）": 22,
+        "怎么算（口径或算法读偏）": 19
+      },
+      "total": 44,
+      "with_result": 42,
+      "split": {
+        "heldout": 22,
+        "tuning": 22
+      },
+      "identities": [
+        {
+          "qid": "Q05",
+          "rep": 2,
+          "category": "SQL 或执行问题"
+        },
+        {
+          "qid": "Q112",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q113",
+          "rep": 2,
+          "category": "SQL 或执行问题"
+        },
+        {
+          "qid": "Q112",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q119",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q121",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q122",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q121",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q121",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q18",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q122",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q20",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q20",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q24",
+          "rep": 2,
+          "category": "SQL 或执行问题"
+        },
+        {
+          "qid": "Q27",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q30",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q37",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q38",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q38",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q38",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q47",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q49",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q49",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q56",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q58",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q58",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q61",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q61",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q61",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q67",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q67",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q67",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q74",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q87",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q87",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q89",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q87",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q89",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q92",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q94",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q94",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q98",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q98",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q98",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        }
+      ]
+    },
+    "SQL-L3a": {
+      "categories": {
+        "怎么算（口径或算法读偏）": 15,
+        "SQL 或执行问题": 2,
+        "是什么、属于谁（对象或范围）": 4
+      },
+      "total": 21,
+      "with_result": 19,
+      "split": {
+        "heldout": 9,
+        "tuning": 12
+      },
+      "identities": [
+        {
+          "qid": "Q113",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q117",
+          "rep": 3,
+          "category": "SQL 或执行问题"
+        },
+        {
+          "qid": "Q122",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q122",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q122",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q18",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q18",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q37",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q37",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q47",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q49",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q58",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q61",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q65",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q72",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q73",
+          "rep": 3,
+          "category": "SQL 或执行问题"
+        },
+        {
+          "qid": "Q82",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q89",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q89",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q98",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q98",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        }
+      ]
+    },
+    "SQL-L1-tuned": {
+      "categories": {
+        "怎么算（口径或算法读偏）": 9,
+        "是什么、属于谁（对象或范围）": 3
+      },
+      "total": 12,
+      "with_result": 12,
+      "split": {
+        "heldout": 11,
+        "tuning": 1
+      },
+      "identities": [
+        {
+          "qid": "Q20",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q20",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q20",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q37",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q37",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q67",
+          "rep": 2,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q67",
+          "rep": 1,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q67",
+          "rep": 3,
+          "category": "是什么、属于谁（对象或范围）"
+        },
+        {
+          "qid": "Q70",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q87",
+          "rep": 2,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q87",
+          "rep": 3,
+          "category": "怎么算（口径或算法读偏）"
+        },
+        {
+          "qid": "Q87",
+          "rep": 1,
+          "category": "怎么算（口径或算法读偏）"
+        }
+      ]
+    }
+  },
+  "composition": {
+    "questions": 98,
+    "source": {
+      "cube": 76,
+      "new": 22
+    },
+    "q_level": {
+      "Q2": 33,
+      "Q1": 38,
+      "Q3": 27
+    },
+    "split": {
+      "heldout": 49,
+      "tuning": 49
+    },
+    "excluded": {
+      "cube": 24
+    },
+    "excluded_qids": [
+      "Q07",
+      "Q17",
+      "Q29",
+      "Q33",
+      "Q39",
+      "Q40",
+      "Q42",
+      "Q44",
+      "Q45",
+      "Q46",
+      "Q48",
+      "Q59",
+      "Q68",
+      "Q69",
+      "Q76",
+      "Q79",
+      "Q83",
+      "Q85",
+      "Q86",
+      "Q91",
+      "Q93",
+      "Q95",
+      "Q97",
+      "Q99"
+    ]
+  },
+  "scale": {
+    "formal_cells": 19,
+    "formal_attempts": 5439,
+    "u2_cells": 6,
+    "u2_attempts": 1764,
+    "combined_cells": 25,
+    "combined_attempts": 7203
+  },
+  "d3": [
+    {
+      "moved": false,
+      "dependency": "可从数据发现",
+      "questions": 27,
+      "accuracy": {
+        "SQL-L0": 0.7901234567901234,
+        "SQL-L0-E": 0.7283950617283951,
+        "SQL-L1": 0.8888888888888888,
+        "SQL-L1-E": 0.8518518518518519
+      },
+      "L0_L1": {
+        "questions": 27,
+        "delta": 0.09876543209876544,
+        "interval": [
+          -0.024691358024691357,
+          0.24691358024691357
+        ],
+        "contains_zero": true
+      },
+      "L0_L0E": {
+        "questions": 27,
+        "delta": -0.0617283950617284,
+        "interval": [
+          -0.16049382716049382,
+          0.037037037037037035
+        ],
+        "contains_zero": true
+      }
+    },
+    {
+      "moved": false,
+      "dependency": "只能由业务告知",
+      "questions": 71,
+      "accuracy": {
+        "SQL-L0": 0.3615023474178404,
+        "SQL-L0-E": 0.4084507042253521,
+        "SQL-L1": 0.8356807511737089,
+        "SQL-L1-E": 0.8591549295774648
+      },
+      "L0_L1": {
+        "questions": 71,
+        "delta": 0.47417840375586856,
+        "interval": [
+          0.3615023474178404,
+          0.5868544600938967
+        ],
+        "contains_zero": false
+      },
+      "L0_L0E": {
+        "questions": 71,
+        "delta": 0.046948356807511735,
+        "interval": [
+          -0.03286384976525822,
+          0.1267605633802817
+        ],
+        "contains_zero": true
+      }
+    },
+    {
+      "moved": true,
+      "dependency": "可从数据发现",
+      "questions": 20,
+      "accuracy": {
+        "SQL-L0": 0.7833333333333333,
+        "SQL-L0-E": 0.7666666666666667,
+        "SQL-L1": 0.9166666666666666,
+        "SQL-L1-E": 0.9
+      },
+      "L0_L1": {
+        "questions": 20,
+        "delta": 0.13333333333333333,
+        "interval": [
+          0.0,
+          0.3
+        ],
+        "contains_zero": true
+      },
+      "L0_L0E": {
+        "questions": 20,
+        "delta": -0.016666666666666666,
+        "interval": [
+          -0.11666666666666667,
+          0.1
+        ],
+        "contains_zero": true
+      }
+    },
+    {
+      "moved": true,
+      "dependency": "只能由业务告知",
+      "questions": 78,
+      "accuracy": {
+        "SQL-L0": 0.4017094017094017,
+        "SQL-L0-E": 0.42735042735042733,
+        "SQL-L1": 0.8333333333333334,
+        "SQL-L1-E": 0.8461538461538461
+      },
+      "L0_L1": {
+        "questions": 78,
+        "delta": 0.43162393162393164,
+        "interval": [
+          0.32051282051282054,
+          0.5384615384615384
+        ],
+        "contains_zero": false
+      },
+      "L0_L0E": {
+        "questions": 78,
+        "delta": 0.025641025641025637,
+        "interval": [
+          -0.05128205128205128,
+          0.10256410256410256
+        ],
+        "contains_zero": true
+      }
+    }
+  ],
+  "u2": [
+    {
+      "cell": "SQL-L0",
+      "attempts": 294,
+      "correct": 136,
+      "accuracy": 0.46258503401360546,
+      "refused": 9,
+      "refusal_rate": 0.030612244897959183,
+      "answered": 285,
+      "answered_accuracy": 0.47719298245614034,
+      "gate90_answered": 0,
+      "gate90_correct": 0,
+      "gate90_coverage": 0.0,
+      "gate90_accuracy": null
+    },
+    {
+      "cell": "SQL-L0-u2",
+      "attempts": 294,
+      "correct": 138,
+      "accuracy": 0.46938775510204084,
+      "refused": 7,
+      "refusal_rate": 0.023809523809523808,
+      "answered": 287,
+      "answered_accuracy": 0.4808362369337979,
+      "gate90_answered": 56,
+      "gate90_correct": 42,
+      "gate90_coverage": 0.19047619047619047,
+      "gate90_accuracy": 0.75
+    },
+    {
+      "cell": "SQL-L0-u2p",
+      "attempts": 294,
+      "correct": 129,
+      "accuracy": 0.4387755102040816,
+      "refused": 96,
+      "refusal_rate": 0.32653061224489793,
+      "answered": 198,
+      "answered_accuracy": 0.6515151515151515,
+      "gate90_answered": 192,
+      "gate90_correct": 126,
+      "gate90_coverage": 0.6530612244897959,
+      "gate90_accuracy": 0.65625
+    },
+    {
+      "cell": "SQL-L1",
+      "attempts": 294,
+      "correct": 235,
+      "accuracy": 0.7993197278911565,
+      "refused": 0,
+      "refusal_rate": 0.0,
+      "answered": 294,
+      "answered_accuracy": 0.7993197278911565,
+      "gate90_answered": 0,
+      "gate90_correct": 0,
+      "gate90_coverage": 0.0,
+      "gate90_accuracy": null
+    },
+    {
+      "cell": "SQL-L1-u2",
+      "attempts": 294,
+      "correct": 241,
+      "accuracy": 0.8197278911564626,
+      "refused": 0,
+      "refusal_rate": 0.0,
+      "answered": 294,
+      "answered_accuracy": 0.8197278911564626,
+      "gate90_answered": 157,
+      "gate90_correct": 137,
+      "gate90_coverage": 0.5340136054421769,
+      "gate90_accuracy": 0.8726114649681529
+    },
+    {
+      "cell": "SQL-L1-u2p",
+      "attempts": 294,
+      "correct": 239,
+      "accuracy": 0.8129251700680272,
+      "refused": 16,
+      "refusal_rate": 0.05442176870748299,
+      "answered": 278,
+      "answered_accuracy": 0.8597122302158273,
+      "gate90_answered": 247,
+      "gate90_correct": 213,
+      "gate90_coverage": 0.8401360544217688,
+      "gate90_accuracy": 0.8623481781376519
+    }
+  ],
+  "u2_methods": {
+    "v2": 929,
+    "manual": 611,
+    "R1-R11": 90,
+    "refused": 128,
+    "execution_or_format": 6
+  },
+  "u2_pairs": [
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-u2",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.006802721088435376,
+      "interval": [
+        -0.023809523809523808,
+        0.04081632653061224
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-u2",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.006802721088435375,
+      "interval": [
+        -0.034013605442176874,
+        0.013605442176870748
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-u2p",
+      "metric": "correct",
+      "questions": 98,
+      "delta": -0.02380952380952381,
+      "interval": [
+        -0.06462585034013606,
+        0.017006802721088437
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L0-u2p",
+      "metric": "refused",
+      "questions": 98,
+      "delta": 0.29591836734693877,
+      "interval": [
+        0.22789115646258504,
+        0.3673469387755102
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.336734693877551,
+      "interval": [
+        0.24149659863945577,
+        0.43197278911564624
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.030612244897959183,
+      "interval": [
+        -0.061224489795918366,
+        -0.006802721088435374
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-u2",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.35714285714285715,
+      "interval": [
+        0.2585034013605442,
+        0.4557823129251701
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-u2",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.030612244897959183,
+      "interval": [
+        -0.061224489795918366,
+        -0.006802721088435374
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-u2p",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.35034013605442177,
+      "interval": [
+        0.2619047619047619,
+        0.4387755102040816
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0",
+      "right": "SQL-L1-u2p",
+      "metric": "refused",
+      "questions": 98,
+      "delta": 0.023809523809523808,
+      "interval": [
+        -0.013605442176870748,
+        0.061224489795918366
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L0-u2p",
+      "metric": "correct",
+      "questions": 98,
+      "delta": -0.030612244897959186,
+      "interval": [
+        -0.06802721088435375,
+        0.006802721088435374
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L0-u2p",
+      "metric": "refused",
+      "questions": 98,
+      "delta": 0.30272108843537415,
+      "interval": [
+        0.23469387755102042,
+        0.3741496598639456
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L1",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.3299319727891156,
+      "interval": [
+        0.23129251700680273,
+        0.42857142857142855
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L1",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.023809523809523808,
+      "interval": [
+        -0.047619047619047616,
+        -0.006802721088435374
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L1-u2",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.35034013605442177,
+      "interval": [
+        0.24829931972789115,
+        0.4489795918367347
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L1-u2",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.023809523809523808,
+      "interval": [
+        -0.047619047619047616,
+        -0.006802721088435374
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L1-u2p",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.3435374149659864,
+      "interval": [
+        0.25510204081632654,
+        0.43197278911564624
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2",
+      "right": "SQL-L1-u2p",
+      "metric": "refused",
+      "questions": 98,
+      "delta": 0.030612244897959183,
+      "interval": [
+        0.0,
+        0.06462585034013606
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L0-u2p",
+      "right": "SQL-L1",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.36054421768707484,
+      "interval": [
+        0.2619047619047619,
+        0.45918367346938777
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2p",
+      "right": "SQL-L1",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.32653061224489793,
+      "interval": [
+        -0.4013605442176871,
+        -0.25510204081632654
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2p",
+      "right": "SQL-L1-u2",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.38095238095238093,
+      "interval": [
+        0.282312925170068,
+        0.47959183673469385
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2p",
+      "right": "SQL-L1-u2",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.32653061224489793,
+      "interval": [
+        -0.4013605442176871,
+        -0.25510204081632654
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2p",
+      "right": "SQL-L1-u2p",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.3741496598639456,
+      "interval": [
+        0.2857142857142857,
+        0.46258503401360546
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L0-u2p",
+      "right": "SQL-L1-u2p",
+      "metric": "refused",
+      "questions": 98,
+      "delta": -0.27210884353741494,
+      "interval": [
+        -0.3469387755102041,
+        -0.19727891156462585
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-u2",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.02040816326530612,
+      "interval": [
+        -0.017006802721088437,
+        0.061224489795918366
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-u2",
+      "metric": "refused",
+      "questions": 98,
+      "delta": 0,
+      "interval": [
+        0.0,
+        0.0
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-u2p",
+      "metric": "correct",
+      "questions": 98,
+      "delta": 0.013605442176870748,
+      "interval": [
+        -0.030612244897959183,
+        0.05782312925170068
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1",
+      "right": "SQL-L1-u2p",
+      "metric": "refused",
+      "questions": 98,
+      "delta": 0.05442176870748299,
+      "interval": [
+        0.027210884353741496,
+        0.08503401360544217
+      ],
+      "contains_zero": false
+    },
+    {
+      "left": "SQL-L1-u2",
+      "right": "SQL-L1-u2p",
+      "metric": "correct",
+      "questions": 98,
+      "delta": -0.006802721088435375,
+      "interval": [
+        -0.05102040816326531,
+        0.03741496598639456
+      ],
+      "contains_zero": true
+    },
+    {
+      "left": "SQL-L1-u2",
+      "right": "SQL-L1-u2p",
+      "metric": "refused",
+      "questions": 98,
+      "delta": 0.05442176870748299,
+      "interval": [
+        0.027210884353741496,
+        0.08503401360544217
+      ],
+      "contains_zero": false
+    }
+  ],
+  "u2_baseline_selection": [
+    {
+      "cell": "SQL-L0-u2",
+      "refused_baseline_error": 0.9047619047619048,
+      "answered_baseline_error": 0.5284552845528456,
+      "difference": 0.37630662020905914,
+      "interval": [
+        0.07407407407407413,
+        0.5400696864111498
+      ],
+      "refusal_rate_at_least_5_percent": false
+    },
+    {
+      "cell": "SQL-L0-u2p",
+      "refused_baseline_error": 0.8506944444444445,
+      "answered_baseline_error": 0.3855218855218855,
+      "difference": 0.46517255892255904,
+      "interval": [
+        0.34183673469387765,
+        0.5755968169761274
+      ],
+      "refusal_rate_at_least_5_percent": true
+    },
+    {
+      "cell": "SQL-L1-u2",
+      "refused_baseline_error": null,
+      "answered_baseline_error": 0.20068027210884354,
+      "difference": null,
+      "interval": null,
+      "refusal_rate_at_least_5_percent": false
+    },
+    {
+      "cell": "SQL-L1-u2p",
+      "refused_baseline_error": 0.6666666666666667,
+      "answered_baseline_error": 0.17386091127098321,
+      "difference": 0.4928057553956835,
+      "interval": [
+        0.23640661938534283,
+        0.6909722222222223
+      ],
+      "refusal_rate_at_least_5_percent": true
+    }
+  ],
+  "static": {
+    "metrics": 69,
+    "synonyms": 56,
+    "plus_counts": {
+      "general_rules": 1,
+      "clarifications": 41,
+      "concepts": 37,
+      "aliases": 17,
+      "hierarchies": 13
+    },
+    "ontology_formal_or_formalizable": 46,
+    "ontology_total": 109,
+    "dataset": {
+      "tables": 25,
+      "columns": 244,
+      "rows": 34326191
+    },
+    "store_types": {
+      "Store": 299,
+      "Online": 3,
+      "Catalog": 1,
+      "Reseller": 3
+    },
+    "pilot": {
+      "attempts": 48,
+      "questions": 24,
+      "python_calls": 0
+    },
+    "orphan_products": {
+      "rows": 1715380,
+      "all_rows": 12627608,
+      "fraction": 0.13584362137310566
+    }
+  },
+  "tool_purposes": {
+    "SQL-L0-E": {
+      "聚合或候选答案核验": 1018,
+      "枚举或分组查值": 186,
+      "明细或样例查值": 682,
+      "行数或存在性检查": 89,
+      "结构或执行计划": 2
+    },
+    "SQL-L1-E": {
+      "行数或存在性检查": 26,
+      "聚合或候选答案核验": 599,
+      "枚举或分组查值": 43,
+      "明细或样例查值": 52
+    }
+  },
+  "d4": {
+    "first_correct": 92,
+    "first_n": 98,
+    "selected": 89,
+    "selected_correct": 86,
+    "first_wrong": 6,
+    "blocked_wrong": 3,
+    "blocked_correct": 6
+  },
+  "inherited_input_verification": {
+    "unchanged": [
+      "runs/20261031-T31-v5-rulings-01/manifest.json",
+      "runs/20261031-T31-v5-rulings-01/SQL-L0.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L0-E.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1-E.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L2.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L2-E.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1plus.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L3a.jsonl",
+      "runs/20261031-T31-v5-rulings-01/JSON-L2.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1.5S.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1.5W.jsonl",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1plus-tuned-instr.jsonl",
+      "runs/20261018-T13-sql-direct-01/SQL-L0.jsonl",
+      "runs/20261018-T13-sql-direct-01/SQL-L1.jsonl",
+      "runs/20261019-T16-full-v14-sql-new-01/SQL-L2.jsonl",
+      "runs/20261019-T15-explorer-01/SQL-L0-E.jsonl",
+      "runs/20261019-T15-explorer-01/SQL-L1-E.jsonl",
+      "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl",
+      "runs/20261020-T15-explorer-l2e-03/SQL-L2-E.jsonl",
+      "reports/midterm/v3-cost-runs.csv",
+      "runs/20261016-T11-smoke-01/SQL-L1.jsonl",
+      "runs/20261017-T11-smoke-1017-01/SQL-L1.jsonl",
+      "runs/20261018-T12-pilot-flash-01/SQL-L1.jsonl",
+      "runs/20261018-T12-pilot-flash-01/SQL-R.jsonl",
+      "runs/20261018-T12-pilot-pro-01/SQL-L1.jsonl",
+      "runs/20261018-T12-pilot-pro-01/SQL-R.jsonl",
+      "runs/20261018-T12-cache-flash-01/cache-probe.jsonl",
+      "runs/20261018-T13-sql-direct-01/SQL-L1.5S.jsonl",
+      "runs/20261018-T13-sql-direct-01/SQL-L1.5W.jsonl",
+      "runs/20261018-T13-sql-direct-01/SQL-L1c.jsonl",
+      "runs/20261018-T13-sql-direct-01/SQL-R.jsonl",
+      "runs/20261019-T15-pilot-01/SQL-L0-E.jsonl",
+      "runs/20261019-T15-pilot-01/SQL-L1-E.jsonl",
+      "runs/20261019-T16-pilot-01/SQL-L2.jsonl",
+      "runs/20261019-T15-pilot-l0e-02/SQL-L0-E.jsonl",
+      "runs/20261019-T21-pilot-01/SQL-L0-P.jsonl",
+      "runs/20261019-T21-pilot-01/SQL-L1-P.jsonl",
+      "runs/20261019-T16-pilot-v13-02/JSON-L2.jsonl",
+      "runs/20261019-T16-pilot-v13-02/SQL-L2.jsonl",
+      "runs/20261019-T15-explorer-l2e-01/SQL-L2-E.jsonl",
+      "runs/20261019-T13-l15s-v14-01/SQL-L1.5S.jsonl",
+      "runs/20261019-C13-ladder-01/SQL-L1-T2.jsonl",
+      "runs/20261019-C13-ladder-02/SQL-L1-T2.jsonl",
+      "runs/20261019-C13-ladder-02/SQL-L1-T3.jsonl",
+      "runs/20261019-C13-ladder-02/SQL-L1-T4.jsonl",
+      "runs/20261019-T16-full-v14-sql-old-01/SQL-L2-notes-v12.jsonl",
+      "runs/20261019-T16-full-v14-json-01/JSON-L2.jsonl",
+      "runs/20261020-T19b-attrib-01/attribution.jsonl",
+      "runs/20261023-T19c-confidence-01/confidence.jsonl",
+      "runs/20261025-T22b-l1plus-l3a-01/SQL-L1plus.jsonl",
+      "runs/20261025-T22b-l1plus-l3a-01/incident-audit.jsonl",
+      "runs/20261025-T22b-l1plus-l3a-02/SQL-L1plus.jsonl",
+      "runs/20261025-T22b-l1plus-l3a-02/incident-audit.jsonl",
+      "runs/20261025-T22b-l1plus-l3a-03/SQL-L1plus.jsonl",
+      "runs/20261025-T22b-l1plus-l3a-03/SQL-L3a.jsonl",
+      "runs/20261025-T14-tuned-01/SQL-L1-tuned-instr.jsonl",
+      "runs/20261025-T14-tuned-01/SQL-L1-tuned.jsonl",
+      "runs/20261025-T22b-attrib-01/attribution.jsonl",
+      "runs/20261025-T29-pilot-01/SQL-L1plus-sel-k1.jsonl",
+      "runs/20261025-T29-pilot-01/SQL-L1plus-sel-k3.jsonl",
+      "runs/20261026-T29-expanded-01/SQL-L1plus-confidence.jsonl",
+      "runs/20261026-T29-expanded-01/SQL-L1plus-sel-front-k10.jsonl",
+      "runs/20261026-T29-expanded-01/SQL-L1plus-sel-front-k3.jsonl",
+      "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k10.jsonl",
+      "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k100.jsonl",
+      "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k20.jsonl",
+      "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k5.jsonl",
+      "runs/20261025-T30-combo-01/SQL-L1plus-tuned-instr.jsonl",
+      "reports/validation/l1plus-l3a-correspondence.md",
+      "reports/validation/l3a-ontology/missed.json",
+      "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt",
+      "$SEMDEBT_DATA_DIR/runs-raw/20261019-T16-full-v14-json-01/JSON-L2/Q57_r1_t0.exec.json",
+      "$SEMDEBT_DATA_DIR/runs-raw/20261019-T16-full-v14-json-01/JSON-L2/Q57_r2_t0.exec.json",
+      "$SEMDEBT_DATA_DIR/runs-raw/20261019-T16-full-v14-json-01/JSON-L2/Q57_r3_t0.exec.json",
+      "decisions/2026-10-23-blind-data-dir.md",
+      "semantic/l0_map.yaml",
+      "docs/design-v5-public.md",
+      "reports/validation/t16-v14-8836110/coverage.json",
+      "reports/validation/reference-and-presentation-review.md"
+    ],
+    "changed": []
+  },
+  "inherited": {
+    "pro_flash_cost_ratio": 7.4296901410591225,
+    "tutorial_examples": [
+      "Q12",
+      "Q49",
+      "Q50",
+      "Q60",
+      "Q78",
+      "Q82"
+    ],
+    "l0_relationships": {
+      "kept": 32,
+      "dropped": 16,
+      "kept_fraction": 0.6666666666666666
+    },
+    "explorer_step_cap": 8,
+    "approved_rule_ids": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "R6",
+      "R7",
+      "R8",
+      "R9",
+      "R10",
+      "R11"
+    ],
+    "scenario_rendering": {
+      "H10_lines": 46,
+      "related_lines": 81
+    }
+  },
+  "u2_independent_review_rows": 101,
+  "inputs": {
+    "runs/20261031-T31-v5-rulings-01/manifest.json": "def8b415492c1a9477458c942cdaf5351413d3152d5b449b8d757ae5bbfcfedd",
+    "$SEMDEBT_EVAL_DIR@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/cube_100.yaml": "9f08510d1bf86104458d0e5fd66b787d60f9d50e1cbe0df5e2d128ade24b26cd",
+    "$SEMDEBT_EVAL_DIR@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/new.yaml": "a42925ee9631250aef0f40c8a539fa28f2a36d6effa5e86c27360b23bcf97a6c",
+    "runs/20261031-T31-v5-rulings-01/JSON-L2.jsonl": "3f20f1598f16be0138babb64c1de0c02079b8dc42d1497ee8c6524159ab76188",
+    "runs/20261019-T16-full-v14-json-01/JSON-L2.jsonl": "10a1ab5c480b8708c81f6bd9fa61a947cbaf81ed45194a205db23808f3a4c7cf",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0-E.jsonl": "79ed656e3150f3124db0e1d7d7c2636e719b0a69355b0acbc222c761e7ca2ad6",
+    "runs/20261019-T15-explorer-01/SQL-L0-E.jsonl": "f0c4d2bc3a7c70a129b1f80b2b918f508ee6904bde57a92dc6b2e6c0bf5c9461",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0.jsonl": "be5785873c78bb5bb2efbc3ec31ba9490e89793d40d211e9e2097b3543112011",
+    "runs/20261018-T13-sql-direct-01/SQL-L0.jsonl": "cd18674fad7a222339802f982a7f94a16feec25f06f304c8e27e1dbb4f73ce8c",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-E.jsonl": "03ee8734785d216720d9115bbdbe87f5f87e78836203238599aed77067fac5aa",
+    "runs/20261019-T15-explorer-01/SQL-L1-E.jsonl": "a09ce03bb899e739939c7fa3763d21ede9f8b47fdd076973ab88ca482d9227be",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T2.jsonl": "7a56993607ab8dbde164f77ff00eea54104fa382eb30b600f5b70ab4abefb5ac",
+    "runs/20261019-C13-ladder-02/SQL-L1-T2.jsonl": "9a28982d4079f0188161afc2d87d9d345bde8ec9bb2b722c3d236c426b8a4965",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T3.jsonl": "7610200351491774c82b5bc8288667fea82060e23f50736b31db656701ae3ee3",
+    "runs/20261019-C13-ladder-02/SQL-L1-T3.jsonl": "e59be1041f960897f670da39ecb0c329f7ba1b0a8331592c42ad3dc2ec99b39e",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T4.jsonl": "bf98674cf34172299b4380850e75f857ce524490bbd0a537ab70ae950dbe453a",
+    "runs/20261019-C13-ladder-02/SQL-L1-T4.jsonl": "459032ff2dec16d0225bc173e2df96142b2977ba3550eeddb4d19898cf4697ff",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned-instr.jsonl": "71ae56b1d4e738aa26664f0686d228a0a8cf37c04c8cc7fda5d66f2d904a977e",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned-instr.jsonl": "1be51e0952e64a3ae5f274c9e2b1b2c22e7d1040de02b18232ca7466133fe532",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned.jsonl": "8de7ef70b8f2f29d0b4ed179ee77d5e72bd3844d6b9cb88b9159dbcf5728be19",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned.jsonl": "e65be80548af9fdcdc818258ad7430f90f42e9dc212c245e78cec3a25f9ceb9b",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5S.jsonl": "190dd5d0c8529595388d854bd1086d9f414e9cb00cb4d36d6df3075559cfd340",
+    "runs/20261019-T13-l15s-v14-01/SQL-L1.5S.jsonl": "c7e465c42eddf564ad5a2c622651713aaa916db4e1e8bd1fb1e97d53a63f9c8a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5W.jsonl": "271b48a20bbcd920602c1073bf423970ea3899645e83127437695264ee5fa090",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.5W.jsonl": "c063cd130288d105c7f061c705beae9801dcbb6cb8b2f51bc290cb64bbe1a2c3",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl": "10054c729b82c91504922b73f70bddbbf97700847427d3a709c73f8dfd578f2a",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.jsonl": "9d8a6b7ee75de9211642b7a94f88dc1be11f3823b50592b024c388fde897ead6",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1c.jsonl": "1535d2304ebbdc0d6bba32ab4699a8302c4bf59f7e949b5219443e9fc194aed6",
+    "runs/20261018-T13-sql-direct-01/SQL-L1c.jsonl": "6deb1a4a0c03f68d879794ee09c73a26f2987b8fac0361c1b37a30f42ff2b802",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus-tuned-instr.jsonl": "e0cd78d6b6153d8aca70804a9705c879649dd870dff47c289cda3fbfef451464",
+    "runs/20261025-T30-combo-01/SQL-L1plus-tuned-instr.jsonl": "41546aff0de2dcb4d050cd27efd13b47de0797fe445ee48d668dc280bc1a16f2",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus.jsonl": "48af0eab88f6b09d0502a15cac6d7f3543f325e70118542193c367828635bfb1",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L1plus.jsonl": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2-E.jsonl": "e0aca16c51617846b65f03178f35b58fb68022c0c68b8220f8a1d465e96f223a",
+    "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl": "c9122c04dd556268dcf5fbcae57631405ba61aab037feb2c58826524ab77d746",
+    "runs/20261020-T15-explorer-l2e-03/SQL-L2-E.jsonl": "44628d83f320dd6fd64313ffac4d124754b6f3dbf014831ff453853e45aadf4f",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2.jsonl": "189c4d3ad52ebd03ab17ea15bbaf5c2595f10cf2e67b0df77bf667bcf6099bb0",
+    "runs/20261019-T16-full-v14-sql-new-01/SQL-L2.jsonl": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+    "runs/20261031-T31-v5-rulings-01/SQL-L3a.jsonl": "98aeb013c46be903aec2405ae0397d18276160d92aeaa6b5af81f3b19425a06c",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L3a.jsonl": "67f282deddb1a92b4406133da746e8ba6250cf99c9f81c78127ccbe4dec7a2c6",
+    "runs/20261031-T31-v5-rulings-01/SQL-R.jsonl": "21bce20f6503f1e85e9b01f850bb92aeb886ba8372eb4e26e6922baac6e8c713",
+    "runs/20261018-T13-sql-direct-01/SQL-R.jsonl": "27ab95f5761450501912ebda3922bb9dd37e4a195b730678b88e95e175757e97",
+    "reports/validation/t16-v14-8836110/coverage.json": "54d88eb347548023521ee0ede1c7e8788669a4612b13c35f4dfc158a60102329",
+    "$SEMDEBT_DATA_DIR/t19a-v8-error-causes-20261101/classifications.json": "7ac2f9943c53cace4046b1f6d3ac5f97186f72fb6460de6667c099c409596baa",
+    "reports/validation/t29-u2-content-labels.csv": "ed0ad7759fdad28a6cca45e126990a3d94dabd90971aa8beb5d50e5b2333d7af",
+    "$SEMDEBT_DATA_DIR/t29-u2-runtime-v4/runs/20261031-T29-u2-v3-01/SQL-L0.jsonl": "7aacbc8572a1a65bad3eabe575278238d710d3e9d173f1471b51643ddc32621d",
+    "$SEMDEBT_DATA_DIR/t29-u2-runtime-v4/runs/20261031-T29-u2-v3-01/SQL-L0-u2.jsonl": "b71bd2ca3a71c1d9787b12ac6c9f748e73e64cf917da486c4e298bfced3950e9",
+    "$SEMDEBT_DATA_DIR/t29-u2-runtime-v4/runs/20261031-T29-u2-v3-01/SQL-L0-u2p.jsonl": "a5f30879608f2bc8c9ddf6fec3abe2cc372e37f1f4eb9d2942ffcf29b625e519",
+    "$SEMDEBT_DATA_DIR/t29-u2-runtime-v4/runs/20261031-T29-u2-v3-01/SQL-L1.jsonl": "cf56ddacd8e555b7add289678ea9eddc549707d709b09bef42498f1957f62b46",
+    "$SEMDEBT_DATA_DIR/t29-u2-runtime-v4/runs/20261031-T29-u2-v3-01/SQL-L1-u2.jsonl": "2945ee0bc4cf90392951569fe491d5dc30ae18b6117b2a37c4b6e8536cabf550",
+    "$SEMDEBT_DATA_DIR/t29-u2-runtime-v4/runs/20261031-T29-u2-v3-01/SQL-L1-u2p.jsonl": "f7baae80e747982523edec5325ac6c31809a2c00fe7effc93432f995c5e9ccec",
+    "semantic/source.yaml": "086f438b43600ffc003ecf11e95f9753a5ee915ae5494370725757ad160fcb65",
+    "semantic/l1plus.yaml": "983437b35be9a126e4aefca5aea2629d5df8d16a3a1af6db8a82b2b162d6da8a",
+    "reports/validation/l1plus-l3a-correspondence.md": "075ef23be8ba52b8bb5b685ef1c833b4685401e26e36d4f46cc3cf7b6efc2e64",
+    "reports/validation/l3a-ontology/missed.json": "b893f7c7bd92e1c65c657de6ae0c60f3bfe43e2412d1f773ca1f43dcc2112c89",
+    "runs/20261019-T21-pilot-01/SQL-L0-P.jsonl": "f70f8081fdcae5358f78645b8d9b3e4cf2a6c3de9a57b037699f6f15b3e58dd1",
+    "runs/20261019-T21-pilot-01/SQL-L1-P.jsonl": "a065ff89b215ffe37842c7161bb6cdd2e4f058ff531d887e2aa909f50fe5f7d2",
+    "reports/midterm/tool-audit.csv": "30a8532364a2446cdad4a4dbcb55947883567148d1604eb2ff4da2e087ad6ae4",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/d4-content-equivalence-audit.json": "525454d42b52873e4bdfbf856829332d383abb3cad004f43c3460d4b06fbda3d",
+    "reports/recheck/v7-fixes.json": "3590e4ba3acb89cd0766f3d3c1dd57409184f8e571248f275ce081112a8cc5a4",
+    "$SEMDEBT_DATA_DIR/t29-u2-content-20261031/claude-review/claude-labels-u2-101.csv": "d25586c7f19d562b6739aa3d492b6e70382ed618d0d438d964e793d680bc9aba"
+  }
+}
