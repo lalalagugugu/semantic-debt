@@ -76,6 +76,27 @@ def lock_verdicts(path, value):
         write(path,value)
 
 
+def apply_amendments(labels, amendments):
+    """Apply explicit user verdict changes without replacing the blind review."""
+    result=[dict(r) for r in labels]
+    seen=set()
+    for patch in amendments:
+        aid=patch['anon_id']
+        if aid in seen:
+            raise ValueError('duplicate adjudication amendment')
+        seen.add(aid)
+        matches=[r for r in result if r['anon_id']==aid]
+        if len(matches)!=1:
+            raise ValueError('amendment identity missing or duplicated')
+        r=matches[0]
+        if (r['qid'],r['cell'],r['rep'],r['correct'])!=(patch['qid'],patch['cell'],patch['rep'],patch['old_correct']):
+            raise ValueError('amendment does not match the original verdict')
+        if type(patch['correct']) is not bool or not patch['decision']:
+            raise ValueError('amendment requires a user decision and boolean verdict')
+        r.update(correct=patch['correct'],category=patch['category'])
+    return result
+
+
 def prepare(data, private):
     if private.exists():
         raise ValueError('preserve the existing private review; do not overwrite')
@@ -183,6 +204,12 @@ def analyze(data, private):
     labels=final_labels(keys,decisions,materials)
     # Freeze the anonymous verdicts before reconnecting arm identities or computing outcomes.
     lock_verdicts(private/'verdict-lock.json',dict(judgments_sha256=sha(decisions_path.read_bytes()),model_api_calls=0))
+    amendment_path=private/'user-adjudication-amendments.json'
+    if amendment_path.exists():
+        amendment=json.loads(amendment_path.read_text())
+        if amendment['original_judgments_sha256']!=sha(decisions_path.read_bytes()):
+            raise ValueError('amendments refer to a different anonymous verdict lock')
+        labels=apply_amendments(labels,amendment['records'])
     by_cell={c:[k for k in labels if k['cell']==c] for c in CELLS}
     baseline={c:{q:[r['correct'] for r in sorted(by_cell[c],key=lambda r:r['rep']) if r['qid']==q]
                  for q in {k['qid'] for k in by_cell[c]}} for c in CELLS[:2]}
@@ -212,6 +239,17 @@ def export(data, private):
     lock=json.loads((private/'verdict-lock.json').read_text())
     if sha((private/'anonymous-judgments.json').read_bytes())!=lock['judgments_sha256']:
         raise ValueError('verdicts changed after unblinding')
+    expected=final_labels(json.loads((private/'identity-key.json').read_text()),
+        json.loads((private/'anonymous-judgments.json').read_text()),
+        json.loads((private/'blinded-materials.json').read_text()))
+    amendment_path=private/'user-adjudication-amendments.json'
+    if amendment_path.exists():
+        amendment=json.loads(amendment_path.read_text())
+        if amendment['original_judgments_sha256']!=lock['judgments_sha256']:
+            raise ValueError('amendments refer to a different anonymous verdict lock')
+        expected=apply_amendments(expected,amendment['records'])
+    if labels!=expected:
+        raise ValueError('analysis labels are stale; rerun analysis before export')
     rows=[]
     for r in sorted(labels,key=lambda r:(r['cell'],int(r['qid'][1:]),r['rep'])):
         rows.append(dict(qid=r['qid'],cell=r['cell'],rep=r['rep'],anonymous_id=r['anon_id'],
@@ -229,6 +267,8 @@ def export(data, private):
     write(ROOT/'reports/results/t29-u2-content-analysis.json',dict(source_run=RUN,
           fingerprint=FP,model_api_calls=0,query_executions=0,
           verdict_lock_sha256=sha((private/'verdict-lock.json').read_bytes()),
+          adjudication_amendments_sha256=sha((private/'user-adjudication-amendments.json').read_bytes())
+          if (private/'user-adjudication-amendments.json').exists() else None,
           summary=summary,**analysis))
     # A separate private packet lets the other vendor review all positives.
     # It deliberately contains neither arm identity nor the first reviewer's rationale.
@@ -263,9 +303,9 @@ def export(data, private):
     lines=['# U2 全量内容判定与预登记分析（Codex 初判，待 Claude 独立复核）','',
         '日期：2026-11-01。原始采集 run `'+RUN+'`，指纹 `'+FP+'`。六单元各98题×3次，共1764次；本次模型API调用0、SQL执行0。分析只用本次同指纹基线，旧指纹基线仅描述漂移。','',
         '## 判定与盲法','',
-        '沿用D1定稿的v2、R1–R11及2026-10-31统一内容规则：929次v2判对、90次规则放行、128次原生拒答、6次执行或协议失败；其余611次匿名逐条核对，102次判对、509次判错，总计1121次内容正确。完整结果、SQL、题面及证据均留数据目录。公开逐次标签见 `../validation/t29-u2-content-labels.csv`。','',
+        f"沿用D1定稿的v2、R1–R11及内容规则：929次v2判对、90次规则放行、128次原生拒答、6次执行或协议失败；其余611次匿名逐条核对，用户改判后{sum(r['correct'] for r in labels if r['method']=='manual')}次判对、{sum(not r['correct'] for r in labels if r['method']=='manual')}次判错，总计{len(packet)}次内容正确。完整结果、SQL、题面及证据均留数据目录。公开逐次标签见 `../validation/t29-u2-content-labels.csv`。",'',
         '先用系统随机源打乱1764次作答并生成匿名编号。人工材料移除了单元/臂别、次数、系统提示、假设文本及把握分，仅含题号、题面、所交付基础上下文、SQL和结果/参考。按首次遇到题号的随机顺序分组审阅；所有标签完成后写入不可覆盖的verdict-lock，再接回身份。不是严格双盲：同一Codex会话构建材料并判定，SQL表名与基础上下文可提示L0/L1，但未依据惩罚臂或把握值判内容。','',
-        '用户2026-11-01确认Q110的NULL所问格可按一步、无歧义、无矛盾规则补全，新增1次内容正确；暂停前285次标签中的同类回查无变更，变更/新增单列 `../validation/t29-u2-null-review-changes.csv`。没有把NULL当0。19个正式单元只读核对另见 `../validation/t29-u2-d1-null-one-step.md`，发现4次Q96现有判错，D1标签全部保持不动。','',
+        '用户2026-11-01以“所问格直接为NULL一律判错”取代此前NULL一步推导裁决，原因是19单元Q96同类均判错且含用户逐次裁定。本次只将Q110 SQL-L1第3次（U1437）由对改错；其余1763次标签不变。缺数但没有直接NULL的原一步推导许可不受影响，包括Q110 SQL-L2第3次。原匿名锁保留，改判发生于接回身份之后，以单独用户改判账及SHA记录；上一版私有标签、分析及判对材料包另存快照。历史新增及本次改判均列 `../validation/t29-u2-null-review-changes.csv`。19正式单元只读清单中的Q96四次标签及全部D1标签不改。','',
         '## 六单元总计','',
         '|单元|次数|内容正确|准确率|原生拒答|执行/协议失败|',
         '|---|---:|---:|---:|---:|---:|']
@@ -296,7 +336,7 @@ def export(data, private):
     lines+=['','两侧均使用内容标签，旧基线来自D1最终快照 `'+D1_RUN+'`。这些差异只描述漂移，不进入U2拒答判据，不作为新的成功条件。','',
         '## 复现与独立复核','',
         '全部区间沿用冻结的 `harness/u2_analysis.py`：98题成簇、每题保留3次，10,000次、种子20261019、经验百分位95%区间；两臂差和新旧基线差按题配对。四臂Δ/AUC有效重采样次数在同名JSON中逐项报告，本次所有可计算指标均为10,000次；<5%臂Δ为0次。判据未改。','',
-        '数据目录中的 `t29-u2-content-20261031/claude-positive-materials.json` 含1121次判对材料及上下文哈希，不含臂别和Codex理由，供Claude独立核对；identity-key及初判理由另存，不应先交给独立判定者。上下文在同目录 `contexts/`。尚未声称已独立复核，后续分歧需单列，不覆盖本次匿名锁。','',
+        f'数据目录中的 `t29-u2-content-20261031/claude-positive-materials.json` 含{len(packet)}次当前判对材料及上下文哈希，不含臂别和Codex理由，供Claude独立核对；identity-key及初判理由另存，不应先交给独立判定者。上下文在同目录 `contexts/`。尚未声称已独立复核，后续分歧需单列，不覆盖本次匿名锁。','',
         '离线复算（使用已锁定的私有证据目录；环境变量须已指向授权目录）：','',
         '```sh','uv run --offline python scripts/t29_u2_content.py analyze',
         'uv run --offline python scripts/t29_u2_content.py export','```','',

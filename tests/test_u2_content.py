@@ -6,7 +6,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from scripts.t29_u2_content import blinded, final_labels, historical_baseline, lock_verdicts
+from scripts.t29_u2_content import blinded, final_labels, historical_baseline, lock_verdicts, apply_amendments
 
 
 def test_review_view_excludes_arm_confidence_and_source_identity():
@@ -50,3 +50,17 @@ def test_locked_verdicts_cannot_be_replaced(tmp_path):
     with pytest.raises(ValueError,match='preserve'):
         lock_verdicts(path,{'digest':'changed'})
     assert json.loads(path.read_text())=={'digest':'first'}
+
+
+def test_user_amendment_changes_only_explicit_identity_and_preserves_original():
+    rows=[dict(anon_id='A',qid='synthetic',cell='unit',rep=1,correct=True,category='old'),
+          dict(anon_id='B',qid='synthetic',cell='unit',rep=2,correct=True,category='missing_without_null')]
+    patch=dict(anon_id='A',qid='synthetic',cell='unit',rep=1,old_correct=True,
+               correct=False,category='direct_null',decision='user superseding ruling')
+    result=apply_amendments(rows,[patch])
+    assert not result[0]['correct'] and result[1]==rows[1]
+    assert rows[0]['correct']
+    with pytest.raises(ValueError,match='original verdict'):
+        apply_amendments(rows,[dict(patch,rep=3)])
+    with pytest.raises(ValueError,match='duplicate adjudication'):
+        apply_amendments(rows,[patch,patch])

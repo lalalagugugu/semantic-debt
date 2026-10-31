@@ -1138,7 +1138,7 @@ Q109,SQL-L1,2,U1733,1,manual,数值呈现,False
 Q109,SQL-L1,3,U0027,0,manual,数值错误,False
 Q110,SQL-L1,1,U1220,1,manual,数值呈现,False
 Q110,SQL-L1,2,U1333,1,v2,v2,False
-Q110,SQL-L1,3,U1437,1,manual,一步推导,False
+Q110,SQL-L1,3,U1437,0,manual,所问格直接NULL,False
 Q111,SQL-L1,1,U0973,1,v2,v2,False
 Q111,SQL-L1,2,U0977,1,v2,v2,False
 Q111,SQL-L1,3,U0552,1,v2,v2,False
