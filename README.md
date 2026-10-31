@@ -15,6 +15,8 @@
 
 这些结果只来自一个模型和一份数据，换模型后绝对数字会变。准确率按结果内容判定，比较方法和局限见报告。
 
+这套题已经公开，以后不能再当留出题用。
+
 完整报告：发布后补链接。
 
 ## 两个仓库
@@ -54,8 +56,11 @@ export SEMDEBT_DATA_DIR="$PWD/../data"   # 放在仓库之外
 **重算报告数字：** 不需要数据，也不调用模型。
 
 ```bash
-python3 scripts/t19a_v7_numbers.py
+python3 scripts/t19a_v7_numbers.py > "$TMPDIR/numbers.md"
+cmp "$TMPDIR/numbers.md" reports/results/t19a-v7-numbers.md
 ```
+
+脚本把结果写到标准输出。`cmp` 没有输出，就说明和仓库里的结果逐字节一致。
 
 逐次标签在 `runs/20261031-T31-v5-rulings-01/`，总表在 `reports/results/accuracy-v5.md`。独立复核的脚本在 `reports/recheck/`。
 
@@ -66,11 +71,14 @@ uv run python data/load.py
 uv run python data/export_parquet.py
 ```
 
-**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包的下载地址发布后补。
+**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包的下载地址发布后补。先把题库切到报告用的版本：
 
 ```bash
-uv run python -m harness.rescore --source 20261018-T13-sql-direct-01 --cell SQL-L1 --run-id <新的-run-id>
+git -C "$SEMDEBT_EVAL_DIR" checkout eval-v1.3
+uv run python -m harness.rescore --source 20261018-T13-sql-direct-01 --cell SQL-L1 --run-id <新的-run-id> --eval-tag eval-v1.3
 ```
+
+这一步只跑确定性自动评分，得到的不是报告的准确率。主表上 SQL-L1 的自动评分是 202/294 = 68.7%，报告是 250/294 = 85.0%，差额来自后续的规则放行和逐条内容判定，依据见 `decisions/2026-10-31-v7-content-review-rulings.md`。最终标签在 `runs/20261031-T31-v5-rulings-01/`，上面的重算步骤用的就是它们。判 judge 题和内容判定没有一键命令。
 
 **重新调用模型：** 需要付费的 DeepSeek API key，且只从环境变量 `DEEPSEEK_API_KEY` 读取。入口见 [harness/README.md](harness/README.md)。模型服务端会更新，结果不一定相同。
 
