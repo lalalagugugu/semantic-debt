@@ -1,0 +1,666 @@
+{
+  "model_calls": 0,
+  "query_executions": 0,
+  "reviewed_head": "a8a1ec260290013a6ab0fa551bd538d4202f2538",
+  "bank_counts": {
+    "cube_100": 100,
+    "new": 22,
+    "total": 122
+  },
+  "main_question_counts": {
+    "q_level": {
+      "Q1": 38,
+      "Q3": 27,
+      "Q2": 33
+    },
+    "split": {
+      "heldout": 49,
+      "tuning": 49
+    },
+    "persona": {
+      "管理层": 45,
+      "分析师": 53
+    }
+  },
+  "usage": {
+    "SQL-L0": {
+      "prompt_tokens": 1937757,
+      "cache_hit_tokens": 1853312,
+      "cache_miss_tokens": 84445,
+      "completion_tokens": 1082834,
+      "attempts": 294,
+      "mean_input": 6591.010204081633,
+      "recorded_cny": 4.45284724,
+      "all_cold_cny": 6.269093
+    },
+    "SQL-L1": {
+      "prompt_tokens": 18026983,
+      "cache_hit_tokens": 17897344,
+      "cache_miss_tokens": 129639,
+      "completion_tokens": 571643,
+      "attempts": 294,
+      "mean_input": 61316.268707482996,
+      "recorded_cny": 2.77415788,
+      "all_cold_cny": 20.313555
+    },
+    "SQL-L2": {
+      "prompt_tokens": 17401604,
+      "cache_hit_tokens": 17299968,
+      "cache_miss_tokens": 101636,
+      "completion_tokens": 1051535,
+      "attempts": 294,
+      "mean_input": 59189.12925170068,
+      "recorded_cny": 4.65377536,
+      "all_cold_cny": 21.607744
+    },
+    "SQL-L0-E": {
+      "prompt_tokens": 10036483,
+      "cache_hit_tokens": 9077120,
+      "cache_miss_tokens": 959363,
+      "completion_tokens": 675591,
+      "attempts": 294,
+      "mean_input": 34137.69727891157,
+      "recorded_cny": 3.8432694,
+      "all_cold_cny": 12.738847
+    },
+    "SQL-L1-E": {
+      "prompt_tokens": 48656227,
+      "cache_hit_tokens": 48266852,
+      "cache_miss_tokens": 389375,
+      "completion_tokens": 594217,
+      "attempts": 294,
+      "mean_input": 165497.37074829932,
+      "recorded_cny": 3.73158004,
+      "all_cold_cny": 51.033095
+    },
+    "SQL-L2-E": {
+      "prompt_tokens": 56140126,
+      "cache_hit_tokens": 55688960,
+      "cache_miss_tokens": 451166,
+      "completion_tokens": 897268,
+      "attempts": 294,
+      "mean_input": 190952.80952380953,
+      "recorded_cny": 5.1540172,
+      "all_cold_cny": 59.729198
+    }
+  },
+  "exploration_ratios": {
+    "SQL-L0": {
+      "input": 5.179433231308157,
+      "all_cold_cost": 2.032007979463696,
+      "recorded_cost": 0.8631038059145277
+    },
+    "SQL-L1": {
+      "input": 2.699077654868815,
+      "all_cold_cost": 2.5122680397399666,
+      "recorded_cost": 1.3451217275348437
+    },
+    "SQL-L2": {
+      "input": 3.226146624184759,
+      "all_cold_cost": 2.7642496134719106,
+      "recorded_cost": 1.1074916173005824
+    }
+  },
+  "cost_ledger": [
+    {
+      "run": "20261016-T11-smoke-01",
+      "records": 6,
+      "cny": "0.1028217599999999999"
+    },
+    {
+      "run": "20261017-T11-smoke-1017-01",
+      "records": 6,
+      "cny": "0.102909359999999996"
+    },
+    {
+      "run": "20261018-T12-pilot-flash-01",
+      "records": 144,
+      "cny": "1.2949350400000000219"
+    },
+    {
+      "run": "20261018-T12-pilot-pro-01",
+      "records": 144,
+      "cny": "9.6209661000000000046"
+    },
+    {
+      "run": "20261018-T12-cache-flash-01",
+      "records": 14,
+      "cny": "0.3324751999999999993"
+    },
+    {
+      "run": "20261018-T13-sql-direct-01",
+      "records": 2196,
+      "cny": "24.80484018000000000708"
+    },
+    {
+      "run": "20261019-T15-pilot-01",
+      "records": 48,
+      "cny": "0.6712665599999999955"
+    },
+    {
+      "run": "20261019-T16-pilot-01",
+      "records": 24,
+      "cny": "0.5451007199999999668"
+    },
+    {
+      "run": "20261019-T15-pilot-l0e-02",
+      "records": 24,
+      "cny": "0.335193120000000007"
+    },
+    {
+      "run": "20261019-T15-explorer-01",
+      "records": 732,
+      "cny": "10.1377083399999999798"
+    },
+    {
+      "run": "20261019-T21-pilot-01",
+      "records": 48,
+      "cny": "1.1848204800000000365"
+    },
+    {
+      "run": "20261019-T16-pilot-v13-02",
+      "records": 46,
+      "cny": "1.4145290400000000245"
+    },
+    {
+      "run": "20261019-T15-explorer-l2e-01",
+      "records": 7,
+      "cny": "0.071635320000000000"
+    },
+    {
+      "run": "20261019-T13-l15s-v14-01",
+      "records": 327,
+      "cny": "2.6997005799999999865"
+    },
+    {
+      "run": "20261019-C13-ladder-01",
+      "records": 1,
+      "cny": "0.0023947200000000004"
+    },
+    {
+      "run": "20261019-C13-ladder-02",
+      "records": 819,
+      "cny": "7.1655752399999999442"
+    },
+    {
+      "run": "20261019-T16-full-v14-sql-new-01",
+      "records": 327,
+      "cny": "5.2876588000000000411"
+    },
+    {
+      "run": "20261019-T16-full-v14-sql-old-01",
+      "records": 327,
+      "cny": "5.4555550800000000430"
+    },
+    {
+      "run": "20261019-T16-full-v14-json-01",
+      "records": 327,
+      "cny": "2.5839331200000000532"
+    },
+    {
+      "run": "20261020-T15-explorer-l2e-02",
+      "records": 284,
+      "cny": "4.7034385199999999972"
+    },
+    {
+      "run": "20261020-T15-explorer-l2e-03",
+      "records": 45,
+      "cny": "1.097838200000000013"
+    },
+    {
+      "run": "20261020-T19b-attrib-01",
+      "records": 117,
+      "cny": "4.4209004000000000276"
+    },
+    {
+      "run": "20261023-T19c-confidence-01",
+      "records": 327,
+      "cny": "1.0188095599999999646"
+    },
+    {
+      "run": "20261025-T22b-l1plus-l3a-01",
+      "records": 1,
+      "cny": "0.03272164"
+    },
+    {
+      "run": "20261025-T22b-l1plus-l3a-02",
+      "records": 1,
+      "cny": "0.0025961599999999997"
+    },
+    {
+      "run": "20261025-T22b-l1plus-l3a-03",
+      "records": 654,
+      "cny": "8.0589816999999998340"
+    },
+    {
+      "run": "20261025-T14-tuned-01",
+      "records": 654,
+      "cny": "4.7717769200000000104"
+    },
+    {
+      "run": "20261025-T22b-attrib-01",
+      "records": 82,
+      "cny": "1.7253797200000000036"
+    },
+    {
+      "run": "20261025-T29-pilot-01",
+      "records": 40,
+      "cny": "0.3045816000000000027"
+    },
+    {
+      "run": "20261026-T29-expanded-01",
+      "records": 169,
+      "cny": "1.7685656400000000304"
+    },
+    {
+      "run": "20261025-T30-combo-01",
+      "records": 327,
+      "cny": "2.8906140200000000208"
+    }
+  ],
+  "cost_scope": {
+    "old_physical_cny": "99.64646157999999995738",
+    "known_total_cny": "104.61022284000000001128",
+    "rounded_ledger_total_cny": "104.5966924400000000539",
+    "excluded": [
+      "U2",
+      "requests without returned usage/cost",
+      "budget/events duplicate accounting"
+    ]
+  },
+  "ontology_run_costs": {
+    "SQL-L1plus": "3.2118754200000000053",
+    "SQL-L3a": "4.8471062799999998287"
+  },
+  "ontology_cost_ratio": 1.5091202634503178,
+  "main_cost_per_attempt": {
+    "SQL-L0": 0.015145738911564625,
+    "SQL-L1": 0.009435911156462586,
+    "SQL-L0-E": 0.013072344897959184,
+    "SQL-L1-E": 0.012692449115646258,
+    "SQL-L2": 0.015829167891156463,
+    "SQL-L2-E": 0.01753067074829932,
+    "SQL-L1plus": 0.009599113673469387,
+    "SQL-L3a": 0.01450126993197279,
+    "JSON-L2": 0.007579175510204083,
+    "SQL-L1.5S": 0.00824301857142857,
+    "SQL-L1.5W": 0.010599639455782312,
+    "SQL-L1plus-tuned-instr": 0.00872240217687075
+  },
+  "ontology_entries": {
+    "formalized": 30,
+    "formalizable_annotations": 16,
+    "disjoint_union": 46,
+    "total": 109,
+    "fraction": 0.42201834862385323
+  },
+  "dataset": {
+    "tables": 25,
+    "columns": 244,
+    "rows": 34326191,
+    "per_table": [
+      {
+        "table": "DimAccount",
+        "columns": 6,
+        "rows": 24
+      },
+      {
+        "table": "DimChannel",
+        "columns": 3,
+        "rows": 4
+      },
+      {
+        "table": "DimCurrency",
+        "columns": 3,
+        "rows": 28
+      },
+      {
+        "table": "DimCustomer",
+        "columns": 15,
+        "rows": 18869
+      },
+      {
+        "table": "DimDate",
+        "columns": 20,
+        "rows": 2556
+      },
+      {
+        "table": "DimEmployee",
+        "columns": 21,
+        "rows": 293
+      },
+      {
+        "table": "DimEntity",
+        "columns": 8,
+        "rows": 421
+      },
+      {
+        "table": "DimGeography",
+        "columns": 6,
+        "rows": 674
+      },
+      {
+        "table": "DimMachine",
+        "columns": 14,
+        "rows": 7816
+      },
+      {
+        "table": "DimOutage",
+        "columns": 5,
+        "rows": 303
+      },
+      {
+        "table": "DimProduct",
+        "columns": 22,
+        "rows": 2233
+      },
+      {
+        "table": "DimProductCategory",
+        "columns": 2,
+        "rows": 8
+      },
+      {
+        "table": "DimProductSubcategory",
+        "columns": 3,
+        "rows": 44
+      },
+      {
+        "table": "DimPromotion",
+        "columns": 5,
+        "rows": 28
+      },
+      {
+        "table": "DimSalesTerritory",
+        "columns": 10,
+        "rows": 265
+      },
+      {
+        "table": "DimScenario",
+        "columns": 2,
+        "rows": 3
+      },
+      {
+        "table": "DimStore",
+        "columns": 16,
+        "rows": 306
+      },
+      {
+        "table": "FactExchangeRate",
+        "columns": 5,
+        "rows": 773
+      },
+      {
+        "table": "FactITMachine",
+        "columns": 5,
+        "rows": 23283
+      },
+      {
+        "table": "FactITSLA",
+        "columns": 8,
+        "rows": 4925
+      },
+      {
+        "table": "FactInventory",
+        "columns": 13,
+        "rows": 8013099
+      },
+      {
+        "table": "FactOnlineSales",
+        "columns": 18,
+        "rows": 12627608
+      },
+      {
+        "table": "FactSales",
+        "columns": 16,
+        "rows": 3406089
+      },
+      {
+        "table": "FactSalesQuota",
+        "columns": 10,
+        "rows": 7465911
+      },
+      {
+        "table": "FactStrategyPlan",
+        "columns": 8,
+        "rows": 2750628
+      }
+    ]
+  },
+  "orphan_product_rows": {
+    "orphan": 1715380,
+    "total": 12627608,
+    "fraction": 0.13584362137310566
+  },
+  "store_types": {
+    "Store": 299,
+    "Online": 3,
+    "Catalog": 1,
+    "Reseller": 3
+  },
+  "scenario_rendering": {
+    "H10_lines": 46,
+    "related_lines": 81
+  },
+  "moved_L0_L1": {
+    "questions": 20,
+    "L0_correct": 47,
+    "L1_correct": 55,
+    "attempts": 60,
+    "difference": 0.13333333333333333,
+    "exact_bootstrap_interval": [
+      0.0,
+      0.3
+    ]
+  },
+  "model_pilot": {
+    "flash": {
+      "questions": 24,
+      "judge": [
+        "Q40"
+      ],
+      "low": [
+        "Q17",
+        "Q68",
+        "Q69",
+        "Q76"
+      ],
+      "main_questions": 19,
+      "main_attempts": 57,
+      "physical_cost_cny": 1.29493504
+    },
+    "pro": {
+      "questions": 24,
+      "judge": [
+        "Q40"
+      ],
+      "low": [
+        "Q17",
+        "Q68",
+        "Q69",
+        "Q76"
+      ],
+      "main_questions": 19,
+      "main_attempts": 57,
+      "physical_cost_cny": 9.6209661
+    }
+  },
+  "pro_flash_cost_ratio": 7.4296901410591225,
+  "planning_pilot": {
+    "SQL-L0-P": {
+      "attempts": 24,
+      "questions": 24,
+      "levels": {
+        "Q1": 8,
+        "Q2": 8,
+        "Q3": 8
+      }
+    },
+    "SQL-L1-P": {
+      "attempts": 24,
+      "questions": 24,
+      "levels": {
+        "Q1": 8,
+        "Q2": 8,
+        "Q3": 8
+      }
+    }
+  },
+  "brand_result_rows": [
+    11,
+    11,
+    11
+  ],
+  "tutorial_examples": [
+    "Q12",
+    "Q49",
+    "Q50",
+    "Q60",
+    "Q78",
+    "Q82"
+  ],
+  "l0_relationships": {
+    "kept": 32,
+    "dropped": 16,
+    "kept_fraction": 0.6666666666666666
+  },
+  "explorer_step_cap": 8,
+  "combo_heldout": {
+    "correct": 141,
+    "attempts": 147,
+    "wrong": 6,
+    "one_attempt_pp": 0.6802721088435374
+  },
+  "answered_coverage_pct": 90.81632653061224,
+  "coverage_outside": [
+    {
+      "cell": "JSON-L2",
+      "attempts": 183,
+      "has_result": 61,
+      "outcomes": {
+        "refused": 121,
+        "wrong": 35,
+        "correct": 26,
+        "exec_error": 1
+      }
+    },
+    {
+      "cell": "SQL-L1.5S",
+      "attempts": 168,
+      "has_result": 67,
+      "outcomes": {
+        "refused": 97,
+        "wrong": 57,
+        "correct": 10,
+        "exec_error": 4
+      }
+    }
+  ],
+  "widetable_deltas": {
+    "all": -0.04081632653061218,
+    "heldout": -0.08843537414965985
+  },
+  "approved_rule_ids": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7",
+    "R8",
+    "R9",
+    "R10",
+    "R11"
+  ],
+  "validation": "All stated numeric and input-identity assertions passed.",
+  "source_sha256": {
+    "runs/20261031-T31-v5-rulings-01/manifest.json": "def8b415492c1a9477458c942cdaf5351413d3152d5b449b8d757ae5bbfcfedd",
+    "eval@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/cube_100.yaml": "9f08510d1bf86104458d0e5fd66b787d60f9d50e1cbe0df5e2d128ade24b26cd",
+    "eval@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/new.yaml": "a42925ee9631250aef0f40c8a539fa28f2a36d6effa5e86c27360b23bcf97a6c",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0.jsonl": "be5785873c78bb5bb2efbc3ec31ba9490e89793d40d211e9e2097b3543112011",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl": "10054c729b82c91504922b73f70bddbbf97700847427d3a709c73f8dfd578f2a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0-E.jsonl": "79ed656e3150f3124db0e1d7d7c2636e719b0a69355b0acbc222c761e7ca2ad6",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-E.jsonl": "03ee8734785d216720d9115bbdbe87f5f87e78836203238599aed77067fac5aa",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2.jsonl": "189c4d3ad52ebd03ab17ea15bbaf5c2595f10cf2e67b0df77bf667bcf6099bb0",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2-E.jsonl": "e0aca16c51617846b65f03178f35b58fb68022c0c68b8220f8a1d465e96f223a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus.jsonl": "48af0eab88f6b09d0502a15cac6d7f3543f325e70118542193c367828635bfb1",
+    "runs/20261031-T31-v5-rulings-01/SQL-L3a.jsonl": "98aeb013c46be903aec2405ae0397d18276160d92aeaa6b5af81f3b19425a06c",
+    "runs/20261031-T31-v5-rulings-01/JSON-L2.jsonl": "3f20f1598f16be0138babb64c1de0c02079b8dc42d1497ee8c6524159ab76188",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5S.jsonl": "190dd5d0c8529595388d854bd1086d9f414e9cb00cb4d36d6df3075559cfd340",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5W.jsonl": "271b48a20bbcd920602c1073bf423970ea3899645e83127437695264ee5fa090",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus-tuned-instr.jsonl": "e0cd78d6b6153d8aca70804a9705c879649dd870dff47c289cda3fbfef451464",
+    "runs/20261018-T13-sql-direct-01/SQL-L0.jsonl": "cd18674fad7a222339802f982a7f94a16feec25f06f304c8e27e1dbb4f73ce8c",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.jsonl": "9d8a6b7ee75de9211642b7a94f88dc1be11f3823b50592b024c388fde897ead6",
+    "runs/20261019-T16-full-v14-sql-new-01/SQL-L2.jsonl": "65b42c7d35431052b9ef1333991f13792231dd05c71ed7397c58fbc3b0fdbc1e",
+    "runs/20261019-T15-explorer-01/SQL-L0-E.jsonl": "f0c4d2bc3a7c70a129b1f80b2b918f508ee6904bde57a92dc6b2e6c0bf5c9461",
+    "runs/20261019-T15-explorer-01/SQL-L1-E.jsonl": "a09ce03bb899e739939c7fa3763d21ede9f8b47fdd076973ab88ca482d9227be",
+    "runs/20261020-T15-explorer-l2e-02/SQL-L2-E.jsonl": "c9122c04dd556268dcf5fbcae57631405ba61aab037feb2c58826524ab77d746",
+    "runs/20261020-T15-explorer-l2e-03/SQL-L2-E.jsonl": "44628d83f320dd6fd64313ffac4d124754b6f3dbf014831ff453853e45aadf4f",
+    "reports/midterm/v3-cost-runs.csv": "98c75523c3159bf26b3412377b794aeb111d30dc7d0732073239c6718377b750",
+    "runs/20261016-T11-smoke-01/SQL-L1.jsonl": "7f4fb6df70ad6100bb15b05154e645208ac639cbca10b5ec8b93743712fad290",
+    "runs/20261017-T11-smoke-1017-01/SQL-L1.jsonl": "481d892b52eb3ec886de64ce47d58b58b76ff4c03eb32503a9b24bbc97e7cc4d",
+    "runs/20261018-T12-pilot-flash-01/SQL-L1.jsonl": "09c3371e350ab25f4533e3a05affab915e2b116bd4d141e9f8c16bf862a9c0eb",
+    "runs/20261018-T12-pilot-flash-01/SQL-R.jsonl": "4a1938a4e3723b07fbb68f0e0a748877130427803947eb5b661e062470edcd62",
+    "runs/20261018-T12-pilot-pro-01/SQL-L1.jsonl": "d44348a1a207aa2f6373dc1e57df26f92e480c057290d3bb7267cbee3b471aae",
+    "runs/20261018-T12-pilot-pro-01/SQL-R.jsonl": "a820f7d5f4d64f7f0697467702d3150c38050fc47688e0ebc1462683acb680f4",
+    "runs/20261018-T12-cache-flash-01/cache-probe.jsonl": "1a2a6d1a8845c445c9d1519d05c969270c8afd623841ed149598a79a38e180ce",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.5S.jsonl": "25ac3f16eb377ef7e2b195dac70e5543fcd27c1eb25fab390184dda40ea9e2fa",
+    "runs/20261018-T13-sql-direct-01/SQL-L1.5W.jsonl": "c063cd130288d105c7f061c705beae9801dcbb6cb8b2f51bc290cb64bbe1a2c3",
+    "runs/20261018-T13-sql-direct-01/SQL-L1c.jsonl": "6deb1a4a0c03f68d879794ee09c73a26f2987b8fac0361c1b37a30f42ff2b802",
+    "runs/20261018-T13-sql-direct-01/SQL-R.jsonl": "27ab95f5761450501912ebda3922bb9dd37e4a195b730678b88e95e175757e97",
+    "runs/20261019-T15-pilot-01/SQL-L0-E.jsonl": "c264a3b6b8ef1f78a8a53cf394046b0ed2606cf4a6ff1d817b8f5454b4d91930",
+    "runs/20261019-T15-pilot-01/SQL-L1-E.jsonl": "55e18dff94f4a919a05669cf5e40b54642d81d8300d21395cc103d2d6d6baeba",
+    "runs/20261019-T16-pilot-01/SQL-L2.jsonl": "60f2566162dcc895567a3eb5e445563027ccee03a9e76c1f5a6ff07822f28355",
+    "runs/20261019-T15-pilot-l0e-02/SQL-L0-E.jsonl": "9eb2aa72053bc6354a39f8fbea1ae993d7bf4f222d43a05c32b9b472e2c984ee",
+    "runs/20261019-T21-pilot-01/SQL-L0-P.jsonl": "f70f8081fdcae5358f78645b8d9b3e4cf2a6c3de9a57b037699f6f15b3e58dd1",
+    "runs/20261019-T21-pilot-01/SQL-L1-P.jsonl": "a065ff89b215ffe37842c7161bb6cdd2e4f058ff531d887e2aa909f50fe5f7d2",
+    "runs/20261019-T16-pilot-v13-02/JSON-L2.jsonl": "39b45621001d21574265d912c85e257303d4fe5ec074cb5b98c6b459572fab04",
+    "runs/20261019-T16-pilot-v13-02/SQL-L2.jsonl": "70a81ed10ea60194f7f4f99c77c665186c96f5e6dd2615f805f3a7ddbb8be959",
+    "runs/20261019-T15-explorer-l2e-01/SQL-L2-E.jsonl": "1b63f5e25e24de688130e865ed05cb3a8f263e543ae0279f57391b156826ecb5",
+    "runs/20261019-T13-l15s-v14-01/SQL-L1.5S.jsonl": "c7e465c42eddf564ad5a2c622651713aaa916db4e1e8bd1fb1e97d53a63f9c8a",
+    "runs/20261019-C13-ladder-01/SQL-L1-T2.jsonl": "60c89fd8e47ee21098be13c979055e1a28b66e45148a6a9e83964e7c8d5fd7c3",
+    "runs/20261019-C13-ladder-02/SQL-L1-T2.jsonl": "9a28982d4079f0188161afc2d87d9d345bde8ec9bb2b722c3d236c426b8a4965",
+    "runs/20261019-C13-ladder-02/SQL-L1-T3.jsonl": "e59be1041f960897f670da39ecb0c329f7ba1b0a8331592c42ad3dc2ec99b39e",
+    "runs/20261019-C13-ladder-02/SQL-L1-T4.jsonl": "459032ff2dec16d0225bc173e2df96142b2977ba3550eeddb4d19898cf4697ff",
+    "runs/20261019-T16-full-v14-sql-old-01/SQL-L2-notes-v12.jsonl": "f58926226ebb7031d806437c100b5db2196e05b91f68f9002c3ca45be500e2a4",
+    "runs/20261019-T16-full-v14-json-01/JSON-L2.jsonl": "10a1ab5c480b8708c81f6bd9fa61a947cbaf81ed45194a205db23808f3a4c7cf",
+    "runs/20261020-T19b-attrib-01/attribution.jsonl": "a87417ae1dd988efff18461f3fdbfee3ca058d1132e75b2a484bcfd6004aacf5",
+    "runs/20261023-T19c-confidence-01/confidence.jsonl": "744bc12565b95a5b83e13143ec83f53a6bd2388e0dad5c4c9837ad335a151616",
+    "runs/20261025-T22b-l1plus-l3a-01/SQL-L1plus.jsonl": "1c646177b881372d8df256d5924a02dd74b03dc97b9789a3fadd1cf668c566bf",
+    "runs/20261025-T22b-l1plus-l3a-01/incident-audit.jsonl": "79e07a5e81b1ce280c1d8070e2d6fc8452c346a4c1516a4e626edd7a2e8bf0c2",
+    "runs/20261025-T22b-l1plus-l3a-02/SQL-L1plus.jsonl": "ee48bd7c593327483983eec0aa43c3118c0e891e2a82dc9e8e901c2b8bd18cfc",
+    "runs/20261025-T22b-l1plus-l3a-02/incident-audit.jsonl": "6869ecea00b3b217eb492abda3436838429bb8860c426d7cd55e43c533f98573",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L1plus.jsonl": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L3a.jsonl": "67f282deddb1a92b4406133da746e8ba6250cf99c9f81c78127ccbe4dec7a2c6",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned-instr.jsonl": "1be51e0952e64a3ae5f274c9e2b1b2c22e7d1040de02b18232ca7466133fe532",
+    "runs/20261025-T14-tuned-01/SQL-L1-tuned.jsonl": "e65be80548af9fdcdc818258ad7430f90f42e9dc212c245e78cec3a25f9ceb9b",
+    "runs/20261025-T22b-attrib-01/attribution.jsonl": "208efd979014f2fedf2ded577ac90db4b9a45449a0f2eb02524bbf7fbec28a0e",
+    "runs/20261025-T29-pilot-01/SQL-L1plus-sel-k1.jsonl": "201c7c01ebeb1fb7c6bc24fbac72d3422d1e62385d608231d8eed0302a83bf5f",
+    "runs/20261025-T29-pilot-01/SQL-L1plus-sel-k3.jsonl": "ca3beb8e4c4cc2e79b9138ebd2c73d23337e5b8ebcca5f7a4b9445a299ee00e9",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-confidence.jsonl": "536dd31c050b0f58192f64c3dc1555a16bbec967901d9e421e49143bc42c5160",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-front-k10.jsonl": "d11e3673cbd0b5ea454a513826424837fc758d555c3933159c2b44eb9b80100f",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-front-k3.jsonl": "5a622009e1732f4216142b29e23955f6f967c2639e16b544a26cb08bc354672b",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k10.jsonl": "f5f5fd77d23a535e4caf413814b446578323011011afba6feb3ab7e09f46f4f7",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k100.jsonl": "d7bf1f8705f2aae23d9937a44243b01df39a0dfb11689b7798ff39f6d6e41f84",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k20.jsonl": "fc52360ce55e4e33475c54689cac6e8bf1b4084358a8af4a58bd192fb123547e",
+    "runs/20261026-T29-expanded-01/SQL-L1plus-sel-k5.jsonl": "5bb1555afecabacfe5ba52416e95b3de838741c5c6c083cf1e1e2da3db4e937c",
+    "runs/20261025-T30-combo-01/SQL-L1plus-tuned-instr.jsonl": "41546aff0de2dcb4d050cd27efd13b47de0797fe445ee48d668dc280bc1a16f2",
+    "reports/validation/l1plus-l3a-correspondence.md": "075ef23be8ba52b8bb5b685ef1c833b4685401e26e36d4f46cc3cf7b6efc2e64",
+    "reports/validation/l3a-ontology/missed.json": "b893f7c7bd92e1c65c657de6ae0c60f3bfe43e2412d1f773ca1f43dcc2112c89",
+    "$SEMDEBT_DATA_DIR/parquet/DimStore.parquet": "9f7d2c768e467f579a13ab31fd9938a181b721bb70ba9bedeb3c1b7e1ac50933",
+    "$SEMDEBT_DATA_DIR/parquet/DimProduct.parquet": "30d761a21522376efb3b5ed2b3b41bc464bdffdc8583bbbc683fb18e3b861147",
+    "$SEMDEBT_DATA_DIR/parquet/FactOnlineSales.parquet": "9eb47c074acb121eb9821b04d2ebd76c7fb4d764ac12dfbbd2a8e44a39b247a0",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt": "c9f3135cd92a672e435922a8edab4f1823fb3ffafcf8084093dcee21f504873a",
+    "eval@eval-v1.1/questions/cube_100.yaml": "f4991452518678d2c699507bbf28d45e9d0a3d96c062b4c60a3660782b97b6f8",
+    "eval@eval-v1.1/questions/new.yaml": "029a239958920d990b11572e673fa74eb71723937ad6743ced90f7da252f6835",
+    "$SEMDEBT_DATA_DIR/runs-raw/20261019-T16-full-v14-json-01/JSON-L2/Q57_r1_t0.exec.json": "7e17bd11baccc29365e440af4ff56a847c5c4660ceae5ddfae49131797872184",
+    "$SEMDEBT_DATA_DIR/runs-raw/20261019-T16-full-v14-json-01/JSON-L2/Q57_r2_t0.exec.json": "7e17bd11baccc29365e440af4ff56a847c5c4660ceae5ddfae49131797872184",
+    "$SEMDEBT_DATA_DIR/runs-raw/20261019-T16-full-v14-json-01/JSON-L2/Q57_r3_t0.exec.json": "7e17bd11baccc29365e440af4ff56a847c5c4660ceae5ddfae49131797872184",
+    "decisions/2026-10-23-blind-data-dir.md": "684164672234b14e1b9c6e76d94356c40d28ee3e4ed993d30cd35b1abd48b0b3",
+    "semantic/l0_map.yaml": "50b081f91b18e8831aa665ddbbdf81f2349ebe44558b7d57277dc1ec80f5d792",
+    "docs/design-v5-public.md": "b90176b8af2acd1b275daba4bb8f537f0b1a26bd06bd441577cd619c9e9cc061",
+    "reports/validation/t16-v14-8836110/coverage.json": "54d88eb347548023521ee0ede1c7e8788669a4612b13c35f4dfc158a60102329",
+    "reports/validation/reference-and-presentation-review.md": "964e732afc1b79047aea8bdf1fd75710b339856edb0bb2f9d58876e56e999bbc",
+    "reports/midterm/v7-number-sources.md": "b7b7dbe85496940578e9aa7d940c3e737f49ddd037473ae57bde9f3d7229a489"
+  }
+}
