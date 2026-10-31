@@ -77,7 +77,7 @@ T20 只对照了本清单的旧版。下面这些是它之后改的或新补出�
 | 局限 | Pro 贵约 7 倍 | 实测 7.43 倍：T12 两单元（SQL-L1、SQL-R）全试跑日志，Flash 1.29493504 元、Pro 9.62096610 元（`reports/recheck/v7-fixes.json`，PR #235）。`decisions/model.md` 第 76 行的「约 7.5 倍」是约数，已弃用 |
 | 局限 | 19 道题 | `reports/T12-pilot.md` 选模型表：SQL-L1 主表 57 次 ÷ 3（24 题去掉 judge Q40 和 4 道低区分度题）。v6 写的 20 道不对，已改 |
 | 附录 | L1.5W 留出 −8.8（−15.0 到 −3.4）；全部 −4.1（−8.5 到 +0.3） | `cmp` |
-| 附录 | 11 条确定性规则 | `reports/results/accuracy-v5.md`（R1–R11） |
+| 附录 | 11 条确定性规则 | `reports/validation/reference-and-presentation-review.md`（R1–R11 逐条编号） |
 | 附录 | 单元表 | `derived`；`cells` |
 | 附录 | 7,379 = 5,439 + 612 + 约 1,330；排除 330、18、183 | `runs/20261028-T31-v4-rescore-02/manifest.json`；`runs/20261031-T31-v5-rulings-01/manifest.json` |
 | 附录 | 5 道修正、原则 A/B/C、统一规则 | `decisions/2026-10-28-reference-rulings-five-questions.md`、`2026-10-28-residual-content-principles.md`、`2026-10-31-v7-content-review-rulings.md` |
