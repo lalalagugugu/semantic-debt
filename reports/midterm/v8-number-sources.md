@@ -2,14 +2,14 @@
 
 报告在 Claude Docs 文档 `e6ba0940-5536-4c83-b2fd-296fbdf47b8d` 的「中期报告 v8」tab。本清单只含数字和题号，不含题面。
 
-路径约定：`cells` = `reports/results/accuracy-v5-cells.csv`；`cmp` = `reports/results/accuracy-v5-comparisons.csv`；`v7num` = `reports/results/t19a-v7-numbers.md`；`v8num` = `reports/results/t19a-v8-numbers.md`（`scripts/t19a_v8_numbers.py` 生成）；`causes` = PR #244 分支 `T29-v8-error-causes` 的 `reports/results/t19a-v8-error-causes.md`；`u2` = PR #245 分支 `T29-u2-reviewed-rulings` 的 `reports/results/t29-u2-content-analysis.md`、`.json`；`v7src` = `reports/midterm/v7-number-sources.md`。
+路径约定：`cells` = `reports/results/accuracy-v5-cells.csv`；`cmp` = `reports/results/accuracy-v5-comparisons.csv`；`v7num` = `reports/results/t19a-v7-numbers.md`；`v8num` = `reports/results/t19a-v8-numbers.md`（`scripts/t19a_v8_numbers.py` 生成）；`causes` = PR #244 分支 `T29-v8-error-causes` 的 `reports/results/t19a-v8-error-causes.md`；`u2` = PR #245（已合并）的 `reports/results/t29-u2-content-analysis.md`、`.json`；`v7src` = `reports/midterm/v7-number-sources.md`。
 
 ## 需要 Codex 再核的新数字
 
 - `v8num` 全文：首轮报错 93、8、5 / 294；第一轮输入 token；覆盖外未得分 157/171、158/177；复盘补语义 12 次错答全部有结果；题目构成 76、22、24。
 - 第 3 节「约 2–2.5 倍」：v7 的 2–2.8 含 SQL-L2，v8 只讲 L0、L1。
 - 附录 25 单元、7,203 次。
-- `causes`、`u2` 在 v8 写作时还是未合并的 PR，合并后核对数字没有变化。
+- `causes` 在 v8 写作时还是未合并的 PR，合并后核对数字没有变化。
 
 ## 各节数字
 
@@ -53,8 +53,8 @@
 | 9 | 单元表；L1+→L3a 测试集 +0.7；L1→L1+ 测试集 +8.2 [−1.4, 17.7] | `cells`、`cmp` split=heldout |
 | 9 | 12 次全部有结果；11 次测试集、1 次调优集 | `v8num`；`cells` 136/147、146/147 |
 | 9 | 12 = 9、3 | `causes` |
-| 10 | 六单元准确率、拒答率、已答准确率 | `u2` |
-| 10 | 拒答率差 +30.3、+5.4（区间不含 0）；基线错误率 85.1、38.6、66.7、17.4 | `u2` |
+| 10 | 六单元准确率、拒答率、已答准确率 | `u2`；基线行由总计表算出：L0 拒答 9/294 = 3.1%，已答 136/285 = 47.7%；L1 拒答 0，已答 235/294 = 79.9% |
+| 10 | 拒答率差 +30.3、+5.4（区间不含 0）；基线错误率 85.1、38.6、66.7、17.4 | `u2`。第 10 节的区间用 `harness/u2_analysis.py`：10,000 次、种子 20261019；主表比较是 5,000 次、seed=0。差别不进正文 |
 | 局限 | 1,411、194、420、33、24、991 | `v7src` |
 | 局限 | U2：101 次复核；1,019 = 929 + 90 | `u2`；`tasks/COORDINATION-HANDOFF.md` |
 | 局限 | Pro 约 7 倍；19 道题；5 道修正 | `v7src` |
@@ -63,3 +63,5 @@
 | 附录 | 24 道未计分，都来自公开基准 | `v8num` |
 | 附录 | 71 题 +47.4、27 题 +9.9；L1.5W −4.1、−8.8 | `v7num` D3；`cmp` |
 | 附录 | 11 条规则、原则 A/B/C、统一规则、5 道修正 | `v7src` |
+| 附录 | 所问的格为空值判错；列名单位与数值差 100 倍判错 | `decisions/2026-11-01-u2-null-one-step.md`、`decisions/2026-11-01-u2-independent-review-rulings.md` |
+| 公开计划 | 发布范围含题目和参考答案、原始响应 | `decisions/2026-10-31-publication-choices.md`；协调会话转达的用户确认 |
