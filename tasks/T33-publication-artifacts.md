@@ -1,6 +1,6 @@
 # T33 发布物：作答对照页和原始回包
 
-- 状态：候选产物已完成，等待用户确认范围（2026-11-01）
+- 状态：候选产物已完成；用户 2026-11-01 确认范围（含思考内容、私有材料 11 个文件、邮箱和本机路径不脱敏）。页面不美化。叠加单元是否留在对照页和压缩包，等 T19a v8 的取舍（`tasks/T19a-v8-brief.md`）
 - 负责：Codex
 - 模式：主仓库 clone（`scripts/start-card.sh T33`），只读题库和 `$SEMDEBT_DATA_DIR`
 - 依据：`decisions/2026-10-31-publication-choices.md`、`decisions/2026-10-26-answer-browser-idea.md`、`decisions/2026-10-31-license-check.md`
