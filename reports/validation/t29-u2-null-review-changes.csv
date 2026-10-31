@@ -1,0 +1,3 @@
+qid,cell,rep,anonymous_id,old_label,new_label,category
+Q110,SQL-L1,3,U1437,待裁决,内容正确,NULL一步推导
+Q110,SQL-L1,3,U1437,内容正确,内容错误,后续裁决：所问格直接NULL
