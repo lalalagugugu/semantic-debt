@@ -251,3 +251,7 @@ independent-check 复核 101 次（Codex 逐条判对的部分），99 次一致
 - 只在本机、GitHub 没有：`~/dev/tracker`（无 remote）；`$SEMDEBT_DATA_DIR` 全部（20 GB，含 `runs-raw`、判定证据、`publication/`）；题库工作区 3 份未跟踪的 `audit/2026-10-24-l1plus-*-review.md`；`cards/T13` 未跟踪的 `decisions/2026-10-23-tuning-answer-requirements.md`（main 上是 `2026-10-23-tuning-instructions.md`，内容未比对）；`cards/T02` 的 1 个 stash；会话记录和项目记忆。
 - 未推送且 GitHub 查不到的提交：`cards/T05b` 分支 `scorer-v2-check`（tip `f7000ae`，26 个未推送提交）；`cards/T21` 分支 `T21-close`（tip `01a0031`，规划 agent 代码，v8 第 6 节 Python 试跑用的）；主仓库 `scorer-spec-v2-clarify2`（`a9dc975`，旧分支）。
 - 公开前：这些新推的提交没有扫过，转公开前重跑一次 gitleaks。
+
+## v9 计划（2026-11-02）
+
+用户批完 v8（rev 2005）。计划见 `tasks/T19a-v9-plan.md`，等用户定标题上限、差值单位、局限位置。新发现的两个事实错误：叠加单元的 17 处矛盾实际按规则删了 12 条复盘条目；L3a 只把 L1+ 新增的 109 条写成本体，L1 原文未动。三个推送分支已确认在 GitHub 上。写作复盘已按 v8 批注校准。
