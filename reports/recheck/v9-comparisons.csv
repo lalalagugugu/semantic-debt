@@ -1,0 +1,69 @@
+item,kind,reference,independent,difference,status
+v8num footer L1 errors,count,44.0,44,0.0,OK
+v8num footer L1 with result,count,42.0,42,0.0,OK
+v8num footer main attempts,count,5439.0,5439,0.0,OK
+v8num footer manual residuals,count,1411.0,1411,0.0,OK
+v8num footer residual percent,point,0.259,0.25942268799411655,0.000422687994116544,OK
+v9 residual 26%,point,0.26,0.25942268799411655,-0.0005773120058834569,OK
+v9 data/enums SQL-L0-E,point,0.44,0.43904906423874557,-0.0009509357612544345,OK
+v9 data/enums SQL-L1-E,point,0.13,0.13194444444444445,0.001944444444444443,ROUNDING
+v8num first prompt SQL-L1plus,token,75258,75257.69387755102,-0.30612244897929486,OK
+v8num first prompt SQL-L3a,token,219864,219863.693877551,-0.3061224489938468,OK
+v9 title L1+ 93%,point,0.93,0.9319727891156463,0.001972789115646245,ROUNDING
+v9 title L1+ detailed 93.2%,point,0.932,0.9319727891156463,-2.7210884353756626e-05,OK
+v9 title minimum below 40%,predicate,1,1,0,OK
+v9 heldout tuned 92.5%,point,0.925,0.9251700680272109,0.0001700680272108679,OK
+v9 section9 SQL-L1plus,point,0.932,0.9319727891156463,-2.7210884353756626e-05,OK
+v9 section9 SQL-L1-tuned,point,0.925,0.9251700680272109,0.0001700680272108679,OK
+v9 section9 SQL-L1-tuned-instr,point,0.932,0.9319727891156463,-2.7210884353756626e-05,OK
+v9 same questions L1 full first,point,0.85,0.8503401360544217,0.0003401360544217358,OK
+v9 same questions L1 full second,point,0.85,0.8503401360544217,0.0003401360544217358,OK
+v9 same questions L1 summary,point,0.929,0.9285714285714286,-0.0004285714285714448,OK
+v9 same questions L1 json,point,0.919,0.918918918918919,-8.108108108106915e-05,OK
+v9 covered SQL-L1.5S,point,-0.079,-0.07936507936507936,-0.0003650793650793599,OK
+v9 covered SQL-L1.5S lower,interval,-0.19,-0.1984126984126984,-0.0084126984126984,DIFF
+v9 covered SQL-L1.5S upper,interval,0.032,0.031746031746031744,-0.0002539682539682564,OK
+v9 covered SQL-L1.5S contains zero,zero,1,1,0,OK
+v9 covered JSON-L2,point,-0.045,-0.04504504504504505,-4.5045045045051524e-05,OK
+v9 covered JSON-L2 lower,interval,-0.126,-0.12612612612612611,-0.00012612612612611374,OK
+v9 covered JSON-L2 upper,interval,0.027,0.02702702702702703,2.7027027027028833e-05,OK
+v9 covered JSON-L2 contains zero,zero,1,1,0,OK
+v9 D3 business,point,0.432,0.43162393162393164,-0.0003760683760683503,OK
+v9 D3 discoverable,point,0.133,0.13333333333333333,0.0003333333333333244,OK
+v9 D3 agent 20 questions,point,-0.017,-0.016666666666666666,0.0003333333333333348,OK
+v9 D3 business questions,count,78,78,0,OK
+v9 D3 discoverable questions,count,20,20,0,OK
+v9 SQL cases,count,3,3,0,OK
+v9 SQL repair still failing,count,2,2,0,OK
+v9 SQL executable mechanism error,count,1,1,0,OK
+v9 L1 errors,count,44,44,0,OK
+v9 L1 with result,count,42,42,0,OK
+v9 tuned errors,count,12,12,0,OK
+v9 tuned with result,count,12,12,0,OK
+v9 D4 questions,count,98,98,0,OK
+v9 D4 selected,count,89,89,0,OK
+v9 D4 blocked,count,9,9,0,OK
+v9 D4 blocked wrong,count,3,3,0,OK
+v9 D4 blocked correct,count,6,6,0,OK
+v9 D4 remaining wrong questions,count,3,3,0,OK
+v9 D4 remaining wrong all three,count,3,3,0,OK
+v9 U2 answered SQL-L0-u2,point,0.481,0.4808362369337979,-0.0001637630662020828,OK
+v9 U2 answered SQL-L0-u2p,point,0.652,0.6515151515151515,-0.0004848484848485324,OK
+v9 U2 answered SQL-L1-u2,point,0.82,0.8197278911564626,-0.0002721088435373442,OK
+v9 U2 answered SQL-L1-u2p,point,0.86,0.8597122302158273,-0.0002877697841726645,OK
+v9 U2 refusal difference SQL-L0,point,0.303,0.30272108843537415,-0.0002789115646258389,OK
+v9 U2 refusal difference SQL-L1,point,0.054,0.05442176870748299,0.0004217687074829918,OK
+v9 U2 L1 answered,count,294,294,0,OK
+v9 U2 L1 accuracy,point,0.82,0.8197278911564626,-0.0002721088435373442,OK
+v9 U2 >=90 answered,count,157,157,0,OK
+v9 U2 >=90 coverage,point,0.534,0.5340136054421769,1.3605442176878313e-05,OK
+v9 U2 >=90 accuracy,point,0.873,0.8726114649681529,-0.0003885350318471037,OK
+v9 combo source,count,40,40,0,OK
+v9 combo retained,count,28,28,0,OK
+v9 combo removed,count,12,12,0,OK
+v9 combo removed_examples,count,9,9,0,OK
+v9 overlay entries,count,109,109,0,OK
+v9 formal,count,30,30,0,OK
+v9 annotation,count,79,79,0,OK
+v9 formalizable,count,16,16,0,OK
+v9 total formalizable,count,46,46,0,OK
