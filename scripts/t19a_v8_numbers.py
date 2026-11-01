@@ -105,5 +105,12 @@ def main():
           f"结局：{dict(Counter(r['historical_outcome'] for r in wrong))}；"
           f"划分：{dict(Counter(r['split'] for r in wrong))}。")
 
+    print("\n## v9 新增：第 10 节和局限\n")
+    wrong_l1 = [r for r in base if not r["content_correct"]]
+    print(f"L1 未得分 {len(wrong_l1)} 次，其中有查询结果 {sum(r['has_result'] for r in wrong_l1)} 次；"
+          f"没有结果的：{sorted((r['qid'], r['rep']) for r in wrong_l1 if not r['has_result'])}。")
+    total = sum(len(labels(p.stem)) for p in RUN.glob("*.jsonl") if p.stem != "summary")
+    print(f"主表作答 {total} 次；AI 逐次判定 1,411 次，占 {1411 / total * 100:.1f}%。")
+
 
 main()
