@@ -1,0 +1,224 @@
+{
+  "independent_sha256": "5d238895c19cf886b890334505375032fed2e959828139e9a733eac4b658f3f9",
+  "v8_reference_sha256": "5534fd3c27b2f96251798b95f0639f8e813b1fbf599742c21129f89a50dc686c",
+  "checks": 755,
+  "counts": {
+    "count OK": 141,
+    "point OK": 270,
+    "ratio OK": 2,
+    "token OK": 10,
+    "interval OK": 208,
+    "zero OK": 98,
+    "interval DIFF": 26
+  },
+  "differences": [
+    {
+      "item": "cmp.csv SQL-L1.5W SQL-L1.5S all upper",
+      "kind": "interval",
+      "reference": -0.3163265306122449,
+      "independent": -0.30952380952380953,
+      "difference": 0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L0 JSON-L2 heldout upper",
+      "kind": "interval",
+      "reference": 0.10884353741496598,
+      "independent": 0.10204081632653061,
+      "difference": -0.006802721088435368,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L0 SQL-L1.5S heldout lower",
+      "kind": "interval",
+      "reference": -0.2653061224489796,
+      "independent": -0.272108843537415,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L0 SQL-L1.5S heldout upper",
+      "kind": "interval",
+      "reference": 0.10204081632653061,
+      "independent": 0.09523809523809523,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L0 SQL-L1.5W heldout upper",
+      "kind": "interval",
+      "reference": 0.3945578231292517,
+      "independent": 0.3877551020408163,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L0 SQL-L2 heldout upper",
+      "kind": "interval",
+      "reference": 0.47619047619047616,
+      "independent": 0.46938775510204084,
+      "difference": -0.006802721088435326,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 JSON-L2 heldout lower",
+      "kind": "interval",
+      "reference": -0.5578231292517006,
+      "independent": -0.5510204081632653,
+      "difference": 0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1c heldout upper",
+      "kind": "interval",
+      "reference": -0.061224489795918366,
+      "independent": -0.06802721088435375,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L1plus heldout upper",
+      "kind": "interval",
+      "reference": 0.17687074829931976,
+      "independent": 0.1836734693877551,
+      "difference": 0.006802721088435354,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1 SQL-L2 heldout lower",
+      "kind": "interval",
+      "reference": -0.08163265306122448,
+      "independent": -0.07482993197278912,
+      "difference": 0.006802721088435368,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1-tuned SQL-L1-tuned-instr heldout upper",
+      "kind": "interval",
+      "reference": 0.06802721088435373,
+      "independent": 0.061224489795918366,
+      "difference": -0.006802721088435368,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1.5S JSON-L2 heldout upper",
+      "kind": "interval",
+      "reference": 0.14285714285714285,
+      "independent": 0.1360544217687075,
+      "difference": -0.006802721088435354,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1.5S SQL-L2 heldout lower",
+      "kind": "interval",
+      "reference": 0.2585034013605442,
+      "independent": 0.2653061224489796,
+      "difference": 0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1.5S SQL-L2 heldout upper",
+      "kind": "interval",
+      "reference": 0.5578231292517006,
+      "independent": 0.564625850340136,
+      "difference": 0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L1c SQL-L1.5W heldout lower",
+      "kind": "interval",
+      "reference": -0.027210884353741503,
+      "independent": -0.034013605442176874,
+      "difference": -0.006802721088435371,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-L2 JSON-L2 heldout upper",
+      "kind": "interval",
+      "reference": -0.2925170068027211,
+      "independent": -0.2857142857142857,
+      "difference": 0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R JSON-L2 heldout lower",
+      "kind": "interval",
+      "reference": -0.29931972789115646,
+      "independent": -0.2925170068027211,
+      "difference": 0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L1 heldout upper",
+      "kind": "interval",
+      "reference": 0.43537414965986393,
+      "independent": 0.4217687074829932,
+      "difference": -0.013605442176870708,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L1.5S heldout upper",
+      "kind": "interval",
+      "reference": 0.040816326530612256,
+      "independent": 0.034013605442176874,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L1.5W heldout lower",
+      "kind": "interval",
+      "reference": 0.08843537414965985,
+      "independent": 0.08163265306122448,
+      "difference": -0.006802721088435368,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L1.5W heldout upper",
+      "kind": "interval",
+      "reference": 0.3469387755102041,
+      "independent": 0.3401360544217687,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L1c heldout upper",
+      "kind": "interval",
+      "reference": 0.272108843537415,
+      "independent": 0.2653061224489796,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L2 heldout lower",
+      "kind": "interval",
+      "reference": 0.1564625850340136,
+      "independent": 0.14965986394557823,
+      "difference": -0.006802721088435382,
+      "status": "DIFF"
+    },
+    {
+      "item": "cmp.csv SQL-R SQL-L2 heldout upper",
+      "kind": "interval",
+      "reference": 0.44217687074829937,
+      "independent": 0.43537414965986393,
+      "difference": -0.006802721088435437,
+      "status": "DIFF"
+    },
+    {
+      "item": "U2 SQL-L1-u2p selection delta upper",
+      "kind": "interval",
+      "reference": 0.6962962962962963,
+      "independent": 0.6909722222222223,
+      "difference": -0.005324074074073981,
+      "status": "DIFF"
+    },
+    {
+      "item": "D3 可从数据发现 L0_L1 lower",
+      "kind": "interval",
+      "reference": -0.037000000000000005,
+      "independent": -0.024691358024691357,
+      "difference": 0.012308641975308648,
+      "status": "DIFF"
+    }
+  ]
+}
