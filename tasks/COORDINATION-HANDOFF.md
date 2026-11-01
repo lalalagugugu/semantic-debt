@@ -244,3 +244,10 @@ independent-check 复核 101 次（Codex 逐条判对的部分），99 次一致
 - 用户电脑进过水，能用，几天后送修。本机独有内容的盘点脚本在协调会话的临时目录，结果和备份安排记在下一次更新。
 - 写作复盘 draft（Claude Docs `5e35e342-d76d-4f52-919f-aa65b7151591`）：从 v6、v7 批注归纳的写作标准和流程，等用户批 v8 后校准。
 - 发布前要查的「人工」：`reports/results`、`reports/validation` 有 14 个文件含这个词，不全是错的（用户本人裁定可以叫人工），要逐处看。
+
+## 本机独有内容盘点（2026-11-01 20:39，用户电脑进水后）
+
+- 本机没有配置 Time Machine，GitHub 之外没有任何备份。用户负责备份到加密移动硬盘。
+- 只在本机、GitHub 没有：`~/dev/tracker`（无 remote）；`$SEMDEBT_DATA_DIR` 全部（20 GB，含 `runs-raw`、判定证据、`publication/`）；题库工作区 3 份未跟踪的 `audit/2026-10-24-l1plus-*-review.md`；`cards/T13` 未跟踪的 `decisions/2026-10-23-tuning-answer-requirements.md`（main 上是 `2026-10-23-tuning-instructions.md`，内容未比对）；`cards/T02` 的 1 个 stash；会话记录和项目记忆。
+- 未推送且 GitHub 查不到的提交：`cards/T05b` 分支 `scorer-v2-check`（tip `f7000ae`，26 个未推送提交）；`cards/T21` 分支 `T21-close`（tip `01a0031`，规划 agent 代码，v8 第 6 节 Python 试跑用的）；主仓库 `scorer-spec-v2-clarify2`（`a9dc975`，旧分支）。
+- 公开前：这些新推的提交没有扫过，转公开前重跑一次 gitleaks。
