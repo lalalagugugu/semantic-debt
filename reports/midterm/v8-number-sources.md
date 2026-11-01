@@ -46,6 +46,7 @@
 | 6 | 44 = 19、22、3 | `causes` |
 | 6 | 24 题、48 次，L0 和 L1 | `runs/20261019-T21-pilot-01/SQL-L0-P.jsonl`、`SQL-L1-P.jsonl`；`v7src` |
 | 6 | 首轮报错 31.6、2.7、1.7（98 题） | `v8num`。v7 的 32.4、2.8、2.4 是 109 题口径 |
+| 6 | 1 级首轮报错 93 次，修一次后 2 次仍执行失败（Q24、Q113 各第 2 次） | 93：`v8num`，T20 已复现；2：`runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl` 主表 `has_result` 为假的条数。只说明能执行，不说明答对 |
 | 6 | 测试集 85.0、83.0、86.4、85.7；−2.0、+1.4、+0.7；6 道调优题 | `cells`、`cmp`；`v7src` |
 | 7 | 69、14；41、37、17、13；L1→L1+ +8.2 [2.0, 14.6] | `v7src`；`cmp` |
 | 8 | 85.0、92.5、93.2；+7.5 [1.4, 14.3]；+0.7 | `cells`、`cmp` split=heldout |
@@ -64,4 +65,4 @@
 | 附录 | 71 题 +47.4、27 题 +9.9；L1.5W −4.1、−8.8 | `v7num` D3；`cmp` |
 | 附录 | 11 条规则、原则 A/B/C、统一规则、5 道修正 | `v7src` |
 | 附录 | 所问的格为空值判错；列名单位与数值差 100 倍判错 | `decisions/2026-11-01-u2-null-one-step.md`、`decisions/2026-11-01-u2-independent-review-rulings.md` |
-| 公开计划 | 发布范围含题目和参考答案；原始响应只含附录表的 19 个单元 | `decisions/2026-10-31-publication-choices.md` 第 3 条；`reports/validation/t33-publication-artifacts.md` |
+| 公开计划 | 发布范围含题目和参考答案；原始响应含全部 25 个单元；对照页只放附录表的 19 个单元 | `decisions/2026-10-31-publication-choices.md` 末尾的 2026-11-01 更新（PR #249，分支 `coord-release-covers-u2`，未合并时以该分支为准） |
