@@ -22,6 +22,8 @@ sys.path.insert(0, str(ROOT))
 from scripts.rescore_t23 import frozen_bank
 
 RUN = '20261031-T31-v5-rulings-01'
+U2_RUN = '20261031-T29-u2-v3-01'
+U2_CELLS = ('SQL-L0', 'SQL-L1', 'SQL-L0-u2', 'SQL-L1-u2', 'SQL-L0-u2p', 'SQL-L1-u2p')
 MISSING = '未运行（T4 只跑留出题）'
 LOCAL_PATH = re.compile(rb'(?:/(?:Users|home|private|tmp)/[^\s"<>]+|(?<![A-Za-z0-9_])[A-Za-z]:\\[^\s"<>]+)')
 SOURCE_RUNS = {
@@ -53,6 +55,8 @@ REVIEWED_GENERIC = {
     't33-formal-raw.zip/runs-raw/20261018-T13-sql-direct-01/SQL-R/Q31_r1_t1.json': 'd02cf49ee5cfa4e37818d03140b1267b610a9be39c29b7edf131854dca797620',
     't33-formal-raw.zip/runs-raw/20261019-T16-full-v14-sql-new-01/SQL-L2/Q49_r2_t0.json': 'a5fd0dc341694131c59eea12a3eeed13c6a63c850671484b7f06f98e330efb35',
     't33-formal-raw.zip/runs-raw/20261025-T14-tuned-01/SQL-L1-tuned-instr/Q79_r2_t0.json': 'd072df469ab28277dc403a666c9cf144e7b0c0ab63ca9766128e7598dfdb78ef',
+    't33-formal-raw.zip/runs-raw/20261031-T29-u2-v3-01/SQL-L1-u2/Q119_r2_t1.json': 'c391aeedd0a4a5587872ac18c0d78205dbdffdabcca4aed6e01ad2b29bd3f39b',
+    't33-formal-raw.zip/runs-raw/20261031-T29-u2-v3-01/SQL-L1-u2p/Q118_r2_t0.json': '61b20647b826d18644ff38b407b93cd186d644cab51ef09693e6ffdcb58b5199',
 }
 
 
@@ -93,6 +97,56 @@ def decoded_text(value):
     if isinstance(value, list):
         return '\n'.join(decoded_text(item) for item in value)
     return ''
+
+
+def completed_u2(records, cell, qids):
+    """Keep completed U2 answers; stopped/API-error records are not answers."""
+    selected = [r for r in records if r['status'] == 'done']
+    expected = {(qid, rep) for qid in qids for rep in (1, 2, 3)}
+    identities = [(r['qid'], r['rep']) for r in selected]
+    if len(identities) != len(expected) or set(identities) != expected:
+        raise ValueError(f'incomplete or duplicate U2 identities: {cell}')
+    if any(r['run_id'] != U2_RUN or r['cell'] != cell or not r['turns'] for r in selected):
+        raise ValueError(f'invalid U2 source record: {cell}')
+    return selected
+
+
+def referenced_members(data, run, record):
+    """Select exact hash-referenced files, excluding orphan/replaced attempts."""
+    rawdir = data / 'runs-raw' / run / record['cell']
+    wanted = raw_hashes(record)
+    found, members = set(), {}
+    for path in sorted(rawdir.glob(f"{record['qid']}_r{record['rep']}_*.json")):
+        digest = sha(path.read_bytes())
+        if digest in wanted:
+            members[str(path.relative_to(data))] = path
+            found.add(digest)
+    if not wanted or found != wanted:
+        raise ValueError(f'missing referenced raw artifact: {run}, {record["cell"]}, {record["qid"]}, {record["rep"]}')
+    return members
+
+
+def u2_members(data, qids):
+    report = json.loads((ROOT / 'reports/validation/t29-u2-v4-collection.json').read_text())
+    if report['run_id'] != U2_RUN or {r['cell'] for r in report['rows']} != set(U2_CELLS):
+        raise ValueError('unexpected U2 collection scope')
+    members, sources = {}, {}
+    count = 0
+    for row in report['rows']:
+        path = data / 't29-u2-runtime-v4' / 'runs' / U2_RUN / (row['cell'] + '.jsonl')
+        digest = sha(path.read_bytes())
+        if digest != row['source_log_sha256']:
+            raise ValueError(f'U2 source checksum mismatch: {row["cell"]}')
+        sources[row['cell']] = digest
+        records = completed_u2(lines(path), row['cell'], qids)
+        for record in records:
+            if {t['system_fingerprint'] for t in record['turns']} != set(report['fingerprints']):
+                raise ValueError('unexpected U2 fingerprint')
+            members.update(referenced_members(data, U2_RUN, record))
+        count += len(records)
+    if count != 1764 or count != report['completed_attempts']:
+        raise ValueError('unexpected U2 attempt count')
+    return members, sources, count
 
 
 def public_attempt(score, record, execution):
@@ -287,10 +341,14 @@ def main():
                 attempts.sort(key=lambda r: r['rep'])
             (browser / (qid + '.html')).write_text(question_page(payload, cells, qids))
     (browser / 'index.html').write_text(index_page(list(pages.values()), cells))
+    extra_members, u2_sources, u2_attempts = u2_members(data, qids)
+    members.update(extra_members)
     packages = {}
     packages['t33-formal-raw.zip'] = archive(output / 't33-formal-raw.zip', members)
     packages['t33-cited-private.zip'] = archive(output / 't33-cited-private.zip', {p: data / p for p in PRIVATE_FILES})
     manifest = dict(model_calls=0, query_executions=0, formal_attempts=len(scores),
+                    u2_run=U2_RUN, u2_cells=list(U2_CELLS), u2_attempts=u2_attempts,
+                    raw_attempts=len(scores) + u2_attempts, u2_source_logs=u2_sources,
                     browser_attempts=len(main_rows), questions=98, cells=19,
                     t4_note=MISSING, user_scope_confirmation='pending',
                     packages={name: dict(bytes=(output / name).stat().st_size,

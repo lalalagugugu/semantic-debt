@@ -1,7 +1,11 @@
 import json
 import zipfile
+import pytest
 
-from scripts.t33_publication_artifacts import LOCAL_PATH, archive, decoded_text, encoded, public_attempt, raw_hashes
+from scripts.t33_publication_artifacts import (
+    LOCAL_PATH, U2_RUN, archive, completed_u2, decoded_text, encoded,
+    public_attempt, raw_hashes, referenced_members, sha,
+)
 
 
 def test_public_export_uses_allowlist_and_caps_rows():
@@ -49,3 +53,32 @@ def test_local_path_scan_does_not_treat_json_newlines_as_drive_paths():
     assert LOCAL_PATH.search(rb'C:\\example\\file.txt')
     assert LOCAL_PATH.search(b'/' + b'Users' + b'/example/file.txt')
     assert not LOCAL_PATH.search(decoded_text(json.loads(r'{"text":"p:\nSELECT 1"}')).encode())
+
+
+def test_completed_u2_requires_exact_coverage_and_ignores_failed_records():
+    records = [dict(run_id=U2_RUN, cell='SQL-L0', qid='Q01', rep=n,
+                    status='done', turns=[{'raw_sha256': str(n)}]) for n in (1, 2, 3)]
+    failed = dict(records[0], status='api_error', turns=[])
+    assert completed_u2(records + [failed], 'SQL-L0', ['Q01']) == records
+    with pytest.raises(ValueError, match='incomplete or duplicate'):
+        completed_u2(records[:-1], 'SQL-L0', ['Q01'])
+    with pytest.raises(ValueError, match='incomplete or duplicate'):
+        completed_u2(records + [records[0]], 'SQL-L0', ['Q01'])
+    with pytest.raises(ValueError, match='invalid U2 source'):
+        completed_u2([dict(r, run_id='other-run') for r in records], 'SQL-L0', ['Q01'])
+
+
+def test_referenced_members_excludes_orphans_and_rejects_missing_results(tmp_path):
+    directory = tmp_path / 'runs-raw' / U2_RUN / 'SQL-L0'
+    directory.mkdir(parents=True)
+    api, execution = b'{"reasoning_content":"preserved"}', b'{"rows":[[1]]}'
+    (directory / 'Q01_r1_t0.json').write_bytes(api)
+    (directory / 'Q01_r1_t0.exec.json').write_bytes(execution)
+    (directory / 'Q01_r1_t0_obsolete.json').write_bytes(b'{}')
+    record = dict(cell='SQL-L0', qid='Q01', rep=1, turns=[
+        dict(raw_sha256=sha(api), exec={'exec_raw_sha256': sha(execution)})])
+    selected = referenced_members(tmp_path, U2_RUN, record)
+    assert len(selected) == 2 and not any('obsolete' in name for name in selected)
+    (directory / 'Q01_r1_t0.exec.json').unlink()
+    with pytest.raises(ValueError, match='missing referenced raw artifact'):
+        referenced_members(tmp_path, U2_RUN, record)

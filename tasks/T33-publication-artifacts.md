@@ -22,7 +22,8 @@
 
 先出清单，用户确认后才算定稿。
 
-- 回包：只取 19 个正式单元实际用到的回包和执行结果。来源 run 以 T31 日志的 `source_run` 为准：`20261018-T13-sql-direct-01`、`20261019-C13-ladder-02`、`20261019-T13-l15s-v14-01`、`20261019-T15-explorer-01`、`20261019-T16-full-v14-json-01`、`20261019-T16-full-v14-sql-new-01`、`20261020-T15-explorer-l2e-02`、`20261020-T15-explorer-l2e-03`、`20261025-T14-tuned-01`、`20261025-T22b-l1plus-l3a-03`、`20261025-T30-combo-01`。按单元筛，不整 run 打包。U2 不进这个包。
+- 回包：取 19 个正式单元实际用到的回包和执行结果。来源 run 以 T31 日志的 `source_run` 为准：`20261018-T13-sql-direct-01`、`20261019-C13-ladder-02`、`20261019-T13-l15s-v14-01`、`20261019-T15-explorer-01`、`20261019-T16-full-v14-json-01`、`20261019-T16-full-v14-sql-new-01`、`20261020-T15-explorer-l2e-02`、`20261020-T15-explorer-l2e-03`、`20261025-T14-tuned-01`、`20261025-T22b-l1plus-l3a-03`、`20261025-T30-combo-01`。按单元筛，不整 run 打包。
+- 2026-11-01 用户更新：同一回包包另加 `20261031-T29-u2-v3-01` 的 `SQL-L0`、`SQL-L1`、`SQL-L0-u2`、`SQL-L1-u2`、`SQL-L0-u2p`、`SQL-L1-u2p`，各 98 题 × 3 次，共 1,764 次，含思考内容和执行结果。以采集核验报告固定的完整源日志 SHA-256 为准，只收 done 作答引用的实际文件；对照页仍仅 19 单元。
 - 私有材料：报告出处引用的 `v7-eval-20261030/`、`t31-v7-census-20261030/` 里实际被引用的文件。
 - 对压缩包内容跑 gitleaks，并查本机路径、邮箱和 `DEEPSEEK_API_KEY`。报告只写文件名和类别，不贴匹配值。
 - 输出：`$SEMDEBT_DATA_DIR/publication/` 下的压缩包和 sha256，文件清单和体积写进报告 `reports/validation/t33-publication-artifacts.md`。
@@ -36,7 +37,7 @@
 
 ## 记录（完成后填写）
 
-- 产出：`scripts/t33_publication_artifacts.py`、5 项针对性测试、`reports/validation/t33-publication-artifacts.md` 完整文件清单；外部 publication 目录含 99 个静态页面、两个 ZIP、SHA-256、manifest 和扫描摘要。19 单元主表 5,439 次判定与 accuracy-v5 一致；回包包覆盖实际 6,051 次正式记录、20,031 个文件；私有引用包 11 文件。
+- 产出：`scripts/t33_publication_artifacts.py`、7 项针对性测试、`reports/validation/t33-publication-artifacts.md` 完整文件清单；外部 publication 目录含 99 个静态页面、两个 ZIP、SHA-256、manifest 和扫描摘要。19 单元主表 5,439 次判定与 accuracy-v5 一致；回包包覆盖原 6,051 次及 U2 1,764 次，共 7,815 次、24,127 个文件，压缩后 54,508,350 字节；U2 新增 4,096 文件、13,188,201 压缩字节。对照页和 11 文件私有引用包哈希保持不变。
 - 偏离与理由：用户已确认 T4 只跑 49 道留出题，保留 98 题导航，其余题标注「未运行（T4 只跑留出题）」；不补跑。clone 离线依赖缓存不全，复用主工作区已有 Python 环境，未添加依赖。浏览器工具禁止 file 协议，视觉验收留待用户本地查看；已验证页面数据和脚本语法。
 - 工时：未计时；本卡模型调用与新增查询均为 0。
 
