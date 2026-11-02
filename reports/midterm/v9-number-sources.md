@@ -21,7 +21,7 @@
 | 4 | L1+ = L1 原文 + 109 条；L3a 只改这 109 条；30 条形式化、79 条注解、16 条有现成写法，共 46 | `render/l1plus.py`；`reports/validation/l1plus-l3a-correspondence.md`；`reports/validation/l3a-ontology-validation.md` |
 | 4 | 第一轮 token 约 7.5 万、约 22 万（含 L1 原文） | `v8num`：75,258、219,864 |
 | 5 | L1.5S −7.9 [−19.0, +3.2]；JSON-L2 −4.5 [−12.6, +2.7] | `v7num` 第 5 节 |
-| 5 | 「金额最大的一笔」应按单行销售算，JSON-L2 算成一整单 | Q58 第 1、2 次，`$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/codex-decisions.json` 的 note；参考答案为单行 |
+| 5 | Q58 的例子：应按单行销售算，JSON-L2 算成一整单 | Q58 第 1、2 次，`$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/codex-decisions.json` 的 note；参考答案为单行 |
 | 6 | 3 次 = 2 次修一次后仍执行失败（Q24、Q113 各第 2 次）+ 1 次能执行但 SQL 机制用错（Q05 第 2 次） | `causes`；`v8num` |
 | 6 | 48 次 = 24 题 × 2 单元 × 1 次 | `runs/20261019-T21-pilot-01/` |
 | 8 | L1 上的对账没有查出「日均销售额」的矛盾 | `reports/validation/metric-text-vs-impl.md` |
