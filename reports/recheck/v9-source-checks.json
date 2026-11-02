@@ -1,0 +1,75 @@
+{
+  "model_api_calls": 0,
+  "query_executions": 0,
+  "l3a": {
+    "raw_base_yaml_identical": true,
+    "frozen_system_matches_original": {
+      "SQL-L1plus": true,
+      "SQL-L3a": true
+    },
+    "formal_and_possible_sets_disjoint": true
+  },
+  "combo": {
+    "metadata_unchanged": true,
+    "remaining_base_equals_L1plus": true
+  },
+  "daily_sales_audit": {
+    "scope_L1_metrics": 69,
+    "daily_sales_channel_conflict_listed": false,
+    "later_document_problem_rows": 2,
+    "later_qids": [
+      "Q29"
+    ]
+  },
+  "original_bidirectional_audit": {
+    "attempts": 200,
+    "old_negative_reviewed": 126,
+    "old_negative_retained": 124,
+    "old_negative_historically_changed": 2
+  },
+  "review_scope_warning": "991 negatives were not included in THIS later independent review; not a statement about all history",
+  "role_commits": {
+    "10dfab6": {
+      "claude_recorded": true,
+      "full_commit": "10dfab6ce003dc1d80f20e018d9502b578bd67ba"
+    },
+    "3434837": {
+      "claude_recorded": true,
+      "full_commit": "3434837154d4c3923d52e4642ecc7170ce5f68ad"
+    },
+    "4d03430": {
+      "claude_recorded": true,
+      "full_commit": "4d03430b294a2b652fd14a71ce50c64a5c0415d7"
+    }
+  },
+  "publication": {
+    "response_units": 25,
+    "comparison_page_units": 19,
+    "latest_decision_controls": true
+  },
+  "inputs": {
+    "semantic/tuning/SQL-L1.yaml": "671b0762b39a0fe1238e1ce3618844c66a466ff43e43142579707c520062bcf6",
+    "semantic/tuning/SQL-L1.combo.yaml": "44c253cade47c63e87c245f454c1b1921326b880d35251835d8af29be7e928ce",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L1plus-system.txt": "b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L1plus.jsonl": "229ec559a2544a5f5e5d04dc8167ceaa0fa711fcf8fddeb3f3bf38a641732592",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt": "c9f3135cd92a672e435922a8edab4f1823fb3ffafcf8084093dcee21f504873a",
+    "runs/20261025-T22b-l1plus-l3a-03/SQL-L3a.jsonl": "67f282deddb1a92b4406133da746e8ba6250cf99c9f81c78127ccbe4dec7a2c6",
+    "reports/validation/l3a-ontology/missed.json": "b893f7c7bd92e1c65c657de6ae0c60f3bfe43e2412d1f773ca1f43dcc2112c89",
+    "reports/validation/metric-text-vs-impl.md": "c897e5343f814965cafaf4450f9a74ea5efb1406c04c5787121f53b2a43bb970",
+    "reports/results/l1-error-attribution.md": "b9f7b2a268d7c685487ee339418dbe7e7da084549f3e108b728a7416067ce8fa",
+    "semantic/l1plus-audit.md": "558d3a63b1c13a4c820eb9012f4ed2e5203dc636a33e1baad5cfecd2622d17fb",
+    "$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/original-sample-bidirectional-audit.json": "fd6af825c4e0d85ecfaa1a5de6735f36942ba0808c70add84ae375c0027d6b79",
+    "reports/validation/t31-v7-rescan.md": "add1a3c455a7c9bfd28b541f342107f77f3d7681cac7c35622eca4525048a7dc",
+    "tasks/COORDINATION-HANDOFF.md": "2cce70d4e2d833fd97eaba0ecbef92dfb94ddbeab02598acc685a013ec0e6712",
+    "tasks/T10-renderer.md": "4a1694f193d8b1241c2210ed513b6fcc8f8d44cea484a9ca731fe25189f764ea",
+    "tasks/T16-metric-layer.md": "3a6246ef2d2e814db1abd7a7434f05eb4c0e5d4085762efcc022ba33b5c0eca6",
+    "decisions/2026-10-31-publication-choices.md": "d6b456f8f55763e6c6684caccbf29213bbc5d8d76bf98f497a49ed7cfd912ae8",
+    "render/context.py": "6779b0536e4b46b30f34660e700d839741920aed52114521ff45927e479ce27d",
+    "render/l1plus.py": "1d5e6f0ea9ce1f137ddd7b728160d2dcb32951373a71cc1bd1eec46338dbaf61",
+    "render/combo.py": "6ca2799705930ac13e4de5dfca3d7eb93ac8cf226705c7c2cd1bad9810ea1913",
+    "reports/validation/l1plus-l3a-correspondence.md": "075ef23be8ba52b8bb5b685ef1c833b4685401e26e36d4f46cc3cf7b6efc2e64",
+    "reports/validation/l3a-ontology-validation.md": "6959eb4380a08a98ad9ead4e356126b4b06ac829b67cf1e0f3e010e75871a52e",
+    "tasks/T30-combo-cell.md": "5c43037ca3e949194efea41a957bb1652f8f42fe4bd73098176c752291c5c8ee",
+    "reports/results/combo.md": "0a85e6659e5e259897dc5effa9d1dc09c8625081a86388ebc4d4821e5a3f4078"
+  }
+}

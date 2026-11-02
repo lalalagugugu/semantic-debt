@@ -1,0 +1,33 @@
+{
+  "independent_sha256": "82d549317ccb37c36431a1ce46b8e3bdcb742cf0fcca6bc7f49d2db691b5b018",
+  "reference_sha256": "da99a7dcc7949618177bb525a31f9096cb6b99eaa8e530f900c86e12f00bd735",
+  "checks": 68,
+  "differences": [
+    {
+      "item": "v9 covered SQL-L1.5S lower",
+      "kind": "interval",
+      "reference": -0.19,
+      "independent": -0.1984126984126984,
+      "difference": -0.0084126984126984,
+      "status": "DIFF"
+    }
+  ],
+  "integer_rounding_over_point_threshold": [
+    {
+      "item": "v9 data/enums SQL-L1-E",
+      "kind": "point",
+      "reference": 0.13,
+      "independent": 0.13194444444444445,
+      "difference": 0.001944444444444443,
+      "status": "ROUNDING"
+    },
+    {
+      "item": "v9 title L1+ 93%",
+      "kind": "point",
+      "reference": 0.93,
+      "independent": 0.9319727891156463,
+      "difference": 0.001972789115646245,
+      "status": "ROUNDING"
+    }
+  ]
+}

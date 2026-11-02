@@ -34,7 +34,7 @@
 | T17 | Power BI 模型与 DAX 执行器 | Claude Code | Windows | G1；试跑需 G3 | 5 / 15 元 | **Mac 侧准备完成**（2026-10-23，T17-mac）：DAX 执行器、探测模式、`windows/README.md` 与 `t17.ps1`、检查清单第 1、3 项（渲染器修正两处 DAX 交付缺陷，待用户决定是否打 `semantic-v1.5`，`decisions/2026-10-23-t17-mac-dax-renderer.md`）；第 2 项（Codex T16 #156）已落成 69 项引擎探针，度量值改不改等 Windows 结果后裁决（open-questions T17-1）；Windows 上探测、冒烟待做 |
 | T18 | DAX 全量与 L2 调优 | Claude Code | Windows | T17、G3 | 40 / 120 元 | 未开始 |
 | T19 | 评分、失败归类与报告 | Claude Code + 用户 | 普通 | T13–T18 | 80 元（Pro 裁判） | 未开始 |
-| T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | v8 全清单复核已交付（2026-11-01）：755 项自动对照，新增数字及 U2 六单元点估计/计数一致；26 个区间端点差异已列，98 项含 0 判断一致。见 reports/final/recheck-v8.md；未改报告，待用户审阅 |
+| T20 | 报告数字独立复核 | Codex | 主仓库 clone | T19 初稿 | 0 | v9 改动清单复核已交付（2026-11-02）：68项数字检查，新增计数一致；2处整数取整、1处区间端点差异已解释，三条实验描述相符；“判错没有复查”需限定这一轮。见 reports/final/recheck-v9.md；未改报告，待审阅 |
 | T21 | 规划 agent（-P）：在探查 agent 上加规划、Python 退路、按需检索；L0-P、L1-P | Claude Code | 普通 | G3；`harness-agent-v1.1`；对照 T15 全量 | 小样本 ≤ 3 元；全量待估 | 第一期暂停，第二期再做（2026-10-19 用户裁决，与 judge-v1 一起）；小样本保留（`20261019-T21-pilot-01`，1.18 元，L0-P 50.0%、L1-P 58.3%，Python 0/48） |
 | T22 | L1+（内容补全与歧义澄清，盲写）与 L3a（同内容的 OWL + SHACL）（`tasks/T22-l1plus-l3a.md`） | Claude Code（盲 → 普通）+ Codex 复核 | 盲 / 普通 | `semantic-v1.4`；`harness-v1.1` | 10 元（Flash） | 第 1–3 步完成（#164，`semantic/l1plus.yaml` v3，Codex 三轮复核、用户裁决 R1–R12）；第 4–6 步移到 T22b |
 | T22b | L1+ / L3a 渲染、运行、报告、残余歧义归因（`tasks/T22b-l1plus-render-run.md`） | Codex | 主仓库 clone | T22 第 1–3 步 | 15 + 3 元（Flash，用户已上调） | 运行与报告已完成，协调会话独立复算数字一致；98 题 L1plus 75.5%、L3a 74.5%，运行已知累计 8.09429950 元。归因 20261025-T22b-attrib-01 完成 82/82 条、1.72537972 元；五类 + 单列及数据质量标记固定，Flash / Codex 独立计数与题号清单见 reports/results/l1plus-error-attribution.md；无异常或待核算费用，PR #176 待协调验收归因 |
