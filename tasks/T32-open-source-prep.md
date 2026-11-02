@@ -46,9 +46,11 @@
 - [x] 干净环境复现：由 Codex 新 clone 跑通重算和离线重评一个单元（`reports/validation/t32-clean-repro.md`）；缺口已补进 README。未登录访问等转公开后核对
 - [x] （T33）作答对照页：静态页面，同一题在各单元的查询、判定和不超过 20 行的结果并排；由脚本从日志和题库生成
 - [x] （T33）原始回包打包并扫密钥（含 U2 六单元，#250）
-- [ ] 转公开前重跑 gitleaks：新推分支 `scorer-v2-check`（题库）、`T21-work`、`scorer-spec-v2-clarify2`，题库 PR #25，压缩包
-- [ ] 查公开文件里的「人工」
-- [ ] 报告里补上仓库和对照页链接
+- [x] 主仓库重跑 gitleaks（2026-11-02，全部分支 459 个提交）：仍是那 2 处 `q.ScenarioKey =` 误报
+- [ ] 题库仓库重跑 gitleaks（含 `scorer-v2-check`、PR #25）（题库侧 Codex）
+- [x] 查公开文件里的「人工」：历史记录不改写，README 说明这个词的含义
+- [ ] 定稿报告导出到 `reports/midterm-report.md`（README 已指向它）
+- [ ] Release `midterm-v1` 草稿（T33 Codex）；对照页 `gh-pages` 分支（T33 Codex），转公开后开 Pages
 - [x] README 写明公开后这套题退役，不能再当留出题用
 - [ ] 解除硬规则「仓库不放题面」，用户转公开，发布后从未登录的浏览器核对
 

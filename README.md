@@ -6,18 +6,20 @@
 
 ## 主要结果
 
-| 模型读到的语义层 | 准确率（主表 98 题） |
+| 做法 | 准确率 |
 |---|---:|
-| L0：晦涩命名，没有描述，缺一部分表关系 | 48.0% |
-| L1：业务名、全部关系、描述、企业约定、文字版指标口径 | 85.0% |
-| L1+：在 L1 上补全内容、逐条消歧 | 93.2%（测试集 49 题 93.2%） |
-| L1 加上线后按错答复盘补的语义 | 95.9%（测试集 49 题 92.5%） |
+| L0：晦涩命名，没有描述，缺一部分表关系 | 48.0%（全部 98 题） |
+| L1：业务名、全部关系、描述、企业约定、文字版指标口径 | 85.0%（全部 98 题） |
+| L1+：在 L1 上补全内容、逐条消歧 | 93.2%（全部 98 题） |
+| L1 加上线后按错答复盘补的语义 | 92.5%（复盘没用过的测试集 49 题） |
+
+全部 18 种做法的结果在 `reports/results/accuracy-v5.md`。最低的是只给汇总表（39.8%）和只能调指标（41.8%），主要因为覆盖不到一半的题。
 
 这些结果只来自一个模型和一份数据，换模型后绝对数字会变。准确率按结果内容判定，比较方法和局限见报告。
 
 这套题已经公开，以后不能再当留出题用。
 
-完整报告：发布后补链接。
+完整报告：[reports/midterm-report.md](reports/midterm-report.md)。原始响应：[Release midterm-v1](https://github.com/lalalagugugu/semantic-debt/releases/tag/midterm-v1)。作答对照页：<https://lalalagugugu.github.io/semantic-debt/>。
 
 ## 两个仓库
 
@@ -39,6 +41,8 @@
 | `decisions/`、`tasks/` | 设计决定、用户裁决和任务记录 |
 
 `AGENTS.md`、`START-HERE.md` 和 `templates/` 是实验期间给 coding agent 和操作者用的，保留下来作为过程记录。
+
+实验记录里的「人工判定」多数指 AI 会话逐条判断，区别于脚本的确定性评分，不是人判的。人做的裁定写作「用户裁决」。分工见报告的实验描述。
 
 ## 复现
 
@@ -71,7 +75,7 @@ uv run python data/load.py
 uv run python data/export_parquet.py
 ```
 
-**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包的下载地址发布后补。先把题库切到报告用的版本：
+**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包在 [Release midterm-v1](https://github.com/lalalagugugu/semantic-debt/releases/tag/midterm-v1)。先把题库切到报告用的版本：
 
 ```bash
 git -C "$SEMDEBT_EVAL_DIR" checkout eval-v1.3
