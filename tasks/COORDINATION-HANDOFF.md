@@ -284,3 +284,7 @@ independent-check 复核 101 次（Codex 逐条判对的部分），99 次一致
 **备份：** 三个分支已推上 GitHub（`01a0031`、`a9dc975`、`f7000ae` 已核对）；题库 3 份 L1+ 复核记录已入库（PR #25）；`cards/T13` 的未跟踪决策和 `cards/T02` 的 stash 只在硬盘备份里。用户已把 `~/.claude/projects`、`~/.codex` 复制到硬盘，`~/dev` 在复制中；待核对大小、确认硬盘加密、补 `~/Desktop`、`~/Documents`、`~/.zshrc`，然后送修。本机没有 Time Machine。tracker 无 remote，MaIA-code-study 有大量未提交改动，都只靠硬盘。
 
 **协作提醒：** 消息发给 v8-drafting 时它可能还没读完上一条，要求放在开写前发。`git fetch` 不能带 `-q` 和管道一起用才稳；`gh pr diff` 不接受路径参数。
+
+## 暂缓发布（2026-11-02）
+
+用户决定先补本体测试和明显缺陷，这一节取代上面的发布顺序。下一步见 `tasks/T19a-v10-plan.md`：等用户定局限清单和手机表格做法；本体补测先写任务卡，查 DeepSeek 上下文上限和当前指纹，dry-run 后用户批准才花钱。Release、gh-pages、转公开都暂停。写作和核对流程不变。
