@@ -21,7 +21,7 @@
 | 4 | L1+ = L1 原文 + 109 条；L3a 只改这 109 条；30 条形式化、79 条注解、16 条有现成写法，共 46 | `render/l1plus.py`；`reports/validation/l1plus-l3a-correspondence.md`；`reports/validation/l3a-ontology-validation.md` |
 | 4 | 第一轮 token 约 7.5 万、约 22 万（含 L1 原文） | `v8num`：75,258、219,864 |
 | 5 | L1.5S −7.9 [−19.0, +3.2]；JSON-L2 −4.5 [−12.6, +2.7] | `v7num` 第 5 节 |
-| 5 | 「金额最大的一笔」应按单行销售算，JSON-L2 算成一整单 | Q58 第 1、2 次，`$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/codex-decisions.json` 的 note；参考答案为单行 |
+| 5 | Q58 的例子：应按单行销售算，JSON-L2 算成一整单 | Q58 第 1、2 次，`$SEMDEBT_DATA_DIR/t31-v7-census-20261030/snapshots/20261031-T31-v5-rulings-01/codex-decisions.json` 的 note；参考答案为单行 |
 | 6 | 3 次 = 2 次修一次后仍执行失败（Q24、Q113 各第 2 次）+ 1 次能执行但 SQL 机制用错（Q05 第 2 次） | `causes`；`v8num` |
 | 6 | 48 次 = 24 题 × 2 单元 × 1 次 | `runs/20261019-T21-pilot-01/` |
 | 8 | L1 上的对账没有查出「日均销售额」的矛盾 | `reports/validation/metric-text-vs-impl.md` |
@@ -38,3 +38,21 @@
 | 局限 | 26%；判错没有复查；判对只复核一部分（420 次里 194 次跨厂商） | `reports/validation/t31-v7-rescan.md` |
 | 附录 | 叠加单元以 L1+ 为准，删 12 个条目（含 9 条示例 SQL），其余不改 | `tasks/T30-combo-cell.md`；`reports/results/combo.md` |
 | 附录 | 原始响应 25 个单元，对照页 19 个单元 | `decisions/2026-10-31-publication-choices.md` |
+
+## 第三轮新增或改动
+
+节号：原第 9 节并入第 8 节，原第 10 节改为第 9 节。上面表格里的「10」对应现在的第 9 节。
+
+| 节 | 数字或说法 | 出处 |
+|---|---|---|
+| 4 | 16 条是实验跑完后校验才发现可以形式化的；没有补上重跑，影响没有测 | `tasks/T26-ontology-validation.md` 第 55 行；`reports/validation/l3a-ontology-validation.md` 第 6.2 节。正文不用 32、14、13：那是旧标签，范围也不同（32 题里主表 29 题）。定稿标签上主表 29 题 L1+ 92.0%（80/87）、L3a 87.4%（76/87），差值没有算区间，所以既不写「看不出影响」，也不写有影响 |
+| 4 | 「不要专门建本体」写成本报告认为：只有 L1+ 的 109 条换了格式，L1 原文没换，实验没有直接测整个语义层换成本体 | 用户确认，`tasks/T19a-v9-plan.md` 第八节 |
+| 5 | 覆盖的题上 84.9、92.9；87.4、91.9；L1.5S 比 L1 低 7.9 [−19.0, +3.2]；JSON-L2 比 L1 低 4.5 [−12.6, +2.7] | `v7num` 第 5 节；`reports/final/recheck-v9.md`。7.9 由原始计数算出，不是 92.9 − 84.9 |
+| 8 | 表里 L1+ 93.2 | `accuracy-v5-cells.csv` split=heldout |
+| 9 | 42 次答错 = 44 次 − 2 次执行失败 | `v8num` |
+| 9 | 表里 87.3（自评不低于 90% 的 157 次） | `u2` SQL-L1-u2 |
+| 局限 | 判错的只在早期抽查过一部分 | `reports/final/recheck-v9.md`：历史双向审查含 126 条原判错 |
+
+## 公众号排版调整（2026-11-02，只改版式）
+
+第 1 节 YAML 和第 4 节本体代码块按微信规范折行，每行不超过 40 个半角宽度（一个汉字算 2）。第 4 节把 `urn:semdebt:l1plus:` 缩写成 `l1:`，百分号编码解回中文，三元组没有删；所以这段不再是原样截取，正文写了「节选」，原文在 `$SEMDEBT_DATA_DIR/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt`。第 5 节的表拆成两张，数字不变。
