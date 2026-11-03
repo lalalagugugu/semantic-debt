@@ -1,6 +1,6 @@
 # T34 全部语义换成本体（L3a-full）与 L1+ 对比
 
-- 状态：待开工（用户 2026-11-03 批准开始准备）
+- 状态：**暂停**。用户 2026-11-03 要求先把假设写清楚；单元设计等 `tasks/T19a-v10-plan.md` 第六节定稿后再改本卡，之前不开工。
 - 负责：第 1–2 步 Claude Code（盲模式）；第 3 步 Codex 复核；第 4–6 步 Codex（codex-main）
 - 依据：`tasks/T19a-v10-plan.md` 第一节；`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-t22b-l3a-presentation.md`；`reports/validation/l3a-ontology-validation.md`（T26）
 - 依赖：`semantic-v1.6-l1plus`；`harness-v1.1`；`eval-v1.2`
