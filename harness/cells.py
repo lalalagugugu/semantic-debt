@@ -72,9 +72,12 @@ L1PLUS_CELLS: dict[str, Cell] = {c.name: c for c in [
     Cell(name, "chdb", ("retail",), f"build:{name}.yaml", "clickhouse_sql.md", card="T22b", skip_judge=True)
     for name in ("SQL-L1plus", "SQL-L3a")
 ]}
-# T34: the whole semantic layer as an ontology; same executor and syntax note as SQL-L1plus.
+# T34: the same content written as an ontology. SQL-L1-onto = L1 only (group 1, against SQL-L1);
+# SQL-L3a-full = L1 + the 109 L1+ entries (group 2, against SQL-L1plus). Same executor and syntax note.
 L1PLUS_CELLS["SQL-L3a-full"] = replace(L1PLUS_CELLS["SQL-L3a"], name="SQL-L3a-full",
                                        context="build:SQL-L3a-full.yaml", card="T34")
+L1PLUS_CELLS["SQL-L1-onto"] = replace(L1PLUS_CELLS["SQL-L3a"], name="SQL-L1-onto",
+                                      context="build:SQL-L1-onto.yaml", card="T34")
 
 
 # T29 is an explicit opt-in: same L1plus context and executor, one extra rule.
