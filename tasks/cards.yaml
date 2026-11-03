@@ -65,4 +65,4 @@ cards:
   - {id: T31,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T31-reference-and-presentation-review.md, note: "可疑参考答案集中核对 + 呈现差异逐类盘点（是否进一步放宽评分）；免费，只读题库"}
   - {id: T32,  owner: claude, mode: open,          repo: main, card: tasks/T32-open-source-prep.md, after: G3, note: "开源准备：扫描、公开方式、README、对照页；转公开由用户执行；免费"}
   - {id: T33,  owner: codex,  mode: codex-main,    repo: main, card: tasks/T33-publication-artifacts.md, note: "发布物：作答对照页和原始回包打包；免费；不创建 Release，不转公开"}
-  - {id: T34,  owner: claude, mode: blind,         repo: main, card: tasks/T34-ontology-full.md, after: semantic-v1.6-l1plus, note: "全部语义换成本体（L3a-full）对 L1+；第 1–2 步盲写渲染，Codex 复核与运行；付费，dry-run 后用户批准"}
+  - {id: T34,  owner: claude, mode: blind,         repo: main, card: tasks/T34-ontology-full.md, after: semantic-v1.6-l1plus, note: "本体写法对文字写法，L1、L1+ 两组四个单元；第 1–2 步盲写渲染，Codex 复核与运行；付费，dry-run 后用户批准"}
