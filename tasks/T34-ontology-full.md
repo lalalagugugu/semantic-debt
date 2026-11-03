@@ -1,6 +1,6 @@
 # T34 全部语义换成本体（L3a-full）与 L1+ 对比
 
-- 状态：第 1–2 步完成（Claude Code 盲写，2026-11-04），待第 3 步 Codex 复核
+- 状态：第 3 步已复核，暂不通过，待盲写修订后再核（Codex，2026-11-04）
 - 负责：第 1–2 步 Claude Code（盲模式）；第 3 步 Codex 复核；第 4–6 步 Codex（codex-main）
 - 依据：`tasks/T19a-v10-plan.md` 第一节；`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-t22b-l3a-presentation.md`；`reports/validation/l3a-ontology-validation.md`（T26）
 - 依赖：`semantic-v1.6-l1plus`；`harness-v1.1`；`eval-v1.2`
@@ -100,3 +100,11 @@
   - 盲模式下 `semantic/tuning/` 和 `scorer-corpus` 不可读：`tests/test_combo.py` 两项失败、`tests/test_scorer_v2_shared.py` 无法收集，与本卡无关；其余 1,108 项通过、23 项跳过。`render/render_all.py` 在盲模式下会把 `reports/validation/context_sizes.md` 的调优单元写成「未渲染」，所以没有提交它的改动。
   - uv 在沙箱里读不到自带的 Python，本会话用 `UV_PYTHON=/opt/homebrew/bin/python3.14 UV_PYTHON_DOWNLOADS=never UV_CACHE_DIR=$TMPDIR/uvcache`；`uv.lock` 未变。会话内 `git fetch` / `gh` 读不到凭据，fetch 由用户运行，PR #261 由协调会话开。
 - 工时：约 5 小时（Claude Code 会话，两轮）。
+
+### 第 3 步（Codex 独立复核，2026-11-04）
+
+- 基线：`0072999`（`origin/T34-work`）；复核分支 `T34-review`，未向 T34-work 推送。
+- 报告：`reports/validation/t34-codex-review.md`，含 109 条新旧档位、15 条 L1 约定、69 项 L1 指标、T26 的 16 条对照及按编号的盲写修改清单。
+- 结论：暂不通过。E10 增加了日期行断言含义；部分核心条件仍在注解，档位需修订或补齐。原报第 (1) 档 58 条中，按报告定义有 39 条依赖项目自定义谓词表达核心。
+- 工程：独立 RDFlib 子图与差集核对通过，3,429 = 3,420 + 9；三种 PYTHONHASHSEED 字节一致；旧上下文渲染、两个新单元显式选择、系统提示和语法回归通过（外部文件不可用的边界见报告）。
+- 测试：T34 17 passed；全套 1 failed / 1321 passed / 23 skipped。唯一失败为外部上下文缺 SEMDEBT_EVAL_DIR，不作为通过。未修改实现、未打 tag、未启动第 4–6 步，付费模型调用 0。
