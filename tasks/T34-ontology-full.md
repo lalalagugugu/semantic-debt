@@ -1,6 +1,6 @@
 # T34 全部语义换成本体（L3a-full）与 L1+ 对比
 
-- 状态：第 3 步已复核，暂不通过，待盲写修订后再核（Codex，2026-11-04）
+- 状态：第 3 步复核暂不通过（Codex，2026-11-04）；盲写已按复核修订（2026-11-04），待 Codex 再核
 - 负责：第 1–2 步 Claude Code（盲模式）；第 3 步 Codex 复核；第 4–6 步 Codex（codex-main）
 - 依据：`tasks/T19a-v10-plan.md` 第一节；`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-t22b-l3a-presentation.md`；`reports/validation/l3a-ontology-validation.md`（T26）
 - 依赖：`semantic-v1.6-l1plus`；`harness-v1.1`；`eval-v1.2`
@@ -34,7 +34,7 @@
 
 1. **写两份本体的渲染**（扩展 `render/l1plus.py` 或新文件）：SQL-L1-onto 只含 L1；SQL-L3a-full 含 L1 和 109 条。两份里 L1 部分的本体逐字节相同，SQL-L3a-full 只多出 109 条。输入只有 `semantic/source.yaml`、`semantic/l1plus.yaml` 和现有 L1 上下文的渲染代码。
    - L1 的表、字段、类型、关系、枚举及含义、同义词、约定、69 个指标口径，109 条的澄清、概念、别名、层级、通则，全部进本体。
-   - 能形式化的都形式化（OWL 类、对象属性、数据属性、实例与别名、SHACL 约束；指标口径可用 SHACL-SPARQL 或注解里的 SQL 片段）。表达不了的放注解，原文完整保留。
+   - 能形式化的都形式化（OWL 类、对象属性、数据属性、实例与别名、SHACL 约束；只用 OWL 2 和 SHACL Core 的标准构造，不用 SHACL-SPARQL、SHACL-AF 规则或其他查询式规则；指标口径放注解里的 SQL 片段）。表达不了的放注解，原文完整保留。
    - 109 条复用旧 L3a 的来源和生成器，不另起炉灶：内容仍从 `semantic/l1plus.yaml` 生成，在 `render/l1plus.py` 的基础上改，不手抄旧 Turtle。改的只有写法质量，下面几处：
      - 修掉 E07：不区分大小写的筛选不能丢。
      - 有现成 OWL / SHACL 写法却只放注解的条目，这次要形式化（不看 T26 的清单，自己逐条判断；第 3 步由 Codex 对照）。
@@ -108,3 +108,29 @@
 - 结论：暂不通过。E10 增加了日期行断言含义；部分核心条件仍在注解，档位需修订或补齐。原报第 (1) 档 58 条中，按报告定义有 39 条依赖项目自定义谓词表达核心。
 - 工程：独立 RDFlib 子图与差集核对通过，3,429 = 3,420 + 9；三种 PYTHONHASHSEED 字节一致；旧上下文渲染、两个新单元显式选择、系统提示和语法回归通过（外部文件不可用的边界见报告）。
 - 测试：T34 17 passed；全套 1 failed / 1321 passed / 23 skipped。唯一失败为外部上下文缺 SEMDEBT_EVAL_DIR，不作为通过。未修改实现、未打 tag、未启动第 4–6 步，付费模型调用 0。
+
+### 第 3 步修订（Claude Code，盲模式，2026-11-04）
+
+在 `049ee04`（`origin/T34-review`，fast-forward）上修订。按协调会话的批准只读了 `reports/validation/t34-codex-review.md`，没有读它引用的 T26 报告。付费调用 0。
+
+- 改了哪些条目：
+  - **E10（必须修）**：取值节点不再用物理列属性作谓词。每个说法按大洲拆成节点：`:continent`、`:onColumn`（字段只作宾语）、`:value`，另有 `:selects [ sh:path 季节字段 ; sh:hasValue 取值 ]` 与 `:whenContinent [ sh:path DimGeography.ContinentName ; sh:hasValue 大洲 ]`。全图扫过：没有其他三元组用 `retail:` / `rel:` 属性作谓词（测试）。
+  - **D10、D11、D19**：每档改成 `sh:NodeShape` + `sh:property [ sh:path … ; 边界 ]`，分别绑到 `:D10`（年龄）、`DimCustomer.YearlyIncome`、新声明的 `:D19.累计占比`；`:bandOf` 保留。
+  - **D23**：哨兵值节点加 `:selects [ sh:path DimStore.CloseDate ; sh:not [ sh:pattern "^2090-12-31" ] ]`（CloseDate 是字符串列，用前缀匹配）。
+  - **A19**：加 `retail:DimPromotion owl:hasKey ( PromotionKey )`。
+  - **A33**：加 FactStrategyPlan 的形状（AccountKey `sh:in` 17 个叶子、Amount `sh:minExclusive 0`）。
+  - **H07**：加 `:H07.上级科目闭包`（owl:TransitiveProperty），`:parentAccount rdfs:subPropertyOf` 它。
+  - **A24**：去掉挂在原始数量列上的比较形状，改为链接到 H12 的门店 × 产品组合类（比较在那里是形状）。
+  - 其余清单与 T26 条目没有标准写法的，在报告「第 3 步复核清单的处理」表里逐条标「未做」和原因（问题措辞触发的例外、参数化窗口、聚合、按订单去重计数、无环约束、除法等）。
+- 档位（1S / 1C / 2 / 3，按复核档；三条与复核不同，各附证据）：
+  - 109 条：旧 SQL-L3a 1 / 11 / 18 / 79；SQL-L3a-full **19 / 21 / 54 / 15**。与复核（16 / 22 / 56 / 15）不同的：E10（复核 2 → 1S，修了编码，语义探针通过）、D11（复核 1C → 1S，分档已是绑定字段的标准形状，正反例通过）、D23（复核 2 → 1S，补了哨兵排除形状，正反例通过；按期间筛选是问题参数）。D10 补了绑定，但年龄派生式只在注解，仍按复核归 (2)。
+  - L1：约定 0 / 0 / 15 / 0；指标 0 / 0 / 69 / 0。12 个纯比率（加折扣率共 13 个链接分子分母的）都归 (2)；D16、D17 同理归 (2)。
+  - 宽口径 77 / 71% 保留在报告里作参考，不用于结论。
+- 测试（`tests/test_l3a_full.py`，22 项）：新增语义探针（owlrl 的 RDFS 与 OWL-RL 闭包后，两份本体都没有任何节点成为 `retail:` 表或 `class:` 类的实例，并确认探针能抓到旧 E10 写法）、物理列谓词扫描、pyshacl 正反例（D10、D11、D19 的分档，D23 哨兵，A33 计划表形状，E10 的季节与大洲形状）、档位规则（1S 必须有标准构造、1C 必须有自定义谓词、没有降档、没有查询式谓词）。`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py`：22 passed。全套（不装这三个可选依赖）：1,109 passed、27 skipped、2 failed（`test_combo` 两项读不到盲模式拒读的 `semantic/tuning/`，与上一轮相同）；`test_scorer_v2_shared.py` 仍因 `scorer-corpus` 不可读无法收集。
+- token（整条系统消息，估算）：SQL-L1 41,084、SQL-L1-onto 58,115、SQL-L1plus 66,698 不变；SQL-L3a-full 94,716 → **96,006**（E10、分档、A33 等新增结构）。旧 SQL-L3a 156,469 不变。最大占上下文上限 9.6%。
+- 子图：SQL-L1-onto 4,975 个三元组不变；SQL-L3a-full 8,404 → 8,609，差额仍逐条追溯到 109 条与 L1+ 文件头。
+- 偏离与理由：
+  - 卡上「指标口径可用 SHACL-SPARQL」改为「只用 OWL 2 和 SHACL Core 的标准构造」（协调会话 2026-11-04 要求）：SHACL-SPARQL、SHACL-AF 规则等查询式规则属于 L3b，混进来就不是只换写法。
+  - E10、D11、D23 三条与复核档不同，理由见上与报告逐条表，交 Codex 再核。
+  - 自定义谓词一个未删，已有事实保留；A24 去掉的是本卡上一轮自己加的、挂在原始列上的比较形状（复核指出会被当成聚合后的筛选），原文不变。
+- 工时：约 2 小时。

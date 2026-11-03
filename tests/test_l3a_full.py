@@ -75,17 +75,108 @@ def test_serialization_is_deterministic():
     assert len(digests) == 1
 
 
-def test_three_tiers_cover_every_entry(source):
+def test_tiers_cover_every_entry(source):
     ctx, data, _ = source
     ids = [item["id"] for s in SECTIONS for item in data[s]]
     assert set(L.TIERS) == set(ids)
-    assert all(old in (1, 2, 3) and new in (1, 2, 3) and why for old, new, why in L.TIERS.values())
-    assert all(new <= old for old, new, _ in L.TIERS.values())     # nothing got less formal
+    rank = {t: i for i, t in enumerate(L.TIER_ORDER)}
+    assert all(old in rank and new in rank and why for old, new, why in L.TIERS.values())
+    assert all(rank[new] <= rank[old] for old, new, _ in L.TIERS.values())     # nothing got less formal
     cons = L.constructs(ctx, data)
     assert not {x for v in cons.values() for x in v} & L.SPARQL_PREDICATES
-    for i in ids:                                                     # tier (1) entries carry a formal construct
-        if L.TIERS[i][1] == 1:
-            assert [x for x in cons[i] if x != ":ref"], i
+    standard = {c for c in L._CONSTRUCTS if c.startswith("sh:") or c in (
+        "owl:equivalentClass", "owl:disjointUnionOf", "owl:AllDisjointClasses", "owl:hasKey")}
+    for i in ids:
+        if L.TIERS[i][1] == "1S":
+            assert standard & set(cons[i]), i
+        if L.TIERS[i][1] == "1C":
+            assert [x for x in cons[i] if x.startswith(":") and x != ":ref"], i
+    # L1 conventions and metrics are all (2) under the review's rule (links do not define division).
+    t = L.l1_tiers(ctx)
+    assert t["conventions"] == {"2": 15} and t["metrics"] == {"2": 69}
+
+
+def test_no_description_node_uses_a_physical_column_as_predicate(source, l1_text):
+    for text in (source[2], l1_text):
+        p = L.Parsed(text)
+        assert not [pred for _, pred, _ in p.triples() if pred.startswith(("retail:", "rel:"))]
+
+
+def _graph(text):
+    rdflib = pytest.importorskip("rdflib")
+    g = rdflib.Graph()
+    g.parse(data=text, format="turtle")
+    return rdflib, g
+
+
+@pytest.mark.parametrize("which", ["full", "l1"])
+def test_semantic_probe_no_new_rows_after_closure(source, l1_text, which):
+    owlrl = pytest.importorskip("owlrl")
+    rdflib, _ = _graph("")
+    text = source[2] if which == "full" else l1_text
+    for semantics in (owlrl.RDFS_Semantics, owlrl.OWLRL_Semantics):
+        _, g = _graph(text)
+        owlrl.DeductiveClosure(semantics).expand(g)
+        rows = [(s, o) for s, o in g.subject_objects(rdflib.RDF.type)
+                if str(o).startswith((L.PREFIXES["retail"], L.PREFIXES["class"]))]
+        assert rows == [], (semantics.__name__, rows[:3])
+    # The probe does catch the old E10 encoding (a node using a DimDate column as predicate).
+    _, g = _graph(text + '\n:probe :value [ retail:DimDate.AsiaSeason "Holiday" ] .\n')
+    owlrl.DeductiveClosure(owlrl.RDFS_Semantics).expand(g)
+    assert any(str(o) == L.PREFIXES["retail"] + "DimDate" for o in g.objects(None, rdflib.RDF.type))
+
+
+def _validate(g, target_shape, data_ttl):
+    """Run pyshacl with `target_shape` (a node of the ontology graph g) aimed at ex:x."""
+    pyshacl = pytest.importorskip("pyshacl")
+    import rdflib
+
+    shapes = rdflib.Graph()
+    for t in g:
+        shapes.add(t)
+    shapes.add((target_shape, rdflib.URIRef(L.PREFIXES["sh"] + "targetNode"), rdflib.URIRef("urn:ex:x")))
+    data = rdflib.Graph()
+    data.parse(data="".join(f"@prefix {k}: <{v}> .\n" for k, v in L.PREFIXES.items()) + data_ttl, format="turtle")
+    return pyshacl.validate(data, shacl_graph=shapes)[0]
+
+
+def _labelled(g, rdflib, label):
+    return next(s for s in g.subjects(rdflib.RDFS.label, rdflib.Literal(label)))
+
+
+def test_shacl_bands_bind_to_fields(source):
+    rdflib, g = _graph(source[2])
+    income = _labelled(g, rdflib, "[40000, 80000)")
+    assert _validate(g, income, "<urn:ex:x> retail:DimCustomer.YearlyIncome 50000.0 .")
+    assert not _validate(g, income, "<urn:ex:x> retail:DimCustomer.YearlyIncome 90000.0 .")
+    age = _labelled(g, rdflib, "30–39")
+    assert _validate(g, age, "<urn:ex:x> :D10 35 .")
+    assert not _validate(g, age, "<urn:ex:x> :D10 41 .")
+    cum = _labelled(g, rdflib, "B")
+    assert _validate(g, cum, "<urn:ex:x> :D19.累计占比 0.9 .")
+    assert not _validate(g, cum, "<urn:ex:x> :D19.累计占比 0.8 .")
+
+
+def test_shacl_sentinel_scenario_plan_and_season(source):
+    rdflib, g = _graph(source[2])
+    ns = rdflib.Namespace(L.PREFIXES[""])
+    sentinel = next(g.objects(ns["D23"], ns["sentinel"]))
+    shape = next(g.objects(sentinel, ns["selects"]))
+    assert _validate(g, shape, '<urn:ex:x> retail:DimStore.CloseDate "2009-05-01" .')
+    assert not _validate(g, shape, '<urn:ex:x> retail:DimStore.CloseDate "2090-12-31" .')
+    plan = next(o for o in g.objects(ns["A33"], ns["axiom"]))
+    good = "<urn:ex:x> retail:FactStrategyPlan.AccountKey 4 ; retail:FactStrategyPlan.Amount 10.0 ; retail:FactStrategyPlan.ScenarioKey 1 ."
+    assert _validate(g, plan, good)
+    assert not _validate(g, plan, good.replace("AccountKey 4", "AccountKey 2"))
+    assert not _validate(g, plan, good.replace("Amount 10.0", "Amount -1.0"))
+    # E10「春季」in Asia: the season field and value, and the continent condition, are separate shapes.
+    spring = next(m for m in g.objects(ns["E10"], ns["map"]) if rdflib.Literal("春季") in set(g.objects(m, rdflib.SKOS.altLabel)))
+    asia = next(v for v in g.objects(spring, ns["seasonValue"]) if (v, ns["continent"], rdflib.Literal("Asia")) in g)
+    sel, when = next(g.objects(asia, ns["selects"])), next(g.objects(asia, ns["whenContinent"]))
+    assert _validate(g, sel, '<urn:ex:x> retail:DimDate.AsiaSeason "Spring/Back to School" .')
+    assert not _validate(g, sel, '<urn:ex:x> retail:DimDate.AsiaSeason "Holiday" .')
+    assert _validate(g, when, '<urn:ex:x> retail:DimGeography.ContinentName "Asia" .')
+    assert not _validate(g, when, '<urn:ex:x> retail:DimGeography.ContinentName "Europe" .')
 
 
 def test_round_trip_and_counts(source, parsed):

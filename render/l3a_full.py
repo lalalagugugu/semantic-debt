@@ -203,6 +203,8 @@ VOCAB = {
     "decisionList": ("obj", "按顺序取第一条满足的规则"),
     "scenarioTerm": ("obj", "说法 → 场景"),
     "comparisonWindow": ("obj", "默认对比期"),
+    "seasonValue": ("obj", "按大洲分开的季节取值（大洲、字段、取值分开表达）"),
+    "whenContinent": ("obj", "适用的大洲条件（SHACL 形状）"),
 }
 ANNOTATION_PREDICATES = {"rdfs:label", "rdfs:comment", "skos:altLabel"} | {
     ":" + k for k, (kind, _) in VOCAB.items() if kind == "ann"}
@@ -720,12 +722,27 @@ ALIAS_COLUMNS = {
 ALIAS_TABLE = {"E14": "DimDate", "E08": "DimProduct", "E13": "DimCustomer"}  # bare per-mapping column names
 
 
+SEASON_CONTINENT = {"NorthAmericaSeason": "North America", "EuropeSeason": "Europe", "AsiaSeason": "Asia"}  # A10
+
+
 def alias_value(value, item_table: str | None) -> str:
     if isinstance(value, list):
         return coll(lit(v) for v in value)
-    if isinstance(value, dict):
-        return bnode(*[(f"retail:{item_table}.{k}", lit(v)) for k, v in value.items()])
     return lit(value)
+
+
+def season_values(value: dict) -> list[str]:
+    """E10: one node per continent. The physical column is an object (:onColumn / sh:path),
+    never a predicate on the node, so the node is not asserted to be a DimDate row; the
+    continent condition is its own shape on DimGeography.ContinentName."""
+    out = []
+    for col, v in value.items():
+        column = f"retail:DimDate.{col}"
+        out.append(bnode((":continent", lit(SEASON_CONTINENT[col])), (":onColumn", column), (":value", lit(v)),
+                         (":selects", bnode(("sh:path", column), ("sh:hasValue", lit(v)))),
+                         (":whenContinent", bnode(("sh:path", "retail:DimGeography.ContinentName"),
+                                                  ("sh:hasValue", lit(SEASON_CONTINENT[col]))))))
+    return out
 
 
 def selection_shape(entry: dict, item: dict, n: Names) -> str | None:
@@ -761,6 +778,8 @@ def encode_alias(g: Graph, item: dict, n: Names):
         props = [("skos:altLabel", lit(t)) for t in mp["terms"]]
         if ident == "E09" and isinstance(mp["value"], str) and mp["value"].startswith("PromotionKey "):
             props.append((":condition", lit(mp["value"])))
+        elif isinstance(mp["value"], dict):
+            props += [(":seasonValue", x) for x in season_values(mp["value"])]
         else:
             props.append((":value", alias_value(mp["value"], "DimDate")))
         if "key" in mp:
@@ -964,6 +983,7 @@ def _accounts(keys):
     return coll(f"account:{k}" for k in keys)
 
 
+INCOME = "retail:DimCustomer.YearlyIncome"
 EXPENSE_LEAVES = [5, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 20, 21, 22, 23]
 PLAN_LEAVES = [4, 5, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 
@@ -983,8 +1003,10 @@ def _term(terms, start=None, end=None, target=None):
     return bnode(*pairs)
 
 
-def _band(label, **bounds):
-    return bnode(("rdfs:label", lit(label)), *[(f"sh:{k}", lit(v)) for k, v in bounds.items()])
+def _band(label, path, **bounds):
+    """A band is a SHACL node shape whose property shape binds the bounds to `path`."""
+    return bnode(("rdf:type", "sh:NodeShape"), ("rdfs:label", lit(label)),
+                 ("sh:property", bnode(("sh:path", path), *[(f"sh:{k}", lit(v)) for k, v in bounds.items()])))
 
 
 def _disjoint_union(whole, parts):
@@ -1028,12 +1050,10 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
     "A16": [(":A16", [(":termTarget", _term(["标价", "吊牌价", "零售价", "产品单价", "最贵 / 最便宜的产品"],
                                             target="retail:DimProduct.UnitPrice")),
                       (":termTarget", _term(["均价", "单价", "平均价格", "成交价", "平均售价"], target="metric:平均单价"))])],
-    "A24": [(":A24", [(":termTarget", bnode(*[("skos:altLabel", lit(t)) for t in ("缺货", "低于安全库存", "补货预警")],
-                                            (":selects", bnode(("sh:path", "retail:FactInventory.OnHandQuantity"),
-                                                               ("sh:lessThan", "retail:FactInventory.SafetyStockQuantity"))))),
-                      (":termTarget", bnode(*[("skos:altLabel", lit(t)) for t in ("断货", "零库存", "无库存")],
-                                            (":selects", bnode(("sh:path", "retail:FactInventory.OnHandQuantity"),
-                                                               ("sh:hasValue", "0")))))])],
+    # The comparisons are defined on 门店 × 产品 latest snapshots (H12's classes); the
+    # aggregate-first rule for product / store objects stays in the rule text.
+    "A24": [(":A24", [(":termTarget", _term(["缺货", "低于安全库存", "补货预警"], target="class:低于安全库存组合")),
+                      (":termTarget", _term(["断货", "零库存", "无库存"], target="class:零库存组合"))])],
     "A27": [(":最近购买月数", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:domain", "retail:DimCustomer"),
                           ("rdfs:range", "xsd:integer"), ("rdfs:label", lit("月数（末购日到参照日）")),
                           (":sqlExpressionOf", lit("dateDiff('month', 末购日, 参照日)")), (":definedBy", ":A27")])],
@@ -1041,14 +1061,20 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
     "A18": [(":A18", [(":defaultMetric", f"metric:{m}") for m in ("销售额", "销售数量", "折扣金额", "折扣率")]
              + [(":rowScope", "class:打折交易"), (":defaultGroupBy", "retail:DimPromotion.PromotionKey")])],
     "A19": [(":A19", [(":defaultGroupBy", "retail:DimPromotion.PromotionKey"),
-                      (":alsoShow", "retail:DimPromotion.PromotionName")])],
+                      (":alsoShow", "retail:DimPromotion.PromotionName")]),
+            ("retail:DimPromotion", [("owl:hasKey", coll(["retail:DimPromotion.PromotionKey"]))])],
     "A20": [(":A20", [(":requiresLeftJoin", f"rel:{t}.ProductKey-DimProduct")
                       for t in ("FactOnlineSales", "FactSales", "FactInventory", "FactSalesQuota")])],
     "A31": [(":A31", [(":defines", "class:在售产品"), (":defines", "class:停售产品")])],
     "A32": [(":A32", [(":geoPath", coll(["rel:FactStrategyPlan.EntityKey-DimEntity",
                                          bnode(("owl:inverseOf", "rel:DimStore.EntityKey-DimEntity")),
                                          "rel:DimStore.GeographyKey-DimGeography"]))])],
-    "A33": [(":A33", [(":planRowAccounts", _accounts(PLAN_LEAVES))])],
+    "A33": [(":A33", [(":planRowAccounts", _accounts(PLAN_LEAVES)),
+                      (":axiom", bnode(("rdf:type", "sh:NodeShape"), ("sh:targetClass", "retail:FactStrategyPlan"),
+                                       ("sh:property", bnode(("sh:path", "retail:FactStrategyPlan.AccountKey"),
+                                                             ("sh:in", coll(str(k) for k in PLAN_LEAVES)))),
+                                       ("sh:property", bnode(("sh:path", "retail:FactStrategyPlan.Amount"),
+                                                             ("sh:minExclusive", "0")))))])],
     "A34": [(":A34", [(":termTarget", _term(["IT 成本", "设备成本", "运维成本"], target="retail:FactITMachine.CostAmount")),
                       (":termTarget", _term(["设备购置费", "购置成本"], target="class:设备购置费")),
                       (":termTarget", _term(["年度维护费", "维护费"], target="class:年度维护费"))])],
@@ -1077,23 +1103,31 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
     "D10": [(":D10", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:domain", "retail:DimCustomer"),
                       ("rdfs:range", "xsd:integer"), (":sqlExpressionOf", lit("2009 - toYear(toDate(BirthDate))")),
                       *[(":band", b) for b in (
-                          _band("30 岁以下", maxExclusive=30), _band("30–39", minInclusive=30, maxExclusive=40),
-                          _band("40–49", minInclusive=40, maxExclusive=50), _band("50–59", minInclusive=50, maxExclusive=60),
-                          _band("60 岁及以上", minInclusive=60))]])],
+                          _band("30 岁以下", ":D10", maxExclusive=30),
+                          _band("30–39", ":D10", minInclusive=30, maxExclusive=40),
+                          _band("40–49", ":D10", minInclusive=40, maxExclusive=50),
+                          _band("50–59", ":D10", minInclusive=50, maxExclusive=60),
+                          _band("60 岁及以上", ":D10", minInclusive=60))]])],
     "D11": [(":D11", [(":bandOf", "retail:DimCustomer.YearlyIncome"), *[(":band", b) for b in (
-        _band("[0, 40000)", minInclusive=0, maxExclusive=40000),
-        _band("[40000, 80000)", minInclusive=40000, maxExclusive=80000),
-        _band("[80000, 130000)", minInclusive=80000, maxExclusive=130000),
-        _band("[130000, +∞)", minInclusive=130000))]])],
-    "D19": [(":D19", [(":band", b) for b in (
-        _band("A", maxInclusive=0.8), _band("B", minExclusive=0.8, maxInclusive=0.95), _band("C", minExclusive=0.95))])],
+        _band("[0, 40000)", INCOME, minInclusive=0, maxExclusive=40000),
+        _band("[40000, 80000)", INCOME, minInclusive=40000, maxExclusive=80000),
+        _band("[80000, 130000)", INCOME, minInclusive=80000, maxExclusive=130000),
+        _band("[130000, +∞)", INCOME, minInclusive=130000))]])],
+    "D19": [(":D19.累计占比", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:range", "xsd:double"),
+                              ("rdfs:label", lit("累计占比（D19 的定义）"))]),
+            (":D19", [(":band", b) for b in (
+                _band("A", ":D19.累计占比", maxInclusive=0.8),
+                _band("B", ":D19.累计占比", minExclusive=0.8, maxInclusive=0.95),
+                _band("C", ":D19.累计占比", minExclusive=0.95))])],
     "D20": [(":D20", [(":objectClass", bnode(("rdf:type", "owl:Class"), ("rdfs:label", lit("动销产品")),
                                              ("rdfs:subClassOf", "class:在售产品")))])],
     "D21": [(":D21", [("rdf:type", "owl:Class"), ("rdfs:subClassOf", "class:在售产品"),
                       (":defaultWindow", bnode((":start", date("2009-10-03")), (":end", date("2009-12-31"))))])],
     "D22": [(":D22", [("rdf:type", "owl:Class"), ("rdfs:subClassOf", "class:门店")])],
     "D23": [(":D23", [("rdf:type", "owl:Class"), ("owl:equivalentClass", "class:已关店门店"),
-                      (":sentinel", bnode((":onColumn", "retail:DimStore.CloseDate"), (":value", lit("2090-12-31"))))])],
+                      (":sentinel", bnode((":onColumn", "retail:DimStore.CloseDate"), (":value", lit("2090-12-31")),
+                                          (":selects", bnode(("sh:path", "retail:DimStore.CloseDate"),
+                                                             ("sh:not", bnode(("sh:pattern", lit("^2090-12-31"))))))))])],
     "D27": [(":D27", [("rdf:type", "owl:Class"), ("owl:equivalentClass", "class:零库存组合")])],
     "D29": [(":D29", [(":defaultWindow", bnode((":start", date("2009-10-03")), (":end", date("2009-12-31"))))])],
     "D30": [(":D30", [(":defaultAccount", "account:4"), (":numeratorScenario", "class:Actual"),
@@ -1120,7 +1154,10 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
             ("account:6", [(":leafAccounts", _accounts([7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 20, 21, 22, 23]))]),
             ("account:13", [(":leafAccounts", _accounts([15, 16, 17, 18, 20, 21, 22, 23]))]),
             ("account:14", [(":leafAccounts", _accounts([20, 21, 22, 23]))]),
-            (":H07", [(":breakCycle", bnode((":root", "account:1"), (":ignoreParentOf", "account:1")))])],
+            (":H07", [(":breakCycle", bnode((":root", "account:1"), (":ignoreParentOf", "account:1")))]),
+            (":H07.上级科目闭包", [("rdf:type", "owl:ObjectProperty"), ("rdf:type", "owl:TransitiveProperty"),
+                              ("rdfs:label", lit("上级科目（向上递归的传递闭包）"))]),
+            (":parentAccount", [("rdfs:subPropertyOf", ":H07.上级科目闭包")])],
     "H08": [_disjoint_union("class:分层客户集合", ["活跃客户", "有流失风险客户", "已流失客户"]),
             ("class:分层客户集合", [("owl:disjointWith", "class:未购买客户")]),
             ("class:活跃客户", [("rdf:type", "sh:NodeShape"),
@@ -1335,8 +1372,6 @@ def _metric_name(iri: str, n: Names) -> str:
 def _decode_alias_value(o):
     if isinstance(o, Coll):
         return [value_of(x) for x in o.items]
-    if isinstance(o, BNode):
-        return {unprefix(pred, "retail").split(".", 1)[1]: value_of(v) for pred, v in o.props}
     return value_of(o)
 
 
@@ -1374,8 +1409,15 @@ def decode_l1plus(p: Parsed, n: Names) -> dict:
         d["map"] = []
         for b in p.all(s, ":map"):
             cond = p.opt(b, ":condition")
-            mp = {"terms": [text_of(x) for x in p.all(b, "skos:altLabel")],
-                  "value": text_of(cond) if cond is not None else _decode_alias_value(p.one(b, ":value"))}
+            seasons = p.all(b, ":seasonValue")
+            if cond is not None:
+                value = text_of(cond)
+            elif seasons:
+                value = {unprefix(p.one(x, ":onColumn"), "retail").split(".", 1)[1]: value_of(p.one(x, ":value"))
+                         for x in seasons}
+            else:
+                value = _decode_alias_value(p.one(b, ":value"))
+            mp = {"terms": [text_of(x) for x in p.all(b, "skos:altLabel")], "value": value}
             if p.opt(b, ":key") is not None:
                 mp["key"] = value_of(p.one(b, ":key"))
             _opt_text(p, b, ":level", mp, "level")
@@ -1577,119 +1619,131 @@ def _subtree(p: Parsed, subject):
 # Report
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-# Three tiers (aligned with T26), judged entry by entry for the old SQL-L3a and this one:
-#   1 core 口径 formalized: the part that decides how the SQL is written is an axiom / shape /
-#     individual, not only annotation (explanations and edge cases may stay as text);
-#   2 declarations only: types, domain / range, links; the core 口径 is in annotation;
-#   3 annotation only.
-# (old tier, new tier, why it changed or what stays text)
+# Tiers (step-3 review, reports/validation/t34-codex-review.md). (1) is split:
+#   1S core 口径 formalized with standard OWL 2 / SHACL Core constructs;
+#   1C core formalized, but its meaning depends on this ontology's own predicates;
+#   2  declarations, ranges or links; the core 口径 is in annotation;
+#   3  annotation only.
+# The review's tier is adopted unless an entry gained new standard structure in this round;
+# those three (E10, D11, D23) carry their evidence in the note.
+# id → (old SQL-L3a tier, new tier, note)
 # ---------------------------------------------------------------------------
-_OLD_A = "旧 L3a 的 A / D / G 条只有原文注解树（含 SQL 片段注解），没有类型和链接"
-TIERS: dict[str, tuple[int, int, str]] = {
-    "G01": (3, 3, "比率分母为 0 / NULL 的通则是文字规则，无对应公理"),
-    "A01": (3, 1, "默认范围链接到类:门店（≡ DimStore），例外链接到类:实体店（StoreType 的 hasValue）"),
-    "A02": (3, 2, "引用解析成节点链接；按序选表的规则仍在注解"),
-    "A03": (3, 2, "同上：引用成链接，选表两步规则在注解"),
-    "A04": (3, 2, "引用成链接，地理路径跟随事实表的规则在注解"),
-    "A05": (3, 2, "引用成链接，规则在注解"),
-    "A06": (3, 1, "各事实表的最早 / 最晚 DateKey 写成 xsd:date 个体；主数据不截断的说明在注解"),
-    "A07": (3, 1, "列出的相对时间词写成带起止日的个体；「近 N 天」「近 N 个月」是参数式，留在注解与 SQL 片段"),
-    "A08": (3, 2, "只形式化了默认本期 / 对比期；同比、环比怎么取对比期的规则在注解"),
-    "A09": (3, 2, "引用成链接；交易日日均的定义在注解与 SQL 片段"),
-    "A10": (3, 1, "大洲 → 季节字段的对应写成个体；按「大洲 × 季节」分组的要求在注解"),
-    "A11": (3, 1, "行范围链接到类:线上订单行 与 类:全渠道汇总行（全部行，含退货行）"),
-    "A12": (3, 1, "行范围链接到类:线上订单行（全部交易行，含只有退货的订单）"),
-    "A13": (3, 2, "引用成链接；利润率的选择与上卷公式在注解与 SQL 片段"),
-    "A14": (3, 2, "引用成链接；选表顺序交给 A15，本条规则在注解"),
-    "A15": (3, 1, "五条按序规则写成有序列表（说法 → 表 / 科目），说法 → 场景写成个体"),
-    "A16": (3, 1, "说法 → 落点（DimProduct.UnitPrice 或 指标:平均单价）"),
-    "A17": (3, 1, "分子分母的行范围链接到类:打折交易（PromotionKey 的 sh:not hasValue 1）"),
-    "A18": (3, 1, "默认指标、行范围、默认分组字段都是链接"),
-    "A19": (3, 1, "默认分组字段与同时列出的字段是链接；按交易日期分年的说明在注解"),
-    "A20": (3, 1, "四条「事实表 → DimProduct」关系标为必须左连接；未知组为 NULL 的写法在注解"),
-    "A21": (3, 2, "引用成链接；占比分母规则在注解与 SQL 片段"),
-    "A22": (3, 2, "引用成链接；期末 / 平均库存的算法在注解与 SQL 片段"),
-    "A23": (3, 2, "引用成链接；周转率窗口规则在注解"),
-    "A24": (3, 2, "两组说法写成比较形状（lessThan / hasValue 0）；本条的核心「按产品先跨店汇总再比较」在注解"),
-    "A25": (3, 2, "引用成链接；不用宽表的规则在注解"),
-    "A26": (3, 2, "引用成链接；对齐与全外连接的规则在注解"),
-    "A27": (3, 2, "月数定义成数据属性（定义域 DimCustomer）；客户集合与筛选规则在注解"),
-    "A28": (3, 2, "引用成链接；新客窗口的读法在注解"),
-    "A29": (3, 2, "引用成链接；同店判定规则在注解"),
-    "A30": (3, 2, "引用成链接；坪效分子分母范围在注解与 SQL 片段"),
-    "A31": (3, 2, "在售 / 停售链接到带 hasValue 的类；门店数、产品数的计数规则（本条主体）在注解"),
-    "A32": (3, 1, "地理上卷写成有序关系链（含 owl:inverseOf）；组织树例外在注解"),
-    "A33": (3, 1, "计划表有行的叶子科目写成有序列表，父科目的叶子集合见 H07 的 :leafAccounts"),
-    "A34": (3, 1, "三组说法 → 落点（CostAmount、类:设备购置费、类:年度维护费）"),
-    "A35": (3, 1, "使用 / 不使用的关系是链接"),
-    "A36": (3, 2, "引用成链接；颜色大小写不敏感已在 E07 形式化，本条的平均值规则在注解"),
-    "A37": (3, 1, "按周分组的两个字段写成有序列表"),
-    "A38": (3, 2, "引用成链接；业绩汇总沿员工树的规则在注解（断环在 H06）"),
-    "A39": (3, 1, "说法 → 落点（ContinentName、RegionCountryName）"),
-    "A40": (3, 1, "子类 19 属于 Computers 写成断言个体"),
-    "A41": (3, 1, "根科目与断环写成链接（根 = 科目 1，忽略 1 的上级）"),
-    "D01": (3, 2, "首购日声明为数据属性（定义域 DimCustomer，值域 xsd:date）；口径在注解与 SQL 片段"),
-    "D02": (3, 2, "同 D01"),
-    "D03": (3, 2, "同 D01"),
-    "D04": (3, 3, "三个留存口径是文字与 SQL 片段"),
-    "D05": (3, 2, "声明为类（⊑ DimCustomer，≡ 类:复购客户），行范围链接；「≥ 2 个订单」在注解与 SQL 片段"),
-    "D05b": (3, 2, "同 D05，行范围是类:线上销售行"),
-    "D06": (3, 2, "行范围链接；比率口径在注解与 SQL 片段"),
-    "D06b": (3, 3, "文字与 SQL 片段"),
-    "D06c": (3, 2, "行范围链接到类:线上销售行；比率口径在注解"),
-    "D07": (3, 2, "行范围链接；订单数口径在注解"),
-    "D07b": (3, 2, "行范围链接到类:线上销售行；口径在注解"),
-    "D08": (3, 3, "文字"),
-    "D09": (3, 3, "文字"),
-    "D10": (3, 1, "年龄声明为数据属性并给出派生式；五个年龄段写成区间个体（sh:minInclusive / maxExclusive）"),
-    "D11": (3, 1, "四个收入档写成 YearlyIncome 上的区间个体"),
-    "D12": (3, 3, "文字与 SQL 片段"),
-    "D13": (3, 3, "文字"),
-    "D14": (3, 3, "文字"),
-    "D15": (3, 3, "文字与 SQL 片段"),
-    "D16": (3, 1, "分子 = 指标:销售数量，分母 = 指标:订单数"),
-    "D17": (3, 1, "分子 = 指标:退货金额，分母 = 指标:销售额"),
-    "D18": (3, 3, "文字与 SQL 片段"),
-    "D19": (3, 2, "A / B / C 的阈值写成区间个体；累计占比（含同额）的算法在注解与 SQL 片段"),
-    "D20": (3, 2, "动销产品声明为类:在售产品的子类；窗口与分母规则在注解"),
-    "D21": (3, 2, "声明为类:在售产品的子类，默认窗口是个体；判定规则在注解"),
-    "D22": (3, 2, "声明为类:门店的子类；开店日期判定在注解"),
-    "D23": (3, 1, "≡ 类:已关店门店（Status 的 hasValue 'Off'），CloseDate 哨兵值写成个体"),
-    "D24": (3, 3, "文字"),
-    "D25": (3, 3, "文字"),
-    "D26": (3, 3, "文字与 SQL 片段"),
-    "D27": (3, 1, "≡ 类:零库存组合（OnHandQuantity 的 hasValue 0）"),
-    "D28": (3, 3, "文字"),
-    "D29": (3, 2, "默认窗口是个体；渠道范围与日分母规则在注解与 SQL 片段"),
-    "D30": (3, 1, "默认科目 = 科目 4，分子场景 Actual、分母场景 Budget 是链接"),
-    "D31": (3, 3, "默认科目只在落到战略计划表时成立，不写成无条件公理"),
-    "D32": (3, 1, "收入、费用、税写成叶子科目列表，税前 / 税后利润写成显式减法个体，默认场景链接"),
-    "D33": (3, 2, "只形式化了分母科目；分子随问题，在注解"),
+_R = "复核档；"
+TIERS: dict[str, tuple[str, str, str]] = {
+    "G01": ("3", "3", "比率分母为 0 / NULL 的通则是文字规则"),
+    "A01": ("3", "2", _R + "默认 / 例外范围链接到类；触发例外的是问题措辞，不是数据条件，不能写成形状（未做）"),
+    "A02": ("3", "2", "引用成链接；按序选表规则在注解"),
+    "A03": ("3", "2", "引用成链接；两步选表规则在注解"),
+    "A04": ("3", "2", "引用成链接；地理路径随事实表的规则在注解"),
+    "A05": ("3", "2", "引用成链接；规则在注解"),
+    "A06": ("3", "2", _R + "各表端点是个体；「没说时间时取全部」是作答动作，OWL / SHACL 无对应构造（未做）"),
+    "A07": ("3", "2", _R + "固定时间词的端点是个体；参数化的「近 N 天 / 月」无标准写法（未做）"),
+    "A08": ("3", "2", "默认窗口是个体；同比环比取窗算法在注解"),
+    "A09": ("3", "2", "引用成链接；交易日日均算法在注解"),
+    "A10": ("3", "2", _R + "大洲 → 字段对应是个体；逐行选字段与双键分组是查询写法，无标准构造（未做）"),
+    "A11": ("3", "1C", _R + "行范围（全部行，含退货行）用自定义 :rowScope 链接到带形状的类"),
+    "A12": ("3", "1C", _R + "行范围用自定义 :rowScope；去重算法在注解"),
+    "A13": ("3", "2", "引用成链接；比率选择与上卷在注解"),
+    "A14": ("3", "2", "引用成链接；计划语境识别在注解"),
+    "A15": ("3", "1C", _R + "有序决策表依赖自定义 :decisionList 的释义"),
+    "A16": ("3", "2", _R + "落点是链接；组内简单平均与兜底条件在注解（聚合无标准构造，未做）"),
+    "A17": ("3", "2", _R + "默认行范围链接到类:打折交易；「问题明确要全部交易作分母」是问题措辞（未做）"),
+    "A18": ("3", "2", _R + "默认指标、范围、分组是链接；覆盖条件是问题措辞（未做）"),
+    "A19": ("3", "2", _R + "本轮补 retail:DimPromotion 的 owl:hasKey（PromotionKey）；按名合并与跨年取年份的条件无标准构造（未做）"),
+    "A20": ("3", "2", _R + "左连接关系是链接；未知组保留、参与排名是查询写法（未做）"),
+    "A21": ("3", "2", "引用成链接；分母作用域在注解"),
+    "A22": ("3", "2", "引用成链接；最近快照与平均算法在注解"),
+    "A23": ("3", "2", "引用成链接；周转算法在注解"),
+    "A24": ("3", "2", _R + "本轮改为链接到 H12 的门店 × 产品组合类（比较在那里是形状），不再把原始列比较挂在本条；先跨店汇总再比较是聚合，SHACL Core 无法表达（未做）"),
+    "A25": ("3", "2", "引用成链接；规则在注解"),
+    "A26": ("3", "2", "引用成链接；对齐与全外连接在注解"),
+    "A27": ("3", "2", "月数声明为数据属性；客户集合要按参照日与交易筛选取，是参数化条件（未做）"),
+    "A28": ("3", "2", "引用成链接；新客窗口在注解"),
+    "A29": ("3", "2", "引用成链接；同店判定在注解"),
+    "A30": ("3", "2", "引用成链接；范围与比率在注解"),
+    "A31": ("3", "2", "在售 / 停售链接到带形状的类；计数规则在注解"),
+    "A32": ("3", "1C", _R + "有序关系链（含 owl:inverseOf）挂在自定义 :geoPath 上"),
+    "A33": ("3", "2", _R + "本轮补 FactStrategyPlan 的形状（AccountKey ∈ 17 个叶子、Amount > 0）与传递的上级科目闭包；父科目 = 叶子之和是算术，无标准构造（未做）"),
+    "A34": ("3", "2", _R + "落点是链接；计划语境改走科目 8 是问题措辞，未绑定到映射（未做）"),
+    "A35": ("3", "1C", _R + "选用 / 不选用的关系用自定义谓词"),
+    "A36": ("3", "2", "引用成链接；平均值规则在注解（颜色见 E07）"),
+    "A37": ("3", "1C", _R + "分组字段的有序列表挂在自定义 :groupBy 上"),
+    "A38": ("3", "2", "引用成链接；员工树无环要 SHACL-SPARQL 或递归路径校验，SHACL Core 做不了（未做）"),
+    "A39": ("3", "2", _R + "落点是链接；职级、组织语境的排除是问题措辞（未做）"),
+    "A40": ("3", "1C", _R + "归属是自定义断言；写成标准的子类行实例需要 Computers 的键，原文没有给（未做）"),
+    "A41": ("3", "1C", _R + "根与断环是自定义记录；无环约束 SHACL Core 做不了（未做）；本轮在 H07 补传递闭包属性"),
+    "D01": ("3", "2", "数据属性（定义域 DimCustomer、值域 xsd:date）；聚合在注解"),
+    "D02": ("3", "2", "同 D01"),
+    "D03": ("3", "2", "同 D01"),
+    "D04": ("3", "3", "留存算法是文字与 SQL 片段"),
+    "D05": ("3", "2", "类、等价、行范围；「≥ 2 个不同订单」要按订单号去重计数，SHACL Core 只能数行（未做）"),
+    "D05b": ("3", "2", "同 D05"),
+    "D06": ("3", "2", "行范围链接；比率在注解"),
+    "D06b": ("3", "3", "文字与 SQL 片段"),
+    "D06c": ("3", "2", "行范围链接；比率在注解"),
+    "D07": ("3", "2", "行范围链接；去重在注解"),
+    "D07b": ("3", "2", "行范围链接；去重在注解"),
+    "D08": ("3", "3", "文字"),
+    "D09": ("3", "3", "比率是文字；H08 的划分不算本条的口径（未做：比率无标准构造）"),
+    "D10": ("3", "2", _R + "本轮把五个年龄段写成 sh:NodeShape + sh:property / sh:path :D10；年龄的派生式只在注解，故仍为 (2)"),
+    "D11": ("3", "1S", "复核为 1C（band 只有散落的 SHACL 边界）；本轮每档改成 sh:NodeShape + sh:property / sh:path DimCustomer.YearlyIncome，"
+                        "pyshacl 正反例测试通过（tests/test_l3a_full.py），核心分档已是标准形状，故报 1S"),
+    "D12": ("3", "3", "文字与 SQL 片段"),
+    "D13": ("3", "3", "文字"),
+    "D14": ("3", "3", "文字"),
+    "D15": ("3", "3", "文字与 SQL 片段"),
+    "D16": ("3", "2", _R + "分子分母链接不定义除法"),
+    "D17": ("3", "2", _R + "分子分母链接不定义除法"),
+    "D18": ("3", "3", "文字与 SQL 片段"),
+    "D19": ("3", "2", "阈值改成绑定到累计占比属性的形状；累计排序与同额处理在注解"),
+    "D20": ("3", "2", "父类；窗口与分母在注解"),
+    "D21": ("3", "2", "父类与默认窗口；判定在注解"),
+    "D22": ("3", "2", "父类；日期判定在注解"),
+    "D23": ("3", "1S", "复核为 (2)（哨兵值只是记录）；本轮补哨兵排除形状 sh:not [ sh:pattern \"^2090-12-31\" ]，"
+                        "关店 = owl:equivalentClass 类:已关店门店（Status 的 hasValue \"Off\"），pyshacl 正反例通过；"
+                        "按期间筛选关店日是问题的参数，不是本条口径，故报 1S"),
+    "D24": ("3", "3", "文字"),
+    "D25": ("3", "3", "文字"),
+    "D26": ("3", "3", "文字与 SQL 片段"),
+    "D27": ("3", "2", _R + "零值类是链接；最近快照与跨店聚合在注解"),
+    "D28": ("3", "3", "文字"),
+    "D29": ("3", "2", "默认窗口；渠道与日分母在注解"),
+    "D30": ("3", "2", _R + "默认科目与场景是链接；比率在注解"),
+    "D31": ("3", "3", "有条件的默认科目，不写成无条件公理"),
+    "D32": ("3", "1C", _R + "叶子集合与显式加减依赖自定义谓词；本轮在 H07 补标准传递闭包，算术本身无标准构造"),
+    "D33": ("3", "2", "分母链接；分子随语境"),
 }
-for _i, _e in enumerate(("E01", "E02", "E03", "E06", "E08", "E11", "E12", "E13", "E14", "E15", "E17")):
-    TIERS[_e] = (1, 1, "同档：说法 → 取值的个体旧版已有；新增作用字段的链接（旧版只是字段原文）"
-                 + ("，E12 另链接科目个体" if _e == "E12" else ""))
+for _e in ("E01", "E02", "E03", "E06", "E08", "E11", "E12", "E13", "E14", "E15", "E17"):
+    TIERS[_e] = ("1C", "1C", "同档：说法 → 取值的映射依赖自定义 :value / :map；本轮新增作用字段链接")
 TIERS.update({
-    "E04": (2, 1, "旧版「大中华区」的取值是列表，被丢掉；新版写成 sh:in"),
-    "E05": (2, 1, "旧版「游戏」的列表取值被丢掉；新版写成 sh:in；分不出的说法写成个体，处理规则在注解"),
-    "E07": (2, 1, "旧版只有 :value，大小写不敏感只在注解；新版每个颜色写 sh:pattern + sh:flags \"i\"（E07 已知问题）"),
-    "E09": (2, 1, "旧版把「PromotionKey = 1 / != 1」当取值、名单列表被丢掉；新版写成条件形状（hasValue / sh:not）与 sh:in"),
-    "E10": (2, 1, "旧版字典取值全部丢掉、只剩说法；新版每个说法给出三个季节字段的取值"),
-    "E16": (2, 1, "旧版列表取值全部丢掉；新版写成 sh:in"),
-    "H01": (2, 1, "旧版缺「SalesQuantity > 0」与划分；新版补 sh:minExclusive 与 owl:disjointUnionOf"),
-    "H02": (2, 1, "旧版缺虚拟门店（!=）与两个划分；新版补 sh:not 与两个 owl:disjointUnionOf"),
-    "H03": (2, 1, "旧版有在售 / 停售的 hasValue、缺划分；新版补两个 owl:disjointUnionOf（能否连上 DimProduct 的判定在注解，左连接见 A20）"),
-    "H04": (2, 1, "旧版无形状；新版城市的「GeographyType = 'City' 的行」转 hasValue（旧版的字面等式规则在此不生效），身份写成 owl:hasKey"),
-    "H05": (2, 1, "旧版「EntityType = 'Group'，3 个」带逗号，字面等式规则不生效；新版四类都转 hasValue，并加 owl:AllDisjointClasses"),
-    "H06": (2, 1, "旧版有职级 hasValue、缺划分与断环；新版补 owl:disjointUnionOf 与断环个体"),
-    "H07": (2, 1, "旧版只有科目树；新版加各父科目的叶子集合与断环（利润的显式减法在 D32）"),
-    "H08": (2, 1, "旧版只有类与子类；新版把三层客户写成月数区间形状，加划分与 owl:disjointWith（客户集合规则在 A27 的注解）"),
-    "H09": (2, 1, "旧版缺打折交易（!=）与划分；新版补 sh:not 与 owl:disjointUnionOf，路径用 sh:alternativePath"),
-    "H10": (1, 1, "同档：旧版已有三个场景的 hasValue 与「每行恰好一个场景」的形状；新版加 owl:AllDisjointClasses"),
-    "H11": (2, 1, "旧版缺划分；新版写 DimDate 的 owl:disjointUnionOf"),
-    "H12": (2, 1, "旧版缺「OnHand < SafetyStock」；新版补 sh:lessThan。零库存 ⊂ 低于安全库存按原文不是规则，不写"),
-    "H13": (2, 1, "旧版缺两个 IN 条件与划分；新版补 sh:in 与两个 owl:disjointUnionOf"),
+    "E04": ("2", "1S", "列表取值写成 sh:in"),
+    "E05": ("2", "1S", "列表取值写成 sh:in；分不出的说法的处理在注解"),
+    "E07": ("2", "1S", "每个颜色 sh:pattern + sh:flags \"i\""),
+    "E09": ("2", "1S", "条件写成 hasValue / sh:not，名单写成 sh:in"),
+    "E10": ("2", "1S", "复核不通过（取值节点用了物理列属性，RDFS 闭包推成 DimDate 行）；本轮改为每个大洲一个节点，"
+                       "字段只作 sh:path / :onColumn 的宾语，取值是 sh:hasValue，适用大洲另写 :whenContinent 形状"
+                       "（DimGeography.ContinentName 的 hasValue）；RDFS / OWL-RL 闭包后无表或类的新实例（语义探针测试）"),
+    "E16": ("2", "1S", "列表取值写成 sh:in"),
+    "H01": ("2", "1S", "形状与划分"),
+    "H02": ("2", "1S", "形状与两套划分"),
+    "H03": ("2", "1S", "形状与划分；能否连上 DimProduct 的判定在注解"),
+    "H04": ("2", "1S", "城市 hasValue、owl:hasKey"),
+    "H05": ("2", "1S", "四类 hasValue、owl:AllDisjointClasses；自指根在注解"),
+    "H06": ("2", "1S", "职级形状与划分；员工树无环 SHACL Core 做不了（未做）"),
+    "H07": ("2", "1C", _R + "科目树用自定义 :parentAccount；本轮补 rdfs:subPropertyOf 到 owl:TransitiveProperty 的闭包属性"),
+    "H08": ("2", "2", _R + "划分正确；分层集合资格与月数派生在注解"),
+    "H09": ("2", "1S", "划分、hasValue / sh:not、sh:alternativePath"),
+    "H10": ("1S", "1S", "同档：场景形状与单值约束"),
+    "H11": ("2", "1S", "形状与划分"),
+    "H12": ("2", "1S", "两种比较形状；不加只在当前数据成立的子类"),
+    "H13": ("2", "1S", "形状、sh:in 与两套划分"),
 })
+TIER_ORDER = ("1S", "1C", "2", "3")
+
+# Review checklist and the T26 list: what this round did per item (补 / 未做 and why).
+REVIEW_ITEMS = ("E10 A01 A06 A07 A10 A16 A17 A18 A19 A20 A33 A34 A39 D10 D16 D17 D23 D27 D30 H08 D11 A24").split()
+T26_ITEMS = ("A17 A19 A24 A27 A33 A34 A38 A40 A41 D05 D05b D09 D10 D11 D23 D32").split()
+
 
 # Constructs that count as OWL / SHACL (reported per entry); custom properties are listed as such.
 _CONSTRUCTS = [
@@ -1757,12 +1811,12 @@ def token_rows() -> list[tuple[str, int, int, int]]:
 
 
 def l1_tiers(ctx: dict) -> dict:
-    """Conventions and metrics by the same three tiers."""
+    """Conventions and metrics by the same tiers: every one is (2) (links, core in annotation).
+    The ratio metrics whose numerator and denominator link to metrics are (2) as well: the two
+    links do not define the division, its scope or the zero-denominator case (step-3 review)."""
     names = {m["name"] for m in ctx["metrics"]}
-    pure_ratio = [m["name"] for m in ctx["metrics"] if m.get("numerator") in names
-                  and m.get("denominator") in names and not m.get("default_filters")]
-    return {"conventions": (0, len(ctx["conventions"]), 0), "metrics": (len(pure_ratio), len(ctx["metrics"]) - len(pure_ratio), 0),
-            "pure_ratio": pure_ratio}
+    ratio_links = [m["name"] for m in ctx["metrics"] if m.get("numerator") in names and m.get("denominator") in names]
+    return {"conventions": {"2": len(ctx["conventions"])}, "metrics": {"2": len(ctx["metrics"])}, "ratio_links": ratio_links}
 
 
 def report(ctx: dict, data: dict, p_l1: Parsed, p_full: Parsed, sub: dict, tokens) -> str:
@@ -1788,7 +1842,7 @@ def report(ctx: dict, data: dict, p_l1: Parsed, p_full: Parsed, sub: dict, token
     c_full = counts(ctx, data, p_full)
     wide = sum(1 for e in c_full["entries"] if e[2] == FORMAL)
     cons = constructs(ctx, data)
-    tiers_new = Counter(TIERS[i][1] for i in ids)
+    tiers_new = Counter(TIERS[i][1] for i in ids)  # noqa: F841
     tiers_old = Counter(TIERS[i][0] for i in ids)
     same = [i for i in ids if TIERS[i][0] == TIERS[i][1]]
 
@@ -1822,7 +1876,7 @@ def report(ctx: dict, data: dict, p_l1: Parsed, p_full: Parsed, sub: dict, token
         "不属于任何一条；保留它是为了 SQL-L1plus 的 `l1plus` 节能逐字段重建）。"
         "109 条里只用到的词汇，声明归第一个用到它的条目。不多不少，否则渲染失败。",
         "3. 本体自己命名空间里用到的每个节点都有定义；生成结果可重现。",
-        "4. 通用解析器复核：rdflib 解析两份文本，三元组数与本模块解析器一致（rdflib 不是项目依赖，未安装时该测试跳过）。",
+        "4. 通用解析器复核：rdflib 解析两份文本，三元组数与本模块解析器一致；语义探针见下（rdflib、owlrl、pyshacl 不是项目依赖，未安装时这些测试跳过）。",
         "5. 不运行 OWL 推理机或 SHACL 引擎，不编译查询。", "",
         "## L1：两份本体里都出现且数量相同", "",
         "| 项 | 源 | SQL-L1-onto | SQL-L3a-full |", "|---|---|---|---|",
@@ -1831,23 +1885,40 @@ def report(ctx: dict, data: dict, p_l1: Parsed, p_full: Parsed, sub: dict, token
         "外键是对象属性（多对一 = owl:FunctionalProperty，一对一再加 owl:InverseFunctionalProperty），"
         "枚举值是个体（`:enumValue [ :code … ; :meaning … ]`，没有写成闭合 `sh:in`：L1 没说哪些清单是完整的），"
         "同义词是「说法 → 指标 / 字段」的链接，多路径默认能解析的写成有序关系链。", "",
-        "### L1 的约定与指标，按三档", "",
-        "三档（与 T26 对齐）：(1) 核心口径已形式化：决定 SQL 怎么写的那部分是公理、形状或个体，不只在注解里；"
-        "(2) 只有声明：类型、定义域值域、链接，核心口径在注解里；(3) 纯注解。两份本体的 L1 部分相同，下表对两份都成立。", "",
-        "| 项 | (1) 核心已形式化 | (2) 只有声明 | (3) 纯注解 | 说明 |", "|---|---|---|---|---|",
-        f"| 约定 | 0 | {l1t['conventions'][1]} | 0 | 适用的表、字段、指标是链接；规则是文字 |",
-        f"| 指标 | {l1t['metrics'][0]} | {l1t['metrics'][1]} | 0 | (1) 是纯比率、分子分母都链接到指标：{'、'.join(l1t['pure_ratio'])}；"
-        "(2) 有表与约定的链接，口径是文字或注解里的 SQL 表达式（折扣率的分子分母虽是链接，但「PromotionKey != 1」的默认筛选在注解，归 (2)） |", "",
-        "## L1+ 109 条，按三档（新旧对照）", "",
+        "### L1 的约定与指标，按档位", "",
+        "档位（第 3 步复核定）：**1S** 核心口径已用 OWL 2 / SHACL Core 的标准构造形式化；**1C** 核心已形式化，但含义依赖本体自定义的谓词；"
+        "**(2)** 只有声明：类型、定义域值域、链接，核心口径在注解里；**(3)** 纯注解。两份本体的 L1 部分相同，下表对两份都成立。", "",
+        "| 项 | 1S | 1C | (2) | (3) | 说明 |", "|---|---|---|---|---|---|",
+        f"| 约定 | 0 | 0 | {l1t['conventions']['2']} | 0 | 适用的表、字段、指标是链接；规则是文字 |",
+        f"| 指标 | 0 | 0 | {l1t['metrics']['2']} | 0 | 都有表与约定的链接，口径是文字或注解里的 SQL 表达式。"
+        f"其中 {len(l1t['ratio_links'])} 个比率的分子分母链接到指标（{'、'.join(l1t['ratio_links'])}），"
+        "链接不定义除法、分组作用域和分母为 0 的处理，按复核归 (2)；上一版把其中 12 个报成 (1)，已改 |", "",
+        "## L1+ 109 条，按档位（新旧对照）", "",
         "| 档 | 旧 SQL-L3a | SQL-L3a-full |", "|---|---|---|",
-        *[f"| ({k}) | {tiers_old[k]}（{pct(tiers_old[k], len(ids))}） | {tiers_new[k]}（{pct(tiers_new[k], len(ids))}） |" for k in (1, 2, 3)], "",
-        f"和旧 L3a 同档的 {len(same)} 条：{'、'.join(same)}；其余 {len(ids) - len(same)} 条档位提高，理由逐条见下表。",
-        f"SHACL-SPARQL 或其他查询式规则：{'、'.join(sparql) if sparql else '没有用'}（指标口径都用注解里的 SQL 片段，按卡片允许的写法）。", "",
-        f"**宽口径**（上一版报的）：只要条目名下有任何一条非注解、非 `:ref`、非自身类型的三元组就算形式化，"
-        f"这样是 {wide} 条（{pct(wide, len(ids))}）。它把「只有声明」也算进形式化，比上面的三档宽，保留作参考。", "",
-        "旧 L3a 的档位按旧生成器（`render/l1plus.py`）的实际输出判：A / D / G 条只有原文注解树；E 条有「说法 → 取值」个体，"
-        "但列表、字典取值和 E07 的筛选写法被丢掉；H 条有类与子类，成员定义只有「开头是字面等式且后面紧跟（、；或结尾」才转 hasValue，"
-        "没有划分公理和键。", "",
+        *[f"| {k} | {tiers_old[k]}（{pct(tiers_old[k], len(ids))}） | {tiers_new[k]}（{pct(tiers_new[k], len(ids))}） |"
+          for k in TIER_ORDER], "",
+        f"新档按第 3 步复核（`reports/validation/t34-codex-review.md`）的逐条档位，只有 3 条和复核不同，都是本轮补了标准构造："
+        f"{'、'.join(i for i in ids if TIERS[i][2].startswith('复核为') or TIERS[i][2].startswith('复核不通过'))}，证据见逐条表。"
+        f"和旧 L3a 同档的 {len(same)} 条：{'、'.join(same)}；其余 {len(ids) - len(same)} 条档位提高，没有降档。", "",
+        "只用 OWL 2 与 SHACL Core 的标准构造；没有用 SHACL-SPARQL、SHACL-AF 规则或其他查询式规则（那属于 L3b）。"
+        f"本体里检出的查询式谓词：{'、'.join(sparql) if sparql else '无'}。指标口径只放注解里的 SQL 片段。", "",
+        f"**宽口径**（第一轮报的）：只要条目名下有任何一条非注解、非 `:ref`、非自身类型的三元组就算形式化，这样是 {wide} 条（{pct(wide, len(ids))}）。"
+        "它把「只有声明」也算进形式化，保留作参考，不用于结论。", "",
+        "旧 L3a 的档位按旧生成器（`render/l1plus.py`）的实际输出判，复核接受：A / D / G 条只有原文注解树；E 条有「说法 → 取值」个体"
+        "（依赖自定义 :value，计 1C），但列表、字典取值和 E07 的筛选写法被丢掉的计 (2)；H 条有类与子类，成员定义只有一部分转 hasValue，"
+        "没有划分公理和键，计 (2)；H10 已有场景形状，计 1S。", "",
+        "## 第 3 步复核清单的处理", "",
+        "「需要盲写会话处理的清单」与「T26 的 16 条」逐条：本轮补了什么，没有标准写法的标「未做」并写原因。不为升档硬写。", "",
+        "| 编号 | 出处 | 复核档 → 本轮档 | 处理 |", "|---|---|---|---|",
+        *[f"| {i} | {'清单' if i in REVIEW_ITEMS else ''}{'、' if i in REVIEW_ITEMS and i in T26_ITEMS else ''}{'T26' if i in T26_ITEMS else ''} "
+          f"| {TIERS[i][1]} | {TIERS[i][2]} |"
+          for i in ids if i in REVIEW_ITEMS or i in T26_ITEMS],
+        f"| L1 比率指标 {len(l1t['ratio_links'])} 个 | 清单 | (2) | 按复核归 (2)；没有补运算结构：OWL 2 / SHACL Core 不表达除法（未做） |", "",
+        "## 语义探针", "",
+        "rdflib 解析两份本体，用 owlrl 的 RDFS 与 OWL-RL 闭包展开，检查闭包后没有任何节点成为 `retail:` 表或 `class:` 类的实例"
+        "（本体里没有真实数据行，所以应为 0）。另检查：没有任何三元组用物理列属性（`retail:表.字段`，带 rdfs:domain）作谓词。"
+        "测试：`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py`；"
+        "同一命令还用 pyshacl 对 D10、D11、D23、A33、E10 的形状做正反例校验。依赖未安装时这些测试跳过。", "",
         "## 三元组", "",
         f"SQL-L1-onto {t1:,} 个，注解 {a1:,}（{pct(a1, t1)}），其余 {t1 - a1:,}（{pct(t1 - a1, t1)}）；"
         f"SQL-L3a-full {t2:,} 个，注解 {a2:,}（{pct(a2, t2)}），其余 {t2 - a2:,}（{pct(t2 - a2, t2)}）。"
@@ -1872,7 +1943,7 @@ def report(ctx: dict, data: dict, p_l1: Parsed, p_full: Parsed, sub: dict, token
         for item in data[section]:
             i = item["id"]
             old, new, why = TIERS[i]
-            lines.append(f"| {section} | {i} | ({old}) | ({new}) | {'同' if old == new else '改'} | "
+            lines.append(f"| {section} | {i} | {old} | {new} | {'同' if old == new else '改'} | "
                          f"{' '.join(f'`{x}`' for x in cons.get(i, [])) or '—'} | {why} |")
     return "\n".join(lines) + "\n"
 
