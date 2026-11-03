@@ -33,6 +33,7 @@ uv run python render/verify_cube.py       # Cube 指标的 SQL 在 chDB 上核�
 | `cube.py` | T10 | `source.yaml`、`metrics.yaml`、`measures.py` | `build/cube/model/cubes/*.yml`（T16 用） |
 | `tmdl.py` | T10 | 同上 | `build/pbip/retail-{L0,L1,L2}/`（T17 用） |
 | `check_equivalence.py` | T10 | `build/contexts/` | 等价校验，不通过退出码 1 |
+| `l3a_full.py` | T34 | SQL-L1 上下文（`render_l1`）、`semantic/l1plus.yaml` | `build/contexts/SQL-L3a-full.yaml`（整份语义层的 OWL + SHACL Turtle）、`reports/validation/l3a-full-correspondence.md`；反解核对不通过即失败 |
 | `context_sizes.py` | T10 | `build/contexts/`、`syntax/` | `reports/validation/context_sizes.md` |
 | `verify_cube.py` | T10 | `build_model()`、chDB | `reports/validation/cube_measures.md` |
 

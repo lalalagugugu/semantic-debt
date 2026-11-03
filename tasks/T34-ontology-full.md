@@ -1,6 +1,6 @@
 # T34 全部语义换成本体（L3a-full）与 L1+ 对比
 
-- 状态：待开工（用户 2026-11-03 批准开始准备）
+- 状态：第 1–2 步完成（Claude Code 盲写，2026-11-04），待第 3 步 Codex 复核；DeepSeek 上下文上限待查（见记录）
 - 负责：第 1–2 步 Claude Code（盲模式）；第 3 步 Codex 复核；第 4–6 步 Codex（codex-main）
 - 依据：`tasks/T19a-v10-plan.md` 第一节；`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-t22b-l3a-presentation.md`；`reports/validation/l3a-ontology-validation.md`（T26）
 - 依赖：`semantic-v1.6-l1plus`；`harness-v1.1`；`eval-v1.2`
@@ -61,6 +61,21 @@
 
 ## 记录（完成后填写）
 
+### 第 1–2 步（Claude Code，盲模式，2026-11-04）
+
+开工自检：试读 `$SEMDEBT_EVAL_DIR/README.md` 被拒（Operation not permitted）；会话里没有任何 `mcp__` 工具。未读 `reports/`（除本卡产出）、`runs/`、`decisions/open-questions.md`、`harness/syntax_ladder/`；未读 T26 的清单。
+
 - 产出：
+  - `render/l3a_full.py`：渲染 + 核对。复现 `uv run python -m render.l3a_full`，写 `build/contexts/SQL-L3a-full.yaml`（唯一的键 `ontology_turtle`）和 `reports/validation/l3a-full-correspondence.md`。
+  - `render/context.py` 加单元 `SQL-L3a-full`（档位 `L3a-full`）；`harness/cells.py` 在 `L1PLUS_CELLS` 里加 `SQL-L3a-full`（与 SQL-L1plus 同执行器、同语法说明、同 skip_judge；`card="T34"`，不进 `CELLS`，`--cell all` 范围不变）。
+  - `tests/test_l3a_full.py`：反解一致与计数、6 种篡改必被拒、E07 / H05 / E09 / 划分 / 键 / 科目树的形式化含义、系统提示与语法说明与 SQL-L1plus 逐字节相同、`run_direct --dry-run` 能解析新单元、T34 之前的全部单元上下文逐字节不变（对 `96abbed` 的 `render/context.py`）、rdflib 复核（`uv run --with rdflib pytest tests/test_l3a_full.py`）。
+  - 核对结果：L1 的表 25、字段 228、枚举值 568、关系 48、指标 69、约定 15、同义词 56、多路径默认 4、数据质量 15，L1+ 109 条，本体里都出现且数量相同；从 Turtle 反解出的 SQL-L1 上下文与 L1+ overlay 与源逐字段相等。L1+ 形式化 77 条（71%）、注解 32 条（29%，其中 11 条带 SQL 片段）；三元组 8,404 个，注解 3,082（37%）、形式化 5,322（63%）。rdflib 7.6.0 解析同一份文本得到同样 8,404 个三元组。
+  - token（harness 的 `estimate_tokens_from_text`，整条系统消息）：SQL-L1 41,084；SQL-L1plus 66,698；旧 SQL-L3a 156,469；SQL-L3a-full 94,709（SQL-L1plus 的 1.42×）。
 - 偏离与理由：
-- 工时：
+  - **DeepSeek 上下文上限没查到**：会话里访问 `api-docs.deepseek.com` 的命令被权限拒绝，盲模式也没有 WebFetch。80% 门槛因此未判定，需用户（或 Codex）查官方文档后补记网址、日期与上限，再决定是否进入第 4 步。
+  - 上下文文件沿用旧 SQL-L3a 的做法，是只有一个键 `ontology_turtle` 的 YAML（harness 对 `build:` 上下文一律用 yaml 代码块）；这样不改 harness 的拼接逻辑，系统提示与写法说明逐字节同 SQL-L1plus。
+  - 逐条判断后手写的形式化放在 `render/l3a_full.py` 的 `EXTRA`（每条只写原文明说的内容）；故意不形式化的：H12「零库存 ⊂ 低于安全库存」（原文说不是规则）、D31 的默认科目（只在落到战略计划表时成立）、枚举值清单不写成闭合 `sh:in`（L1 没说清单完整）。
+  - 旧 L3a 的 E07、E09、H05 问题按我读旧 `render/l1plus.py` 的理解修：E07 全部颜色用 `sh:pattern` + `sh:flags "i"`，蓝色另保留 `lower(ColorName) = 'blue'`；E09 的「PromotionKey = 1 / != 1」记为条件（`:condition`）并写成 `sh:hasValue` / `sh:not`，名单写成 `sh:in`；H05「EntityType = 'Group'，3 个」这类带逗号的成员定义也转成 `sh:hasValue`。是否就是 T26 指的问题，由第 3 步 Codex 对照。
+  - 盲模式下 `semantic/tuning/` 不可读：`tests/test_combo.py` 两项失败、`tests/test_scorer_v2_shared.py` 无法收集（读不到 `scorer-corpus`），与本卡无关；其余 1,103 项通过、23 项跳过。`render/render_all.py` 在盲模式下会把 `reports/validation/context_sizes.md` 的调优单元写成「未渲染」，所以没有提交它的改动。
+  - uv 在沙箱里读不到自带的 Python，本会话用 `UV_PYTHON=/opt/homebrew/bin/python3.14 UV_PYTHON_DOWNLOADS=never UV_CACHE_DIR=$TMPDIR/uvcache`；`uv.lock` 未变。
+- 工时：约 3 小时（Claude Code 会话）。
