@@ -56,6 +56,8 @@ CELLS: dict[str, tuple[str, str, str | None]] = {
     "SQL-L1plus": ("sql", "L1plus", None),
     "SQL-L1plus-tuned-instr": ("sql", "L1plus", "SQL-L1.combo"),
     "SQL-L3a": ("sql", "L3a", None),
+    "SQL-L3a-full": ("sql", "L3a-full", None),
+    "SQL-L1-onto": ("sql", "L1-onto", None),
     "SQL-L1.5W": ("sql", "L1.5W", None),
     "SQL-L1.5S": ("sql", "L1.5S", None),
     "SQL-L1-tuned": ("sql", "L1", "SQL-L1"),
@@ -538,6 +540,10 @@ def render_cell(cell: str) -> dict | None:
         ctx["l1plus" if tier == "L1plus" else "ontology_turtle"] = (
             overlay() if tier == "L1plus" else turtle(overlay())
         )
+    elif tier in {"L3a-full", "L1-onto"}:
+        from render.l3a_full import render_context
+
+        ctx = render_context(with_l1plus=tier == "L3a-full")
     elif tier == "L1.5W":
         ctx = render_l1(n, widetables=True)
     elif tier == "L1.5S":
