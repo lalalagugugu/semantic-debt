@@ -160,3 +160,39 @@
 - 测试：新增通用测试，两份本体里形状约束的每个字面量（共 155 个），类型都等于对应路径属性的 range；另按 D19 的做法补 xsd:int / xsd:double 数据的 pyshacl 正反例（H09 无折扣交易、A33 计划表、D11 收入档边界）。原有正反例的数据改成按字段声明的类型（xsd:int / xsd:double）。`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py`：28 passed。全套（不装三个可选依赖）：1,110 passed、32 skipped、2 failed（同前，`test_combo` 读不到盲模式拒读的 `semantic/tuning/`）。
 - 子图：SQL-L1-onto 4,975、SQL-L3a-full 8,877，三元组数不变（只改字面量类型），差额归属与前缀关系仍成立。
 - token：SQL-L3a-full 97,219 → **97,358**；其余三份不变。
+
+### 第 1–3 步汇总（盲写会话最终记录，2026-11-04）
+
+第 3 步第三轮复核通过（#265，`reports/validation/t34-codex-review.md`「第三轮」）。上面各节是逐轮过程，本节是最终状态。盲写会话自始至终只读过这一份复核文件，没有读 T26 报告、题库、`runs/`、`decisions/open-questions.md`、`harness/syntax_ladder/`；付费模型调用 0。
+
+- 产出：
+  - `render/l3a_full.py`：同一个生成器（`build`）只喂 L1 得到 **SQL-L1-onto**，喂 L1 和 109 条得到 **SQL-L3a-full**。复现 `uv run python -m render.l3a_full`，写 `build/contexts/SQL-L1-onto.yaml`、`build/contexts/SQL-L3a-full.yaml`（各只有一个键 `ontology_turtle`）和 `reports/validation/l3a-full-correspondence.md`。
+  - `render/context.py` 注册两个档位；`harness/cells.py` 在 `L1PLUS_CELLS` 里注册 `SQL-L1-onto`、`SQL-L3a-full`（同 SQL-L1 / SQL-L1plus 的执行器与语法说明，`card="T34"`；不进 `CELLS`，`--cell all` 不变）；`render/README.md` 加一行。
+  - `tests/test_l3a_full.py`，28 项。覆盖：
+    - 两份的反向重建；SQL-L1-onto 不含 109 条编号；子图与差额逐条追溯；篡改必被拒；不同 `PYTHONHASHSEED` 下逐字节相同。
+    - 语义探针（owlrl 的 RDFS / OWL-RL 闭包后无表或类的新实例）；不用物理列属性作谓词。
+    - 形状字面量的类型等于路径属性的 range；pyshacl 正反例（D10、D11、D19 分档与 double 边界，D23、A33、A40、D05、A41、E10、H09，xsd:int / xsd:double 数据）。
+    - 档位规则；系统提示与语法说明分别与 SQL-L1 / SQL-L1plus 逐字节相同；dry-run 能解析新单元；T34 之前的单元上下文逐字节不变。
+    - rdflib / owlrl / pyshacl 不是项目依赖：`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py`，未安装时相关测试跳过。
+  - 最终数字：
+    - **对应**：L1 的表 25、字段 228、枚举值 568、关系 48、指标 69、约定 15、同义词 56、多路径默认 4、数据质量 15，两份都出现且数量相同。
+    - **子图**：SQL-L1-onto 4,975 个三元组 ⊂ SQL-L3a-full 8,877 个；差 3,902 个，归到 109 条与 L1+ 文件头 `:L1plus`（9 个）。文本上前者是后者的前缀。
+    - **档位**（1S / 1C / 2 / 3，按复核）：109 条旧 SQL-L3a 为 1 / 11 / 18 / 79，SQL-L3a-full 为 **19 / 21 / 54 / 15**；L1 约定 15 条、指标 69 个都是 (2)。宽口径 77 / 71% 只作参考。
+    - **构造**：只用 OWL 2 与 SHACL Core 的标准构造，没有 SHACL-SPARQL、SHACL-AF 或其他查询式规则。
+    - **token**（harness 估算，整条系统消息）：SQL-L1 41,084；SQL-L1-onto 58,115；SQL-L1plus 66,698；SQL-L3a-full 97,358；参考：旧 SQL-L3a 156,469。
+    - **上下文上限**：DeepSeek 官方文档 https://api-docs.deepseek.com/quick_start/pricing，2026-11-04 由协调会话查。deepseek-flash（DeepSeek-V4.1-Flash-1017）上下文 1M token，最大输出 384K。四份最大占 9.7%，远低于 80%。
+- 偏离与理由（汇总；各轮细节见上）：
+  - 两份本体的一致性按图核对（子图 + 差额逐条追溯），不要求文本逐字节相同（协调会话要求）。实际文本也是前缀关系，测试一并检查。
+  - 没有在 `render/l1plus.py` 上改，另起 `render/l3a_full.py`。内容来源相同（`semantic/l1plus.yaml` 经 `overlay()`），但紧凑 Turtle、字段级谓词与反向重建需要新的序列化和编码。这样旧 SQL-L3a 也保持逐字节不变。没有手抄旧 Turtle。
+  - 卡上「指标口径可用 SHACL-SPARQL」改为「只用 OWL 2 和 SHACL Core 的标准构造」（协调会话要求）。查询式规则属于 L3b。
+  - 形式化计数改用复核的四档（1S / 1C / 2 / 3）；第一轮的「77 / 71%」标为宽口径保留。
+  - 上下文文件沿用旧 SQL-L3a 的做法，是只有一个键 `ontology_turtle` 的 YAML，不改 harness 的拼接逻辑。
+  - 故意不形式化：H12「零库存 ⊂ 低于安全库存」（原文说不是规则）、D31 的默认科目（只在落到战略计划表时成立）、闭合的枚举清单（L1 没说清单完整）。复核清单里没有标准写法的，在对应表逐条标「未做」和原因。
+  - 自定义谓词一个未删。A24 去掉的是本卡第一轮自己加的、挂在原始数量列上的比较形状。
+  - 第三轮的非阻塞备注（A40）：普通字符串与显式 xsd:string 在 RDF 1.1 里含义相同，但本机 pyshacl / rdflib 的 hasValue 比较会区分这两种内部表示。以后若对实际数据执行形状，数据适配端需要统一字符串表示。本卡没有改。
+  - 环境：
+    - 盲模式下 `semantic/tuning/` 与 `scorer-corpus` 不可读：`tests/test_combo.py` 两项失败，`tests/test_scorer_v2_shared.py` 无法收集，与本卡无关（Codex 在普通环境全套 0 failed）。
+    - `render/render_all.py` 在盲模式下会把 `reports/validation/context_sizes.md` 的调优单元写成「未渲染」，所以没有提交它的改动。
+    - uv 在沙箱里读不到自带的 Python，用了 `UV_PYTHON=/opt/homebrew/bin/python3.14 UV_PYTHON_DOWNLOADS=never UV_CACHE_DIR=$TMPDIR/uvcache`；`uv.lock` 未变。
+    - 会话内 `gh` 读不到配置，PR 由协调会话开；`git fetch` 由用户运行。
+- 工时：盲写会话合计约 9 小时（第 1–2 步两轮约 5 小时，第 3 步三次修订约 4 小时）。
