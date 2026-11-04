@@ -407,12 +407,18 @@ class Parsed:
             value = json.loads(v) if k == "short" else v[3:-3]
             if self.peek()[0] == "dt":
                 self.i += 1
-                return Lit(value, self.take("pname"))
+                dt = self.take("pname")
+                if dt in ("xsd:int", "xsd:integer"):
+                    value = int(value)
+                elif dt in ("xsd:double", "xsd:decimal"):
+                    value = float(value)
+                return Lit(value, dt)
             return Lit(value)
         if k == "num":
-            return Lit(float(v) if re.search(r"[.eE]", v) else int(v), "num")
+            kind = "xsd:double" if re.search(r"[eE]", v) else "xsd:decimal" if "." in v else "xsd:integer"
+            return Lit(float(v) if kind != "xsd:integer" else int(v), kind)
         if k == "word" and v in ("true", "false"):
-            return Lit(v == "true", "bool")
+            return Lit(v == "true", "xsd:boolean")
         if (k, v) == ("punct", "["):
             props = [] if self.peek() == ("punct", "]") else self.pred_objects("]")
             self.expect("]")
@@ -487,6 +493,9 @@ class Names:
         self.columns = {f"{ds['name'].split('.', 1)[1]}.{c['name']}" for ds in ctx["datasets"] for c in ds["columns"]}
         self.metric_iri = self._unique({m["name"]: "metric:" + local(m["name"]) for m in ctx["metrics"]})
         self.dq = {q["id"] for q in ctx["data_quality"]}
+        self.range = {f"retail:{ds['name'].split('.', 1)[1]}.{c['name']}":
+                      TYPE_MAP[re.fullmatch(r"(?:Nullable\()?(\w+)\)?", c["type"])[1]]
+                      for ds in ctx["datasets"] for c in ds["columns"]}
         self.rels = {}
         for r in ctx["relationships"]:
             ft, fc = r["from"].split(".")[1:]
@@ -756,7 +765,7 @@ def selection_shape(entry: dict, item: dict, n: Names) -> str | None:
         m = re.fullmatch(r"PromotionKey (=|!=) (\d+)", value) if isinstance(value, str) else None
         path = n.column("DimPromotion.PromotionKey" if m else "DimPromotion.PromotionName")
         if m:
-            has = ("sh:hasValue", m[2])
+            has = ("sh:hasValue", typed(m[2], n.range[path]))
             return bnode(("sh:path", path), has if m[1] == "=" else ("sh:not", bnode(has)))
         if isinstance(value, list):
             return bnode(("sh:path", path), ("sh:in", coll(lit(v) for v in value)))
@@ -838,13 +847,17 @@ def membership_shape(cls: dict, by_label: dict, ctx_cols: dict[str, list[str]], 
         table = homes[0] if len(homes) == 1 else None
     if table:
         path = n.column(f"{table}.{col}")
+        rng = n.range[path]
     elif col in CLASS_PATH_OVERRIDE:
-        path = bnode(("sh:alternativePath", coll(n.column(c) for c in CLASS_PATH_OVERRIDE[col])))
+        alts = [n.column(c) for c in CLASS_PATH_OVERRIDE[col]]
+        if len({n.range[a] for a in alts}) != 1:
+            raise ValueError(f"Alternative paths with different ranges: {alts}")
+        path, rng = bnode(("sh:alternativePath", coll(alts))), n.range[alts[0]]
     else:
         return []
 
     def term(v):
-        return lit(v[1:-1]) if v.startswith("'") else v
+        return typed(v[1:-1] if v.startswith("'") else v, rng)
 
     if in_list is not None:
         cons = ("sh:in", coll(term(v.strip()) for v in in_list.split(",")))
@@ -1010,6 +1023,18 @@ def _band(label, path, **bounds):
                                                              for k, v in bounds.items()])))
 
 
+def typed(value, rng: str) -> str:
+    """A shape literal typed like the path property's rdfs:range (sh:hasValue / sh:in compare
+    RDF terms, so 1 (xsd:integer) would not match "1"^^xsd:int data)."""
+    if rng == "xsd:string":
+        return lit(str(value))
+    if rng == "xsd:integer":
+        return str(int(value))
+    if rng in ("xsd:int", "xsd:double"):
+        return f'"{value}"^^{rng}'
+    raise ValueError(rng)
+
+
 def double(v: str) -> str:
     """A bound typed like a property declared xsd:double (a bare 0.8 would be xsd:decimal)."""
     return f'"{v}"^^xsd:double'
@@ -1078,9 +1103,9 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
     "A33": [(":A33", [(":planRowAccounts", _accounts(PLAN_LEAVES)),
                       (":axiom", bnode(("rdf:type", "sh:NodeShape"), ("sh:targetClass", "retail:FactStrategyPlan"),
                                        ("sh:property", bnode(("sh:path", "retail:FactStrategyPlan.AccountKey"),
-                                                             ("sh:in", coll(str(k) for k in PLAN_LEAVES)))),
+                                                             ("sh:in", coll(typed(k, "xsd:int") for k in PLAN_LEAVES)))),
                                        ("sh:property", bnode(("sh:path", "retail:FactStrategyPlan.Amount"),
-                                                             ("sh:minExclusive", "0")))))])],
+                                                             ("sh:minExclusive", typed(0, "xsd:double"))))))])],
     "A34": [(":A34", [(":termTarget", _term(["IT 成本", "设备成本", "运维成本"], target="retail:FactITMachine.CostAmount")),
                       (":termTarget", _term(["设备购置费", "购置成本"], target="class:设备购置费")),
                       (":termTarget", _term(["年度维护费", "维护费"], target="class:年度维护费"))])],
@@ -1097,7 +1122,7 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
                                        ("sh:or", coll([
                                            bnode(("sh:not", bnode(("sh:property", bnode(
                                                ("sh:path", "retail:DimProductSubcategory.ProductSubcategoryKey"),
-                                               ("sh:hasValue", "19")))))),
+                                               ("sh:hasValue", typed(19, "xsd:int"))))))),
                                            bnode(("sh:property", bnode(
                                                ("sh:path", coll(["rel:DimProductSubcategory.ProductCategoryKey-DimProductCategory",
                                                                  "retail:DimProductCategory.ProductCategoryName"])),
@@ -1138,10 +1163,10 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
                           _band("50–59", ":D10", minInclusive=50, maxExclusive=60),
                           _band("60 岁及以上", ":D10", minInclusive=60))]])],
     "D11": [(":D11", [(":bandOf", "retail:DimCustomer.YearlyIncome"), *[(":band", b) for b in (
-        _band("[0, 40000)", INCOME, minInclusive=0, maxExclusive=40000),
-        _band("[40000, 80000)", INCOME, minInclusive=40000, maxExclusive=80000),
-        _band("[80000, 130000)", INCOME, minInclusive=80000, maxExclusive=130000),
-        _band("[130000, +∞)", INCOME, minInclusive=130000))]])],
+        _band("[0, 40000)", INCOME, minInclusive=double("0"), maxExclusive=double("40000")),
+        _band("[40000, 80000)", INCOME, minInclusive=double("40000"), maxExclusive=double("80000")),
+        _band("[80000, 130000)", INCOME, minInclusive=double("80000"), maxExclusive=double("130000")),
+        _band("[130000, +∞)", INCOME, minInclusive=double("130000")))]])],
     "D19": [(":D19.累计占比", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:range", "xsd:double"),
                               ("rdfs:label", lit("累计占比（D19 的定义）"))]),
             (":D19", [(":band", b) for b in (
@@ -1204,7 +1229,8 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
                                        ("sh:targetClass", "retail:FactSalesQuota"), ("sh:targetClass", "retail:FactStrategyPlan"),
                                        ("sh:property", bnode(("sh:path", bnode(("sh:alternativePath", coll(
                                            ["retail:FactSalesQuota.ScenarioKey", "retail:FactStrategyPlan.ScenarioKey"])))),
-                                           ("sh:minCount", "1"), ("sh:maxCount", "1"), ("sh:in", "( 1 2 3 )")))))])],
+                                           ("sh:minCount", "1"), ("sh:maxCount", "1"),
+                                           ("sh:in", coll(typed(k, "xsd:int") for k in (1, 2, 3)))))))])],
     "H11": [_disjoint_union("retail:DimDate", ["工作日", "周末"])],
     "H13": [_disjoint_union("class:IT_设备", ["POS", "服务器", "集线器", "路由器"]),
             _disjoint_union("class:IT_成本", ["设备购置费", "年度维护费"])],

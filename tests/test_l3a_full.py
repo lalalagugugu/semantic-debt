@@ -147,8 +147,8 @@ def _labelled(g, rdflib, label):
 def test_shacl_bands_bind_to_fields(source):
     rdflib, g = _graph(source[2])
     income = _labelled(g, rdflib, "[40000, 80000)")
-    assert _validate(g, income, "<urn:ex:x> retail:DimCustomer.YearlyIncome 50000.0 .")
-    assert not _validate(g, income, "<urn:ex:x> retail:DimCustomer.YearlyIncome 90000.0 .")
+    assert _validate(g, income, '<urn:ex:x> retail:DimCustomer.YearlyIncome "50000.0"^^xsd:double .')
+    assert not _validate(g, income, '<urn:ex:x> retail:DimCustomer.YearlyIncome "90000.0"^^xsd:double .')
     age = _labelled(g, rdflib, "30–39")
     assert _validate(g, age, "<urn:ex:x> :D10 35 .")
     assert not _validate(g, age, "<urn:ex:x> :D10 41 .")
@@ -165,10 +165,11 @@ def test_shacl_sentinel_scenario_plan_and_season(source):
     assert _validate(g, shape, '<urn:ex:x> retail:DimStore.CloseDate "2009-05-01" .')
     assert not _validate(g, shape, '<urn:ex:x> retail:DimStore.CloseDate "2090-12-31" .')
     plan = next(o for o in g.objects(ns["A33"], ns["axiom"]))
-    good = "<urn:ex:x> retail:FactStrategyPlan.AccountKey 4 ; retail:FactStrategyPlan.Amount 10.0 ; retail:FactStrategyPlan.ScenarioKey 1 ."
+    good = ('<urn:ex:x> retail:FactStrategyPlan.AccountKey "4"^^xsd:int ; retail:FactStrategyPlan.Amount "10.0"^^xsd:double ; '
+            'retail:FactStrategyPlan.ScenarioKey "1"^^xsd:int .')
     assert _validate(g, plan, good)
-    assert not _validate(g, plan, good.replace("AccountKey 4", "AccountKey 2"))
-    assert not _validate(g, plan, good.replace("Amount 10.0", "Amount -1.0"))
+    assert not _validate(g, plan, good.replace('"4"^^xsd:int', '"2"^^xsd:int'))
+    assert not _validate(g, plan, good.replace('"10.0"^^xsd:double', '"-1.0"^^xsd:double'))
     # E10「春季」in Asia: the season field and value, and the continent condition, are separate shapes.
     spring = next(m for m in g.objects(ns["E10"], ns["map"]) if rdflib.Literal("春季") in set(g.objects(m, rdflib.SKOS.altLabel)))
     asia = next(v for v in g.objects(spring, ns["seasonValue"]) if (v, ns["continent"], rdflib.Literal("Asia")) in g)
@@ -316,7 +317,7 @@ def test_a40_subcategory_19_belongs_to_computers(source):
     rdflib, g = _graph(source[2])
     ns = rdflib.Namespace(L.PREFIXES[""])
     shape = next(o for o in g.objects(ns["A40"], ns["axiom"]))
-    row = ('<urn:ex:x> retail:DimProductSubcategory.ProductSubcategoryKey {key} ; '
+    row = ('<urn:ex:x> retail:DimProductSubcategory.ProductSubcategoryKey "{key}"^^xsd:int ; '
            'rel:DimProductSubcategory.ProductCategoryKey-DimProductCategory <urn:ex:c> . '
            '<urn:ex:c> retail:DimProductCategory.ProductCategoryName "{name}" .')
     assert _validate(g, shape, row.format(key=19, name="Computers"))
@@ -344,3 +345,65 @@ def test_a41_known_accounts_are_acyclic(source):
         restored.add(t)
     restored.add((acc["1"], ns["parentAccount"], acc["24"]))        # the parent edge the text breaks
     assert not pyshacl.validate(restored, shacl_graph=g)[0]
+
+
+VALUE_CONSTRAINTS = ("sh:hasValue", "sh:in", "sh:minInclusive", "sh:maxInclusive", "sh:minExclusive", "sh:maxExclusive")
+
+
+def _shape_literal_types(p):
+    """(path property, literal datatype) for every typed literal a property shape constrains."""
+    ranges = {s: p.one(s, "rdfs:range") for s in p.order
+              if "owl:DatatypeProperty" in p.all(s, "rdf:type") and p.opt(s, "rdfs:range") is not None}
+
+    def last_props(path):
+        if isinstance(path, str):
+            return [path]
+        if isinstance(path, L.Coll):
+            return last_props(path.items[-1])
+        alt = p.opt(path, "sh:alternativePath")
+        return [x for item in alt.items for x in last_props(item)] if alt is not None else []
+
+    def literals(node):
+        for pred, o in node.props:
+            if pred in VALUE_CONSTRAINTS:
+                for v in (o.items if isinstance(o, L.Coll) else [o]):
+                    if isinstance(v, L.Lit):
+                        yield v
+            elif pred in ("sh:not", "sh:and", "sh:or") and isinstance(o, (L.BNode, L.Coll)):
+                for shape in (o.items if isinstance(o, L.Coll) else [o]):
+                    if isinstance(shape, L.BNode) and p.opt(shape, "sh:path") is None:
+                        yield from literals(shape)
+
+    out = []
+    for s, pred, o in p.triples():
+        if isinstance(s, L.BNode) and pred == "sh:path":
+            props = last_props(o)
+            for v in literals(s):
+                for prop in props:
+                    out.append((prop, ranges.get(prop), v.datatype or "xsd:string", v))
+    return out
+
+
+def test_shape_literals_match_the_path_range(source, l1_text):
+    for text in (source[2], l1_text):
+        rows = _shape_literal_types(L.Parsed(text))
+        bad = [(prop, rng, dt, lit.value) for prop, rng, dt, lit in rows if rng is not None and dt != rng]
+        assert bad == [], bad[:10]
+    rows = _shape_literal_types(L.Parsed(source[2]))
+    assert len(rows) > 100 and {r[2] for r in rows} >= {"xsd:int", "xsd:double", "xsd:string", "xsd:integer"}
+    assert all(r[1] is not None for r in rows if r[0].startswith("retail:"))     # every column path has a range
+
+
+def test_int_typed_data_matches_int_shapes(source):
+    rdflib, g = _graph(source[2])
+    shape = next(g.objects(rdflib.URIRef(L.PREFIXES["class"] + "无折扣交易"), rdflib.URIRef(L.PREFIXES["sh"] + "property")))
+    assert _validate(g, shape, '<urn:ex:x> retail:FactOnlineSales.PromotionKey "1"^^xsd:int .')
+    assert not _validate(g, shape, '<urn:ex:x> retail:FactOnlineSales.PromotionKey "2"^^xsd:int .')
+    plan = next(o for o in g.objects(rdflib.URIRef(L.PREFIXES[""] + "A33"), rdflib.URIRef(L.PREFIXES[""] + "axiom")))
+    row = ('<urn:ex:x> retail:FactStrategyPlan.AccountKey "{k}"^^xsd:int ; retail:FactStrategyPlan.Amount "10.0"^^xsd:double ; '
+           'retail:FactStrategyPlan.ScenarioKey "1"^^xsd:int .')
+    assert _validate(g, plan, row.format(k=4))
+    assert not _validate(g, plan, row.format(k=2))
+    income = _labelled(g, rdflib, "[40000, 80000)")
+    assert _validate(g, income, '<urn:ex:x> retail:DimCustomer.YearlyIncome "40000"^^xsd:double .')
+    assert not _validate(g, income, '<urn:ex:x> retail:DimCustomer.YearlyIncome "80000"^^xsd:double .')

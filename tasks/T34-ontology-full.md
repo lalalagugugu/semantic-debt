@@ -149,5 +149,14 @@
 - 子图：SQL-L1-onto 4,975 不变；SQL-L3a-full 8,609 → 8,877，差额仍逐条追溯到 109 条与文件头；文本仍是前缀关系。
 - token：SQL-L3a-full 96,006 → **97,219**；SQL-L1、SQL-L1-onto、SQL-L1plus、旧 SQL-L3a 不变。
 - 测试：`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py` 26 passed。全套（不装三个可选依赖）1,109 passed、31 skipped、2 failed（`test_combo` 两项读不到盲模式拒读的 `semantic/tuning/`，与前几轮相同）。
-- 发现、未改（不在本轮 6 条内，交协调会话决定）：整数阈值与取值（如 H09 / H10 / E09 的 `sh:hasValue 1`、A33 的 `sh:in`）写成 Turtle 默认的 xsd:integer，而对应字段声明为 xsd:int。`sh:hasValue` / `sh:in` 按 RDF 项相等比较，如果实际数据按字段声明写成 `"1"^^xsd:int`，这些形状会判不符合。和 D19 同类，是表示类型一致性问题。
+- 发现：整数阈值与取值写成了 Turtle 默认的 xsd:integer，而对应字段声明为 xsd:int（与 D19 同类）。协调会话决定统一，见下一节。
 - 工时：约 1 小时。
+
+### 形状字面量的数据类型统一（Claude Code，盲模式，2026-11-04，协调会话要求）
+
+- 规则：所有形状里的字面量（sh:hasValue、sh:in、sh:min/maxInclusive、sh:min/maxExclusive）的数据类型一律等于路径属性声明的 rdfs:range；路径是序列时取最后一段，sh:alternativePath 的各分支 range 必须相同。生成器用 `typed(值, range)` 写这些字面量；成员定义的形状按所在字段的 range 自动取类型。
+- 全图扫描后改了 **40 个字面量**（按路径属性计 48 处：H09、H10 的路径是两张事实表的 sh:alternativePath，一个字面量对应两个属性），涉及 8 条：A33（AccountKey 的 sh:in 17 个 → xsd:int，Amount 的下界 → xsd:double）、A40（子类键 19 → xsd:int）、D11（7 个收入边界 → xsd:double）、E09（PromotionKey 1 的两处 → xsd:int）、H01（SalesQuantity 的 0 两处、channelKey 2 → xsd:int）、H09（PromotionKey 1 两处 → xsd:int）、H10（三个场景的 hasValue 与「恰好一个场景」的 sh:in (1 2 3) → xsd:int）、H12（OnHandQuantity 0 → xsd:int）。值域为 xsd:integer 的派生属性（D10 年龄、H08 月数）和字符串值本来就一致，没有改。SQL-L1-onto 里没有形状，0 处。档位不变。
+- 解析器把带类型的数值字面量读成数值，并按 Turtle 规则区分 xsd:integer / xsd:decimal / xsd:double。
+- 测试：新增通用测试，两份本体里形状约束的每个字面量（共 155 个），类型都等于对应路径属性的 range；另按 D19 的做法补 xsd:int / xsd:double 数据的 pyshacl 正反例（H09 无折扣交易、A33 计划表、D11 收入档边界）。原有正反例的数据改成按字段声明的类型（xsd:int / xsd:double）。`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py`：28 passed。全套（不装三个可选依赖）：1,110 passed、32 skipped、2 failed（同前，`test_combo` 读不到盲模式拒读的 `semantic/tuning/`）。
+- 子图：SQL-L1-onto 4,975、SQL-L3a-full 8,877，三元组数不变（只改字面量类型），差额归属与前缀关系仍成立。
+- token：SQL-L3a-full 97,219 → **97,358**；其余三份不变。
