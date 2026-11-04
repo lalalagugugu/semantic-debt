@@ -1006,7 +1006,13 @@ def _term(terms, start=None, end=None, target=None):
 def _band(label, path, **bounds):
     """A band is a SHACL node shape whose property shape binds the bounds to `path`."""
     return bnode(("rdf:type", "sh:NodeShape"), ("rdfs:label", lit(label)),
-                 ("sh:property", bnode(("sh:path", path), *[(f"sh:{k}", lit(v)) for k, v in bounds.items()])))
+                 ("sh:property", bnode(("sh:path", path), *[(f"sh:{k}", v if isinstance(v, str) else lit(v))
+                                                             for k, v in bounds.items()])))
+
+
+def double(v: str) -> str:
+    """A bound typed like a property declared xsd:double (a bare 0.8 would be xsd:decimal)."""
+    return f'"{v}"^^xsd:double'
 
 
 def _disjoint_union(whole, parts):
@@ -1083,15 +1089,38 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
     "A37": [(":A37", [(":groupBy", coll(["retail:DimDate.CalendarYear", "retail:DimDate.CalendarWeekLabel"]))])],
     "A39": [(":A39", [(":termTarget", _term(["区域", "大区"], target="retail:DimGeography.ContinentName")),
                       (":termTarget", _term(["地区"], target="retail:DimGeography.RegionCountryName"))])],
+    # If a subcategory row's key is 19, its parent category (via the L1 foreign key) is named
+    # Computers. Uses only the key the text gives; no category key is assumed.
     "A40": [(":A40", [(":asserts", bnode((":subcategoryKey", "19"), (":subcategoryName", lit("Projectors & Screens")),
-                                         (":inCategory", lit("Computers"))))])],
+                                         (":inCategory", lit("Computers")))),
+                      (":axiom", bnode(("rdf:type", "sh:NodeShape"), ("sh:targetClass", "retail:DimProductSubcategory"),
+                                       ("sh:or", coll([
+                                           bnode(("sh:not", bnode(("sh:property", bnode(
+                                               ("sh:path", "retail:DimProductSubcategory.ProductSubcategoryKey"),
+                                               ("sh:hasValue", "19")))))),
+                                           bnode(("sh:property", bnode(
+                                               ("sh:path", coll(["rel:DimProductSubcategory.ProductCategoryKey-DimProductCategory",
+                                                                 "retail:DimProductCategory.ProductCategoryName"])),
+                                               ("sh:hasValue", lit("Computers")))))]))))])],
+    # The 24 accounts H07 lists: none is its own ancestor along :parentAccount. A finite check
+    # of known individuals; there is no direct SHACL Core form for arbitrary unknown nodes.
     "A41": [(":A41", [(":rootAccount", "account:1"),
-                      (":breakCycle", bnode((":root", "account:1"), (":ignoreParentOf", "account:1")))])],
+                      (":breakCycle", bnode((":root", "account:1"), (":ignoreParentOf", "account:1"))),
+                      *[(":axiom", bnode(("rdf:type", "sh:NodeShape"), ("sh:targetNode", f"account:{k}"),
+                                         ("sh:property", bnode(("sh:path", bnode(("sh:oneOrMorePath", ":parentAccount"))),
+                                                               ("sh:not", bnode(("sh:in", coll([f"account:{k}"]))))))))
+                        for k in range(1, 25)]])],
     "D01": [(":D01", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:domain", "retail:DimCustomer"), ("rdfs:range", "xsd:date")])],
     "D02": [(":D02", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:domain", "retail:DimCustomer"), ("rdfs:range", "xsd:date")])],
     "D03": [(":D03", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:domain", "retail:DimCustomer"), ("rdfs:range", "xsd:date")])],
+    # ≥ 2 distinct order numbers: the value nodes of the path are a set, so two rows of the
+    # same order count once. The window stays in the text.
     "D05": [(":D05", [("rdf:type", "owl:Class"), ("rdfs:subClassOf", "retail:DimCustomer"),
-                      ("owl:equivalentClass", "class:复购客户"), (":rowScope", "class:线上订单行")])],
+                      ("owl:equivalentClass", "class:复购客户"), (":rowScope", "class:线上订单行"),
+                      ("rdf:type", "sh:NodeShape"),
+                      ("sh:property", bnode(("sh:path", coll([bnode(("sh:inversePath", "rel:FactOnlineSales.CustomerKey-DimCustomer")),
+                                                               "retail:FactOnlineSales.SalesOrderNumber"])),
+                                            ("sh:minCount", "2")))])],
     "D05b": [(":D05b", [("rdf:type", "owl:Class"), ("rdfs:subClassOf", "retail:DimCustomer"),
                         (":rowScope", "class:线上销售行")])],
     "D06": [(":D06", [(":rowScope", "class:线上订单行")])],
@@ -1116,9 +1145,9 @@ EXTRA: dict[str, list[tuple[str, list[tuple[str, str]]]]] = {
     "D19": [(":D19.累计占比", [("rdf:type", "owl:DatatypeProperty"), ("rdfs:range", "xsd:double"),
                               ("rdfs:label", lit("累计占比（D19 的定义）"))]),
             (":D19", [(":band", b) for b in (
-                _band("A", ":D19.累计占比", maxInclusive=0.8),
-                _band("B", ":D19.累计占比", minExclusive=0.8, maxInclusive=0.95),
-                _band("C", ":D19.累计占比", minExclusive=0.95))])],
+                _band("A", ":D19.累计占比", maxInclusive=double("0.8")),
+                _band("B", ":D19.累计占比", minExclusive=double("0.8"), maxInclusive=double("0.95")),
+                _band("C", ":D19.累计占比", minExclusive=double("0.95")))])],
     "D20": [(":D20", [(":objectClass", bnode(("rdf:type", "owl:Class"), ("rdfs:label", lit("动销产品")),
                                              ("rdfs:subClassOf", "class:在售产品")))])],
     "D21": [(":D21", [("rdf:type", "owl:Class"), ("rdfs:subClassOf", "class:在售产品"),
@@ -1668,16 +1697,24 @@ TIERS: dict[str, tuple[str, str, str]] = {
     "A35": ("3", "1C", _R + "选用 / 不选用的关系用自定义谓词"),
     "A36": ("3", "2", "引用成链接；平均值规则在注解（颜色见 E07）"),
     "A37": ("3", "1C", _R + "分组字段的有序列表挂在自定义 :groupBy 上"),
-    "A38": ("3", "2", "引用成链接；员工树无环要 SHACL-SPARQL 或递归路径校验，SHACL Core 做不了（未做）"),
+    "A38": ("3", "2", "引用成链接；未做，限制分开说：原文没有列全员工之间的上下级边（输入不足，只给了 18 与 1 的环）；"
+                      "SHACL Core 有 sh:oneOrMorePath，已知有限个体可逐个查无环，但对任意未知节点的通用无环检查没有直接写法；"
+                      "业绩沿树求和是算术，做不了"),
     "A39": ("3", "2", _R + "落点是链接；职级、组织语境的排除是问题措辞（未做）"),
-    "A40": ("3", "1C", _R + "归属是自定义断言；写成标准的子类行实例需要 Computers 的键，原文没有给（未做）"),
-    "A41": ("3", "1C", _R + "根与断环是自定义记录；无环约束 SHACL Core 做不了（未做）；本轮在 H07 补传递闭包属性"),
+    "A40": ("3", "1C", _R + "归属仍有自定义断言；第二轮补 SHACL Core 条件形状：子类键 = 19 的行，沿 L1 外键关系"
+                       "（sh:path 序列）到的父品类名称 hasValue \"Computers\"（sh:or / sh:not / sh:hasValue），"
+                       "不猜父品类键、不新建描述节点；正反例通过"),
+    "A41": ("3", "1C", _R + "根与断环是自定义记录；第二轮补 H07 已列的 24 个科目个体逐个 sh:targetNode，"
+                       "[ sh:oneOrMorePath :parentAccount ] 的值 sh:not [ sh:in (自身) ]，断环后的图通过、恢复被断的父边后不通过；"
+                       "对任意未知节点的通用无环检查没有直接写法，已知的有限个体可以逐个检查"),
     "D01": ("3", "2", "数据属性（定义域 DimCustomer、值域 xsd:date）；聚合在注解"),
     "D02": ("3", "2", "同 D01"),
     "D03": ("3", "2", "同 D01"),
     "D04": ("3", "3", "留存算法是文字与 SQL 片段"),
-    "D05": ("3", "2", "类、等价、行范围；「≥ 2 个不同订单」要按订单号去重计数，SHACL Core 只能数行（未做）"),
-    "D05b": ("3", "2", "同 D05"),
+    "D05": ("3", "2", "类、等价、行范围；第二轮补门槛：路径 ( [ sh:inversePath 客户关系 ] SalesOrderNumber ) 的 sh:minCount 2，"
+                      "值是集合，同一订单号只算一次（正反例通过）；窗口条件在注解，故仍为 (2)"),
+    "D05b": ("3", "2", "类与行范围（类:线上销售行）；未做：缺的是只取正销量的中间行、同时绑定当前客户和窗口；"
+                       "也不能从订单号反查销售行，原始数据有订单号被多个客户重复使用，会串入别人的正销量行"),
     "D06": ("3", "2", "行范围链接；比率在注解"),
     "D06b": ("3", "3", "文字与 SQL 片段"),
     "D06c": ("3", "2", "行范围链接；比率在注解"),
@@ -1695,7 +1732,8 @@ TIERS: dict[str, tuple[str, str, str]] = {
     "D16": ("3", "2", _R + "分子分母链接不定义除法"),
     "D17": ("3", "2", _R + "分子分母链接不定义除法"),
     "D18": ("3", "3", "文字与 SQL 片段"),
-    "D19": ("3", "2", "阈值改成绑定到累计占比属性的形状；累计排序与同额处理在注解"),
+    "D19": ("3", "2", "阈值是绑定到累计占比属性的形状，第二轮把阈值改成与属性一致的 xsd:double"
+                      "（等于、略小、略大的 double 探针通过）；累计排序与同额处理在注解"),
     "D20": ("3", "2", "父类；窗口与分母在注解"),
     "D21": ("3", "2", "父类与默认窗口；判定在注解"),
     "D22": ("3", "2", "父类；日期判定在注解"),
@@ -1729,7 +1767,8 @@ TIERS.update({
     "H03": ("2", "1S", "形状与划分；能否连上 DimProduct 的判定在注解"),
     "H04": ("2", "1S", "城市 hasValue、owl:hasKey"),
     "H05": ("2", "1S", "四类 hasValue、owl:AllDisjointClasses；自指根在注解"),
-    "H06": ("2", "1S", "职级形状与划分；员工树无环 SHACL Core 做不了（未做）"),
+    "H06": ("2", "1S", "职级形状与划分；员工树的无环检查未做：原文没有列全员工上下级边（输入不足），"
+                       "对任意未知节点的通用无环检查没有直接写法（SHACL Core 有 sh:oneOrMorePath，已知有限个体可逐个查，见 A41）"),
     "H07": ("2", "1C", _R + "科目树用自定义 :parentAccount；本轮补 rdfs:subPropertyOf 到 owl:TransitiveProperty 的闭包属性"),
     "H08": ("2", "2", _R + "划分正确；分层集合资格与月数派生在注解"),
     "H09": ("2", "1S", "划分、hasValue / sh:not、sh:alternativePath"),
@@ -1897,8 +1936,9 @@ def report(ctx: dict, data: dict, p_l1: Parsed, p_full: Parsed, sub: dict, token
         "| 档 | 旧 SQL-L3a | SQL-L3a-full |", "|---|---|---|",
         *[f"| {k} | {tiers_old[k]}（{pct(tiers_old[k], len(ids))}） | {tiers_new[k]}（{pct(tiers_new[k], len(ids))}） |"
           for k in TIER_ORDER], "",
-        f"新档按第 3 步复核（`reports/validation/t34-codex-review.md`）的逐条档位，只有 3 条和复核不同，都是本轮补了标准构造："
-        f"{'、'.join(i for i in ids if TIERS[i][2].startswith('复核为') or TIERS[i][2].startswith('复核不通过'))}，证据见逐条表。"
+        f"新档按第 3 步复核（`reports/validation/t34-codex-review.md`）的逐条档位。和第一轮复核不同的 3 条是盲写修订补了标准构造的"
+        f"{'、'.join(i for i in ids if TIERS[i][2].startswith('复核为') or TIERS[i][2].startswith('复核不通过'))}，"
+        "第二轮复核已接受（均为 1S），证据见逐条表。"
         f"和旧 L3a 同档的 {len(same)} 条：{'、'.join(same)}；其余 {len(ids) - len(same)} 条档位提高，没有降档。", "",
         "只用 OWL 2 与 SHACL Core 的标准构造；没有用 SHACL-SPARQL、SHACL-AF 规则或其他查询式规则（那属于 L3b）。"
         f"本体里检出的查询式谓词：{'、'.join(sparql) if sparql else '无'}。指标口径只放注解里的 SQL 片段。", "",

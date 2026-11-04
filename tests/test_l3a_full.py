@@ -299,3 +299,48 @@ def test_generic_turtle_parser_agrees(source, parsed, l1_text):
         graph = rdflib.Graph()
         graph.parse(data=text, format="turtle")
         assert len(graph) == len(L.Parsed(text).triples())
+
+
+def test_d19_double_bounds(source):
+    rdflib, g = _graph(source[2])
+    bands = {k: _labelled(g, rdflib, k) for k in "ABC"}
+    # equal / slightly below / slightly above each threshold, typed like the declared property
+    cases = {"0.8": "A", "0.7999999": "A", "0.8000001": "B", "0.95": "B", "0.9499999": "B", "0.9500001": "C"}
+    for value, expected in cases.items():
+        data = f'<urn:ex:x> :D19.累计占比 "{value}"^^xsd:double .'
+        got = [k for k, shape in bands.items() if _validate(g, shape, data)]
+        assert got == [expected], (value, got)
+
+
+def test_a40_subcategory_19_belongs_to_computers(source):
+    rdflib, g = _graph(source[2])
+    ns = rdflib.Namespace(L.PREFIXES[""])
+    shape = next(o for o in g.objects(ns["A40"], ns["axiom"]))
+    row = ('<urn:ex:x> retail:DimProductSubcategory.ProductSubcategoryKey {key} ; '
+           'rel:DimProductSubcategory.ProductCategoryKey-DimProductCategory <urn:ex:c> . '
+           '<urn:ex:c> retail:DimProductCategory.ProductCategoryName "{name}" .')
+    assert _validate(g, shape, row.format(key=19, name="Computers"))
+    assert not _validate(g, shape, row.format(key=19, name="TV and Video"))
+    assert _validate(g, shape, row.format(key=20, name="TV and Video"))      # other keys are not constrained
+
+
+def test_d05_two_distinct_orders(source):
+    rdflib, g = _graph(source[2])
+    shape = rdflib.URIRef(L.PREFIXES[""] + "D05")
+    rows = ('<urn:ex:r1> rel:FactOnlineSales.CustomerKey-DimCustomer <urn:ex:x> ; retail:FactOnlineSales.SalesOrderNumber "{a}" . '
+            '<urn:ex:r2> rel:FactOnlineSales.CustomerKey-DimCustomer <urn:ex:x> ; retail:FactOnlineSales.SalesOrderNumber "{b}" .')
+    assert not _validate(g, shape, rows.format(a="SO1", b="SO1"))   # two rows of one order are one order
+    assert _validate(g, shape, rows.format(a="SO1", b="SO2"))
+
+
+def test_a41_known_accounts_are_acyclic(source):
+    pyshacl = pytest.importorskip("pyshacl")
+    rdflib, g = _graph(source[2])
+    assert pyshacl.validate(g, shacl_graph=g)[0]                    # the tree after breaking the cycle
+    ns = rdflib.Namespace(L.PREFIXES[""])
+    acc = rdflib.Namespace(L.PREFIXES["account"])
+    restored = rdflib.Graph()
+    for t in g:
+        restored.add(t)
+    restored.add((acc["1"], ns["parentAccount"], acc["24"]))        # the parent edge the text breaks
+    assert not pyshacl.validate(restored, shacl_graph=g)[0]

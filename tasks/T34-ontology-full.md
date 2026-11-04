@@ -134,3 +134,20 @@
   - E10、D11、D23 三条与复核档不同，理由见上与报告逐条表，交 Codex 再核。
   - 自定义谓词一个未删，已有事实保留；A24 去掉的是本卡上一轮自己加的、挂在原始列上的比较形状（复核指出会被当成聚合后的筛选），原文不变。
 - 工时：约 2 小时。
+
+### 第 3 步第二轮修订（Claude Code，盲模式，2026-11-04）
+
+在 `origin/T34-review2`（PR #264）上 fast-forward 后修订；只读了 `reports/validation/t34-codex-review.md` 的「第二轮」一节，没有读 T26 报告。付费调用 0。只改复核点名的 6 条：
+
+- **D19**：三个分档的阈值改成与 `:D19.累计占比`（xsd:double）一致的 `"0.8"^^xsd:double`、`"0.95"^^xsd:double`。新增探针：每个阈值的等于、略小、略大各一个 double 值，恰好只入原文规定的一档（0.8 → A、0.95 → B）。
+- **A40**：在 `:A40 :axiom` 加 SHACL Core 条件形状：targetClass DimProductSubcategory，`sh:or ( [ sh:not [ 子类键 hasValue 19 ] ] [ 路径 ( 子类 → 品类外键关系 , ProductCategoryName ) hasValue "Computers" ] )`。只用原文给的子类键，不猜父品类键，不新建描述节点。正反例：键 19 + Computers 通过，键 19 + 其他品类不通过，其他键不受约束。
+- **D05**：`:D05` 加 `sh:property [ sh:path ( [ sh:inversePath rel:FactOnlineSales.CustomerKey-DimCustomer ] retail:FactOnlineSales.SalesOrderNumber ) ; sh:minCount 2 ]`。正反例：同一订单号两行不通过，两个不同订单号通过。窗口留在注解，档位 (2)。
+- **A41**：H07 的 24 个科目个体逐个 `sh:targetNode`，`[ sh:oneOrMorePath :parentAccount ]` 的值 `sh:not [ sh:in (自身) ]`。正反例：断环后的图通过，加回被断的 1 → 24 父边后不通过。理由改为：对任意未知节点的通用无环检查没有直接写法，已知的有限个体可以逐个检查。档位不变（1C，根与断环仍用自定义谓词记录）。
+- **A38、H06**：「未做」理由更正，限制分开写：原文没有列全员工之间的上下级边（输入不足）；对任意未知节点的通用无环检查没有直接写法（SHACL Core 有 sh:oneOrMorePath）；业绩求和是算术，做不了。
+- **D05b**：「只能数行」的理由改为：缺的是只取正销量的中间行、同时绑定当前客户和窗口；也不能从订单号反查销售行，因为订单号有跨客户复用。档位 (2)。
+- 档位不变：109 条 1S / 1C / 2 / 3 = 19 / 21 / 54 / 15；L1 约定 15 条、指标 69 个都是 (2)。
+- 子图：SQL-L1-onto 4,975 不变；SQL-L3a-full 8,609 → 8,877，差额仍逐条追溯到 109 条与文件头；文本仍是前缀关系。
+- token：SQL-L3a-full 96,006 → **97,219**；SQL-L1、SQL-L1-onto、SQL-L1plus、旧 SQL-L3a 不变。
+- 测试：`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py` 26 passed。全套（不装三个可选依赖）1,109 passed、31 skipped、2 failed（`test_combo` 两项读不到盲模式拒读的 `semantic/tuning/`，与前几轮相同）。
+- 发现、未改（不在本轮 6 条内，交协调会话决定）：整数阈值与取值（如 H09 / H10 / E09 的 `sh:hasValue 1`、A33 的 `sh:in`）写成 Turtle 默认的 xsd:integer，而对应字段声明为 xsd:int。`sh:hasValue` / `sh:in` 按 RDF 项相等比较，如果实际数据按字段声明写成 `"1"^^xsd:int`，这些形状会判不符合。和 D19 同类，是表示类型一致性问题。
+- 工时：约 1 小时。

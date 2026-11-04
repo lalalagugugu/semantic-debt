@@ -11,7 +11,7 @@
 ## 怎么核对
 
 1. **反向重建**：核对器解析生成的 Turtle（本模块自带的、保留文档顺序的解析器，只认生成器用到的子集），从图里反解出 SQL-L1 的上下文（两份都做）和 L1+ 的 overlay（SQL-L3a-full），要求与源**逐字段相等**（含列表顺序、标量类型）。SQL-L1-onto 另查：109 条的编号（`A01`…`H13`、`G01`、`D05b` 这类）在整份文本里一个都不出现。
-2. **子图**（按图比，不比文本）：把三元组规范化（空白节点按内容展开）后按多重集比较。SQL-L1-onto 的 4,975 个三元组全部在 SQL-L3a-full 的 8,609 个里；差 3,634 个，恰好等于按条目分别生成的三元组之和，每个都追到条目编号：109 条共 3,625 个，另 9 个属于 L1+ 的文件头 `:L1plus`（`l1plus.yaml` 顶层的 version、base、title、as_of_date 与两个词汇声明，不属于任何一条；保留它是为了 SQL-L1plus 的 `l1plus` 节能逐字段重建）。109 条里只用到的词汇，声明归第一个用到它的条目。不多不少，否则渲染失败。
+2. **子图**（按图比，不比文本）：把三元组规范化（空白节点按内容展开）后按多重集比较。SQL-L1-onto 的 4,975 个三元组全部在 SQL-L3a-full 的 8,877 个里；差 3,902 个，恰好等于按条目分别生成的三元组之和，每个都追到条目编号：109 条共 3,893 个，另 9 个属于 L1+ 的文件头 `:L1plus`（`l1plus.yaml` 顶层的 version、base、title、as_of_date 与两个词汇声明，不属于任何一条；保留它是为了 SQL-L1plus 的 `l1plus` 节能逐字段重建）。109 条里只用到的词汇，声明归第一个用到它的条目。不多不少，否则渲染失败。
 3. 本体自己命名空间里用到的每个节点都有定义；生成结果可重现。
 4. 通用解析器复核：rdflib 解析两份文本，三元组数与本模块解析器一致；语义探针见下（rdflib、owlrl、pyshacl 不是项目依赖，未安装时这些测试跳过）。
 5. 不运行 OWL 推理机或 SHACL 引擎，不编译查询。
@@ -50,7 +50,7 @@
 | 2 | 18（17%） | 54（50%） |
 | 3 | 79（72%） | 15（14%） |
 
-新档按第 3 步复核（`reports/validation/t34-codex-review.md`）的逐条档位，只有 3 条和复核不同，都是本轮补了标准构造：D11、D23、E10，证据见逐条表。和旧 L3a 同档的 28 条：G01、D04、D06b、D08、D09、D12、D13、D14、D15、D18、D24、D25、D26、D28、D31、E01、E02、E03、E06、E08、E11、E12、E13、E14、E15、E17、H08、H10；其余 81 条档位提高，没有降档。
+新档按第 3 步复核（`reports/validation/t34-codex-review.md`）的逐条档位。和第一轮复核不同的 3 条是盲写修订补了标准构造的D11、D23、E10，第二轮复核已接受（均为 1S），证据见逐条表。和旧 L3a 同档的 28 条：G01、D04、D06b、D08、D09、D12、D13、D14、D15、D18、D24、D25、D26、D28、D31、E01、E02、E03、E06、E08、E11、E12、E13、E14、E15、E17、H08、H10；其余 81 条档位提高，没有降档。
 
 只用 OWL 2 与 SHACL Core 的标准构造；没有用 SHACL-SPARQL、SHACL-AF 规则或其他查询式规则（那属于 L3b）。本体里检出的查询式谓词：无。指标口径只放注解里的 SQL 片段。
 
@@ -77,12 +77,12 @@
 | A27 | T26 | 2 | 月数声明为数据属性；客户集合要按参照日与交易筛选取，是参数化条件（未做） |
 | A33 | 清单、T26 | 2 | 复核档；本轮补 FactStrategyPlan 的形状（AccountKey ∈ 17 个叶子、Amount > 0）与传递的上级科目闭包；父科目 = 叶子之和是算术，无标准构造（未做） |
 | A34 | 清单、T26 | 2 | 复核档；落点是链接；计划语境改走科目 8 是问题措辞，未绑定到映射（未做） |
-| A38 | T26 | 2 | 引用成链接；员工树无环要 SHACL-SPARQL 或递归路径校验，SHACL Core 做不了（未做） |
+| A38 | T26 | 2 | 引用成链接；未做，限制分开说：原文没有列全员工之间的上下级边（输入不足，只给了 18 与 1 的环）；SHACL Core 有 sh:oneOrMorePath，已知有限个体可逐个查无环，但对任意未知节点的通用无环检查没有直接写法；业绩沿树求和是算术，做不了 |
 | A39 | 清单 | 2 | 复核档；落点是链接；职级、组织语境的排除是问题措辞（未做） |
-| A40 | T26 | 1C | 复核档；归属是自定义断言；写成标准的子类行实例需要 Computers 的键，原文没有给（未做） |
-| A41 | T26 | 1C | 复核档；根与断环是自定义记录；无环约束 SHACL Core 做不了（未做）；本轮在 H07 补传递闭包属性 |
-| D05 | T26 | 2 | 类、等价、行范围；「≥ 2 个不同订单」要按订单号去重计数，SHACL Core 只能数行（未做） |
-| D05b | T26 | 2 | 同 D05 |
+| A40 | T26 | 1C | 复核档；归属仍有自定义断言；第二轮补 SHACL Core 条件形状：子类键 = 19 的行，沿 L1 外键关系（sh:path 序列）到的父品类名称 hasValue "Computers"（sh:or / sh:not / sh:hasValue），不猜父品类键、不新建描述节点；正反例通过 |
+| A41 | T26 | 1C | 复核档；根与断环是自定义记录；第二轮补 H07 已列的 24 个科目个体逐个 sh:targetNode，[ sh:oneOrMorePath :parentAccount ] 的值 sh:not [ sh:in (自身) ]，断环后的图通过、恢复被断的父边后不通过；对任意未知节点的通用无环检查没有直接写法，已知的有限个体可以逐个检查 |
+| D05 | T26 | 2 | 类、等价、行范围；第二轮补门槛：路径 ( [ sh:inversePath 客户关系 ] SalesOrderNumber ) 的 sh:minCount 2，值是集合，同一订单号只算一次（正反例通过）；窗口条件在注解，故仍为 (2) |
+| D05b | T26 | 2 | 类与行范围（类:线上销售行）；未做：缺的是只取正销量的中间行、同时绑定当前客户和窗口；也不能从订单号反查销售行，原始数据有订单号被多个客户重复使用，会串入别人的正销量行 |
 | D09 | T26 | 3 | 比率是文字；H08 的划分不算本条的口径（未做：比率无标准构造） |
 | D10 | 清单、T26 | 2 | 复核档；本轮把五个年龄段写成 sh:NodeShape + sh:property / sh:path :D10；年龄的派生式只在注解，故仍为 (2) |
 | D11 | 清单、T26 | 1S | 复核为 1C（band 只有散落的 SHACL 边界）；本轮每档改成 sh:NodeShape + sh:property / sh:path DimCustomer.YearlyIncome，pyshacl 正反例测试通过（tests/test_l3a_full.py），核心分档已是标准形状，故报 1S |
@@ -102,7 +102,7 @@ rdflib 解析两份本体，用 owlrl 的 RDFS 与 OWL-RL 闭包展开，检查�
 
 ## 三元组
 
-SQL-L1-onto 4,975 个，注解 1,883（38%），其余 3,092（62%）；SQL-L3a-full 8,609 个，注解 3,086（36%），其余 5,523（64%）。列表按 rdf:first / rdf:rest 展开计；注解 = 谓词是 rdfs:label、rdfs:comment、skos:altLabel 或本体声明的注解属性。
+SQL-L1-onto 4,975 个，注解 1,883（38%），其余 3,092（62%）；SQL-L3a-full 8,877 个，注解 3,086（35%），其余 5,791（65%）。列表按 rdf:first / rdf:rest 展开计；注解 = 谓词是 rdfs:label、rdfs:comment、skos:altLabel 或本体声明的注解属性。
 
 ## 系统消息的 token 数
 
@@ -113,7 +113,7 @@ SQL-L1-onto 4,975 个，注解 1,883（38%），其余 3,092（62%）；SQL-L3a-
 | SQL-L1 | 1 文字 | 112,842 | 40,254 | 41,084 | 0.62× | 4.1% |
 | SQL-L1-onto | 1 本体 | 168,391 | 57,285 | 58,115 | 0.87× | 5.8% |
 | SQL-L1plus | 2 文字 | 180,005 | 65,868 | 66,698 | 1.00× | 6.7% |
-| SQL-L3a-full | 2 本体 | 274,521 | 95,176 | 96,006 | 1.44× | 9.6% |
+| SQL-L3a-full | 2 本体 | 278,565 | 96,389 | 97,219 | 1.46× | 9.7% |
 | SQL-L3a | 参考（旧，混合写法） | 464,859 | 155,639 | 156,469 | 2.35× | 15.6% |
 
 上下文上限：deepseek-flash（DeepSeek-V4.1-Flash-1017） 上下文 1,000,000 token、最大输出 384,000 token；来源 DeepSeek 官方文档 https://api-docs.deepseek.com/quick_start/pricing，2026-11-04 由协调会话查（盲写会话访问该网址被拒）。四份都远低于上限的 80%。
@@ -162,16 +162,16 @@ SQL-L1-onto 4,975 个，注解 1,883（38%），其余 3,092（62%）；SQL-L3a-
 | clarifications | A35 | 3 | 1C | 改 | `:notRelationship` `:ref` `:useRelationship` | 复核档；选用 / 不选用的关系用自定义谓词 |
 | clarifications | A36 | 3 | 2 | 改 | `:ref` | 引用成链接；平均值规则在注解（颜色见 E07） |
 | clarifications | A37 | 3 | 1C | 改 | `:groupBy` `:ref` | 复核档；分组字段的有序列表挂在自定义 :groupBy 上 |
-| clarifications | A38 | 3 | 2 | 改 | `:ref` | 引用成链接；员工树无环要 SHACL-SPARQL 或递归路径校验，SHACL Core 做不了（未做） |
+| clarifications | A38 | 3 | 2 | 改 | `:ref` | 引用成链接；未做，限制分开说：原文没有列全员工之间的上下级边（输入不足，只给了 18 与 1 的环）；SHACL Core 有 sh:oneOrMorePath，已知有限个体可逐个查无环，但对任意未知节点的通用无环检查没有直接写法；业绩沿树求和是算术，做不了 |
 | clarifications | A39 | 3 | 2 | 改 | `:ref` `:target` `:termTarget` | 复核档；落点是链接；职级、组织语境的排除是问题措辞（未做） |
-| clarifications | A40 | 3 | 1C | 改 | `:asserts` `:inCategory` `:ref` `:subcategoryKey` `:subcategoryName` | 复核档；归属是自定义断言；写成标准的子类行实例需要 Computers 的键，原文没有给（未做） |
-| clarifications | A41 | 3 | 1C | 改 | `:breakCycle` `:ignoreParentOf` `:ref` `:root` `:rootAccount` | 复核档；根与断环是自定义记录；无环约束 SHACL Core 做不了（未做）；本轮在 H07 补传递闭包属性 |
+| clarifications | A40 | 3 | 1C | 改 | `sh:NodeShape` `sh:hasValue` `sh:not` `sh:targetClass` `:asserts` `:axiom` `:inCategory` `:ref` `:subcategoryKey` `:subcategoryName` | 复核档；归属仍有自定义断言；第二轮补 SHACL Core 条件形状：子类键 = 19 的行，沿 L1 外键关系（sh:path 序列）到的父品类名称 hasValue "Computers"（sh:or / sh:not / sh:hasValue），不猜父品类键、不新建描述节点；正反例通过 |
+| clarifications | A41 | 3 | 1C | 改 | `sh:NodeShape` `sh:in` `sh:not` `:axiom` `:breakCycle` `:ignoreParentOf` `:ref` `:root` `:rootAccount` | 复核档；根与断环是自定义记录；第二轮补 H07 已列的 24 个科目个体逐个 sh:targetNode，[ sh:oneOrMorePath :parentAccount ] 的值 sh:not [ sh:in (自身) ]，断环后的图通过、恢复被断的父边后不通过；对任意未知节点的通用无环检查没有直接写法，已知的有限个体可以逐个检查 |
 | concepts | D01 | 3 | 2 | 改 | `owl:DatatypeProperty` `rdfs:domain` | 数据属性（定义域 DimCustomer、值域 xsd:date）；聚合在注解 |
 | concepts | D02 | 3 | 2 | 改 | `owl:DatatypeProperty` `rdfs:domain` | 同 D01 |
 | concepts | D03 | 3 | 2 | 改 | `owl:DatatypeProperty` `rdfs:domain` | 同 D01 |
 | concepts | D04 | 3 | 3 | 同 | — | 留存算法是文字与 SQL 片段 |
-| concepts | D05 | 3 | 2 | 改 | `owl:Class` `rdfs:subClassOf` `owl:equivalentClass` `:rowScope` | 类、等价、行范围；「≥ 2 个不同订单」要按订单号去重计数，SHACL Core 只能数行（未做） |
-| concepts | D05b | 3 | 2 | 改 | `owl:Class` `rdfs:subClassOf` `:rowScope` | 同 D05 |
+| concepts | D05 | 3 | 2 | 改 | `owl:Class` `rdfs:subClassOf` `owl:equivalentClass` `sh:NodeShape` `sh:minCount` `:rowScope` | 类、等价、行范围；第二轮补门槛：路径 ( [ sh:inversePath 客户关系 ] SalesOrderNumber ) 的 sh:minCount 2，值是集合，同一订单号只算一次（正反例通过）；窗口条件在注解，故仍为 (2) |
+| concepts | D05b | 3 | 2 | 改 | `owl:Class` `rdfs:subClassOf` `:rowScope` | 类与行范围（类:线上销售行）；未做：缺的是只取正销量的中间行、同时绑定当前客户和窗口；也不能从订单号反查销售行，原始数据有订单号被多个客户重复使用，会串入别人的正销量行 |
 | concepts | D06 | 3 | 2 | 改 | `:rowScope` | 行范围链接；比率在注解 |
 | concepts | D06b | 3 | 3 | 同 | — | 文字与 SQL 片段 |
 | concepts | D06c | 3 | 2 | 改 | `:rowScope` | 行范围链接；比率在注解 |
@@ -188,7 +188,7 @@ SQL-L1-onto 4,975 个，注解 1,883（38%），其余 3,092（62%）；SQL-L3a-
 | concepts | D16 | 3 | 2 | 改 | `:denominatorMetric` `:numeratorMetric` | 复核档；分子分母链接不定义除法 |
 | concepts | D17 | 3 | 2 | 改 | `:denominatorMetric` `:numeratorMetric` | 复核档；分子分母链接不定义除法 |
 | concepts | D18 | 3 | 3 | 同 | — | 文字与 SQL 片段 |
-| concepts | D19 | 3 | 2 | 改 | `owl:DatatypeProperty` `sh:NodeShape` `sh:maxInclusive` `sh:minExclusive` `:band` | 阈值改成绑定到累计占比属性的形状；累计排序与同额处理在注解 |
+| concepts | D19 | 3 | 2 | 改 | `owl:DatatypeProperty` `sh:NodeShape` `sh:maxInclusive` `sh:minExclusive` `:band` | 阈值是绑定到累计占比属性的形状，第二轮把阈值改成与属性一致的 xsd:double（等于、略小、略大的 double 探针通过）；累计排序与同额处理在注解 |
 | concepts | D20 | 3 | 2 | 改 | `owl:Class` `rdfs:subClassOf` `:objectClass` | 父类；窗口与分母在注解 |
 | concepts | D21 | 3 | 2 | 改 | `owl:Class` `rdfs:subClassOf` `:defaultWindow` `:end` `:start` | 父类与默认窗口；判定在注解 |
 | concepts | D22 | 3 | 2 | 改 | `owl:Class` `rdfs:subClassOf` | 父类；日期判定在注解 |
@@ -225,7 +225,7 @@ SQL-L1-onto 4,975 个，注解 1,883（38%），其余 3,092（62%）；SQL-L3a-
 | hierarchies | H03 | 2 | 1S | 改 | `owl:Class` `rdfs:subClassOf` `owl:equivalentClass` `owl:disjointUnionOf` `owl:ObjectProperty` `rdfs:domain` `sh:NodeShape` `sh:hasValue` `:class` `:relation` `:viaRelationship` | 形状与划分；能否连上 DimProduct 的判定在注解 |
 | hierarchies | H04 | 2 | 1S | 改 | `owl:Class` `owl:hasKey` `owl:ObjectProperty` `rdfs:domain` `sh:NodeShape` `sh:hasValue` `:class` `:relation` `:viaRelationship` | 城市 hasValue、owl:hasKey |
 | hierarchies | H05 | 2 | 1S | 改 | `owl:Class` `rdfs:subClassOf` `owl:equivalentClass` `owl:AllDisjointClasses` `owl:ObjectProperty` `rdfs:domain` `sh:NodeShape` `sh:hasValue` `:axiom` `:class` `:relation` `:viaRelationship` | 四类 hasValue、owl:AllDisjointClasses；自指根在注解 |
-| hierarchies | H06 | 2 | 1S | 改 | `owl:Class` `rdfs:subClassOf` `owl:equivalentClass` `owl:disjointUnionOf` `owl:ObjectProperty` `rdfs:domain` `sh:NodeShape` `sh:hasValue` `:breakCycle` `:class` `:onColumn` `:relation` `:rootKey` `:viaRelationship` | 职级形状与划分；员工树无环 SHACL Core 做不了（未做） |
+| hierarchies | H06 | 2 | 1S | 改 | `owl:Class` `rdfs:subClassOf` `owl:equivalentClass` `owl:disjointUnionOf` `owl:ObjectProperty` `rdfs:domain` `sh:NodeShape` `sh:hasValue` `:breakCycle` `:class` `:onColumn` `:relation` `:rootKey` `:viaRelationship` | 职级形状与划分；员工树的无环检查未做：原文没有列全员工上下级边（输入不足），对任意未知节点的通用无环检查没有直接写法（SHACL Core 有 sh:oneOrMorePath，已知有限个体可逐个查，见 A41） |
 | hierarchies | H07 | 2 | 1C | 改 | `owl:ObjectProperty` `owl:NamedIndividual` `:breakCycle` `:ignoreParentOf` `:leaf` `:leafAccounts` `:node` `:parentAccount` `:root` | 复核档；科目树用自定义 :parentAccount；本轮补 rdfs:subPropertyOf 到 owl:TransitiveProperty 的闭包属性 |
 | hierarchies | H08 | 2 | 2 | 同 | `owl:Class` `rdfs:subClassOf` `owl:equivalentClass` `owl:disjointUnionOf` `owl:disjointWith` `sh:NodeShape` `sh:minInclusive` `sh:maxInclusive` `sh:minExclusive` `:class` `:definedBy` | 复核档；划分正确；分层集合资格与月数派生在注解 |
 | hierarchies | H09 | 2 | 1S | 改 | `owl:Class` `rdfs:subClassOf` `owl:disjointUnionOf` `owl:ObjectProperty` `rdfs:domain` `sh:NodeShape` `sh:hasValue` `sh:not` `sh:alternativePath` `:class` `:relation` | 划分、hasValue / sh:not、sh:alternativePath |
