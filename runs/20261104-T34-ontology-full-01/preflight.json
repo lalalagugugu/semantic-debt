@@ -1,12 +1,12 @@
 {
   "run_id": "20261104-T34-ontology-full-01",
-  "state": "awaiting_semantic_tag_and_paid_approval",
+  "state": "awaiting_paid_approval",
   "created_at_utc": "2026-11-04T02:13:35.142036+00:00",
   "paid_model_calls": 0,
   "source_code_commit": "51247a8c5e4e296093b4260a17db843ff64c06d8",
   "semantic_tag": "semantic-v1.7-l3a-full",
-  "semantic_tag_commit": null,
-  "semantic_tag_missing": true,
+  "semantic_tag_commit": "51247a8c5e4e296093b4260a17db843ff64c06d8",
+  "semantic_tag_missing": false,
   "eval_tag": "eval-v1.2",
   "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
   "eval_snapshot": "$SEMDEBT_DATA_DIR/eval-ro-eval-v1.2",
@@ -51,13 +51,18 @@
     "--est-from-args"
   ],
   "cli_dry_run": {
-    "status": "refused",
-    "exit_code": 2,
-    "reason": "semantic-v1.7-l3a-full not found"
+    "status": "passed",
+    "exit_code": 0,
+    "validated_at_utc": "2026-11-04T17:31:00.745356+00:00",
+    "eval_commit": "90e13b385a639a9164ac78430c50c11a7859f976",
+    "semantic_commit": "51247a8c5e4e296093b4260a17db843ff64c06d8",
+    "attempts": 1308,
+    "estimated_calls": 1440,
+    "estimated_total_cny": 23.825215800000006
   },
   "estimator": {
     "source": "harness.run_direct.dry_run",
-    "formal_cli_validation_passed": false,
+    "formal_cli_validation_passed": true,
     "estimated_rows": [
       {
         "cell": "SQL-L1",
@@ -401,5 +406,20 @@
       ]
     ],
     "ok": true
+  },
+  "previous_cli_dry_runs": [
+    {
+      "status": "refused",
+      "exit_code": 2,
+      "reason": "semantic-v1.7-l3a-full not found"
+    }
+  ],
+  "semantic_tag_object": "c3750ae8e5fdecfb3304d7b73a7067d28fe40b39",
+  "tag_publication": {
+    "authorized_by": "user 2026-11-05",
+    "tag_object": "c3750ae8e5fdecfb3304d7b73a7067d28fe40b39",
+    "target_commit": "51247a8c5e4e296093b4260a17db843ff64c06d8",
+    "remote_ref_verified": true,
+    "T34_fetch_completed": true
   }
 }

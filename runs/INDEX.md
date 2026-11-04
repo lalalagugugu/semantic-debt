@@ -186,3 +186,7 @@ harness-u2-v3@ee3f0c0→harness-u2-v4@2163228；同run保留56次、新增1708�
 ## 20261104-T34-ontology-full-01：预检登记，尚未付费运行
 
 四单元 SQL-L1、SQL-L1-onto、SQL-L1plus、SQL-L3a-full，计划同一 run 各 109×3（主表只报告 98 题），原主表 SQL-L1plus 配置：deepseek-flash、并发 4、执行超时 120 秒、跳过 judge。两个文字单元与历史上下文字节和源系统消息哈希均一致；109 道题面哈希一致。原生估价函数预计 1,440 调用、错峰 23.8252158 元；**模型调用 0、费用 0，未采集、未判定**。正式 CLI dry-run 被缺少 `semantic-v1.7-l3a-full` 标签的版本检查拒绝，尚未通过；待标签发布后重跑正式 dry-run，再交用户批准并错峰启动。预检报告 `reports/validation/t34-run-preflight.md`，结构化证据 `runs/20261104-T34-ontology-full-01/preflight.json`；冻结题库 eval-v1.2=90e13b385a639a9164ac78430c50c11a7859f976。新指纹待首次实际响应，运行中变化即停；原样 harness，无监督脚本。
+
+### 20261104-T34-ontology-full-01：2026-11-05 标签与正式 dry-run 追加
+
+用户明确授权在 #261 合并提交 51247a8c5e4e296093b4260a17db843ff64c06d8 创建并发布附注标签 semantic-v1.7-l3a-full（tag 对象 c3750ae8e5fdecfb3304d7b73a7067d28fe40b39），远端已核实，T34 目录已 fetch。原样四单元正式 dry-run 退出 0，eval-v1.2 与新语义标签检查通过，1,308 次作答、预计 1,440 调用、错峰 23.8252158 元，与此前估价一致；文字上下文哈希复核未变。**待用户批准付费；模型调用 0、费用 0、未采集、未判定、无新指纹。** 此前缺标签的失败记录保留，不作为本次通过结果。

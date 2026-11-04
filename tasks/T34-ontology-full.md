@@ -1,6 +1,6 @@
 # T34 全部语义换成本体（L3a-full）与 L1+ 对比
 
-- 状态：第 3 步通过（#265）；第 4–6 步预检中，待 semantic-v1.7-l3a-full 标签发布与正式 dry-run 后用户批准（2026-11-04）
+- 状态：第 3 步通过（#265）；第 4–6 步正式 dry-run 通过，预计 1,440 调用 / 23.83 元；待用户批准错峰运行（2026-11-05）
 - 负责：第 1–2 步 Claude Code（盲模式）；第 3 步 Codex 复核；第 4–6 步 Codex（codex-main）
 - 依据：`tasks/T19a-v10-plan.md` 第一节；`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-t22b-l3a-presentation.md`；`reports/validation/l3a-ontology-validation.md`（T26）
 - 依赖：`semantic-v1.6-l1plus`；`harness-v1.1`；`eval-v1.2`
@@ -169,3 +169,11 @@
 - 正式 CLI dry-run 尚未通过：已 fetch --tags 并核对远端，未见 `semantic-v1.7-l3a-full`，原生语义版本检查退出 2。没有造标签或绕过；待发布后重跑并交用户批准。
 - 预检：`reports/validation/t34-run-preflight.md`；结构化记录 `runs/20261104-T34-ontology-full-01/preflight.json`，INDEX 已登记为计划/未启动。
 - API 调用 0、费用 0；尚无新指纹、作答、判定或准确率。原样 harness，不套监督脚本；后续判定与报告按卡片和本次用户指示。
+
+### 第 4–6 步：冻结标签与正式 dry-run（Codex，2026-11-05）
+
+- 按用户明确授权，每条命令单独执行，在 #261 合并提交 `51247a8c5e4e296093b4260a17db843ff64c06d8` 创建附注标签 `semantic-v1.7-l3a-full` 并推送；tag 对象 `c3750ae8e5fdecfb3304d7b73a7067d28fe40b39`，远端核实且 T34 已 fetch。没有打到仅改任务卡的 fd920f3。
+- 正式原样 CLI dry-run 退出 0，题库/语义版本/上下文验证通过；四单元各 109×3，预计 1,440 调用、错峰 23.8252158 元，与昨日预估相同。
+- 原两文字上下文的四份历史/当前哈希复核未变；沿用计划 run-id `20261104-T34-ontology-full-01`。
+- 预检文档与结构化元数据已更新；保留昨日缺标签的退出记录；INDEX 只追加本次通过状态。
+- 待用户批准后错峰启动。付费模型 API 调用 0，尚无新指纹、作答或内容判定。
