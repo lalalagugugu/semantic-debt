@@ -438,3 +438,92 @@ env -u DEEPSEEK_API_KEY UV_CACHE_DIR="$TMPDIR/uvcache" \
 ```
 
 已有测试全绿与本轮独立探针发现问题并不矛盾：现有 D19 正反例没有使用声明的 double 边界，「未做」理由也没有被这些测试验证。本轮只追加复核意见，未修改生成器、已有测试或对应表；修订后再核。
+
+## 第三轮（2026-11-04，Codex）
+
+复核基线：`origin/T34-work` 的 `d33d8af`；第二轮修订提交为 `7a48e61`，字面量类型统一在其后。本轮在 `T34-review3` 工作，仅复核用户指定的改动及工程回归，不重新展开其他条目。前两轮原文逐字节保留。**第 3 步通过**，本轮无阻塞修改项；下方备注不阻塞。付费模型调用 0，未使用子 agent，未修改实现、语义原文、对应表或已有测试，未启动后续实验、未打 tag。
+
+### 第二轮清单的验收
+
+| 编号 | 第三轮结论 |
+|---|---|
+| D19 | 通过。四个边界字面量均为 xsd:double，与累计占比属性的 range 一致。独立使用相邻的 IEEE-754 可表示值验证：0.7999999999999999 → A，0.8 → A，0.8000000000000002 → B；0.9499999999999998 → B，0.95 → B，0.9500000000000001 → C。每个值恰好入一档，修复第二轮的 double 边界偏差；原阈值、开闭方向未改。累计及同额处理仍为注解，(2) 不变。 |
+| A40 | 通过。条件形状只约束源文指定的子类键；沿已有外键的序列路径检查父品类名称，没有猜父品类键、没有把描述节点当物理数据行。44 条真实子类的内存 RDF 图通过；故意改错对应父品类名称后拒绝。带 xsd:int 的键正反例及其他键不受该条件限制的测试通过；忠实于原文的条件归属事实。 |
+| D05 | 通过。逆向客户关系再到订单号，minCount 2 计路径可达订单号的集合。同号两行不通过、异号两行通过；独立探针另确认其他客户的行不计入，只有退货行的订单仍计入。没有增加正销量条件。窗口继续留在注解、维持 (2)，不声称这个门槛会自动完成窗口筛选或推导全部成员。 |
+| A41 | 通过。24 个 targetNode 与 H07 原文枚举的个体集合完全一致。oneOrMorePath 的祖先值不得含自身；断环后的图通过，恢复源文要求忽略的父边后拒绝。只验已知有限图，不冒充任意未知节点的通用无环约束；根与断环的原意未改。 |
+| A38、H06 | 通过。「未做」理由已分开说明：原文未列全员工个体边，Core 支持 oneOrMorePath，已知有限个体可逐个验证，而任意未知节点的通用检查与业绩求和另有限制。不再声称 Core 不支持递归路径，没有增加员工边或计算口径。 |
+| D05b | 通过。「只能数行」已删除，改为正销量中间行、当前客户和窗口的相关绑定尚未表达，并说明跨客户复用订单号时直接反查会串入其他客户。保留 (2) 和完整算法未做的边界，与第二轮验收点一致。 |
+
+### 字面量类型统一：实际数据类型与语义核对
+
+只读 `$SEMDEBT_DATA_DIR/parquet/` 的 Parquet schema，逐列对照生成图实际的 rdfs:range，而非仅检查源码 TYPE_MAP 或形状与 range 是否相互一致。25 份表文件的 **228 个字段全部匹配**：63 个有符号 int32 → xsd:int，45 个 double → xsd:double，111 个字符串 → xsd:string，9 个 date32 → xsd:date。Nullable 的空值可能性与非空标量的 datatype 分开，不把 Nullable 当另一种数值精度。实际字段并非先以 int64 读取再强行宣称 int32。
+
+本轮变更触及的物理列及文件如下；其余 schema 只用于确认 range 没有自洽但与 Parquet 不符的情况。没有写入数据文件或共享数据库目录。
+
+| 编号 | 文件、列与实际类型 |
+|---|---|
+| A33 | `FactStrategyPlan.parquet`：AccountKey 为 int32，Amount 为 double。 |
+| A40 | `DimProductSubcategory.parquet`：ProductSubcategoryKey 为 int32；内存归属探针另读 `DimProductCategory.parquet` 的名称及两表的连接键。 |
+| D11 | `DimCustomer.parquet`：YearlyIncome 为 double。 |
+| E09 | `DimPromotion.parquet`：PromotionKey 为 int32。 |
+| H01 | `FactOnlineSales.parquet`：SalesQuantity 为 int32；`FactSales.parquet`：channelKey 为 int32。 |
+| H09 | `FactOnlineSales.parquet`、`FactSales.parquet`：PromotionKey 均为 int32。 |
+| H10 | `FactSalesQuota.parquet`、`FactStrategyPlan.parquet`：ScenarioKey 均为 int32。 |
+| H12 | `FactInventory.parquet`：OnHandQuantity 为 int32。 |
+
+独立加载 `7a48e61` 的实际生成器与当前生成器，分别用 RDFlib 解析按 owner 生成的图；按 owner、路径（含序列末段/备选分支）、约束谓词、数值或字符串内容对齐。结果确有 **40 个字面量改变 datatype**；去掉 datatype 后，修改前后的上述记录多重集完全相等。没有伴随改变取值、路径、集合成员、阈值或开闭方向。40 个变更按条目计为：
+
+| 编号 | 改变 datatype 的字面量数 | 第三轮结论 |
+|---|---:|---|
+| A33 | 18 | 叶子集合 17 个为 xsd:int，金额下界为 xsd:double；原集合及正值条件不变。 |
+| A40 | 1 | 条件键改为 xsd:int，与实际键列一致，条件范围不变。 |
+| D11 | 7 | 收入上下界改为 xsd:double；全部边界都是可精确表示的整数值，分段区间不变。 |
+| E09 | 2 | 条件中的键值改为 xsd:int，等于/不等于方向不变。 |
+| H01 | 3 | 数量零值及渠道键改为 xsd:int，比较和成员条件不变。 |
+| H09 | 2 | 两个条件值改为 xsd:int，两条备选路径的列类型相同。 |
+| H10 | 6 | 三类的成员值与合法值清单改为 xsd:int；合法集合、单值基数不变，两个备选列类型相同。 |
+| H12 | 1 | 零库存值改为 xsd:int，零值定义不变。 |
+
+按备选路径的每个属性展开是 **48 处**，并非另外增加 8 个字面量。本次 RDFlib 独立扫描得到全图 **147 个约束字面量出现位置 / 155 个路径属性对应位置**，所有对应的 datatype 与 range 一致；小图无形状，0 处。D19 的 double 阈值已在 `7a48e61` 中修复，不重复计入这 40 个。
+
+业务含义忠实于原文，但不能把这一修正说成 RDF 图逐字或逐项语义等价：sh:hasValue / sh:in 比较 RDF term，原先 xsd:integer 与实际 xsd:int 的错配确实可能漏判或误拒。现在消除的是类型错配；没有借改类型增加业务条件。全部被收窄为 xsd:int 的值均在其有效范围，相关物理列本来就是 32 位整数。
+
+独立 pyshacl 正反例使用与物理列一致的 xsd:int / xsd:double：A33 的合法/非法叶子及正值/零值、D11 的区间端点、E09 的等于/不等于、H01 的数量条件、H09 的促销条件、H10 的场景条件、H12 的零值条件均通过；A40 的真实图亦使用 xsd:int 的子类键。没有仅以 Turtle 默认的 xsd:integer 代替这些整数列来制造通过。
+
+### 非阻塞备注
+
+| 编号 | 备注 |
+|---|---|
+| A40 | 额外检查中，若直接通过 RDFlib API 把父品类名称造为显式 xsd:string，而生成图保留普通字符串写法，本机 pyshacl 0.40.1 / rdflib 7.6.0 的 hasValue 比较会把应通过的真实归属拒绝。采用与生成 Turtle 解析结果一致的普通字符串表示后，44 条真实图通过，错误归属仍被拒绝。该库的两种内部表示不应混用；这里记录失败探针，不将其误写为全类型表示均通过。RDF 1.1 规定普通字符串写法只是 xsd:string 的语法简写，因此这不是源文归属或本次整数类型修订的语义错误，不阻塞本轮写法对照；以后若直接执行形状，数据适配端需要统一字符串表示。 |
+| A40、A41、D05 | 已补的标准形状不自动意味着整条必须升档：A41 的根/断环记录仍依赖项目谓词，D05 的窗口仍为注解。本轮按用户范围只验新增表达是否忠实，不重新打开未变的全表档位审查。 |
+
+字符串等价性依据：[RDF 1.1 字面量定义](https://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal)。这里区分标准含义与当前库的表示行为；没有修改库、增加依赖或改写原文。
+
+### 工程与实际测试
+
+独立子图核对仍使用 RDFlib 和按空白节点出边递归规范化的三元组多重集；owner 只用于归属检查，没有调用生成器的 Parsed/check_subgraph 作为独立结论。
+
+| 检查 | 第三轮结果 |
+|---|---|
+| 子图与前缀 | SQL-L1-onto **4,975**；SQL-L3a-full **8,877**。小图全部包含于大图；文本前缀关系也成立。 |
+| 差集归属 | **3,902 = 109 条的 3,893 + 文件头 9**；逐 owner 解析后与实际差集多重集完全相等。 |
+| 可复现 | PYTHONHASHSEED **0、1、12345** 的两份文本分别逐字节相同。 |
+| 小图 SHA-256 | `0eda2504be0eaeed7cd580960d96dcd212b0c5a5d70167cb14523a728b1a44cc`，仍与前两轮相同。 |
+| 大图 SHA-256 | `c73e376388923671136a103bb694f81710d005ba738216bd8f6e6a1764fb9fa2`。 |
+| 旧上下文 | 独立加载 `96abbed` 旧渲染器，14 个可渲染旧单元（含 SQL-L3a）逐字节相同；另 1 个外部指针返回值相同，不冒充外部文件字节比较。 |
+| 新单元选择及提示 | 显式名字的 dry-run、--cell all 范围回归通过；另独立核对两个新单元的系统提示头与语法尾部均与 SQL-L1plus 字节相同，两者仍不进入 CELLS。 |
+| T34 测试 | **28 passed，12.32 秒**，rdflib、owlrl、pyshacl 均实际可用，无相关依赖跳过。 |
+| 全套测试 | **1350 passed, 6 skipped, 109 warnings，123.34 秒，0 failed**。使用环境已有的外部路径配置；付费模型凭据在测试进程中移除。 |
+| 跳过项 | 4 项 Docker 不可达、1 项外部 checkout 未标到固定 tag、1 项冻结后的布局检查；未计为通过。 |
+
+本轮实际命令（沿用已有 T26 环境，没有安装新依赖）：
+
+```sh
+env -u DEEPSEEK_API_KEY UV_CACHE_DIR="$TMPDIR/uvcache" \
+  uv run --no-project --python "$SEMDEBT_MAIN_DIR/../cards/T26/.venv/bin/python" \
+  python -m pytest tests/test_l3a_full.py -ra
+
+env -u DEEPSEEK_API_KEY UV_CACHE_DIR="$TMPDIR/uvcache" \
+  uv run --no-project --python "$SEMDEBT_MAIN_DIR/../cards/T26/.venv/bin/python" \
+  python -m pytest -ra
+```
