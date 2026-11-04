@@ -190,3 +190,9 @@ harness-u2-v3@ee3f0c0→harness-u2-v4@2163228；同run保留56次、新增1708�
 ### 20261104-T34-ontology-full-01：2026-11-05 标签与正式 dry-run 追加
 
 用户明确授权在 #261 合并提交 51247a8c5e4e296093b4260a17db843ff64c06d8 创建并发布附注标签 semantic-v1.7-l3a-full（tag 对象 c3750ae8e5fdecfb3304d7b73a7067d28fe40b39），远端已核实，T34 目录已 fetch。原样四单元正式 dry-run 退出 0，eval-v1.2 与新语义标签检查通过，1,308 次作答、预计 1,440 调用、错峰 23.8252158 元，与此前估价一致；文字上下文哈希复核未变。**待用户批准付费；模型调用 0、费用 0、未采集、未判定、无新指纹。** 此前缺标签的失败记录保留，不作为本次通过结果。
+
+### 20261104-T34-ontology-full-01：2026-11-05 获批采集完成，待独立内容复核
+
+用户明确批准原生 dry-run 参数仅去掉 `--dry-run`，并授权 109 道题面和四份上下文发送 DeepSeek 官方 API（不发参考答案）；按返回用量累计超过 30 元则停止。四单元各 327 次、共 1,308 次作答全完成，1,647 次接口返回、14.25975176 元，均错峰，进程退出 0，无停跑恢复。首条及全部返回指纹 `bc19ba97cbe016479903222bb1578db6`。代码版本全为 948029d；采集期间未提交。起止报费、实际用量见本 run 的 collection.json、usage-audit.json，原始响应只在环境数据目录。
+
+效果范围为主表同一批 98 题；1,176 次 D1 首轮标签位于 `20261104-T34-ontology-full-01-content-01/codex-verdicts.jsonl`，均标记 `final=false`。报告 `reports/results/l3a-full.md` 暂待跨厂商复核。全部 1,013 条判对项（含自动规则项）已生成本机匿名包；清单 `reports/validation/t34-claude-review-manifest.md` 及 JSON，包位于 `$SEMDEBT_DATA_DIR/t34-run-20261104/claude-review/`，由用户本机普通模式 Claude Code 独立复核并写回 results.json。私有题面、参考及理由不入仓库；回收前不将分歧计为 0。

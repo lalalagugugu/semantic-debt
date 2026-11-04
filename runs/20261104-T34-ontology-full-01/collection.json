@@ -1,0 +1,81 @@
+{
+  "run_id": "20261104-T34-ontology-full-01",
+  "state": "collection_complete",
+  "session_id": 23745,
+  "currency": "CNY",
+  "source": "returned API raw usage, offpeak token prices",
+  "cost_stop_threshold_cny": 30,
+  "first_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+  "events": [
+    {
+      "cell": "SQL-L1",
+      "event": "start",
+      "cell_cost_cny": "0.00000000",
+      "cumulative_cost_cny": "0.00000000",
+      "recorded_at_utc": "2026-11-04T18:13:14.685896+00:00"
+    },
+    {
+      "cell": "SQL-L1",
+      "event": "finish",
+      "returned_calls": 440,
+      "completed_attempts": 327,
+      "cell_cost_cny": "3.26076228",
+      "cumulative_cost_cny": "3.26076228",
+      "recorded_at_utc": "2026-11-04T18:29:48.819235+00:00"
+    },
+    {
+      "cell": "SQL-L1-onto",
+      "event": "start",
+      "cell_cost_cny": "0.00000000",
+      "cumulative_cost_cny": "3.26076228",
+      "recorded_at_utc": "2026-11-04T18:29:48.819235+00:00"
+    },
+    {
+      "cell": "SQL-L1-onto",
+      "event": "finish",
+      "returned_calls": 431,
+      "completed_attempts": 327,
+      "cell_cost_cny": "3.54060064",
+      "cumulative_cost_cny": "6.80136292",
+      "recorded_at_utc": "2026-11-04T18:51:00.596106+00:00"
+    },
+    {
+      "cell": "SQL-L1plus",
+      "event": "start",
+      "cell_cost_cny": "0.00000000",
+      "cumulative_cost_cny": "6.80136292",
+      "recorded_at_utc": "2026-11-04T18:51:00.596106+00:00"
+    },
+    {
+      "cell": "SQL-L1plus",
+      "event": "finish",
+      "returned_calls": 391,
+      "completed_attempts": 327,
+      "cell_cost_cny": "3.45597148",
+      "cumulative_cost_cny": "10.25733440",
+      "recorded_at_utc": "2026-11-04T19:09:24.145881+00:00"
+    },
+    {
+      "cell": "SQL-L3a-full",
+      "event": "start",
+      "cell_cost_cny": "0.00000000",
+      "cumulative_cost_cny": "10.25733440",
+      "recorded_at_utc": "2026-11-04T19:09:24.145881+00:00"
+    },
+    {
+      "cell": "SQL-L3a-full",
+      "event": "finish",
+      "returned_calls": 385,
+      "completed_attempts": 327,
+      "cell_cost_cny": "4.00241736",
+      "cumulative_cost_cny": "14.25975176",
+      "recorded_at_utc": "2026-11-04T19:29:22.842843+00:00"
+    }
+  ],
+  "exit_code": 0,
+  "completed_attempts": 1308,
+  "returned_calls": 1647,
+  "total_actual_cost_cny": "14.25975176",
+  "fingerprint_changes": 0,
+  "independent_content_review": "pending"
+}
