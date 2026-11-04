@@ -182,3 +182,7 @@ harness-u2-v3@ee3f0c0→harness-u2-v4@2163228；同run保留56次、新增1708�
 ## 20261101-T32-clean-repro-SQL-L1-01：README 干净环境复现（2026-11-01）
 
 新 clone 按 README 离线重评 SQL-L1，366 条，费用 0，未调用模型。当时 README 没有固定题库版本，用的是题库 `e17a3fa`，不是 eval-v1.3；和既有日志的差异及解释见 `reports/validation/t32-clean-repro.md`。只是复现验证，不进任何报告数字。
+
+## 20261104-T34-ontology-full-01：预检登记，尚未付费运行
+
+四单元 SQL-L1、SQL-L1-onto、SQL-L1plus、SQL-L3a-full，计划同一 run 各 109×3（主表只报告 98 题），原主表 SQL-L1plus 配置：deepseek-flash、并发 4、执行超时 120 秒、跳过 judge。两个文字单元与历史上下文字节和源系统消息哈希均一致；109 道题面哈希一致。原生估价函数预计 1,440 调用、错峰 23.8252158 元；**模型调用 0、费用 0，未采集、未判定**。正式 CLI dry-run 被缺少 `semantic-v1.7-l3a-full` 标签的版本检查拒绝，尚未通过；待标签发布后重跑正式 dry-run，再交用户批准并错峰启动。预检报告 `reports/validation/t34-run-preflight.md`，结构化证据 `runs/20261104-T34-ontology-full-01/preflight.json`；冻结题库 eval-v1.2=90e13b385a639a9164ac78430c50c11a7859f976。新指纹待首次实际响应，运行中变化即停；原样 harness，无监督脚本。

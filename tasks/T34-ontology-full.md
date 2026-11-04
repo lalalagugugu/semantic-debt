@@ -1,6 +1,6 @@
 # T34 全部语义换成本体（L3a-full）与 L1+ 对比
 
-- 状态：第 3 步复核暂不通过（Codex，2026-11-04）；盲写已按复核修订（2026-11-04），待 Codex 再核
+- 状态：第 3 步通过（#265）；第 4–6 步预检中，待 semantic-v1.7-l3a-full 标签发布与正式 dry-run 后用户批准（2026-11-04）
 - 负责：第 1–2 步 Claude Code（盲模式）；第 3 步 Codex 复核；第 4–6 步 Codex（codex-main）
 - 依据：`tasks/T19a-v10-plan.md` 第一节；`decisions/2026-10-23-l1plus-l3a.md`；`decisions/2026-10-25-t22b-l3a-presentation.md`；`reports/validation/l3a-ontology-validation.md`（T26）
 - 依赖：`semantic-v1.6-l1plus`；`harness-v1.1`；`eval-v1.2`
@@ -160,3 +160,12 @@
 - 测试：新增通用测试，两份本体里形状约束的每个字面量（共 155 个），类型都等于对应路径属性的 range；另按 D19 的做法补 xsd:int / xsd:double 数据的 pyshacl 正反例（H09 无折扣交易、A33 计划表、D11 收入档边界）。原有正反例的数据改成按字段声明的类型（xsd:int / xsd:double）。`uv run --with rdflib --with owlrl --with pyshacl pytest tests/test_l3a_full.py`：28 passed。全套（不装三个可选依赖）：1,110 passed、32 skipped、2 failed（同前，`test_combo` 读不到盲模式拒读的 `semantic/tuning/`）。
 - 子图：SQL-L1-onto 4,975、SQL-L3a-full 8,877，三元组数不变（只改字面量类型），差额归属与前缀关系仍成立。
 - token：SQL-L3a-full 97,219 → **97,358**；其余三份不变。
+
+### 第 4–6 步预检（Codex，2026-11-04，未付费）
+
+- 计划 run-id：`20261104-T34-ontology-full-01`；分支 `T34-run`。
+- 文字上下文与历史渲染逐字节相同，完整系统消息哈希与主表源日志相同；四单元 109 题与原 SQL-L1plus 题面哈希一致，均每题 3 次、并发 4、执行超时 120 秒。
+- 原生估价函数：1,308 次作答、预计 1,440 调用、错峰 23.8252158 元；按原 `--est-from-args` 参数。
+- 正式 CLI dry-run 尚未通过：已 fetch --tags 并核对远端，未见 `semantic-v1.7-l3a-full`，原生语义版本检查退出 2。没有造标签或绕过；待发布后重跑并交用户批准。
+- 预检：`reports/validation/t34-run-preflight.md`；结构化记录 `runs/20261104-T34-ontology-full-01/preflight.json`，INDEX 已登记为计划/未启动。
+- API 调用 0、费用 0；尚无新指纹、作答、判定或准确率。原样 harness，不套监督脚本；后续判定与报告按卡片和本次用户指示。
