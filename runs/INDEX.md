@@ -196,3 +196,7 @@ harness-u2-v3@ee3f0c0→harness-u2-v4@2163228；同run保留56次、新增1708�
 用户明确批准原生 dry-run 参数仅去掉 `--dry-run`，并授权 109 道题面和四份上下文发送 DeepSeek 官方 API（不发参考答案）；按返回用量累计超过 30 元则停止。四单元各 327 次、共 1,308 次作答全完成，1,647 次接口返回、14.25975176 元，均错峰，进程退出 0，无停跑恢复。首条及全部返回指纹 `bc19ba97cbe016479903222bb1578db6`。代码版本全为 948029d；采集期间未提交。起止报费、实际用量见本 run 的 collection.json、usage-audit.json，原始响应只在环境数据目录。
 
 效果范围为主表同一批 98 题；1,176 次 D1 首轮标签位于 `20261104-T34-ontology-full-01-content-01/codex-verdicts.jsonl`，均标记 `final=false`。报告 `reports/results/l3a-full.md` 暂待跨厂商复核。全部 1,013 条判对项（含自动规则项）已生成本机匿名包；清单 `reports/validation/t34-claude-review-manifest.md` 及 JSON，包位于 `$SEMDEBT_DATA_DIR/t34-run-20261104/claude-review/`，由用户本机普通模式 Claude Code 独立复核并写回 results.json。私有题面、参考及理由不入仓库；回收前不将分歧计为 0。
+
+### 20261104-T34-ontology-full-01：独立复核范围与主表对齐（2026-11-05）
+
+按用户确认，1,013 条判对来源为 v2 直接判对 839、R1–R11 放行 109、人工判对 65；仅后两类 174 条进入跨厂商复核。原逐次标签和统计不改，原 pending 快照保留，当前复核集合以新版清单为准；839 条排除项不算独立复核通过。新包版本 non-v2-v2，匿名编号 T34V2R0001–T34V2R0174，10 文件，仍在 `$SEMDEBT_DATA_DIR/t34-run-20261104/claude-review/`；旧全量包完整移到同级 claude-review-all-positive-v1/，旧 T34R 编号不再使用。更新了导出脚本、清单和结果报告，模型 API/查询执行 0。

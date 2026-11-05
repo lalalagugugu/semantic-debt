@@ -141,13 +141,14 @@ def prepare(source, cell, output):
 
 
 def export_review(output):
-    """Lock all main98 labels and export all positive attempts for blind review."""
+    """Export rule/manual positives, excluding v2 passes as in the main table."""
     data = Path(os.environ['SEMDEBT_DATA_DIR']) / 't34-run-20261104'
     private = data / 'codex' / output
     target = data / 'claude-review'
     if target.exists():
         raise ValueError('review directory exists; preserve the issued packet')
     positives, locks, public_labels = [], {}, []
+    credit_counts = {}
     for cell in CELLS:
         base = private / cell
         ledger_bytes = (base / 'codex-decisions.json').read_bytes()
@@ -157,6 +158,7 @@ def export_review(output):
         if len(main) != 294 or len({(m['qid'], m['rep']) for m in main}) != 294:
             raise ValueError('incomplete main98 identities')
         locks[cell] = sha(ledger_bytes)
+        counts = Counter(v2=0, rules=0, manual=0)
         for m in main:
             original_material = {k: v for k, v in m.items() if k != 'material_sha256'}
             if sha(encoded(original_material)) != m['material_sha256']:
@@ -172,11 +174,15 @@ def export_review(output):
                                       material_sha256=m['material_sha256'],
                                       independent_review='pending', final=False))
             if verdict['correct']:
-                positives.append((cell, m))
+                kind = 'v2' if m['v2_outcome'] == 'correct' else 'rules' if m['rules'] else 'manual'
+                counts[kind] += 1
+                if kind != 'v2':
+                    positives.append((cell, m))
+        credit_counts[cell] = dict(counts)
     secrets.SystemRandom().shuffle(positives)
     files, mapping, cases = {}, {}, []
     for index, (cell, m) in enumerate(positives, 1):
-        anon = f'T34R{index:04d}'
+        anon = f'T34V2R{index:04d}'
         context = (private / cell / 'system.txt').read_bytes()
         if sha(context) != m['system_sha256']:
             raise ValueError('review context differs from delivered context')
@@ -202,6 +208,10 @@ Review every anonymous attempt independently against the delivered context,
 question, complete executed result and allowed references. Do not execute any
 model API client or rerun collection.
 Do not put private materials in the repository or send them to a cloud coordinator.
+This is edition non-v2-v2, matching the main-table review scope: v2 direct passes
+are excluded. Review all rule-released and manually credited attempts in this
+packet. Earlier T34R identifiers belong to the superseded all-positive packet;
+do not reuse earlier results against these T34V2R identifiers.
 
 Use the unchanged main-table D1 rules: enterprise meaning controls; an unstated
 alternative interpretation is insufficient. Missing unknown/unassigned nonzero
@@ -220,7 +230,7 @@ The scorer permits ratio/percentage scale normalization; do not invent new
 tolerances. D1 still rejects explicit contradictory requested answers.
 
 Write results.json here as an array with exactly one object per anonymous_id:
-{"anonymous_id":"T34R0001","correct":true,"note":"independent evidence"}
+{"anonymous_id":"T34V2R0001","correct":true,"note":"independent evidence"}
 correct must be a JSON boolean. Explain each rejection or document-reference
 conflict in note. Include no original identity guesses. Read full rows rather
 than previews. Do not edit packet inputs. Return results for every listed entry.
@@ -233,15 +243,19 @@ than previews. Do not edit packet inputs. Return results for every listed entry.
                   anonymous_first=cases[0]['anonymous_id'] if cases else None,
                   anonymous_last=cases[-1]['anonymous_id'] if cases else None,
                   batches=entries, files=inventory,
-                  scope='all positive main98 repetitions, including automatic credits',
+                  edition='non-v2-v2',
+                  supersedes='all-positive packet issued at commit 2259845',
+                  credit_counts_by_cell=credit_counts,
+                  credit_counts_total=dict(sum((Counter(v) for v in credit_counts.values()), Counter())),
+                  scope='main-table policy: R1-R11 and manual positives only; v2 direct passes excluded',
                   review_instructions='REVIEW.md', model_calls=0)
     new_or_same(private / 'locked-verdicts.json', encoded(locks))
-    new_or_same(private / 'review-identity-map.json', encoded(mapping))
+    new_or_same(private / 'review-identity-map-non-v2-v2.json', encoded(mapping))
     new_or_same(ROOT / 'runs' / output / 'codex-verdicts.jsonl',
                 b''.join(encoded(r) for r in public_labels))
     for name, blob in files.items():
         new_or_same(target / name, blob)
-    new_or_same(ROOT / 'reports/validation/t34-claude-review-manifest.json', encoded(public))
+    (ROOT / 'reports/validation/t34-claude-review-manifest.json').write_bytes(encoded(public))
     print(json.dumps(dict(entries=len(cases), files=len(files), model_calls=0)))
 
 
