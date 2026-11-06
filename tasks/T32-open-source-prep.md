@@ -40,14 +40,14 @@
 - [x] 重写 `README.md`；报告和回包的链接发布时补
 - [ ] 报告引用的私有材料（`$SEMDEBT_DATA_DIR/v7-eval-20261030/`、`t31-v7-census-20261030/`）随回包一起放进 Release，先由用户确认范围并扫密钥，否则读者查不到出处
 - [x] 主仓库加 `LICENSE`、`LICENSE-CONTENT.md`；`vendor/cube/NOTICE.md` 不用改
-- [ ] 题库仓库：加许可文件，当前文件里的本机路径改成 `<home>`（题库侧 Codex）
+- [x] 题库仓库：加许可文件，当前文件里的本机路径改成 `<home>`（题库侧 Codex；题库 PR #26，11-03）
 - [x] 查 T22 盲写是否读过 `decisions/2026-10-17-semantic-gaps-and-realistic-questions.md`：本机 3 份 T22 会话记录里文件名出现 0 次，不用写进局限
 - [x] 扫两个仓库的 PR 评论和 review（协调会话，正则查密钥、本机路径、邮箱、工作相关姓名）：无命中
 - [x] 干净环境复现：由 Codex 新 clone 跑通重算和离线重评一个单元（`reports/validation/t32-clean-repro.md`）；缺口已补进 README。未登录访问等转公开后核对
 - [x] （T33）作答对照页：静态页面，同一题在各单元的查询、判定和不超过 20 行的结果并排；由脚本从日志和题库生成
 - [x] （T33）原始回包打包并扫密钥（含 U2 六单元，#250）
 - [x] 主仓库重跑 gitleaks（2026-11-02，全部分支 459 个提交）：仍是那 2 处 `q.ScenarioKey =` 误报
-- [ ] 题库仓库重跑 gitleaks（含 `scorer-v2-check`、PR #25）（题库侧 Codex）
+- [x] 题库仓库重跑 gitleaks（含 `scorer-v2-check`、PR #25）（题库侧 Codex；题库 PR #26，0 命中）
 - [x] 查公开文件里的「人工」：历史记录不改写，README 说明这个词的含义
 - [ ] 定稿报告导出到 `reports/midterm-report.md`（README 已指向它）
 - [ ] Release `midterm-v1` 草稿（T33 Codex）；对照页 `gh-pages` 分支（T33 Codex），转公开后开 Pages
