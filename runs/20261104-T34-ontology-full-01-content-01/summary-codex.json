@@ -1,0 +1,160 @@
+{
+  "source": "20261104-T34-ontology-full-01",
+  "content_audit": "20261104-T34-ontology-full-01-content-01",
+  "independent_review": "pending",
+  "final": false,
+  "main98": {
+    "SQL-L1": {
+      "attempts": 294,
+      "correct": 234,
+      "stability": {
+        "all_correct": 65,
+        "all_wrong": 9,
+        "mixed": 24
+      },
+      "first_turn_exec_errors": 103,
+      "wrong_causes": {
+        "怎么算": 28,
+        "是什么/属于谁": 30,
+        "SQL": 2
+      },
+      "first_turn_prompt_tokens": 13669734
+    },
+    "SQL-L1-onto": {
+      "attempts": 294,
+      "correct": 235,
+      "stability": {
+        "all_correct": 69,
+        "all_wrong": 9,
+        "mixed": 20
+      },
+      "first_turn_exec_errors": 95,
+      "wrong_causes": {
+        "SQL": 6,
+        "怎么算": 27,
+        "是什么/属于谁": 26
+      },
+      "first_turn_prompt_tokens": 18413130
+    },
+    "SQL-L1plus": {
+      "attempts": 294,
+      "correct": 269,
+      "stability": {
+        "all_correct": 82,
+        "all_wrong": 2,
+        "mixed": 14
+      },
+      "first_turn_exec_errors": 59,
+      "wrong_causes": {
+        "SQL": 6,
+        "怎么算": 16,
+        "是什么/属于谁": 3
+      },
+      "first_turn_prompt_tokens": 22125762
+    },
+    "SQL-L3a-full": {
+      "attempts": 294,
+      "correct": 275,
+      "stability": {
+        "all_correct": 82,
+        "all_wrong": 0,
+        "mixed": 16
+      },
+      "first_turn_exec_errors": 51,
+      "wrong_causes": {
+        "SQL": 2,
+        "怎么算": 14,
+        "是什么/属于谁": 3
+      },
+      "first_turn_prompt_tokens": 31481430
+    }
+  },
+  "paired_effects": {
+    "SQL-L1-onto minus SQL-L1": {
+      "delta": 0.0034013605442176887,
+      "lo": -0.03741496598639456,
+      "hi": 0.04761904761904762,
+      "contains_zero": true,
+      "questions": 98
+    },
+    "SQL-L3a-full minus SQL-L1plus": {
+      "delta": 0.02040816326530612,
+      "lo": -0.017006802721088437,
+      "hi": 0.05782312925170068,
+      "contains_zero": true,
+      "questions": 98
+    }
+  },
+  "historical_drift": {
+    "SQL-L1": {
+      "delta": -0.054421768707483,
+      "lo": -0.09863945578231294,
+      "hi": -0.013605442176870748,
+      "contains_zero": false,
+      "questions": 98
+    },
+    "SQL-L1plus": {
+      "delta": -0.017006802721088437,
+      "lo": -0.05782312925170068,
+      "hi": 0.027210884353741492,
+      "contains_zero": true,
+      "questions": 98
+    }
+  },
+  "bootstrap": {
+    "unit": "question, average of three repetitions",
+    "resamples": 5000,
+    "seed": 0
+  },
+  "collection_usage": {
+    "source": "20261104-T34-ontology-full-01",
+    "per_cell": {
+      "SQL-L1": {
+        "calls": 440,
+        "prompt_tokens": 20492689,
+        "hit_tokens": 20401664,
+        "miss_tokens": 91025,
+        "completion_tokens": 690426,
+        "cost_cny": "3.26076228"
+      },
+      "SQL-L1-onto": {
+        "calls": 431,
+        "prompt_tokens": 27028004,
+        "hit_tokens": 26872832,
+        "miss_tokens": 155172,
+        "completion_tokens": 711993,
+        "cost_cny": "3.54060064"
+      },
+      "SQL-L1plus": {
+        "calls": 391,
+        "prompt_tokens": 29447737,
+        "hit_tokens": 29315524,
+        "miss_tokens": 132213,
+        "completion_tokens": 684362,
+        "cost_cny": "3.45597148"
+      },
+      "SQL-L3a-full": {
+        "calls": 385,
+        "prompt_tokens": 41244526,
+        "hit_tokens": 41111168,
+        "miss_tokens": 133358,
+        "completion_tokens": 761709,
+        "cost_cny": "4.00241736"
+      }
+    },
+    "fingerprints": {
+      "bc19ba97cbe016479903222bb1578db6": 1647
+    },
+    "returned_calls": 1647,
+    "incomplete_files": 0,
+    "total_cost_cny": "14.25975176",
+    "prices_cny_per_million": {
+      "input_hit": ".02",
+      "input_miss": "1",
+      "output": "4"
+    },
+    "pricing": "offpeak; frozen collection pricing; completion includes reasoning",
+    "model_calls": 0
+  },
+  "model_calls": 0
+}
