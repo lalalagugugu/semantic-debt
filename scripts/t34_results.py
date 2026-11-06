@@ -355,6 +355,116 @@ def summary(source, output):
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
+def finalize_review(output, final_run, review_sha256):
+    """Append final labels only after complete review and a bound manual note audit."""
+    data = Path(os.environ['SEMDEBT_DATA_DIR']) / 't34-run-20261104'
+    private = data / 'codex' / output
+    manifest_path = ROOT / 'reports/validation/t34-claude-review-manifest.json'
+    manifest_bytes = manifest_path.read_bytes()
+    manifest = json.loads(manifest_bytes)
+    raw = (data / 'claude-review/results.json').read_bytes()
+    if sha(raw) != review_sha256:
+        raise ValueError('review result checksum mismatch')
+    results = json.loads(raw)
+    expected_ids = {f'T34V2R{i:04d}' for i in range(1, 175)}
+    if not isinstance(results, list) or len(results) != 174:
+        raise ValueError('review must contain exactly 174 entries')
+    if any(not isinstance(r, dict) or set(r) != {'anonymous_id', 'correct', 'note'}
+           or type(r['correct']) is not bool or not isinstance(r['note'], str)
+           or not r['note'].strip() for r in results):
+        raise ValueError('invalid review output fields')
+    reviewed = {r['anonymous_id']: r for r in results}
+    if set(reviewed) != expected_ids or len(reviewed) != len(results):
+        raise ValueError('missing, duplicate or unexpected review identity')
+    if not all(r['correct'] for r in results):
+        raise ValueError('disagreements require individual adjudication; no labels written')
+    if manifest['edition'] != 'non-v2-v2' or manifest['entries'] != 174:
+        raise ValueError('unexpected review packet edition')
+    packet_ids = []
+    for f in manifest['files']:
+        blob = (data / 'claude-review' / f['file']).read_bytes()
+        if sha(blob) != f['sha256']:
+            raise ValueError('issued packet input checksum mismatch')
+        if f['file'].startswith('cases-'):
+            packet_ids.extend(c['anonymous_id'] for c in json.loads(blob))
+    if set(packet_ids) != expected_ids or len(packet_ids) != 174:
+        raise ValueError('packet coverage differs from review')
+    map_bytes = (private / 'review-identity-map-non-v2-v2.json').read_bytes()
+    mapping = json.loads(map_bytes)
+    note_bytes = (private / 'review-note-audit-final.json').read_bytes()
+    note_rows = json.loads(note_bytes)
+    notes = {r['anonymous_id']: r for r in note_rows}
+    if set(mapping) != expected_ids or set(notes) != expected_ids or len(note_rows) != 174:
+        raise ValueError('incomplete private mapping or manual note audit')
+    for ident, r in reviewed.items():
+        check = notes[ident]
+        if (check['within_existing_rulings'] is not True or
+                check['note_sha256'] != sha(r['note'].encode())):
+            raise ValueError('review note is unexamined or outside existing rulings')
+    source_path = ROOT / 'runs' / output / 'codex-verdicts.jsonl'
+    source_bytes = source_path.read_bytes()
+    labels = [json.loads(line) for line in source_bytes.splitlines()]
+    if len(labels) != 1176 or len({(r['cell'], r['qid'], r['rep']) for r in labels}) != 1176:
+        raise ValueError('incomplete source labels')
+    material = {}
+    for cell in CELLS:
+        for line in (ROOT / 'runs' / output / (cell + '.jsonl')).read_bytes().splitlines():
+            m = json.loads(line)
+            material[cell, m['qid'], m['rep']] = m
+    selected, counts = set(), Counter()
+    for r in labels:
+        key = r['cell'], r['qid'], r['rep']
+        m = material[key]
+        if m['low'] or m['material_sha256'] != r['material_sha256']:
+            raise ValueError('label/material identity mismatch')
+        if r['content_correct']:
+            kind = 'v2' if m['v2_outcome'] == 'correct' else 'rules' if m['rules'] else 'manual'
+            counts[kind] += 1
+            if kind != 'v2':
+                selected.add(key)
+    if counts != Counter(v2=839, rules=109, manual=65):
+        raise ValueError('credit categories changed; re-evaluate before finalizing')
+    source_runs = {material[r['cell'], r['qid'], r['rep']]['source_run'] for r in labels}
+    if len(source_runs) != 1:
+        raise ValueError('mapped attempts belong to different collection runs')
+    source_run = source_runs.pop()
+    restored = {(m['cell'], m['qid'], m['rep']): ident for ident, m in mapping.items()}
+    if set(restored) != selected or len(restored) != 174:
+        raise ValueError('review does not exactly cover rule/manual positives')
+    final = []
+    for r in labels:
+        key = r['cell'], r['qid'], r['rep']
+        m = material[key]
+        ident = restored.get(key)
+        if ident and mapping[ident]['material_sha256'] != r['material_sha256']:
+            raise ValueError('private mapping material binding mismatch')
+        final.append(dict(r, final=True, source_run=m['source_run'], content_audit=output,
+                          independent_review='claude_confirmed' if ident else
+                          'excluded_v2_main_policy' if r['content_correct'] else 'not_in_review_scope',
+                          review_anonymous_id=ident,
+                          review_results_sha256=review_sha256 if ident else None))
+    receipt = dict(final_run=final_run, source_run=source_run,
+                   content_audit=output, review_results_sha256=review_sha256,
+                   review_file='$SEMDEBT_DATA_DIR/t34-run-20261104/claude-review/results.json',
+                   packet_manifest_sha256=sha(manifest_bytes), identity_map_sha256=sha(map_bytes),
+                   source_labels_sha256=sha(source_bytes), note_audit_sha256=sha(note_bytes),
+                   scope='main-table policy: rule/manual positives only',
+                   reviewed=174, confirmed=174, changed=0, disagreements=0, out_of_bounds_notes=0,
+                   excluded_v2=839, excluded_wrong=163, credit_counts=dict(counts),
+                   note_categories=dict(Counter(r['category'] for r in note_rows)),
+                   statistics_changed=False, model_calls=0, query_executions=0)
+    dest = ROOT / 'runs' / final_run
+    new_or_same(dest / 'codex-verdicts.jsonl', b''.join(encoded(r) for r in final))
+    new_or_same(dest / 'review-receipt.json', encoded(receipt))
+    new_or_same(dest / 'review-note-audit.jsonl', b''.join(encoded(r) for r in note_rows))
+    previous = json.loads((ROOT / 'runs' / output / 'summary-codex.json').read_bytes())
+    previous.update(final=True, independent_review='complete', final_run=final_run,
+                    review_results_sha256=review_sha256, review_receipt=receipt)
+    new_or_same(dest / 'summary-final.json', encoded(previous))
+    new_or_same(ROOT / 'reports/validation/t34-claude-review-receipt.json', encoded(receipt))
+    print(json.dumps(receipt, ensure_ascii=False))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='action', required=True)
@@ -369,6 +479,10 @@ def main():
     p = commands.add_parser('summary')
     p.add_argument('--source', required=True)
     p.add_argument('--output', required=True)
+    p = commands.add_parser('finalize-review')
+    p.add_argument('--output', required=True, help='source content audit id')
+    p.add_argument('--final-run', required=True, help='new append-only finalization directory')
+    p.add_argument('--review-sha256', required=True)
     args = parser.parse_args()
     if args.action == 'prepare':
         prepare(args.source, args.cell, args.output or args.source + '-content-01')
@@ -378,6 +492,8 @@ def main():
         print(json.dumps(usage_audit(args.source), ensure_ascii=False))
     elif args.action == 'summary':
         summary(args.source, args.output)
+    elif args.action == 'finalize-review':
+        finalize_review(args.output, args.final_run, args.review_sha256)
 
 
 if __name__ == '__main__':

@@ -29,7 +29,7 @@
 [{"anonymous_id": "T34V2R0001", "correct": true, "note": "独立核对证据"}]
 ```
 
-`correct` 必须为布尔值。每个不通过项或文档/参考冲突在 `note` 中说明；私有说明不入仓库。输入文件不改。Codex 回收后逐条处理分歧并更新报告；未回收不代表无分歧。
+`correct` 必须为布尔值。每个不通过项或文档/参考冲突在 `note` 中说明；私有说明不入仓库。输入文件不改。已于 2026-11-07 回收：SHA-256 `1634d223b90257bb7843a24cd879e000b20a0f1a98b1acba0de0e9803e8c96a9`，174 条全为 true，字段/覆盖/映射校验通过。Codex 逐条核对 note 后，分歧 0、改判 0、越界 0；回执为 `reports/validation/t34-claude-review-receipt.json`。输入包及本次 JSON 输入清单保持不变。
 
 ## 文件
 

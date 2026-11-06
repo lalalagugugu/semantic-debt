@@ -1,6 +1,6 @@
-# T34：全部语义改为本体的同 run 实验（待跨厂商复核）
+# T34：全部语义改为本体的同 run 实验
 
-2026-11-05。采集和 Codex 全量逐次判定已完成；Claude Code 普通模式独立复核尚未回收。以下准确率、稳定性、配对差、错因均为锁定后的 Codex 首轮结果，**不是终版结论**。第 6 步未完成。
+2026-11-07 定稿。判对里需要复核的 **174 条全部经另一家 Claude Code 复核、0 条改判**；v2 直接判对的 **839 条不复核**，判错的 **163 条不复核**，范围与主表一致。回收后逐条核对 note，未发现越界依据，分歧 0。标签、准确率、稳定性、配对差与区间、错因、token 和费用均保持不变，第 6 步完成。
 
 ## 采集与冻结
 
@@ -23,7 +23,7 @@
 | SQL-L1plus | `b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3` |
 | SQL-L3a-full | `6a5ab637b0f598f2d56de068d25756894caba33fe7d1d973f29b0fa489edfe61` |
 
-## D1 与逐次结果（待独立复核）
+## D1 与逐次结果
 
 冻结评分器 v2、已批准的 R1–R11、残余内容判定沿用主表流程。适用 `decisions/2026-10-28-residual-content-principles.md` 的 A/B/C 原则及 `decisions/2026-10-31-v7-content-review-rulings.md` 的一步推导边界；不改标签规则、语义或参考答案。自动比对使用完整结果，残余项逐次人工判定；全部 98×3×4 个身份均有标签，非抽样。
 
@@ -34,9 +34,9 @@
 | SQL-L1plus | 269 | 91.50% | 82 | 2 | 14 |
 | SQL-L3a-full | 275 | 93.54% | 82 | 0 | 16 |
 
-每行稳定性题数合计 98。标签见 `runs/20261104-T34-ontology-full-01-content-01/codex-verdicts.jsonl`（`final=false`）；完整材料及 Codex 理由仅在 `$SEMDEBT_DATA_DIR/t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/`。
+每行稳定性题数合计 98。定稿标签见 `runs/20261107-T34-final-01/codex-verdicts.jsonl`（1,176 条全部 `final=true`）；原 `runs/20261104-T34-ontology-full-01-content-01/codex-verdicts.jsonl` 作为首轮快照保留，不改写；完整材料及 Codex 理由仅在 `$SEMDEBT_DATA_DIR/t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/`。
 
-## 各组同题配对差（待独立复核）
+## 各组同题配对差
 
 本体减文字。先按题平均三次标签，再按题配对自助抽样 5,000 次、seed 0，沿用主表 `scripts/t31_v4_recompute.py::paired_interval`；95% 百分位区间，单位百分点。
 
@@ -47,7 +47,7 @@
 
 分别报告两组，不比较这两项配对差的大小。
 
-## 新文字单元对主表的变化（待独立复核）
+## 新文字单元对主表的变化
 
 历史标签取 `runs/20261031-T31-v5-rulings-01/` 的同单元 D1 定稿标签；同一批 98 题。差为新 run 减主表，用同样的按题自助法。这里同时包含指纹变化和新采样波动。
 
@@ -80,7 +80,7 @@
 
 合计 **1,647 次接口返回，14.25975176 元**。dry-run 预计 1,440 次、23.8252158 元；调用数估算与实际修正次数不同，未改变参数。每个单元开跑与结束均已向用户报费；起止记录见 `runs/20261104-T34-ontology-full-01/collection.json`。接口 token 合计与原生作答日志逐项一致，费用按小数点后 8 位一致。
 
-## 错因三类（待独立复核）
+## 错因三类
 
 每次错误只记一个主要原因。SQL 包含最终执行失败，也包含能执行但 SQL 机制用错；不把执行失败强行归入语义类。
 
@@ -91,7 +91,7 @@
 | SQL-L1plus | 16 | 3 | 6 | 25 |
 | SQL-L3a-full | 14 | 3 | 2 | 19 |
 
-## 独立复核与待核项
+## 独立复核与既有裁决
 
 按用户 2026-11-05 确认的主表做法，**独立复核范围与主表一致：评分器 v2 直接判对项不复核，复核 R1–R11 放行及 Codex 人工判对项**。先按 v2 直接判对分类，再按规则放行分类，剩余为人工判对，三类互斥；判定标签和上述数字不变。
 
@@ -107,19 +107,22 @@
 
 - 本机包：`$SEMDEBT_DATA_DIR/t34-run-20261104/claude-review/`，10 个文件（5 个批次、4 份上下文、1 份说明）。
 - 清单：`reports/validation/t34-claude-review-manifest.md` 与同名 JSON；含文件 SHA-256、条目数和编号范围。
-- 用户在本机普通模式 Claude Code（不是 T34 盲模式会话）读取包内 `REVIEW.md`，全量独立复核，写回同目录 `results.json`。不经云端协调会话转交，包不入仓库。
-- Codex 再校验输入哈希、结果覆盖和编号唯一性，逐条处理分歧，分歧单列；回收前不标记第 6 步完成。
+- 本机普通模式 Claude Code（不是 T34 盲模式会话）已全量复核并写回同目录 `results.json`；不经云端协调会话转交，包及 note 原文不入仓库。
+- Codex 已校验输入哈希、结果覆盖、编号唯一性及包外身份映射；174 条均为布尔值 `true`，无缺无重，字段严格为 `anonymous_id`、`correct`、`note`。
 
-参考待核（不改冻结答案）：`SQL-L3a-full / Q35 / r2、r3` 依实际交付条目 `H06` 按既有原则 C 判对，计 2 次；交独立复核确认。这里只列定位及结论，不公开题面、参考内容或判定理由。
+文档/参考差异披露（不改冻结答案）：`SQL-L3a-full / Q35 / r2、r3` 依实际交付条目 `H06` 按既有原则 C 判对，计 2 次，已由另一家确认。这里只列定位及结论，不公开题面、参考内容或私有 note。
 
 原 1,013 条全量包已完整归档到 `$SEMDEBT_DATA_DIR/t34-run-20261104/claude-review-all-positive-v1/`，仅用于追溯，停止使用旧 `T34R` 编号。当前包版本 `non-v2-v2`，私有身份映射为 Codex 目录下 `review-identity-map-non-v2-v2.json`。原始逐次标签快照中的 `pending` 状态保留；当前应复核集合以新版清单为准，839 条 v2 直接判对项按主表政策排除，不能记为已经独立复核。
 
-当前尚无 Claude Code 回写结果，因此**分歧未评估，不能记作 0**。
+复核文件 SHA-256：`1634d223b90257bb7843a24cd879e000b20a0f1a98b1acba0de0e9803e8c96a9`。**174 条确认，分歧 0、改判 0、越界 note 0**。五个 `results-partial-00N.json` 仅为中间结果，不作为定稿输入。回执见 `reports/validation/t34-claude-review-receipt.json`。
+
+逐条 note 核验分为：冻结规则及格式/完整结果等价 125 条；Top-N 边界选择 7 条；已给所问值及辅助列/行 20 条；一步算术 12 条；已裁定未归属组例外 4 条；原则 C 与 H06 2 条；允许参考边界版本 2 条；已裁定的两种筛选读法 2 条，合计 174。分别核对评分器 v2 规格、2026-10-28 五题裁决、原则 C 和 2026-10-31 一步推导边界。断环条目依实际交付 H06 和原则 C 确认，不将其他题的个别裁决泛化为新规则；筛选读法仅用于已有明确裁决的条目。一步算术均无矛盾的所问值，不涉及跨期累计或截断明细重建。公开逐条核验账仅含匿名编号、note 哈希及裁决文件定位，见 `runs/20261107-T34-final-01/review-note-audit.jsonl`。
 
 ## 验证与复现
 
 - 四个单元均 109×3 个唯一完成身份；主表范围均为同一批 98×3；所有响应和执行结果 SHA-256、系统消息和题面哈希均已核对。
 - 10 个匿名包文件哈希、174 个唯一且连续匿名编号、逐条字段匿名化均通过；包内没有身份映射和 Codex 理由文件。
+- 定稿回收校验、逐条映射及 note 绑定、1,176 条标签不变性、全部数值表不变性通过；重复执行定稿命令输出一致，错误结果哈希在写文件前被拒绝。以下全套测试为采集阶段已完成的结果，本次仅新增离线回收与定稿校验。
 - 定向测试 `tests/test_l3a_full.py tests/test_repo_layout.py` 通过，1 项按 G1 条件跳过。全套 **1,350 passed / 6 skipped / 109 warnings**；其中题库标签检查使用冻结 eval-v1.2 快照单独补跑通过，其余跳过为 4 项 Docker 不可达、1 项 G1 已过。未安装依赖。
 - 离线材料准备、判定、费用审计、自助法和包导出均为模型 API 调用 0；付费采集仅上述原生命令。
 
@@ -130,4 +133,13 @@ env -u DEEPSEEK_API_KEY uv run python scripts/t34_results.py summary \
   --source 20261104-T34-ontology-full-01 --output 20261104-T34-ontology-full-01-content-01
 ```
 
-材料准备命令为 `scripts/t34_results.py prepare --source RUN --cell CELL --output NEW_AUDIT_ID`；从冻结参考重新比对全部保存结果，不重新调用模型或执行查询。输出只追加，既有材料不得覆盖。首轮汇总也保存于 `runs/20261104-T34-ontology-full-01-content-01/summary-codex.json`。
+材料准备命令为 `scripts/t34_results.py prepare --source RUN --cell CELL --output NEW_AUDIT_ID`；从冻结参考重新比对全部保存结果，不重新调用模型或执行查询。输出只追加，既有材料不得覆盖。首轮汇总保留于 `runs/20261104-T34-ontology-full-01-content-01/summary-codex.json`；定稿汇总为 `runs/20261107-T34-final-01/summary-final.json`。定稿只追加标签和复核回执，数值与首轮快照逐项一致。
+
+回收校验及定稿复现命令（离线，重复执行只接受逐字节相同输出）：
+
+```sh
+env -u DEEPSEEK_API_KEY uv run python scripts/t34_results.py finalize-review \
+  --output 20261104-T34-ontology-full-01-content-01 \
+  --final-run 20261107-T34-final-01 \
+  --review-sha256 1634d223b90257bb7843a24cd879e000b20a0f1a98b1acba0de0e9803e8c96a9
+```
