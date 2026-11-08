@@ -1,108 +1,50 @@
 # T33 发布物候选清单与验证报告
 
-- 日期：2026-11-01（Asia/Singapore）。状态：按用户 2026-11-01 更新扩大回包范围，候选产物已重新生成；未发布。
-- 输入：`runs/20261031-T31-v5-rulings-01/`、U2 run `20261031-T29-u2-v3-01`、冻结题库 `eval-v1.3`、只读的既有回包及报告引用材料。
-- 模型调用 0；新查询执行 0；仅更新本卡验证报告，未改其他报告、已有日志、题库或冻结内容；未创建 Release、未转公开。
+- 日期：2026-11-09（Asia/Singapore）。状态：按用户补充裁决重做完毕，等待 PR 审阅；产物未发布。
+- 依据：`decisions/2026-10-31-publication-choices.md` 的 2026-11-01 范围更新及末尾「补充（2026-11-09，用户）」、用户本次明确指令。
+- 预算及执行：付费模型调用 0，新查询执行 0。未创建 Release、未转公开、未创建 gh-pages，未上传压缩包或页面。
+- 仓库只提交生成器、测试、任务进度和本报告；题面、参考答案、原始响应、完整判定材料及生成页面均留在外部数据目录。
 
-## 范围与用户确认
+## 范围与材料
 
-- 对照页：98 题导航、19 单元、5,439 次作答。18 单元各 294 次；SQL-L1-T4 为 49 道留出题 × 3 次＝147 次。
-- 用户在本会话确认：T4 的示例取自调优题，所以仅跑留出题；其余 49 题标注「未运行（T4 只跑留出题）」，不补跑。
-- 回包包：按 T31 的 source_run、cell、qid、rep 和原记录哈希筛选实际引用文件，覆盖 6,051 次正式记录（包括主表外低区分度题），包含实际使用的修正回包、探查回包及执行结果；不整 run 打包，不纳入 judge 单列题或未引用文件。另按公开范围更新及用户本次指令，加入 U2 六单元 1,764 次的回包和执行结果（含思考内容），回包包共覆盖 7,815 次实际完成作答。对照页仍只含原 19 单元。
-- 私有材料：仅下表 11 个报告出处及复核引用文件。出处为 `reports/midterm/v7-number-sources.md`、`reports/final/recheck.md`、`reports/results/t19a-v7-numbers.md` 及 `reports/recheck/*.json` 的输入记录。
-- **原始回包压缩包含模型思考内容；对照页不含思考内容。扩大范围已获用户授权；所有产物均未发布，本 PR 不是发布动作。**
+- 回包包 `t33-formal-raw.zip` 保留此前全部 24,127 个文件（原 19 单元 6,051 次及 U2 1,764 次），再加入 `20261104-T34-ontology-full-01` 四单元各 109 题 × 3 次，共 1,308 次；合计覆盖 9,123 次作答。
+- 本体单元为 SQL-L1、SQL-L1-onto、SQL-L1plus、SQL-L3a-full。新增全部 1,647 个 API 原始响应及 1,647 个执行结果，原始字节保留思考内容。生成器同时验证日志哈希、源记录身份和文件引用哈希，确认该 run 四个单元目录的全部 JSON 均已入包。
+- 引用材料包 `t33-cited-private.zip` 保留原 11 文件，再加入本体对照 14 文件：四单元各一份 materials.json 和含 basis 理由的 codex-decisions.json；SQL-L1-onto、SQL-L3a-full 两份完整 system.txt；locked-verdicts.json、review-identity-map-non-v2-v2.json、review-note-audit-final.json；完整 Claude 复核 results.json。共 25 文件。
+- Codex 材料来自 `$SEMDEBT_DATA_DIR/t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/`；实际系统消息全文逐一匹配采集日志的 system_sha256。materials.json 原始哈希匹配公开输入 manifest，四份判定账与 locked-verdicts 绑定，主表每条判定和材料哈希与定稿 `runs/20261107-T34-final-01/` 一致。未重新判分。
+- Claude 复核文件为 `$SEMDEBT_DATA_DIR/t34-run-20261104/claude-review/results.json`，完整保留 174 项（包括全部 note），不删字段、不改写。包内实际字节 SHA-256 为 `1634d223b90257bb7843a24cd879e000b20a0f1a98b1acba0de0e9803e8c96a9`，与用户指定值及定稿 receipt 一致；匿名身份映射与逐条 note 审计哈希亦与 receipt 一致。
+- 没有将被替代的早期复核包、旧身份映射、控制台、授权文件、账本或锁文件混入新增材料。定稿日志本身已在仓库，引用包只补其对应私有证据。
+- 用户已决定引用材料包随后续 Release 发布，原始回包含思考内容，个人信息按既有裁决不脱敏。本次只生成本地候选并开 PR，发布动作不在本卡授权内。
 
-用户确认清单：
+## 作答对照页
 
-- [x] 原 19 个正式单元范围已由用户确认；本次按授权新增 U2 六单元 1,764 次。清单列明实际引用文件，未授权发布。
-- [x] 用户确认原始回包包含思考内容；本次 U2 扩容仍包含思考内容，发布需另行决定。
-- [x] 用户已确认私有引用材料 11 文件的范围，本次该包字节不变。
-- [x] 用户已确认邮箱形式文本和本机路径不脱敏，本次未新增相关匹配文件。
-- [ ] 本地查看对照页，确认页面展示；再由用户决定后续托管、Release 和转公开。
+- 入口：`$SEMDEBT_DATA_DIR/publication/answer-browser/index.html`。保留旧批次 19 单元、98 题、5,439 次作答，T4 仍只跑 49 道留出题，其余标注「未运行（T4 只跑留出题）」。
+- 新增 `answer-browser/t34/index.html` 及 98 道题页，四个新单元各 98 题 × 3 次，共 1,176 次。两批使用独立页面及单元列表；T34 每页显著标明「新版本模型的同一批次……和旧版主表不直接比较」，不会在同一对照页跨批次选择单元。
+- 总计 198 个 HTML 文件、6,615 次主表作答。旧批次 98 道题页哈希全部不变，旧目录页只增加新批次入口。U2 仍不进入对照页。
+- 每份作答只导出查询、声明的假设、前 20 行结果、内容判定、按约定交付判定、来源及 API 用量；不导出模型思考文本、参考答案或其他响应字段。两个批次均提供同题一对一错及三次时对时错列表。
+- HTML 总计 12,783,899 字节，最大单文件 231,071 字节；无服务端、远程脚本或网络请求。
 
-## 产物与复现
+## 压缩包体积及校验和
 
-输出目录：`$SEMDEBT_DATA_DIR/publication/`。产物不入 Git。对照页入口：`answer-browser/index.html`，可直接本地打开，无服务端、远程脚本、字体或网络请求。按题拆为 98 页加目录，共 99 个 HTML 文件。
+| 压缩包 | 文件数 | 压缩字节 | 较上版新增文件 | 较上版新增压缩字节 | SHA-256 |
+|---|---:|---:|---:|---:|---|
+| `t33-formal-raw.zip` | 27,421 | 62,917,954 | 3,294 | 8,409,604 | `8a686853fee56eb081ace05c271042e60ee1e3bf14bc38ca74e0fc4c3ef84834` |
+| `t33-cited-private.zip` | 25 | 6,965,210 | 14 | 6,646,419 | `ee4f95890ca4e34542ba3ef368757ac49b094ba13c6819e30958066f3801302f` |
 
-对照页总计 10,119,365 字节；最大单文件 231,071 字节。每页两个单元使用同一个次数选择器；两份案例列表按内容判定生成，点击保留所选单元及次数。
+`t33-manifest.json` 列出所有包内文件和 198 个页面的大小、SHA-256，另存两批页面范围和本体定稿来源；`t33-SHA256SUMS` 列出两个 ZIP 的 SHA-256；`t33-scan.json` 只记录文件名、类别、计数与复核结论，不记录匹配值。三者均在 `$SEMDEBT_DATA_DIR/publication/`。
 
-正常项目环境：
+## 判定计数
 
-```bash
-uv run --offline python scripts/t33_publication_artifacts.py --scan
-uv run --offline python -m pytest tests/test_t33_publication_artifacts.py -q
-```
+- 旧批次 19 单元：生成器逐单元对照 `reports/results/accuracy-v5-cells.csv` 的主表次数、内容判对数及交付判对数，全部一致。
+- 本体批次：内容判定使用 `runs/20261107-T34-final-01/codex-verdicts.jsonl`，不使用待审或中间标签。每条均绑定原私有材料和含理由判定账；以下内容判对数与 summary-final.json 完全一致。交付判对沿用同一作答的既有 scorer_v2 判定，不新执行查询。
 
-本次 clone 的 uv 离线缓存缺少锁定的 chdb-core，首次标准命令失败；未联网安装依赖。实际复用已经存在的主工作区 Python 环境（未修改其依赖）：
+| 本体批次单元 | 全部作答 | 主表作答 | 主表内容判对 | 主表按约定交付 | 实际系统消息 SHA-256 |
+|---|---:|---:|---:|---:|---|
+| SQL-L1 | 327 | 294 | 234 | 192 | `8df43ae0552cab461d8bd490ff4e21114995681ff0ccd38cf85115f65e44f6a6` |
+| SQL-L1-onto | 327 | 294 | 235 | 193 | `33f01624084b19c4941dd0a0ece60bb149ecbeaaadc47202e92941879e7a74eb` |
+| SQL-L1plus | 327 | 294 | 269 | 226 | `b80107d469e5600f1c7f3150afef18d11734452a25cc9340f1df46bc470073a3` |
+| SQL-L3a-full | 327 | 294 | 275 | 228 | `6a5ab637b0f598f2d56de068d25756894caba33fe7d1d973f29b0fa489edfe61` |
 
-```bash
-UV_CACHE_DIR="${TMPDIR}/uvcache" uv run --no-project --python "$SEMDEBT_MAIN_DIR/.venv/bin/python" python scripts/t33_publication_artifacts.py --scan
-UV_CACHE_DIR="${TMPDIR}/uvcache" uv run --no-project --python "$SEMDEBT_MAIN_DIR/.venv/bin/python" python -m pytest tests/test_t33_publication_artifacts.py -q
-```
-
-以上命令需要已设置 SEMDEBT_DATA_DIR、SEMDEBT_EVAL_DIR 和 SEMDEBT_MAIN_DIR，且本机已有 gitleaks。生成器仅导入已有冻结题库加载器，读取参考结果文件，不调用执行器或模型。
-
-`t33-manifest.json` 保存全部包内文件及页面的大小、SHA-256；`t33-SHA256SUMS` 保存两个 ZIP 的校验和；`t33-scan.json` 只记扫描类别、文件名、数量及复核结论，不记匹配值。
-
-| 压缩包 | 文件数 | 压缩体积（字节） | SHA-256 |
-|---|---:|---:|---|
-| `t33-formal-raw.zip` | 24,127 | 54,508,350 | `1b757c462bbb70585a66c00c2758f6da186adc05df4f37dfa7e022790cb8c3d1` |
-| `t33-cited-private.zip` | 11 | 318,791 | `f7d25fa7fa9e28cf0cda5470d18f6e887d4f67efa3589111f362aaaedd9d6e0a` |
-
-### U2 扩容对账（2026-11-01）
-
-- 依据：`decisions/2026-10-31-publication-choices.md` 末尾更新及用户本次明确指令；对照页保持原 19 单元，不引入跨指纹并排比较。
-- 来源：`reports/validation/t29-u2-v4-collection.json` 固定六份完整源日志的 SHA-256，读取 `$SEMDEBT_DATA_DIR/t29-u2-runtime-v4/runs/20261031-T29-u2-v3-01/`；逐单元核对 done 身份为相同 98 题 × 3 次，无缺失、无重复，所有作答指纹与采集报告一致。
-- 只加入完成作答所引用、哈希匹配的 API 和执行文件，不加入控制台、授权文件、锁、账本、stopped/API-error 记录或孤立文件；失败/停止记录仍保留于既有采集证据。
-- 新增 4,096 文件：API 回包 2,112 个，执行结果 1,984 个；解压体积新增 38,256,056 字节。
-- 回包包从 41,320,149 字节、20,031 文件增加到 54,508,350 字节、24,127 文件；压缩体积新增 **13,188,201 字节（约 12.58 MiB）**。
-- 原 20,031 文件的 SHA-256、大小、类别逐条保持不变；99 个 HTML 页面和私有引用包的 SHA-256 均与扩容前一致；扩大后重复生成的整个 manifest、两个 ZIP 及页面逐字节一致。
-
-| U2 单元 | 题数 | 次数/题 | 完成作答 | 新增 API 回包 | 新增执行结果 |
-|---|---:|---:|---:|---:|---:|
-| SQL-L0 | 98 | 3 | 294 | 330 | 321 |
-| SQL-L1 | 98 | 3 | 294 | 398 | 398 |
-| SQL-L0-u2 | 98 | 3 | 294 | 327 | 320 |
-| SQL-L1-u2 | 98 | 3 | 294 | 394 | 394 |
-| SQL-L0-u2p | 98 | 3 | 294 | 314 | 218 |
-| SQL-L1-u2p | 98 | 3 | 294 | 349 | 333 |
-
-## 验证结果
-
-- 重复运行生成器后，完整 manifest 逐字节一致；两个 ZIP 和 99 个 HTML 的 SHA-256 均一致。ZIP 使用固定时间、权限和排序。
-- 19 个单元的主表尝试次数、内容判对数、交付判对数与 `reports/results/accuracy-v5-cells.csv` 逐单元一致；生成器在不一致时拒绝完成。
-- 98 题页面数据检查：共 5,439 次、T4 缺失 49 题；每份结果最多 20 行；导出字段白名单无 reasoning、response、message 字段（usage 中 reasoning_tokens 是用量，允许保留）。
-- 99 页嵌入脚本均经 Node `vm.Script` 语法检查通过；使用 textContent 展示查询、题面、结果，嵌入 JSON 转义 HTML 标签字符。
-- 针对性测试 7 项全部通过（本次新增 2 项）：字段白名单及行数上限、原始文件引用筛选、ZIP 字节保真和可重复性、脚本闭合注入防护、路径扫描排除 JSON 换行误报，以及 U2 的完整身份覆盖/重复/来源校验和未引用文件排除/缺执行结果拒绝。仓库布局检查通过，G1 前置限制检查因冻结 tag 已存在而按既有规则跳过 1 项。
-- 浏览器视觉验收未完成：浏览器工具的 URL 安全策略拒绝 file 协议；没有绕过策略。页面数据与脚本语法已经验证，视觉效果留待用户本地查看。
-
-## 密钥与隐私扫描
-
-- gitleaks 8.30.1 对两个 ZIP 解压后的全部文件及 99 个页面进行扫描，共 24,237 文件；使用默认规则、100% 脱敏输出，并忽略文件内 allow 注释。
-- 共 7 个 generic-api-key 命中（原有 5、本次 U2 新增 2），逐项核对为 SQL 标识符或表达式误报；新增两项分别位于作答代码和思考内容中的 SQL 表达式。完整文件 SHA-256 固定于生成脚本；复扫未复核项为 0，未发现真实密钥。未停用任何规则，新增或变更文件的命中仍报错。
-- 当前环境 API key 的精确值检查已执行，匹配为 0；DEEPSEEK_API_KEY 标识匹配为 0。没有发现需要撤销或替换的密钥。
-- 自定义补充检查本机路径、邮箱形式文本及 DEEPSEEK_API_KEY；以下仅列文件名、类别和数量，不贴匹配值。邮箱形式文本涉及 8 个文件，本机路径涉及 1 个文件，均与扩容前相同；用户此前已确认原样保留，不脱敏。
-
-| 文件（压缩包名 / 包内路径，或页面） | 类别 | 数量 | 复核/处置 |
-|---|---|---:|---|
-| `t33-cited-private.zip/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt` | 邮箱 | 1 | 原样保留（用户已确认） |
-| `t33-cited-private.zip/v7-eval-20261030/SQL-L1-context.txt` | 邮箱 | 1 | 原样保留（用户已确认） |
-| `t33-cited-private.zip/v7-eval-20261030/report.md` | 本机路径 | 6 | 原样保留（用户已确认） |
-| `t33-cited-private.zip/v7-eval-20261030/snapshot/semantic/source.yaml` | 邮箱 | 1 | 原样保留（用户已确认） |
-| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q08_r1_t0_c1.exec.json` | 邮箱 | 5 | 原样保留（用户已确认） |
-| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q08_r2_t0_c1.exec.json` | 邮箱 | 5 | 原样保留（用户已确认） |
-| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q35_r3_t1_c1.exec.json` | 邮箱 | 1 | 原样保留（用户已确认） |
-| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q65_r1_t1_c1.exec.json` | 邮箱 | 4 | 原样保留（用户已确认） |
-| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q82_r1_t0_c0.exec.json` | 邮箱 | 5 | 原样保留（用户已确认） |
-| `answer-browser/Q31.html` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
-| `t33-formal-raw.zip/runs-raw/20261018-T13-sql-direct-01/SQL-L1/Q49_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
-| `t33-formal-raw.zip/runs-raw/20261018-T13-sql-direct-01/SQL-R/Q31_r1_t1.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
-| `t33-formal-raw.zip/runs-raw/20261019-T16-full-v14-sql-new-01/SQL-L2/Q49_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
-| `t33-formal-raw.zip/runs-raw/20261025-T14-tuned-01/SQL-L1-tuned-instr/Q79_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
-| `t33-formal-raw.zip/runs-raw/20261031-T29-u2-v3-01/SQL-L1-u2/Q119_r2_t1.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
-| `t33-formal-raw.zip/runs-raw/20261031-T29-u2-v3-01/SQL-L1-u2p/Q118_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
-
-## 逐单元主表计数
+旧批次逐单元主表计数：
 
 | 单元 | 题数 | 作答数 | 内容判对 | 按约定交付 |
 |---|---:|---:|---:|---:|
@@ -126,9 +68,65 @@ UV_CACHE_DIR="${TMPDIR}/uvcache" uv run --no-project --python "$SEMDEBT_MAIN_DIR
 | SQL-L3a | 98 | 294 | 273 | 223 |
 | SQL-R | 98 | 294 | 152 | 127 |
 
+## 验证与复现
+
+- 扩容前两个包中的每个文件，其路径、大小、SHA-256 和类别全部保留。扩容后重新运行生成器，完整 manifest 逐字节一致，两个 ZIP 和 198 个 HTML 的 SHA-256 全部一致。ZIP 固定排序、时间和权限。
+- 198 页 JavaScript 均通过 Node vm.Script 语法检查；独立读取页面实际内嵌数据，核对旧批次 5,439 次、本体批次 1,176 次，后者全部来源于本次本体 run，四单元判定计数与定稿一致，结果行数均不超过 20。导出字段无 reasoning、response、message 字段（usage.reasoning_tokens 是用量，允许保留）。
+- 针对性测试及仓库布局检查：53 passed, 1 skipped。新增两项验证定稿材料/标签/判定账的绑定及篡改拒绝，以及独立批次页面标记和单元范围；既有跳过是 G1 已通过条件。
+- 视觉验收没有重新声称完成：此前浏览器工具的 URL 安全策略拒绝 file 协议；本次采用页面数据、批次范围、模板测试和 JavaScript 语法检查，没有绕过策略。
+- 最小标准命令（需要已存在的项目环境、gitleaks 和 SEMDEBT_DATA_DIR / SEMDEBT_EVAL_DIR）：
+
+```bash
+uv run --offline python scripts/t33_publication_artifacts.py --scan
+uv run --offline python -m pytest tests/test_t33_publication_artifacts.py tests/test_repo_layout.py -q
+```
+
+- 本 clone 离线缓存此前缺少 chdb-core；本次复用已经存在的主工作区 Python 环境，未添加依赖，实际执行：
+
+```bash
+UV_CACHE_DIR="${TMPDIR}/uvcache" uv run --no-project --python "$SEMDEBT_MAIN_DIR/.venv/bin/python" python scripts/t33_publication_artifacts.py --scan
+UV_CACHE_DIR="${TMPDIR}/uvcache" uv run --no-project --python "$SEMDEBT_MAIN_DIR/.venv/bin/python" python -m pytest -o addopts='' tests/test_t33_publication_artifacts.py tests/test_repo_layout.py -q
+```
+
+## 密钥与个人信息扫描
+
+- gitleaks 8.30.1 对两个 ZIP 解压后的全部文件以及两批对照页扫描，共 27,644 文件；启用默认规则、忽略源内 allow 注释，输出 100% 脱敏。
+- 共 15 次 generic-api-key 命中，原有 7、本次新增 8（新增涉及 4 文件）。逐条核对均为 SQL 标识符或表达式误报，新增项为 SQL 除法表达式在响应、Codex 材料、页面中的重复出现；未发现真实密钥。按完整文件 SHA-256 绑定复核结论，未停用规则，新增或变更文件的命中仍拒绝通过；复扫未复核项 0。
+- 当前环境 DEEPSEEK_API_KEY 的精确值在原始及解码内容中检查，匹配 0；DEEPSEEK_API_KEY 标识匹配 0。扫描及本报告均不记录匹配值。
+- 邮箱形式文本涉及 10 文件（较上次新增两份本体 system.txt），本机路径仍涉及原私有报告 1 文件。按用户既有个人信息裁决保留原始内容，不脱敏；两份新系统消息也逐字节保留。以下仅列文件名、类别、数量和复核结论。
+
+| 文件（压缩包名 / 包内路径，或页面） | 类别 | 数量 | 复核/处置 |
+|---|---|---:|---|
+| `t33-cited-private.zip/t31-v7-census-20261030/frozen-inputs/semantic-v1.6-l1plus/SQL-L3a-system.txt` | 邮箱 | 1 | 按用户裁决原样保留 |
+| `t33-cited-private.zip/t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L1-onto/system.txt` | 邮箱 | 1 | 按用户裁决原样保留 |
+| `t33-cited-private.zip/t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L3a-full/system.txt` | 邮箱 | 1 | 按用户裁决原样保留 |
+| `t33-cited-private.zip/v7-eval-20261030/SQL-L1-context.txt` | 邮箱 | 1 | 按用户裁决原样保留 |
+| `t33-cited-private.zip/v7-eval-20261030/report.md` | 本机路径 | 6 | 按用户裁决原样保留 |
+| `t33-cited-private.zip/v7-eval-20261030/snapshot/semantic/source.yaml` | 邮箱 | 1 | 按用户裁决原样保留 |
+| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q08_r1_t0_c1.exec.json` | 邮箱 | 5 | 按用户裁决原样保留 |
+| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q08_r2_t0_c1.exec.json` | 邮箱 | 5 | 按用户裁决原样保留 |
+| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q35_r3_t1_c1.exec.json` | 邮箱 | 1 | 按用户裁决原样保留 |
+| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q65_r1_t1_c1.exec.json` | 邮箱 | 4 | 按用户裁决原样保留 |
+| `t33-formal-raw.zip/runs-raw/20261019-T15-explorer-01/SQL-L0-E/Q82_r1_t0_c0.exec.json` | 邮箱 | 5 | 按用户裁决原样保留 |
+| `answer-browser/Q31.html` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `answer-browser/t34/Q49.html` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261018-T13-sql-direct-01/SQL-L1/Q49_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261018-T13-sql-direct-01/SQL-R/Q31_r1_t1.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-cited-private.zip/t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L3a-full/materials.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-cited-private.zip/t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L3a-full/materials.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261019-T16-full-v14-sql-new-01/SQL-L2/Q49_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261025-T14-tuned-01/SQL-L1-tuned-instr/Q79_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261031-T29-u2-v3-01/SQL-L1-u2/Q119_r2_t1.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261031-T29-u2-v3-01/SQL-L1-u2p/Q118_r2_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261104-T34-ontology-full-01/SQL-L3a-full/Q49_r3_t1.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261104-T34-ontology-full-01/SQL-L3a-full/Q49_r3_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261104-T34-ontology-full-01/SQL-L3a-full/Q49_r3_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261104-T34-ontology-full-01/SQL-L3a-full/Q49_r3_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+| `t33-formal-raw.zip/runs-raw/20261104-T34-ontology-full-01/SQL-L3a-full/Q49_r3_t0.json` | gitleaks:generic-api-key | 1 | 已核对：SQL 标识符或表达式误报 |
+
 ## 完整压缩包文件清单
 
-以下清单逐文件列出，包含本次 U2 新增文件。每节标题为 ZIP 内目录，表内文件名与目录拼接即为完整包内路径；体积为解压后的原始字节数。API 回包可能含思考内容；执行结果为完整既有结果，不受页面的 20 行展示上限限制。
+每节标题是 ZIP 内目录，表内文件名与目录拼接即为完整包内路径；字节数为解压后的原始体积。API 原包保留思考内容，执行结果保持完整；Codex 理由和 Claude note 字段只在外部引用材料包中保留，不复制到仓库。
 
 ### t33-formal-raw.zip
 
@@ -24389,6 +24387,3320 @@ UV_CACHE_DIR="${TMPDIR}/uvcache" uv run --no-project --python "$SEMDEBT_MAIN_DIR
 | `Q98_r3_t0.exec.json` | 执行结果 | 1002 |
 | `Q98_r3_t0.json` | API 回包（可能含思考内容） | 18380 |
 
+#### `runs-raw/20261104-T34-ontology-full-01/SQL-L1-onto/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `Q01_r1_t0.exec.json` | 执行结果 | 414 |
+| `Q01_r1_t0.json` | API 回包（可能含思考内容） | 1249 |
+| `Q01_r1_t1.exec.json` | 执行结果 | 139 |
+| `Q01_r1_t1.json` | API 回包（可能含思考内容） | 787 |
+| `Q01_r2_t0.exec.json` | 执行结果 | 414 |
+| `Q01_r2_t0.json` | API 回包（可能含思考内容） | 1022 |
+| `Q01_r2_t1.exec.json` | 执行结果 | 139 |
+| `Q01_r2_t1.json` | API 回包（可能含思考内容） | 863 |
+| `Q01_r3_t0.exec.json` | 执行结果 | 414 |
+| `Q01_r3_t0.json` | API 回包（可能含思考内容） | 1125 |
+| `Q01_r3_t1.exec.json` | 执行结果 | 139 |
+| `Q01_r3_t1.json` | API 回包（可能含思考内容） | 865 |
+| `Q02_r1_t0.exec.json` | 执行结果 | 448 |
+| `Q02_r1_t0.json` | API 回包（可能含思考内容） | 1111 |
+| `Q02_r1_t1.exec.json` | 执行结果 | 166 |
+| `Q02_r1_t1.json` | API 回包（可能含思考内容） | 879 |
+| `Q02_r2_t0.exec.json` | 执行结果 | 448 |
+| `Q02_r2_t0.json` | API 回包（可能含思考内容） | 1156 |
+| `Q02_r2_t1.exec.json` | 执行结果 | 165 |
+| `Q02_r2_t1.json` | API 回包（可能含思考内容） | 912 |
+| `Q02_r3_t0.exec.json` | 执行结果 | 165 |
+| `Q02_r3_t0.json` | API 回包（可能含思考内容） | 1007 |
+| `Q03_r1_t0.exec.json` | 执行结果 | 460 |
+| `Q03_r1_t0.json` | API 回包（可能含思考内容） | 993 |
+| `Q03_r1_t1.exec.json` | 执行结果 | 158 |
+| `Q03_r1_t1.json` | API 回包（可能含思考内容） | 858 |
+| `Q03_r2_t0.exec.json` | 执行结果 | 424 |
+| `Q03_r2_t0.json` | API 回包（可能含思考内容） | 695 |
+| `Q03_r2_t1.exec.json` | 执行结果 | 140 |
+| `Q03_r2_t1.json` | API 回包（可能含思考内容） | 702 |
+| `Q03_r3_t0.exec.json` | 执行结果 | 474 |
+| `Q03_r3_t0.json` | API 回包（可能含思考内容） | 2482 |
+| `Q03_r3_t1.exec.json` | 执行结果 | 140 |
+| `Q03_r3_t1.json` | API 回包（可能含思考内容） | 885 |
+| `Q04_r1_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r1_t0.json` | API 回包（可能含思考内容） | 1061 |
+| `Q04_r2_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r2_t0.json` | API 回包（可能含思考内容） | 915 |
+| `Q04_r3_t0.exec.json` | 执行结果 | 44031 |
+| `Q04_r3_t0.json` | API 回包（可能含思考内容） | 1018 |
+| `Q05_r1_t0.exec.json` | 执行结果 | 698 |
+| `Q05_r1_t0.json` | API 回包（可能含思考内容） | 2454 |
+| `Q05_r1_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r1_t1.json` | API 回包（可能含思考内容） | 1422 |
+| `Q05_r2_t0.exec.json` | 执行结果 | 702 |
+| `Q05_r2_t0.json` | API 回包（可能含思考内容） | 2905 |
+| `Q05_r2_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r2_t1.json` | API 回包（可能含思考内容） | 1237 |
+| `Q05_r3_t0.exec.json` | 执行结果 | 698 |
+| `Q05_r3_t0.json` | API 回包（可能含思考内容） | 2810 |
+| `Q05_r3_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r3_t1.json` | API 回包（可能含思考内容） | 1263 |
+| `Q06_r1_t0.exec.json` | 执行结果 | 156 |
+| `Q06_r1_t0.json` | API 回包（可能含思考内容） | 1143 |
+| `Q06_r2_t0.exec.json` | 执行结果 | 153 |
+| `Q06_r2_t0.json` | API 回包（可能含思考内容） | 1074 |
+| `Q06_r3_t0.exec.json` | 执行结果 | 574 |
+| `Q06_r3_t0.json` | API 回包（可能含思考内容） | 1012 |
+| `Q06_r3_t1.exec.json` | 执行结果 | 152 |
+| `Q06_r3_t1.json` | API 回包（可能含思考内容） | 947 |
+| `Q07_r1_t0.exec.json` | 执行结果 | 578 |
+| `Q07_r1_t0.json` | API 回包（可能含思考内容） | 2231 |
+| `Q07_r1_t1.exec.json` | 执行结果 | 823 |
+| `Q07_r1_t1.json` | API 回包（可能含思考内容） | 1064 |
+| `Q07_r2_t0.exec.json` | 执行结果 | 634 |
+| `Q07_r2_t0.json` | API 回包（可能含思考内容） | 2354 |
+| `Q07_r2_t1.exec.json` | 执行结果 | 920 |
+| `Q07_r2_t1.json` | API 回包（可能含思考内容） | 1182 |
+| `Q07_r3_t0.exec.json` | 执行结果 | 815 |
+| `Q07_r3_t0.json` | API 回包（可能含思考内容） | 1841 |
+| `Q08_r1_t0.exec.json` | 执行结果 | 1123 |
+| `Q08_r1_t0.json` | API 回包（可能含思考内容） | 2544 |
+| `Q08_r2_t0.exec.json` | 执行结果 | 1244 |
+| `Q08_r2_t0.json` | API 回包（可能含思考内容） | 2166 |
+| `Q08_r3_t0.exec.json` | 执行结果 | 1035 |
+| `Q08_r3_t0.json` | API 回包（可能含思考内容） | 6588 |
+| `Q09_r1_t0.exec.json` | 执行结果 | 161 |
+| `Q09_r1_t0.json` | API 回包（可能含思考内容） | 1644 |
+| `Q09_r2_t0.exec.json` | 执行结果 | 168 |
+| `Q09_r2_t0.json` | API 回包（可能含思考内容） | 1175 |
+| `Q09_r3_t0.exec.json` | 执行结果 | 156 |
+| `Q09_r3_t0.json` | API 回包（可能含思考内容） | 1444 |
+| `Q100_r1_t0.exec.json` | 执行结果 | 4831 |
+| `Q100_r1_t0.json` | API 回包（可能含思考内容） | 19176 |
+| `Q100_r2_t0.exec.json` | 执行结果 | 6976 |
+| `Q100_r2_t0.json` | API 回包（可能含思考内容） | 16087 |
+| `Q100_r3_t0.exec.json` | 执行结果 | 696 |
+| `Q100_r3_t0.json` | API 回包（可能含思考内容） | 10521 |
+| `Q100_r3_t1.exec.json` | 执行结果 | 8744 |
+| `Q100_r3_t1.json` | API 回包（可能含思考内容） | 2089 |
+| `Q101_r1_t0.exec.json` | 执行结果 | 702 |
+| `Q101_r1_t0.json` | API 回包（可能含思考内容） | 2073 |
+| `Q101_r1_t1.exec.json` | 执行结果 | 231 |
+| `Q101_r1_t1.json` | API 回包（可能含思考内容） | 1098 |
+| `Q101_r2_t0.exec.json` | 执行结果 | 146 |
+| `Q101_r2_t0.json` | API 回包（可能含思考内容） | 2806 |
+| `Q101_r3_t0.exec.json` | 执行结果 | 698 |
+| `Q101_r3_t0.json` | API 回包（可能含思考内容） | 2649 |
+| `Q101_r3_t1.exec.json` | 执行结果 | 231 |
+| `Q101_r3_t1.json` | API 回包（可能含思考内容） | 1103 |
+| `Q102_r1_t0.exec.json` | 执行结果 | 776 |
+| `Q102_r1_t0.json` | API 回包（可能含思考内容） | 5186 |
+| `Q102_r2_t0.exec.json` | 执行结果 | 1792 |
+| `Q102_r2_t0.json` | API 回包（可能含思考内容） | 4329 |
+| `Q102_r2_t1.exec.json` | 执行结果 | 523 |
+| `Q102_r2_t1.json` | API 回包（可能含思考内容） | 1556 |
+| `Q102_r3_t0.exec.json` | 执行结果 | 952 |
+| `Q102_r3_t0.json` | API 回包（可能含思考内容） | 5205 |
+| `Q103_r1_t0.exec.json` | 执行结果 | 344 |
+| `Q103_r1_t0.json` | API 回包（可能含思考内容） | 3502 |
+| `Q103_r2_t0.exec.json` | 执行结果 | 374 |
+| `Q103_r2_t0.json` | API 回包（可能含思考内容） | 7059 |
+| `Q103_r3_t0.exec.json` | 执行结果 | 354 |
+| `Q103_r3_t0.json` | API 回包（可能含思考内容） | 10404 |
+| `Q104_r1_t0.exec.json` | 执行结果 | 627 |
+| `Q104_r1_t0.json` | API 回包（可能含思考内容） | 14847 |
+| `Q104_r2_t0.exec.json` | 执行结果 | 730 |
+| `Q104_r2_t0.json` | API 回包（可能含思考内容） | 14561 |
+| `Q104_r3_t0.exec.json` | 执行结果 | 676 |
+| `Q104_r3_t0.json` | API 回包（可能含思考内容） | 24354 |
+| `Q105_r1_t0.exec.json` | 执行结果 | 271 |
+| `Q105_r1_t0.json` | API 回包（可能含思考内容） | 2588 |
+| `Q105_r2_t0.exec.json` | 执行结果 | 221 |
+| `Q105_r2_t0.json` | API 回包（可能含思考内容） | 6548 |
+| `Q105_r3_t0.exec.json` | 执行结果 | 702 |
+| `Q105_r3_t0.json` | API 回包（可能含思考内容） | 3750 |
+| `Q105_r3_t1.exec.json` | 执行结果 | 216 |
+| `Q105_r3_t1.json` | API 回包（可能含思考内容） | 1094 |
+| `Q106_r1_t0.exec.json` | 执行结果 | 370 |
+| `Q106_r1_t0.json` | API 回包（可能含思考内容） | 4238 |
+| `Q106_r2_t0.exec.json` | 执行结果 | 350 |
+| `Q106_r2_t0.json` | API 回包（可能含思考内容） | 4573 |
+| `Q106_r3_t0.exec.json` | 执行结果 | 345 |
+| `Q106_r3_t0.json` | API 回包（可能含思考内容） | 3629 |
+| `Q107_r1_t0.exec.json` | 执行结果 | 385 |
+| `Q107_r1_t0.json` | API 回包（可能含思考内容） | 18030 |
+| `Q107_r2_t0.exec.json` | 执行结果 | 381 |
+| `Q107_r2_t0.json` | API 回包（可能含思考内容） | 18172 |
+| `Q107_r3_t0.exec.json` | 执行结果 | 384 |
+| `Q107_r3_t0.json` | API 回包（可能含思考内容） | 13857 |
+| `Q108_r1_t0.exec.json` | 执行结果 | 1321 |
+| `Q108_r1_t0.json` | API 回包（可能含思考内容） | 1881 |
+| `Q108_r2_t0.exec.json` | 执行结果 | 1326 |
+| `Q108_r2_t0.json` | API 回包（可能含思考内容） | 2347 |
+| `Q108_r3_t0.exec.json` | 执行结果 | 702 |
+| `Q108_r3_t0.json` | API 回包（可能含思考内容） | 2528 |
+| `Q108_r3_t1.exec.json` | 执行结果 | 1131 |
+| `Q108_r3_t1.json` | API 回包（可能含思考内容） | 1460 |
+| `Q109_r1_t0.exec.json` | 执行结果 | 573 |
+| `Q109_r1_t0.json` | API 回包（可能含思考内容） | 20697 |
+| `Q109_r2_t0.exec.json` | 执行结果 | 700 |
+| `Q109_r2_t0.json` | API 回包（可能含思考内容） | 11605 |
+| `Q109_r2_t1.exec.json` | 执行结果 | 567 |
+| `Q109_r2_t1.json` | API 回包（可能含思考内容） | 2304 |
+| `Q109_r3_t0.exec.json` | 执行结果 | 441 |
+| `Q109_r3_t0.json` | API 回包（可能含思考内容） | 5325 |
+| `Q10_r1_t0.exec.json` | 执行结果 | 464 |
+| `Q10_r1_t0.json` | API 回包（可能含思考内容） | 2223 |
+| `Q10_r1_t1.exec.json` | 执行结果 | 144 |
+| `Q10_r1_t1.json` | API 回包（可能含思考内容） | 832 |
+| `Q10_r2_t0.exec.json` | 执行结果 | 464 |
+| `Q10_r2_t0.json` | API 回包（可能含思考内容） | 1602 |
+| `Q10_r2_t1.exec.json` | 执行结果 | 144 |
+| `Q10_r2_t1.json` | API 回包（可能含思考内容） | 993 |
+| `Q10_r3_t0.exec.json` | 执行结果 | 144 |
+| `Q10_r3_t0.json` | API 回包（可能含思考内容） | 1305 |
+| `Q110_r1_t0.exec.json` | 执行结果 | 495 |
+| `Q110_r1_t0.json` | API 回包（可能含思考内容） | 17779 |
+| `Q110_r2_t0.exec.json` | 执行结果 | 722 |
+| `Q110_r2_t0.json` | API 回包（可能含思考内容） | 11647 |
+| `Q110_r2_t1.exec.json` | 执行结果 | 473 |
+| `Q110_r2_t1.json` | API 回包（可能含思考内容） | 5547 |
+| `Q110_r3_t0.exec.json` | 执行结果 | 488 |
+| `Q110_r3_t0.json` | API 回包（可能含思考内容） | 5190 |
+| `Q111_r1_t0.exec.json` | 执行结果 | 31564 |
+| `Q111_r1_t0.json` | API 回包（可能含思考内容） | 17990 |
+| `Q111_r2_t0.exec.json` | 执行结果 | 742 |
+| `Q111_r2_t0.json` | API 回包（可能含思考内容） | 7326 |
+| `Q111_r2_t1.exec.json` | 执行结果 | 31732 |
+| `Q111_r2_t1.json` | API 回包（可能含思考内容） | 2146 |
+| `Q111_r3_t0.exec.json` | 执行结果 | 34869 |
+| `Q111_r3_t0.json` | API 回包（可能含思考内容） | 23413 |
+| `Q112_r1_t0.exec.json` | 执行结果 | 7073 |
+| `Q112_r1_t0.json` | API 回包（可能含思考内容） | 28544 |
+| `Q112_r2_t0.exec.json` | 执行结果 | 7076 |
+| `Q112_r2_t0.json` | API 回包（可能含思考内容） | 30858 |
+| `Q112_r3_t0.exec.json` | 执行结果 | 7622 |
+| `Q112_r3_t0.json` | API 回包（可能含思考内容） | 26309 |
+| `Q113_r1_t0.exec.json` | 执行结果 | 2249 |
+| `Q113_r1_t0.json` | API 回包（可能含思考内容） | 35709 |
+| `Q113_r2_t0.exec.json` | 执行结果 | 314 |
+| `Q113_r2_t0.json` | API 回包（可能含思考内容） | 23568 |
+| `Q113_r2_t1.exec.json` | 执行结果 | 2435 |
+| `Q113_r2_t1.json` | API 回包（可能含思考内容） | 10561 |
+| `Q113_r3_t0.exec.json` | 执行结果 | 2249 |
+| `Q113_r3_t0.json` | API 回包（可能含思考内容） | 26149 |
+| `Q114_r1_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r1_t0.json` | API 回包（可能含思考内容） | 3940 |
+| `Q114_r2_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r2_t0.json` | API 回包（可能含思考内容） | 3399 |
+| `Q114_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q114_r3_t0.json` | API 回包（可能含思考内容） | 3695 |
+| `Q114_r3_t1.exec.json` | 执行结果 | 304 |
+| `Q114_r3_t1.json` | API 回包（可能含思考内容） | 1366 |
+| `Q115_r1_t0.exec.json` | 执行结果 | 527 |
+| `Q115_r1_t0.json` | API 回包（可能含思考内容） | 16255 |
+| `Q115_r2_t0.exec.json` | 执行结果 | 527 |
+| `Q115_r2_t0.json` | API 回包（可能含思考内容） | 28702 |
+| `Q115_r3_t0.exec.json` | 执行结果 | 527 |
+| `Q115_r3_t0.json` | API 回包（可能含思考内容） | 24166 |
+| `Q116_r1_t0.exec.json` | 执行结果 | 428 |
+| `Q116_r1_t0.json` | API 回包（可能含思考内容） | 20863 |
+| `Q116_r2_t0.exec.json` | 执行结果 | 408 |
+| `Q116_r2_t0.json` | API 回包（可能含思考内容） | 23114 |
+| `Q116_r3_t0.exec.json` | 执行结果 | 436 |
+| `Q116_r3_t0.json` | API 回包（可能含思考内容） | 11701 |
+| `Q117_r1_t0.exec.json` | 执行结果 | 734 |
+| `Q117_r1_t0.json` | API 回包（可能含思考内容） | 24824 |
+| `Q117_r1_t1.exec.json` | 执行结果 | 621 |
+| `Q117_r1_t1.json` | API 回包（可能含思考内容） | 3911 |
+| `Q117_r2_t0.exec.json` | 执行结果 | 639 |
+| `Q117_r2_t0.json` | API 回包（可能含思考内容） | 14259 |
+| `Q117_r3_t0.exec.json` | 执行结果 | 740 |
+| `Q117_r3_t0.json` | API 回包（可能含思考内容） | 31158 |
+| `Q117_r3_t1.exec.json` | 执行结果 | 996 |
+| `Q117_r3_t1.json` | API 回包（可能含思考内容） | 4333 |
+| `Q118_r1_t0.exec.json` | 执行结果 | 324 |
+| `Q118_r1_t0.json` | API 回包（可能含思考内容） | 13627 |
+| `Q118_r2_t0.exec.json` | 执行结果 | 432 |
+| `Q118_r2_t0.json` | API 回包（可能含思考内容） | 12479 |
+| `Q118_r3_t0.exec.json` | 执行结果 | 409 |
+| `Q118_r3_t0.json` | API 回包（可能含思考内容） | 20564 |
+| `Q119_r1_t0.exec.json` | 执行结果 | 31391 |
+| `Q119_r1_t0.json` | API 回包（可能含思考内容） | 9231 |
+| `Q119_r2_t0.exec.json` | 执行结果 | 710 |
+| `Q119_r2_t0.json` | API 回包（可能含思考内容） | 15198 |
+| `Q119_r2_t1.exec.json` | 执行结果 | 33216 |
+| `Q119_r2_t1.json` | API 回包（可能含思考内容） | 2669 |
+| `Q119_r3_t0.exec.json` | 执行结果 | 30489 |
+| `Q119_r3_t0.json` | API 回包（可能含思考内容） | 9737 |
+| `Q11_r1_t0.exec.json` | 执行结果 | 535 |
+| `Q11_r1_t0.json` | API 回包（可能含思考内容） | 6956 |
+| `Q11_r2_t0.exec.json` | 执行结果 | 714 |
+| `Q11_r2_t0.json` | API 回包（可能含思考内容） | 8111 |
+| `Q11_r2_t1.exec.json` | 执行结果 | 530 |
+| `Q11_r2_t1.json` | API 回包（可能含思考内容） | 2320 |
+| `Q11_r3_t0.exec.json` | 执行结果 | 706 |
+| `Q11_r3_t0.json` | API 回包（可能含思考内容） | 3601 |
+| `Q11_r3_t1.exec.json` | 执行结果 | 533 |
+| `Q11_r3_t1.json` | API 回包（可能含思考内容） | 1399 |
+| `Q120_r1_t0.exec.json` | 执行结果 | 590 |
+| `Q120_r1_t0.json` | API 回包（可能含思考内容） | 13676 |
+| `Q120_r2_t0.exec.json` | 执行结果 | 597 |
+| `Q120_r2_t0.json` | API 回包（可能含思考内容） | 14736 |
+| `Q120_r3_t0.exec.json` | 执行结果 | 543 |
+| `Q120_r3_t0.json` | API 回包（可能含思考内容） | 32217 |
+| `Q121_r1_t0.exec.json` | 执行结果 | 720 |
+| `Q121_r1_t0.json` | API 回包（可能含思考内容） | 4722 |
+| `Q121_r1_t1.exec.json` | 执行结果 | 542 |
+| `Q121_r1_t1.json` | API 回包（可能含思考内容） | 2664 |
+| `Q121_r2_t0.exec.json` | 执行结果 | 624 |
+| `Q121_r2_t0.json` | API 回包（可能含思考内容） | 6217 |
+| `Q121_r3_t0.exec.json` | 执行结果 | 733 |
+| `Q121_r3_t0.json` | API 回包（可能含思考内容） | 16531 |
+| `Q122_r1_t0.exec.json` | 执行结果 | 1604 |
+| `Q122_r1_t0.json` | API 回包（可能含思考内容） | 9153 |
+| `Q122_r2_t0.exec.json` | 执行结果 | 1865 |
+| `Q122_r2_t0.json` | API 回包（可能含思考内容） | 22182 |
+| `Q122_r3_t0.exec.json` | 执行结果 | 1343 |
+| `Q122_r3_t0.json` | API 回包（可能含思考内容） | 6488 |
+| `Q12_r1_t0.exec.json` | 执行结果 | 543 |
+| `Q12_r1_t0.json` | API 回包（可能含思考内容） | 4263 |
+| `Q12_r2_t0.exec.json` | 执行结果 | 542 |
+| `Q12_r2_t0.json` | API 回包（可能含思考内容） | 2214 |
+| `Q12_r3_t0.exec.json` | 执行结果 | 546 |
+| `Q12_r3_t0.json` | API 回包（可能含思考内容） | 1974 |
+| `Q13_r1_t0.exec.json` | 执行结果 | 718 |
+| `Q13_r1_t0.json` | API 回包（可能含思考内容） | 3026 |
+| `Q13_r1_t1.exec.json` | 执行结果 | 21337 |
+| `Q13_r1_t1.json` | API 回包（可能含思考内容） | 1242 |
+| `Q13_r2_t0.exec.json` | 执行结果 | 714 |
+| `Q13_r2_t0.json` | API 回包（可能含思考内容） | 2801 |
+| `Q13_r2_t1.exec.json` | 执行结果 | 22703 |
+| `Q13_r2_t1.json` | API 回包（可能含思考内容） | 1340 |
+| `Q13_r3_t0.exec.json` | 执行结果 | 21321 |
+| `Q13_r3_t0.json` | API 回包（可能含思考内容） | 3009 |
+| `Q14_r1_t0.exec.json` | 执行结果 | 143 |
+| `Q14_r1_t0.json` | API 回包（可能含思考内容） | 1963 |
+| `Q14_r2_t0.exec.json` | 执行结果 | 170 |
+| `Q14_r2_t0.json` | API 回包（可能含思考内容） | 3467 |
+| `Q14_r3_t0.exec.json` | 执行结果 | 143 |
+| `Q14_r3_t0.json` | API 回包（可能含思考内容） | 4282 |
+| `Q15_r1_t0.exec.json` | 执行结果 | 706 |
+| `Q15_r1_t0.json` | API 回包（可能含思考内容） | 2128 |
+| `Q15_r1_t1.exec.json` | 执行结果 | 1139 |
+| `Q15_r1_t1.json` | API 回包（可能含思考内容） | 1071 |
+| `Q15_r2_t0.exec.json` | 执行结果 | 1137 |
+| `Q15_r2_t0.json` | API 回包（可能含思考内容） | 1909 |
+| `Q15_r3_t0.exec.json` | 执行结果 | 1136 |
+| `Q15_r3_t0.json` | API 回包（可能含思考内容） | 3898 |
+| `Q16_r1_t0.exec.json` | 执行结果 | 380 |
+| `Q16_r1_t0.json` | API 回包（可能含思考内容） | 8905 |
+| `Q16_r2_t0.exec.json` | 执行结果 | 386 |
+| `Q16_r2_t0.json` | API 回包（可能含思考内容） | 6585 |
+| `Q16_r3_t0.exec.json` | 执行结果 | 400 |
+| `Q16_r3_t0.json` | API 回包（可能含思考内容） | 4660 |
+| `Q17_r1_t0.exec.json` | 执行结果 | 401 |
+| `Q17_r1_t0.json` | API 回包（可能含思考内容） | 8371 |
+| `Q17_r2_t0.exec.json` | 执行结果 | 389 |
+| `Q17_r2_t0.json` | API 回包（可能含思考内容） | 4201 |
+| `Q17_r3_t0.exec.json` | 执行结果 | 377 |
+| `Q17_r3_t0.json` | API 回包（可能含思考内容） | 7849 |
+| `Q18_r1_t0.exec.json` | 执行结果 | 712 |
+| `Q18_r1_t0.json` | API 回包（可能含思考内容） | 2820 |
+| `Q18_r1_t1.exec.json` | 执行结果 | 236 |
+| `Q18_r1_t1.json` | API 回包（可能含思考内容） | 1114 |
+| `Q18_r2_t0.exec.json` | 执行结果 | 712 |
+| `Q18_r2_t0.json` | API 回包（可能含思考内容） | 6394 |
+| `Q18_r2_t1.exec.json` | 执行结果 | 237 |
+| `Q18_r2_t1.json` | API 回包（可能含思考内容） | 1134 |
+| `Q18_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q18_r3_t0.json` | API 回包（可能含思考内容） | 4344 |
+| `Q18_r3_t1.exec.json` | 执行结果 | 657 |
+| `Q18_r3_t1.json` | API 回包（可能含思考内容） | 1324 |
+| `Q19_r1_t0.exec.json` | 执行结果 | 393 |
+| `Q19_r1_t0.json` | API 回包（可能含思考内容） | 8575 |
+| `Q19_r2_t0.exec.json` | 执行结果 | 710 |
+| `Q19_r2_t0.json` | API 回包（可能含思考内容） | 8237 |
+| `Q19_r2_t1.exec.json` | 执行结果 | 382 |
+| `Q19_r2_t1.json` | API 回包（可能含思考内容） | 1151 |
+| `Q19_r3_t0.exec.json` | 执行结果 | 382 |
+| `Q19_r3_t0.json` | API 回包（可能含思考内容） | 5535 |
+| `Q20_r1_t0.exec.json` | 执行结果 | 158124 |
+| `Q20_r1_t0.json` | API 回包（可能含思考内容） | 11064 |
+| `Q20_r2_t0.exec.json` | 执行结果 | 147488 |
+| `Q20_r2_t0.json` | API 回包（可能含思考内容） | 5955 |
+| `Q20_r3_t0.exec.json` | 执行结果 | 32418 |
+| `Q20_r3_t0.json` | API 回包（可能含思考内容） | 6650 |
+| `Q21_r1_t0.exec.json` | 执行结果 | 12805 |
+| `Q21_r1_t0.json` | API 回包（可能含思考内容） | 5341 |
+| `Q21_r2_t0.exec.json` | 执行结果 | 12807 |
+| `Q21_r2_t0.json` | API 回包（可能含思考内容） | 3691 |
+| `Q21_r3_t0.exec.json` | 执行结果 | 11341 |
+| `Q21_r3_t0.json` | API 回包（可能含思考内容） | 2941 |
+| `Q22_r1_t0.exec.json` | 执行结果 | 3709 |
+| `Q22_r1_t0.json` | API 回包（可能含思考内容） | 16117 |
+| `Q22_r2_t0.exec.json` | 执行结果 | 696 |
+| `Q22_r2_t0.json` | API 回包（可能含思考内容） | 5466 |
+| `Q22_r2_t1.exec.json` | 执行结果 | 3683 |
+| `Q22_r2_t1.json` | API 回包（可能含思考内容） | 1940 |
+| `Q22_r3_t0.exec.json` | 执行结果 | 3696 |
+| `Q22_r3_t0.json` | API 回包（可能含思考内容） | 4536 |
+| `Q23_r1_t0.exec.json` | 执行结果 | 712 |
+| `Q23_r1_t0.json` | API 回包（可能含思考内容） | 2667 |
+| `Q23_r1_t1.exec.json` | 执行结果 | 827 |
+| `Q23_r1_t1.json` | API 回包（可能含思考内容） | 1217 |
+| `Q23_r2_t0.exec.json` | 执行结果 | 867 |
+| `Q23_r2_t0.json` | API 回包（可能含思考内容） | 2927 |
+| `Q23_r3_t0.exec.json` | 执行结果 | 838 |
+| `Q23_r3_t0.json` | API 回包（可能含思考内容） | 3660 |
+| `Q24_r1_t0.exec.json` | 执行结果 | 673 |
+| `Q24_r1_t0.json` | API 回包（可能含思考内容） | 15130 |
+| `Q24_r2_t0.exec.json` | 执行结果 | 712 |
+| `Q24_r2_t0.json` | API 回包（可能含思考内容） | 5203 |
+| `Q24_r2_t1.exec.json` | 执行结果 | 673 |
+| `Q24_r2_t1.json` | API 回包（可能含思考内容） | 3422 |
+| `Q24_r3_t0.exec.json` | 执行结果 | 1822 |
+| `Q24_r3_t0.json` | API 回包（可能含思考内容） | 18318 |
+| `Q24_r3_t1.exec.json` | 执行结果 | 682 |
+| `Q24_r3_t1.json` | API 回包（可能含思考内容） | 1589 |
+| `Q25_r1_t0.exec.json` | 执行结果 | 254 |
+| `Q25_r1_t0.json` | API 回包（可能含思考内容） | 8525 |
+| `Q25_r2_t0.exec.json` | 执行结果 | 211 |
+| `Q25_r2_t0.json` | API 回包（可能含思考内容） | 11694 |
+| `Q25_r3_t0.exec.json` | 执行结果 | 330 |
+| `Q25_r3_t0.json` | API 回包（可能含思考内容） | 7776 |
+| `Q26_r1_t0.exec.json` | 执行结果 | 255 |
+| `Q26_r1_t0.json` | API 回包（可能含思考内容） | 3175 |
+| `Q26_r2_t0.exec.json` | 执行结果 | 202 |
+| `Q26_r2_t0.json` | API 回包（可能含思考内容） | 2911 |
+| `Q26_r3_t0.exec.json` | 执行结果 | 209 |
+| `Q26_r3_t0.json` | API 回包（可能含思考内容） | 3283 |
+| `Q27_r1_t0.exec.json` | 执行结果 | 754 |
+| `Q27_r1_t0.json` | API 回包（可能含思考内容） | 2678 |
+| `Q27_r1_t1.exec.json` | 执行结果 | 1260 |
+| `Q27_r1_t1.json` | API 回包（可能含思考内容） | 1391 |
+| `Q27_r2_t0.exec.json` | 执行结果 | 748 |
+| `Q27_r2_t0.json` | API 回包（可能含思考内容） | 3006 |
+| `Q27_r2_t1.exec.json` | 执行结果 | 1121 |
+| `Q27_r2_t1.json` | API 回包（可能含思考内容） | 1454 |
+| `Q27_r3_t0.exec.json` | 执行结果 | 1127 |
+| `Q27_r3_t0.json` | API 回包（可能含思考内容） | 3331 |
+| `Q28_r1_t0.exec.json` | 执行结果 | 708 |
+| `Q28_r1_t0.json` | API 回包（可能含思考内容） | 3364 |
+| `Q28_r1_t1.exec.json` | 执行结果 | 284 |
+| `Q28_r1_t1.json` | API 回包（可能含思考内容） | 1154 |
+| `Q28_r2_t0.exec.json` | 执行结果 | 714 |
+| `Q28_r2_t0.json` | API 回包（可能含思考内容） | 5189 |
+| `Q28_r2_t1.exec.json` | 执行结果 | 386 |
+| `Q28_r2_t1.json` | API 回包（可能含思考内容） | 1178 |
+| `Q28_r3_t0.exec.json` | 执行结果 | 390 |
+| `Q28_r3_t0.json` | API 回包（可能含思考内容） | 7611 |
+| `Q29_r1_t0.exec.json` | 执行结果 | 489 |
+| `Q29_r1_t0.json` | API 回包（可能含思考内容） | 11011 |
+| `Q29_r2_t0.exec.json` | 执行结果 | 389 |
+| `Q29_r2_t0.json` | API 回包（可能含思考内容） | 7472 |
+| `Q29_r3_t0.exec.json` | 执行结果 | 511 |
+| `Q29_r3_t0.json` | API 回包（可能含思考内容） | 22206 |
+| `Q30_r1_t0.exec.json` | 执行结果 | 1449 |
+| `Q30_r1_t0.json` | API 回包（可能含思考内容） | 5678 |
+| `Q30_r2_t0.exec.json` | 执行结果 | 1921 |
+| `Q30_r2_t0.json` | API 回包（可能含思考内容） | 4933 |
+| `Q30_r3_t0.exec.json` | 执行结果 | 1932 |
+| `Q30_r3_t0.json` | API 回包（可能含思考内容） | 6301 |
+| `Q31_r1_t0.exec.json` | 执行结果 | 1002 |
+| `Q31_r1_t0.json` | API 回包（可能含思考内容） | 11431 |
+| `Q31_r2_t0.exec.json` | 执行结果 | 998 |
+| `Q31_r2_t0.json` | API 回包（可能含思考内容） | 10379 |
+| `Q31_r3_t0.exec.json` | 执行结果 | 993 |
+| `Q31_r3_t0.json` | API 回包（可能含思考内容） | 15603 |
+| `Q32_r1_t0.exec.json` | 执行结果 | 694 |
+| `Q32_r1_t0.json` | API 回包（可能含思考内容） | 3444 |
+| `Q32_r1_t1.exec.json` | 执行结果 | 214 |
+| `Q32_r1_t1.json` | API 回包（可能含思考内容） | 1683 |
+| `Q32_r2_t0.exec.json` | 执行结果 | 722 |
+| `Q32_r2_t0.json` | API 回包（可能含思考内容） | 3962 |
+| `Q32_r2_t1.exec.json` | 执行结果 | 217 |
+| `Q32_r2_t1.json` | API 回包（可能含思考内容） | 1328 |
+| `Q32_r3_t0.exec.json` | 执行结果 | 584 |
+| `Q32_r3_t0.json` | API 回包（可能含思考内容） | 2604 |
+| `Q32_r3_t1.exec.json` | 执行结果 | 292 |
+| `Q32_r3_t1.json` | API 回包（可能含思考内容） | 1413 |
+| `Q34_r1_t0.exec.json` | 执行结果 | 728 |
+| `Q34_r1_t0.json` | API 回包（可能含思考内容） | 7671 |
+| `Q34_r1_t1.exec.json` | 执行结果 | 244085 |
+| `Q34_r1_t1.json` | API 回包（可能含思考内容） | 2628 |
+| `Q34_r2_t0.exec.json` | 执行结果 | 260898 |
+| `Q34_r2_t0.json` | API 回包（可能含思考内容） | 31300 |
+| `Q34_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q34_r3_t0.json` | API 回包（可能含思考内容） | 8080 |
+| `Q34_r3_t1.exec.json` | 执行结果 | 218730 |
+| `Q34_r3_t1.json` | API 回包（可能含思考内容） | 2827 |
+| `Q35_r1_t0.exec.json` | 执行结果 | 706 |
+| `Q35_r1_t0.json` | API 回包（可能含思考内容） | 3768 |
+| `Q35_r1_t1.exec.json` | 执行结果 | 18797 |
+| `Q35_r1_t1.json` | API 回包（可能含思考内容） | 1217 |
+| `Q35_r2_t0.exec.json` | 执行结果 | 10588 |
+| `Q35_r2_t0.json` | API 回包（可能含思考内容） | 5095 |
+| `Q35_r3_t0.exec.json` | 执行结果 | 728 |
+| `Q35_r3_t0.json` | API 回包（可能含思考内容） | 3388 |
+| `Q35_r3_t1.exec.json` | 执行结果 | 12992 |
+| `Q35_r3_t1.json` | API 回包（可能含思考内容） | 1144 |
+| `Q36_r1_t0.exec.json` | 执行结果 | 241 |
+| `Q36_r1_t0.json` | API 回包（可能含思考内容） | 2093 |
+| `Q36_r2_t0.exec.json` | 执行结果 | 241 |
+| `Q36_r2_t0.json` | API 回包（可能含思考内容） | 2868 |
+| `Q36_r3_t0.exec.json` | 执行结果 | 241 |
+| `Q36_r3_t0.json` | API 回包（可能含思考内容） | 2460 |
+| `Q37_r1_t0.exec.json` | 执行结果 | 20169 |
+| `Q37_r1_t0.json` | API 回包（可能含思考内容） | 4738 |
+| `Q37_r2_t0.exec.json` | 执行结果 | 20200 |
+| `Q37_r2_t0.json` | API 回包（可能含思考内容） | 4034 |
+| `Q37_r3_t0.exec.json` | 执行结果 | 18708 |
+| `Q37_r3_t0.json` | API 回包（可能含思考内容） | 3143 |
+| `Q38_r1_t0.exec.json` | 执行结果 | 452 |
+| `Q38_r1_t0.json` | API 回包（可能含思考内容） | 6834 |
+| `Q38_r2_t0.exec.json` | 执行结果 | 499 |
+| `Q38_r2_t0.json` | API 回包（可能含思考内容） | 7304 |
+| `Q38_r3_t0.exec.json` | 执行结果 | 467 |
+| `Q38_r3_t0.json` | API 回包（可能含思考内容） | 16266 |
+| `Q41_r1_t0.exec.json` | 执行结果 | 646 |
+| `Q41_r1_t0.json` | API 回包（可能含思考内容） | 1972 |
+| `Q41_r1_t1.exec.json` | 执行结果 | 201 |
+| `Q41_r1_t1.json` | API 回包（可能含思考内容） | 998 |
+| `Q41_r2_t0.exec.json` | 执行结果 | 706 |
+| `Q41_r2_t0.json` | API 回包（可能含思考内容） | 2305 |
+| `Q41_r2_t1.exec.json` | 执行结果 | 249 |
+| `Q41_r2_t1.json` | API 回包（可能含思考内容） | 1097 |
+| `Q41_r3_t0.exec.json` | 执行结果 | 201 |
+| `Q41_r3_t0.json` | API 回包（可能含思考内容） | 2119 |
+| `Q43_r1_t0.exec.json` | 执行结果 | 700 |
+| `Q43_r1_t0.json` | API 回包（可能含思考内容） | 3228 |
+| `Q43_r1_t1.exec.json` | 执行结果 | 1125 |
+| `Q43_r1_t1.json` | API 回包（可能含思考内容） | 1116 |
+| `Q43_r2_t0.exec.json` | 执行结果 | 1729 |
+| `Q43_r2_t0.json` | API 回包（可能含思考内容） | 3132 |
+| `Q43_r3_t0.exec.json` | 执行结果 | 1123 |
+| `Q43_r3_t0.json` | API 回包（可能含思考内容） | 2744 |
+| `Q47_r1_t0.exec.json` | 执行结果 | 15094 |
+| `Q47_r1_t0.json` | API 回包（可能含思考内容） | 3203 |
+| `Q47_r2_t0.exec.json` | 执行结果 | 728 |
+| `Q47_r2_t0.json` | API 回包（可能含思考内容） | 2778 |
+| `Q47_r2_t1.exec.json` | 执行结果 | 13680 |
+| `Q47_r2_t1.json` | API 回包（可能含思考内容） | 1579 |
+| `Q47_r3_t0.exec.json` | 执行结果 | 732 |
+| `Q47_r3_t0.json` | API 回包（可能含思考内容） | 3134 |
+| `Q47_r3_t1.exec.json` | 执行结果 | 13692 |
+| `Q47_r3_t1.json` | API 回包（可能含思考内容） | 1121 |
+| `Q49_r1_t0.exec.json` | 执行结果 | 378 |
+| `Q49_r1_t0.json` | API 回包（可能含思考内容） | 20643 |
+| `Q49_r2_t0.exec.json` | 执行结果 | 17535 |
+| `Q49_r2_t0.json` | API 回包（可能含思考内容） | 29176 |
+| `Q49_r3_t0.exec.json` | 执行结果 | 363 |
+| `Q49_r3_t0.json` | API 回包（可能含思考内容） | 21834 |
+| `Q50_r1_t0.exec.json` | 执行结果 | 425 |
+| `Q50_r1_t0.json` | API 回包（可能含思考内容） | 4490 |
+| `Q50_r2_t0.exec.json` | 执行结果 | 371 |
+| `Q50_r2_t0.json` | API 回包（可能含思考内容） | 13368 |
+| `Q50_r3_t0.exec.json` | 执行结果 | 379 |
+| `Q50_r3_t0.json` | API 回包（可能含思考内容） | 13802 |
+| `Q51_r1_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r1_t0.json` | API 回包（可能含思考内容） | 1839 |
+| `Q51_r1_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r1_t1.json` | API 回包（可能含思考内容） | 887 |
+| `Q51_r2_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r2_t0.json` | API 回包（可能含思考内容） | 1902 |
+| `Q51_r2_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r2_t1.json` | API 回包（可能含思考内容） | 786 |
+| `Q51_r3_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r3_t0.json` | API 回包（可能含思考内容） | 986 |
+| `Q51_r3_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r3_t1.json` | API 回包（可能含思考内容） | 780 |
+| `Q52_r1_t0.exec.json` | 执行结果 | 1086 |
+| `Q52_r1_t0.json` | API 回包（可能含思考内容） | 2071 |
+| `Q52_r2_t0.exec.json` | 执行结果 | 253 |
+| `Q52_r2_t0.json` | API 回包（可能含思考内容） | 1826 |
+| `Q52_r3_t0.exec.json` | 执行结果 | 961 |
+| `Q52_r3_t0.json` | API 回包（可能含思考内容） | 1916 |
+| `Q53_r1_t0.exec.json` | 执行结果 | 606 |
+| `Q53_r1_t0.json` | API 回包（可能含思考内容） | 1398 |
+| `Q53_r1_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r1_t1.json` | API 回包（可能含思考内容） | 943 |
+| `Q53_r2_t0.exec.json` | 执行结果 | 580 |
+| `Q53_r2_t0.json` | API 回包（可能含思考内容） | 1148 |
+| `Q53_r2_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r2_t1.json` | API 回包（可能含思考内容） | 766 |
+| `Q53_r3_t0.exec.json` | 执行结果 | 574 |
+| `Q53_r3_t0.json` | API 回包（可能含思考内容） | 958 |
+| `Q53_r3_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r3_t1.json` | API 回包（可能含思考内容） | 867 |
+| `Q54_r1_t0.exec.json` | 执行结果 | 163 |
+| `Q54_r1_t0.json` | API 回包（可能含思考内容） | 794 |
+| `Q54_r2_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r2_t0.json` | API 回包（可能含思考内容） | 694 |
+| `Q54_r2_t1.exec.json` | 执行结果 | 163 |
+| `Q54_r2_t1.json` | API 回包（可能含思考内容） | 880 |
+| `Q54_r3_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r3_t0.json` | API 回包（可能含思考内容） | 1079 |
+| `Q54_r3_t1.exec.json` | 执行结果 | 163 |
+| `Q54_r3_t1.json` | API 回包（可能含思考内容） | 813 |
+| `Q55_r1_t0.exec.json` | 执行结果 | 468 |
+| `Q55_r1_t0.json` | API 回包（可能含思考内容） | 1452 |
+| `Q55_r1_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r1_t1.json` | API 回包（可能含思考内容） | 809 |
+| `Q55_r2_t0.exec.json` | 执行结果 | 468 |
+| `Q55_r2_t0.json` | API 回包（可能含思考内容） | 715 |
+| `Q55_r2_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r2_t1.json` | API 回包（可能含思考内容） | 691 |
+| `Q55_r3_t0.exec.json` | 执行结果 | 468 |
+| `Q55_r3_t0.json` | API 回包（可能含思考内容） | 1162 |
+| `Q55_r3_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r3_t1.json` | API 回包（可能含思考内容） | 690 |
+| `Q56_r1_t0.exec.json` | 执行结果 | 522 |
+| `Q56_r1_t0.json` | API 回包（可能含思考内容） | 3060 |
+| `Q56_r1_t1.exec.json` | 执行结果 | 209 |
+| `Q56_r1_t1.json` | API 回包（可能含思考内容） | 888 |
+| `Q56_r2_t0.exec.json` | 执行结果 | 171 |
+| `Q56_r2_t0.json` | API 回包（可能含思考内容） | 3367 |
+| `Q56_r3_t0.exec.json` | 执行结果 | 163 |
+| `Q56_r3_t0.json` | API 回包（可能含思考内容） | 2958 |
+| `Q57_r1_t0.exec.json` | 执行结果 | 682 |
+| `Q57_r1_t0.json` | API 回包（可能含思考内容） | 1619 |
+| `Q57_r1_t1.exec.json` | 执行结果 | 352 |
+| `Q57_r1_t1.json` | API 回包（可能含思考内容） | 869 |
+| `Q57_r2_t0.exec.json` | 执行结果 | 139 |
+| `Q57_r2_t0.json` | API 回包（可能含思考内容） | 1431 |
+| `Q57_r3_t0.exec.json` | 执行结果 | 139 |
+| `Q57_r3_t0.json` | API 回包（可能含思考内容） | 2053 |
+| `Q58_r1_t0.exec.json` | 执行结果 | 461 |
+| `Q58_r1_t0.json` | API 回包（可能含思考内容） | 2964 |
+| `Q58_r2_t0.exec.json` | 执行结果 | 319 |
+| `Q58_r2_t0.json` | API 回包（可能含思考内容） | 4296 |
+| `Q58_r3_t0.exec.json` | 执行结果 | 732 |
+| `Q58_r3_t0.json` | API 回包（可能含思考内容） | 4066 |
+| `Q58_r3_t1.exec.json` | 执行结果 | 553 |
+| `Q58_r3_t1.json` | API 回包（可能含思考内容） | 1503 |
+| `Q59_r1_t0.exec.json` | 执行结果 | 470 |
+| `Q59_r1_t0.json` | API 回包（可能含思考内容） | 1085 |
+| `Q59_r1_t1.exec.json` | 执行结果 | 144 |
+| `Q59_r1_t1.json` | API 回包（可能含思考内容） | 696 |
+| `Q59_r2_t0.exec.json` | 执行结果 | 141 |
+| `Q59_r2_t0.json` | API 回包（可能含思考内容） | 1194 |
+| `Q59_r3_t0.exec.json` | 执行结果 | 141 |
+| `Q59_r3_t0.json` | API 回包（可能含思考内容） | 1196 |
+| `Q60_r1_t0.exec.json` | 执行结果 | 200 |
+| `Q60_r1_t0.json` | API 回包（可能含思考内容） | 1027 |
+| `Q60_r2_t0.exec.json` | 执行结果 | 490 |
+| `Q60_r2_t0.json` | API 回包（可能含思考内容） | 907 |
+| `Q60_r2_t1.exec.json` | 执行结果 | 138 |
+| `Q60_r2_t1.json` | API 回包（可能含思考内容） | 809 |
+| `Q60_r3_t0.exec.json` | 执行结果 | 212 |
+| `Q60_r3_t0.json` | API 回包（可能含思考内容） | 977 |
+| `Q61_r1_t0.exec.json` | 执行结果 | 1378 |
+| `Q61_r1_t0.json` | API 回包（可能含思考内容） | 10461 |
+| `Q61_r2_t0.exec.json` | 执行结果 | 1370 |
+| `Q61_r2_t0.json` | API 回包（可能含思考内容） | 5530 |
+| `Q61_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q61_r3_t0.json` | API 回包（可能含思考内容） | 9600 |
+| `Q61_r3_t1.exec.json` | 执行结果 | 1374 |
+| `Q61_r3_t1.json` | API 回包（可能含思考内容） | 1269 |
+| `Q62_r1_t0.exec.json` | 执行结果 | 725 |
+| `Q62_r1_t0.json` | API 回包（可能含思考内容） | 16837 |
+| `Q62_r2_t0.exec.json` | 执行结果 | 726 |
+| `Q62_r2_t0.json` | API 回包（可能含思考内容） | 13198 |
+| `Q62_r3_t0.exec.json` | 执行结果 | 704 |
+| `Q62_r3_t0.json` | API 回包（可能含思考内容） | 3595 |
+| `Q62_r3_t1.exec.json` | 执行结果 | 720 |
+| `Q62_r3_t1.json` | API 回包（可能含思考内容） | 1228 |
+| `Q63_r1_t0.exec.json` | 执行结果 | 532 |
+| `Q63_r1_t0.json` | API 回包（可能含思考内容） | 6638 |
+| `Q63_r2_t0.exec.json` | 执行结果 | 587 |
+| `Q63_r2_t0.json` | API 回包（可能含思考内容） | 8707 |
+| `Q63_r3_t0.exec.json` | 执行结果 | 704 |
+| `Q63_r3_t0.json` | API 回包（可能含思考内容） | 7801 |
+| `Q63_r3_t1.exec.json` | 执行结果 | 538 |
+| `Q63_r3_t1.json` | API 回包（可能含思考内容） | 1121 |
+| `Q64_r1_t0.exec.json` | 执行结果 | 722 |
+| `Q64_r1_t0.json` | API 回包（可能含思考内容） | 6483 |
+| `Q64_r1_t1.exec.json` | 执行结果 | 956 |
+| `Q64_r1_t1.json` | API 回包（可能含思考内容） | 1639 |
+| `Q64_r2_t0.exec.json` | 执行结果 | 998 |
+| `Q64_r2_t0.json` | API 回包（可能含思考内容） | 4697 |
+| `Q64_r3_t0.exec.json` | 执行结果 | 700 |
+| `Q64_r3_t0.json` | API 回包（可能含思考内容） | 3598 |
+| `Q64_r3_t1.exec.json` | 执行结果 | 1163 |
+| `Q64_r3_t1.json` | API 回包（可能含思考内容） | 1289 |
+| `Q65_r1_t0.exec.json` | 执行结果 | 12190 |
+| `Q65_r1_t0.json` | API 回包（可能含思考内容） | 28228 |
+| `Q65_r2_t0.exec.json` | 执行结果 | 21753 |
+| `Q65_r2_t0.json` | API 回包（可能含思考内容） | 24378 |
+| `Q65_r3_t0.exec.json` | 执行结果 | 10170 |
+| `Q65_r3_t0.json` | API 回包（可能含思考内容） | 42874 |
+| `Q66_r1_t0.exec.json` | 执行结果 | 708 |
+| `Q66_r1_t0.json` | API 回包（可能含思考内容） | 3075 |
+| `Q66_r1_t1.exec.json` | 执行结果 | 419 |
+| `Q66_r1_t1.json` | API 回包（可能含思考内容） | 1594 |
+| `Q66_r2_t0.exec.json` | 执行结果 | 288 |
+| `Q66_r2_t0.json` | API 回包（可能含思考内容） | 2413 |
+| `Q66_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q66_r3_t0.json` | API 回包（可能含思考内容） | 2682 |
+| `Q66_r3_t1.exec.json` | 执行结果 | 282 |
+| `Q66_r3_t1.json` | API 回包（可能含思考内容） | 1167 |
+| `Q67_r1_t0.exec.json` | 执行结果 | 1158 |
+| `Q67_r1_t0.json` | API 回包（可能含思考内容） | 16355 |
+| `Q67_r2_t0.exec.json` | 执行结果 | 907 |
+| `Q67_r2_t0.json` | API 回包（可能含思考内容） | 9608 |
+| `Q67_r3_t0.exec.json` | 执行结果 | 1052 |
+| `Q67_r3_t0.json` | API 回包（可能含思考内容） | 13054 |
+| `Q68_r1_t0.exec.json` | 执行结果 | 292 |
+| `Q68_r1_t0.json` | API 回包（可能含思考内容） | 3580 |
+| `Q68_r2_t0.exec.json` | 执行结果 | 355 |
+| `Q68_r2_t0.json` | API 回包（可能含思考内容） | 2211 |
+| `Q68_r3_t0.exec.json` | 执行结果 | 706 |
+| `Q68_r3_t0.json` | API 回包（可能含思考内容） | 4075 |
+| `Q68_r3_t1.exec.json` | 执行结果 | 285 |
+| `Q68_r3_t1.json` | API 回包（可能含思考内容） | 1189 |
+| `Q69_r1_t0.exec.json` | 执行结果 | 429 |
+| `Q69_r1_t0.json` | API 回包（可能含思考内容） | 3591 |
+| `Q69_r2_t0.exec.json` | 执行结果 | 365 |
+| `Q69_r2_t0.json` | API 回包（可能含思考内容） | 31190 |
+| `Q69_r3_t0.exec.json` | 执行结果 | 466 |
+| `Q69_r3_t0.json` | API 回包（可能含思考内容） | 28408 |
+| `Q70_r1_t0.exec.json` | 执行结果 | 449 |
+| `Q70_r1_t0.json` | API 回包（可能含思考内容） | 8485 |
+| `Q70_r2_t0.exec.json` | 执行结果 | 419 |
+| `Q70_r2_t0.json` | API 回包（可能含思考内容） | 13955 |
+| `Q70_r3_t0.exec.json` | 执行结果 | 438 |
+| `Q70_r3_t0.json` | API 回包（可能含思考内容） | 10383 |
+| `Q71_r1_t0.exec.json` | 执行结果 | 741 |
+| `Q71_r1_t0.json` | API 回包（可能含思考内容） | 10056 |
+| `Q71_r2_t0.exec.json` | 执行结果 | 684 |
+| `Q71_r2_t0.json` | API 回包（可能含思考内容） | 8223 |
+| `Q71_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q71_r3_t0.json` | API 回包（可能含思考内容） | 3801 |
+| `Q71_r3_t1.exec.json` | 执行结果 | 620 |
+| `Q71_r3_t1.json` | API 回包（可能含思考内容） | 2395 |
+| `Q72_r1_t0.exec.json` | 执行结果 | 894 |
+| `Q72_r1_t0.json` | API 回包（可能含思考内容） | 3755 |
+| `Q72_r2_t0.exec.json` | 执行结果 | 714 |
+| `Q72_r2_t0.json` | API 回包（可能含思考内容） | 9652 |
+| `Q72_r2_t1.exec.json` | 执行结果 | 911 |
+| `Q72_r2_t1.json` | API 回包（可能含思考内容） | 2612 |
+| `Q72_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q72_r3_t0.json` | API 回包（可能含思考内容） | 2362 |
+| `Q72_r3_t1.exec.json` | 执行结果 | 611 |
+| `Q72_r3_t1.json` | API 回包（可能含思考内容） | 1140 |
+| `Q73_r1_t0.exec.json` | 执行结果 | 1141 |
+| `Q73_r1_t0.json` | API 回包（可能含思考内容） | 8201 |
+| `Q73_r2_t0.exec.json` | 执行结果 | 1120 |
+| `Q73_r2_t0.json` | API 回包（可能含思考内容） | 5265 |
+| `Q73_r3_t0.exec.json` | 执行结果 | 732 |
+| `Q73_r3_t0.json` | API 回包（可能含思考内容） | 4534 |
+| `Q73_r3_t1.exec.json` | 执行结果 | 1110 |
+| `Q73_r3_t1.json` | API 回包（可能含思考内容） | 2256 |
+| `Q74_r1_t0.exec.json` | 执行结果 | 714 |
+| `Q74_r1_t0.json` | API 回包（可能含思考内容） | 8496 |
+| `Q74_r1_t1.exec.json` | 执行结果 | 120171 |
+| `Q74_r1_t1.json` | API 回包（可能含思考内容） | 2122 |
+| `Q74_r2_t0.exec.json` | 执行结果 | 110396 |
+| `Q74_r2_t0.json` | API 回包（可能含思考内容） | 11956 |
+| `Q74_r3_t0.exec.json` | 执行结果 | 710 |
+| `Q74_r3_t0.json` | API 回包（可能含思考内容） | 5255 |
+| `Q74_r3_t1.exec.json` | 执行结果 | 112251 |
+| `Q74_r3_t1.json` | API 回包（可能含思考内容） | 2601 |
+| `Q75_r1_t0.exec.json` | 执行结果 | 2826 |
+| `Q75_r1_t0.json` | API 回包（可能含思考内容） | 15885 |
+| `Q75_r1_t1.exec.json` | 执行结果 | 126120 |
+| `Q75_r1_t1.json` | API 回包（可能含思考内容） | 2742 |
+| `Q75_r2_t0.exec.json` | 执行结果 | 712 |
+| `Q75_r2_t0.json` | API 回包（可能含思考内容） | 10158 |
+| `Q75_r2_t1.exec.json` | 执行结果 | 124889 |
+| `Q75_r2_t1.json` | API 回包（可能含思考内容） | 2097 |
+| `Q75_r3_t0.exec.json` | 执行结果 | 143117 |
+| `Q75_r3_t0.json` | API 回包（可能含思考内容） | 12662 |
+| `Q76_r1_t0.exec.json` | 执行结果 | 810 |
+| `Q76_r1_t0.json` | API 回包（可能含思考内容） | 10987 |
+| `Q76_r2_t0.exec.json` | 执行结果 | 718 |
+| `Q76_r2_t0.json` | API 回包（可能含思考内容） | 9185 |
+| `Q76_r3_t0.exec.json` | 执行结果 | 726 |
+| `Q76_r3_t0.json` | API 回包（可能含思考内容） | 16268 |
+| `Q77_r1_t0.exec.json` | 执行结果 | 1176 |
+| `Q77_r1_t0.json` | API 回包（可能含思考内容） | 14743 |
+| `Q77_r2_t0.exec.json` | 执行结果 | 722 |
+| `Q77_r2_t0.json` | API 回包（可能含思考内容） | 15011 |
+| `Q77_r2_t1.exec.json` | 执行结果 | 1253 |
+| `Q77_r2_t1.json` | API 回包（可能含思考内容） | 1990 |
+| `Q77_r3_t0.exec.json` | 执行结果 | 1814 |
+| `Q77_r3_t0.json` | API 回包（可能含思考内容） | 4744 |
+| `Q77_r3_t1.exec.json` | 执行结果 | 1264 |
+| `Q77_r3_t1.json` | API 回包（可能含思考内容） | 1884 |
+| `Q78_r1_t0.exec.json` | 执行结果 | 1081 |
+| `Q78_r1_t0.json` | API 回包（可能含思考内容） | 7296 |
+| `Q78_r2_t0.exec.json` | 执行结果 | 1058 |
+| `Q78_r2_t0.json` | API 回包（可能含思考内容） | 16191 |
+| `Q78_r3_t0.exec.json` | 执行结果 | 732 |
+| `Q78_r3_t0.json` | API 回包（可能含思考内容） | 5396 |
+| `Q78_r3_t1.exec.json` | 执行结果 | 320 |
+| `Q78_r3_t1.json` | API 回包（可能含思考内容） | 1528 |
+| `Q79_r1_t0.exec.json` | 执行结果 | 1219 |
+| `Q79_r1_t0.json` | API 回包（可能含思考内容） | 16347 |
+| `Q79_r2_t0.exec.json` | 执行结果 | 740 |
+| `Q79_r2_t0.json` | API 回包（可能含思考内容） | 9802 |
+| `Q79_r2_t1.exec.json` | 执行结果 | 2706 |
+| `Q79_r2_t1.json` | API 回包（可能含思考内容） | 2432 |
+| `Q79_r3_t0.exec.json` | 执行结果 | 1266 |
+| `Q79_r3_t0.json` | API 回包（可能含思考内容） | 18611 |
+| `Q80_r1_t0.exec.json` | 执行结果 | 761 |
+| `Q80_r1_t0.json` | API 回包（可能含思考内容） | 8607 |
+| `Q80_r2_t0.exec.json` | 执行结果 | 926 |
+| `Q80_r2_t0.json` | API 回包（可能含思考内容） | 2851 |
+| `Q80_r3_t0.exec.json` | 执行结果 | 769 |
+| `Q80_r3_t0.json` | API 回包（可能含思考内容） | 6086 |
+| `Q81_r1_t0.exec.json` | 执行结果 | 299 |
+| `Q81_r1_t0.json` | API 回包（可能含思考内容） | 11007 |
+| `Q81_r2_t0.exec.json` | 执行结果 | 285 |
+| `Q81_r2_t0.json` | API 回包（可能含思考内容） | 2566 |
+| `Q81_r3_t0.exec.json` | 执行结果 | 310 |
+| `Q81_r3_t0.json` | API 回包（可能含思考内容） | 6144 |
+| `Q82_r1_t0.exec.json` | 执行结果 | 641 |
+| `Q82_r1_t0.json` | API 回包（可能含思考内容） | 6144 |
+| `Q82_r2_t0.exec.json` | 执行结果 | 647 |
+| `Q82_r2_t0.json` | API 回包（可能含思考内容） | 6338 |
+| `Q82_r3_t0.exec.json` | 执行结果 | 647 |
+| `Q82_r3_t0.json` | API 回包（可能含思考内容） | 8124 |
+| `Q83_r1_t0.exec.json` | 执行结果 | 421 |
+| `Q83_r1_t0.json` | API 回包（可能含思考内容） | 12651 |
+| `Q83_r2_t0.exec.json` | 执行结果 | 351 |
+| `Q83_r2_t0.json` | API 回包（可能含思考内容） | 17853 |
+| `Q83_r3_t0.exec.json` | 执行结果 | 746 |
+| `Q83_r3_t0.json` | API 回包（可能含思考内容） | 7734 |
+| `Q83_r3_t1.exec.json` | 执行结果 | 485 |
+| `Q83_r3_t1.json` | API 回包（可能含思考内容） | 4166 |
+| `Q84_r1_t0.exec.json` | 执行结果 | 306 |
+| `Q84_r1_t0.json` | API 回包（可能含思考内容） | 5992 |
+| `Q84_r2_t0.exec.json` | 执行结果 | 380 |
+| `Q84_r2_t0.json` | API 回包（可能含思考内容） | 6113 |
+| `Q84_r3_t0.exec.json` | 执行结果 | 388 |
+| `Q84_r3_t0.json` | API 回包（可能含思考内容） | 6278 |
+| `Q84_r3_t1.exec.json` | 执行结果 | 381 |
+| `Q84_r3_t1.json` | API 回包（可能含思考内容） | 2217 |
+| `Q85_r1_t0.exec.json` | 执行结果 | 312 |
+| `Q85_r1_t0.json` | API 回包（可能含思考内容） | 19964 |
+| `Q85_r1_t1.exec.json` | 执行结果 | 1595 |
+| `Q85_r1_t1.json` | API 回包（可能含思考内容） | 14247 |
+| `Q85_r2_t0.exec.json` | 执行结果 | 312 |
+| `Q85_r2_t0.json` | API 回包（可能含思考内容） | 20199 |
+| `Q85_r2_t1.exec.json` | 执行结果 | 1335 |
+| `Q85_r2_t1.json` | API 回包（可能含思考内容） | 10581 |
+| `Q85_r3_t0.exec.json` | 执行结果 | 312 |
+| `Q85_r3_t0.json` | API 回包（可能含思考内容） | 18415 |
+| `Q85_r3_t1.exec.json` | 执行结果 | 1339 |
+| `Q85_r3_t1.json` | API 回包（可能含思考内容） | 9512 |
+| `Q87_r1_t0.exec.json` | 执行结果 | 1199 |
+| `Q87_r1_t0.json` | API 回包（可能含思考内容） | 30607 |
+| `Q87_r2_t0.exec.json` | 执行结果 | 1735 |
+| `Q87_r2_t0.json` | API 回包（可能含思考内容） | 20863 |
+| `Q87_r3_t0.exec.json` | 执行结果 | 1206 |
+| `Q87_r3_t0.json` | API 回包（可能含思考内容） | 16798 |
+| `Q88_r1_t0.exec.json` | 执行结果 | 1158 |
+| `Q88_r1_t0.json` | API 回包（可能含思考内容） | 12412 |
+| `Q88_r2_t0.exec.json` | 执行结果 | 1276 |
+| `Q88_r2_t0.json` | API 回包（可能含思考内容） | 15068 |
+| `Q88_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q88_r3_t0.json` | API 回包（可能含思考内容） | 11534 |
+| `Q88_r3_t1.exec.json` | 执行结果 | 1152 |
+| `Q88_r3_t1.json` | API 回包（可能含思考内容） | 2203 |
+| `Q89_r1_t0.exec.json` | 执行结果 | 407 |
+| `Q89_r1_t0.json` | API 回包（可能含思考内容） | 12609 |
+| `Q89_r2_t0.exec.json` | 执行结果 | 407 |
+| `Q89_r2_t0.json` | API 回包（可能含思考内容） | 18408 |
+| `Q89_r3_t0.exec.json` | 执行结果 | 401 |
+| `Q89_r3_t0.json` | API 回包（可能含思考内容） | 9602 |
+| `Q90_r1_t0.exec.json` | 执行结果 | 1928 |
+| `Q90_r1_t0.json` | API 回包（可能含思考内容） | 28868 |
+| `Q90_r2_t0.exec.json` | 执行结果 | 2491 |
+| `Q90_r2_t0.json` | API 回包（可能含思考内容） | 21347 |
+| `Q90_r3_t0.exec.json` | 执行结果 | 2509 |
+| `Q90_r3_t0.json` | API 回包（可能含思考内容） | 28602 |
+| `Q92_r1_t0.exec.json` | 执行结果 | 1262 |
+| `Q92_r1_t0.json` | API 回包（可能含思考内容） | 15579 |
+| `Q92_r2_t0.exec.json` | 执行结果 | 962 |
+| `Q92_r2_t0.json` | API 回包（可能含思考内容） | 6678 |
+| `Q92_r3_t0.exec.json` | 执行结果 | 1196 |
+| `Q92_r3_t0.json` | API 回包（可能含思考内容） | 17525 |
+| `Q94_r1_t0.exec.json` | 执行结果 | 692 |
+| `Q94_r1_t0.json` | API 回包（可能含思考内容） | 3925 |
+| `Q94_r1_t1.exec.json` | 执行结果 | 9594 |
+| `Q94_r1_t1.json` | API 回包（可能含思考内容） | 2037 |
+| `Q94_r2_t0.exec.json` | 执行结果 | 9463 |
+| `Q94_r2_t0.json` | API 回包（可能含思考内容） | 12388 |
+| `Q94_r3_t0.exec.json` | 执行结果 | 9901 |
+| `Q94_r3_t0.json` | API 回包（可能含思考内容） | 23312 |
+| `Q96_r1_t0.exec.json` | 执行结果 | 328 |
+| `Q96_r1_t0.json` | API 回包（可能含思考内容） | 4003 |
+| `Q96_r2_t0.exec.json` | 执行结果 | 342 |
+| `Q96_r2_t0.json` | API 回包（可能含思考内容） | 4356 |
+| `Q96_r3_t0.exec.json` | 执行结果 | 355 |
+| `Q96_r3_t0.json` | API 回包（可能含思考内容） | 8095 |
+| `Q98_r1_t0.exec.json` | 执行结果 | 746 |
+| `Q98_r1_t0.json` | API 回包（可能含思考内容） | 10124 |
+| `Q98_r1_t1.exec.json` | 执行结果 | 940 |
+| `Q98_r1_t1.json` | API 回包（可能含思考内容） | 2623 |
+| `Q98_r2_t0.exec.json` | 执行结果 | 918 |
+| `Q98_r2_t0.json` | API 回包（可能含思考内容） | 12549 |
+| `Q98_r3_t0.exec.json` | 执行结果 | 974 |
+| `Q98_r3_t0.json` | API 回包（可能含思考内容） | 22130 |
+| `Q99_r1_t0.exec.json` | 执行结果 | 809 |
+| `Q99_r1_t0.json` | API 回包（可能含思考内容） | 40849 |
+| `Q99_r2_t0.exec.json` | 执行结果 | 997 |
+| `Q99_r2_t0.json` | API 回包（可能含思考内容） | 14014 |
+| `Q99_r3_t0.exec.json` | 执行结果 | 974 |
+| `Q99_r3_t0.json` | API 回包（可能含思考内容） | 22077 |
+
+#### `runs-raw/20261104-T34-ontology-full-01/SQL-L1/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `Q01_r1_t0.exec.json` | 执行结果 | 142 |
+| `Q01_r1_t0.json` | API 回包（可能含思考内容） | 1346 |
+| `Q01_r2_t0.exec.json` | 执行结果 | 143 |
+| `Q01_r2_t0.json` | API 回包（可能含思考内容） | 1012 |
+| `Q01_r3_t0.exec.json` | 执行结果 | 414 |
+| `Q01_r3_t0.json` | API 回包（可能含思考内容） | 1043 |
+| `Q01_r3_t1.exec.json` | 执行结果 | 139 |
+| `Q01_r3_t1.json` | API 回包（可能含思考内容） | 820 |
+| `Q02_r1_t0.exec.json` | 执行结果 | 163 |
+| `Q02_r1_t0.json` | API 回包（可能含思考内容） | 935 |
+| `Q02_r2_t0.exec.json` | 执行结果 | 436 |
+| `Q02_r2_t0.json` | API 回包（可能含思考内容） | 899 |
+| `Q02_r2_t1.exec.json` | 执行结果 | 159 |
+| `Q02_r2_t1.json` | API 回包（可能含思考内容） | 824 |
+| `Q02_r3_t0.exec.json` | 执行结果 | 436 |
+| `Q02_r3_t0.json` | API 回包（可能含思考内容） | 738 |
+| `Q02_r3_t1.exec.json` | 执行结果 | 159 |
+| `Q02_r3_t1.json` | API 回包（可能含思考内容） | 717 |
+| `Q03_r1_t0.exec.json` | 执行结果 | 424 |
+| `Q03_r1_t0.json` | API 回包（可能含思考内容） | 1119 |
+| `Q03_r1_t1.exec.json` | 执行结果 | 140 |
+| `Q03_r1_t1.json` | API 回包（可能含思考内容） | 849 |
+| `Q03_r2_t0.exec.json` | 执行结果 | 424 |
+| `Q03_r2_t0.json` | API 回包（可能含思考内容） | 2528 |
+| `Q03_r2_t1.exec.json` | 执行结果 | 140 |
+| `Q03_r2_t1.json` | API 回包（可能含思考内容） | 891 |
+| `Q03_r3_t0.exec.json` | 执行结果 | 424 |
+| `Q03_r3_t0.json` | API 回包（可能含思考内容） | 1103 |
+| `Q03_r3_t1.exec.json` | 执行结果 | 140 |
+| `Q03_r3_t1.json` | API 回包（可能含思考内容） | 817 |
+| `Q04_r1_t0.exec.json` | 执行结果 | 688 |
+| `Q04_r1_t0.json` | API 回包（可能含思考内容） | 1258 |
+| `Q04_r1_t1.exec.json` | 执行结果 | 43454 |
+| `Q04_r1_t1.json` | API 回包（可能含思考内容） | 949 |
+| `Q04_r2_t0.exec.json` | 执行结果 | 39418 |
+| `Q04_r2_t0.json` | API 回包（可能含思考内容） | 1276 |
+| `Q04_r3_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r3_t0.json` | API 回包（可能含思考内容） | 961 |
+| `Q05_r1_t0.exec.json` | 执行结果 | 698 |
+| `Q05_r1_t0.json` | API 回包（可能含思考内容） | 2432 |
+| `Q05_r1_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r1_t1.json` | API 回包（可能含思考内容） | 1475 |
+| `Q05_r2_t0.exec.json` | 执行结果 | 702 |
+| `Q05_r2_t0.json` | API 回包（可能含思考内容） | 3127 |
+| `Q05_r2_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r2_t1.json` | API 回包（可能含思考内容） | 1750 |
+| `Q05_r3_t0.exec.json` | 执行结果 | 702 |
+| `Q05_r3_t0.json` | API 回包（可能含思考内容） | 2661 |
+| `Q05_r3_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r3_t1.json` | API 回包（可能含思考内容） | 1436 |
+| `Q06_r1_t0.exec.json` | 执行结果 | 153 |
+| `Q06_r1_t0.json` | API 回包（可能含思考内容） | 980 |
+| `Q06_r2_t0.exec.json` | 执行结果 | 574 |
+| `Q06_r2_t0.json` | API 回包（可能含思考内容） | 943 |
+| `Q06_r2_t1.exec.json` | 执行结果 | 153 |
+| `Q06_r2_t1.json` | API 回包（可能含思考内容） | 902 |
+| `Q06_r3_t0.exec.json` | 执行结果 | 155 |
+| `Q06_r3_t0.json` | API 回包（可能含思考内容） | 1267 |
+| `Q07_r1_t0.exec.json` | 执行结果 | 718 |
+| `Q07_r1_t0.json` | API 回包（可能含思考内容） | 1316 |
+| `Q07_r1_t1.exec.json` | 执行结果 | 972 |
+| `Q07_r1_t1.json` | API 回包（可能含思考内容） | 1031 |
+| `Q07_r2_t0.exec.json` | 执行结果 | 646 |
+| `Q07_r2_t0.json` | API 回包（可能含思考内容） | 2216 |
+| `Q07_r2_t1.exec.json` | 执行结果 | 926 |
+| `Q07_r2_t1.json` | API 回包（可能含思考内容） | 2044 |
+| `Q07_r3_t0.exec.json` | 执行结果 | 926 |
+| `Q07_r3_t0.json` | API 回包（可能含思考内容） | 1905 |
+| `Q08_r1_t0.exec.json` | 执行结果 | 1035 |
+| `Q08_r1_t0.json` | API 回包（可能含思考内容） | 1883 |
+| `Q08_r2_t0.exec.json` | 执行结果 | 1104 |
+| `Q08_r2_t0.json` | API 回包（可能含思考内容） | 2003 |
+| `Q08_r3_t0.exec.json` | 执行结果 | 714 |
+| `Q08_r3_t0.json` | API 回包（可能含思考内容） | 2338 |
+| `Q08_r3_t1.exec.json` | 执行结果 | 1229 |
+| `Q08_r3_t1.json` | API 回包（可能含思考内容） | 1082 |
+| `Q09_r1_t0.exec.json` | 执行结果 | 486 |
+| `Q09_r1_t0.json` | API 回包（可能含思考内容） | 1879 |
+| `Q09_r1_t1.exec.json` | 执行结果 | 220 |
+| `Q09_r1_t1.json` | API 回包（可能含思考内容） | 864 |
+| `Q09_r2_t0.exec.json` | 执行结果 | 173 |
+| `Q09_r2_t0.json` | API 回包（可能含思考内容） | 1336 |
+| `Q09_r3_t0.exec.json` | 执行结果 | 219 |
+| `Q09_r3_t0.json` | API 回包（可能含思考内容） | 1783 |
+| `Q100_r1_t0.exec.json` | 执行结果 | 5792 |
+| `Q100_r1_t0.json` | API 回包（可能含思考内容） | 15921 |
+| `Q100_r2_t0.exec.json` | 执行结果 | 696 |
+| `Q100_r2_t0.json` | API 回包（可能含思考内容） | 18333 |
+| `Q100_r2_t1.exec.json` | 执行结果 | 5297 |
+| `Q100_r2_t1.json` | API 回包（可能含思考内容） | 2273 |
+| `Q100_r3_t0.exec.json` | 执行结果 | 4813 |
+| `Q100_r3_t0.json` | API 回包（可能含思考内容） | 19419 |
+| `Q101_r1_t0.exec.json` | 执行结果 | 146 |
+| `Q101_r1_t0.json` | API 回包（可能含思考内容） | 1471 |
+| `Q101_r2_t0.exec.json` | 执行结果 | 148 |
+| `Q101_r2_t0.json` | API 回包（可能含思考内容） | 1121 |
+| `Q101_r3_t0.exec.json` | 执行结果 | 696 |
+| `Q101_r3_t0.json` | API 回包（可能含思考内容） | 2277 |
+| `Q101_r3_t1.exec.json` | 执行结果 | 197 |
+| `Q101_r3_t1.json` | API 回包（可能含思考内容） | 1104 |
+| `Q102_r1_t0.exec.json` | 执行结果 | 534 |
+| `Q102_r1_t0.json` | API 回包（可能含思考内容） | 3433 |
+| `Q102_r2_t0.exec.json` | 执行结果 | 526 |
+| `Q102_r2_t0.json` | API 回包（可能含思考内容） | 4284 |
+| `Q102_r3_t0.exec.json` | 执行结果 | 539 |
+| `Q102_r3_t0.json` | API 回包（可能含思考内容） | 3873 |
+| `Q103_r1_t0.exec.json` | 执行结果 | 348 |
+| `Q103_r1_t0.json` | API 回包（可能含思考内容） | 3090 |
+| `Q103_r2_t0.exec.json` | 执行结果 | 364 |
+| `Q103_r2_t0.json` | API 回包（可能含思考内容） | 2465 |
+| `Q103_r3_t0.exec.json` | 执行结果 | 345 |
+| `Q103_r3_t0.json` | API 回包（可能含思考内容） | 5238 |
+| `Q104_r1_t0.exec.json` | 执行结果 | 713 |
+| `Q104_r1_t0.json` | API 回包（可能含思考内容） | 21192 |
+| `Q104_r2_t0.exec.json` | 执行结果 | 460 |
+| `Q104_r2_t0.json` | API 回包（可能含思考内容） | 13705 |
+| `Q104_r3_t0.exec.json` | 执行结果 | 670 |
+| `Q104_r3_t0.json` | API 回包（可能含思考内容） | 20266 |
+| `Q105_r1_t0.exec.json` | 执行结果 | 268 |
+| `Q105_r1_t0.json` | API 回包（可能含思考内容） | 1627 |
+| `Q105_r2_t0.exec.json` | 执行结果 | 267 |
+| `Q105_r2_t0.json` | API 回包（可能含思考内容） | 1991 |
+| `Q105_r3_t0.exec.json` | 执行结果 | 270 |
+| `Q105_r3_t0.json` | API 回包（可能含思考内容） | 4247 |
+| `Q106_r1_t0.exec.json` | 执行结果 | 362 |
+| `Q106_r1_t0.json` | API 回包（可能含思考内容） | 8470 |
+| `Q106_r2_t0.exec.json` | 执行结果 | 334 |
+| `Q106_r2_t0.json` | API 回包（可能含思考内容） | 4287 |
+| `Q106_r3_t0.exec.json` | 执行结果 | 350 |
+| `Q106_r3_t0.json` | API 回包（可能含思考内容） | 3761 |
+| `Q107_r1_t0.exec.json` | 执行结果 | 373 |
+| `Q107_r1_t0.json` | API 回包（可能含思考内容） | 12324 |
+| `Q107_r2_t0.exec.json` | 执行结果 | 402 |
+| `Q107_r2_t0.json` | API 回包（可能含思考内容） | 15261 |
+| `Q107_r3_t0.exec.json` | 执行结果 | 368 |
+| `Q107_r3_t0.json` | API 回包（可能含思考内容） | 12251 |
+| `Q108_r1_t0.exec.json` | 执行结果 | 702 |
+| `Q108_r1_t0.json` | API 回包（可能含思考内容） | 2322 |
+| `Q108_r1_t1.exec.json` | 执行结果 | 1320 |
+| `Q108_r1_t1.json` | API 回包（可能含思考内容） | 1356 |
+| `Q108_r2_t0.exec.json` | 执行结果 | 1323 |
+| `Q108_r2_t0.json` | API 回包（可能含思考内容） | 2710 |
+| `Q108_r3_t0.exec.json` | 执行结果 | 1322 |
+| `Q108_r3_t0.json` | API 回包（可能含思考内容） | 2608 |
+| `Q109_r1_t0.exec.json` | 执行结果 | 565 |
+| `Q109_r1_t0.json` | API 回包（可能含思考内容） | 32041 |
+| `Q109_r2_t0.exec.json` | 执行结果 | 493 |
+| `Q109_r2_t0.json` | API 回包（可能含思考内容） | 3726 |
+| `Q109_r3_t0.exec.json` | 执行结果 | 574 |
+| `Q109_r3_t0.json` | API 回包（可能含思考内容） | 6336 |
+| `Q10_r1_t0.exec.json` | 执行结果 | 470 |
+| `Q10_r1_t0.json` | API 回包（可能含思考内容） | 943 |
+| `Q10_r1_t1.exec.json` | 执行结果 | 147 |
+| `Q10_r1_t1.json` | API 回包（可能含思考内容） | 831 |
+| `Q10_r2_t0.exec.json` | 执行结果 | 464 |
+| `Q10_r2_t0.json` | API 回包（可能含思考内容） | 2138 |
+| `Q10_r2_t1.exec.json` | 执行结果 | 144 |
+| `Q10_r2_t1.json` | API 回包（可能含思考内容） | 1445 |
+| `Q10_r3_t0.exec.json` | 执行结果 | 464 |
+| `Q10_r3_t0.json` | API 回包（可能含思考内容） | 1846 |
+| `Q10_r3_t1.exec.json` | 执行结果 | 144 |
+| `Q10_r3_t1.json` | API 回包（可能含思考内容） | 893 |
+| `Q110_r1_t0.exec.json` | 执行结果 | 502 |
+| `Q110_r1_t0.json` | API 回包（可能含思考内容） | 17104 |
+| `Q110_r2_t0.exec.json` | 执行结果 | 445 |
+| `Q110_r2_t0.json` | API 回包（可能含思考内容） | 17224 |
+| `Q110_r3_t0.exec.json` | 执行结果 | 459 |
+| `Q110_r3_t0.json` | API 回包（可能含思考内容） | 16001 |
+| `Q111_r1_t0.exec.json` | 执行结果 | 31548 |
+| `Q111_r1_t0.json` | API 回包（可能含思考内容） | 16727 |
+| `Q111_r2_t0.exec.json` | 执行结果 | 31655 |
+| `Q111_r2_t0.json` | API 回包（可能含思考内容） | 13608 |
+| `Q111_r3_t0.exec.json` | 执行结果 | 30922 |
+| `Q111_r3_t0.json` | API 回包（可能含思考内容） | 21528 |
+| `Q112_r1_t0.exec.json` | 执行结果 | 9536 |
+| `Q112_r1_t0.json` | API 回包（可能含思考内容） | 37862 |
+| `Q112_r2_t0.exec.json` | 执行结果 | 8881 |
+| `Q112_r2_t0.json` | API 回包（可能含思考内容） | 28658 |
+| `Q112_r3_t0.exec.json` | 执行结果 | 7700 |
+| `Q112_r3_t0.json` | API 回包（可能含思考内容） | 33119 |
+| `Q113_r1_t0.exec.json` | 执行结果 | 2248 |
+| `Q113_r1_t0.json` | API 回包（可能含思考内容） | 24525 |
+| `Q113_r2_t0.exec.json` | 执行结果 | 2439 |
+| `Q113_r2_t0.json` | API 回包（可能含思考内容） | 25744 |
+| `Q113_r3_t0.exec.json` | 执行结果 | 310 |
+| `Q113_r3_t0.json` | API 回包（可能含思考内容） | 23423 |
+| `Q113_r3_t1.exec.json` | 执行结果 | 2249 |
+| `Q113_r3_t1.json` | API 回包（可能含思考内容） | 7986 |
+| `Q114_r1_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r1_t0.json` | API 回包（可能含思考内容） | 3557 |
+| `Q114_r2_t0.exec.json` | 执行结果 | 704 |
+| `Q114_r2_t0.json` | API 回包（可能含思考内容） | 4112 |
+| `Q114_r2_t1.exec.json` | 执行结果 | 304 |
+| `Q114_r2_t1.json` | API 回包（可能含思考内容） | 2150 |
+| `Q114_r3_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r3_t0.json` | API 回包（可能含思考内容） | 4248 |
+| `Q115_r1_t0.exec.json` | 执行结果 | 524 |
+| `Q115_r1_t0.json` | API 回包（可能含思考内容） | 19791 |
+| `Q115_r2_t0.exec.json` | 执行结果 | 524 |
+| `Q115_r2_t0.json` | API 回包（可能含思考内容） | 17120 |
+| `Q115_r3_t0.exec.json` | 执行结果 | 722 |
+| `Q115_r3_t0.json` | API 回包（可能含思考内容） | 14569 |
+| `Q115_r3_t1.exec.json` | 执行结果 | 524 |
+| `Q115_r3_t1.json` | API 回包（可能含思考内容） | 3233 |
+| `Q116_r1_t0.exec.json` | 执行结果 | 738 |
+| `Q116_r1_t0.json` | API 回包（可能含思考内容） | 19088 |
+| `Q116_r1_t1.exec.json` | 执行结果 | 415 |
+| `Q116_r1_t1.json` | API 回包（可能含思考内容） | 2287 |
+| `Q116_r2_t0.exec.json` | 执行结果 | 732 |
+| `Q116_r2_t0.json` | API 回包（可能含思考内容） | 14937 |
+| `Q116_r2_t1.exec.json` | 执行结果 | 415 |
+| `Q116_r2_t1.json` | API 回包（可能含思考内容） | 2115 |
+| `Q116_r3_t0.exec.json` | 执行结果 | 712 |
+| `Q116_r3_t0.json` | API 回包（可能含思考内容） | 22043 |
+| `Q116_r3_t1.exec.json` | 执行结果 | 435 |
+| `Q116_r3_t1.json` | API 回包（可能含思考内容） | 5007 |
+| `Q117_r1_t0.exec.json` | 执行结果 | 927 |
+| `Q117_r1_t0.json` | API 回包（可能含思考内容） | 40918 |
+| `Q117_r2_t0.exec.json` | 执行结果 | 711 |
+| `Q117_r2_t0.json` | API 回包（可能含思考内容） | 32621 |
+| `Q117_r3_t0.exec.json` | 执行结果 | 645 |
+| `Q117_r3_t0.json` | API 回包（可能含思考内容） | 37758 |
+| `Q118_r1_t0.exec.json` | 执行结果 | 426 |
+| `Q118_r1_t0.json` | API 回包（可能含思考内容） | 12168 |
+| `Q118_r2_t0.exec.json` | 执行结果 | 344 |
+| `Q118_r2_t0.json` | API 回包（可能含思考内容） | 16952 |
+| `Q118_r3_t0.exec.json` | 执行结果 | 336 |
+| `Q118_r3_t0.json` | API 回包（可能含思考内容） | 12482 |
+| `Q119_r1_t0.exec.json` | 执行结果 | 34801 |
+| `Q119_r1_t0.json` | API 回包（可能含思考内容） | 15097 |
+| `Q119_r2_t0.exec.json` | 执行结果 | 404 |
+| `Q119_r2_t0.json` | API 回包（可能含思考内容） | 7836 |
+| `Q119_r2_t1.exec.json` | 执行结果 | 31313 |
+| `Q119_r2_t1.json` | API 回包（可能含思考内容） | 2562 |
+| `Q119_r3_t0.exec.json` | 执行结果 | 32206 |
+| `Q119_r3_t0.json` | API 回包（可能含思考内容） | 11451 |
+| `Q11_r1_t0.exec.json` | 执行结果 | 702 |
+| `Q11_r1_t0.json` | API 回包（可能含思考内容） | 5164 |
+| `Q11_r1_t1.exec.json` | 执行结果 | 526 |
+| `Q11_r1_t1.json` | API 回包（可能含思考内容） | 1311 |
+| `Q11_r2_t0.exec.json` | 执行结果 | 530 |
+| `Q11_r2_t0.json` | API 回包（可能含思考内容） | 4602 |
+| `Q11_r3_t0.exec.json` | 执行结果 | 534 |
+| `Q11_r3_t0.json` | API 回包（可能含思考内容） | 4811 |
+| `Q120_r1_t0.exec.json` | 执行结果 | 589 |
+| `Q120_r1_t0.json` | API 回包（可能含思考内容） | 21295 |
+| `Q120_r2_t0.exec.json` | 执行结果 | 535 |
+| `Q120_r2_t0.json` | API 回包（可能含思考内容） | 16141 |
+| `Q120_r3_t0.exec.json` | 执行结果 | 732 |
+| `Q120_r3_t0.json` | API 回包（可能含思考内容） | 14520 |
+| `Q120_r3_t1.exec.json` | 执行结果 | 590 |
+| `Q120_r3_t1.json` | API 回包（可能含思考内容） | 2548 |
+| `Q121_r1_t0.exec.json` | 执行结果 | 622 |
+| `Q121_r1_t0.json` | API 回包（可能含思考内容） | 9735 |
+| `Q121_r2_t0.exec.json` | 执行结果 | 608 |
+| `Q121_r2_t0.json` | API 回包（可能含思考内容） | 7193 |
+| `Q121_r3_t0.exec.json` | 执行结果 | 2974 |
+| `Q121_r3_t0.json` | API 回包（可能含思考内容） | 29844 |
+| `Q121_r3_t1.exec.json` | 执行结果 | 776 |
+| `Q121_r3_t1.json` | API 回包（可能含思考内容） | 7003 |
+| `Q122_r1_t0.exec.json` | 执行结果 | 1375 |
+| `Q122_r1_t0.json` | API 回包（可能含思考内容） | 6272 |
+| `Q122_r2_t0.exec.json` | 执行结果 | 1394 |
+| `Q122_r2_t0.json` | API 回包（可能含思考内容） | 19618 |
+| `Q122_r3_t0.exec.json` | 执行结果 | 740 |
+| `Q122_r3_t0.json` | API 回包（可能含思考内容） | 23137 |
+| `Q122_r3_t1.exec.json` | 执行结果 | 1718 |
+| `Q122_r3_t1.json` | API 回包（可能含思考内容） | 4130 |
+| `Q12_r1_t0.exec.json` | 执行结果 | 549 |
+| `Q12_r1_t0.json` | API 回包（可能含思考内容） | 2025 |
+| `Q12_r2_t0.exec.json` | 执行结果 | 706 |
+| `Q12_r2_t0.json` | API 回包（可能含思考内容） | 2733 |
+| `Q12_r2_t1.exec.json` | 执行结果 | 545 |
+| `Q12_r2_t1.json` | API 回包（可能含思考内容） | 1157 |
+| `Q12_r3_t0.exec.json` | 执行结果 | 549 |
+| `Q12_r3_t0.json` | API 回包（可能含思考内容） | 1960 |
+| `Q13_r1_t0.exec.json` | 执行结果 | 714 |
+| `Q13_r1_t0.json` | API 回包（可能含思考内容） | 2658 |
+| `Q13_r1_t1.exec.json` | 执行结果 | 19860 |
+| `Q13_r1_t1.json` | API 回包（可能含思考内容） | 1260 |
+| `Q13_r2_t0.exec.json` | 执行结果 | 714 |
+| `Q13_r2_t0.json` | API 回包（可能含思考内容） | 3452 |
+| `Q13_r2_t1.exec.json` | 执行结果 | 23488 |
+| `Q13_r2_t1.json` | API 回包（可能含思考内容） | 1306 |
+| `Q13_r3_t0.exec.json` | 执行结果 | 714 |
+| `Q13_r3_t0.json` | API 回包（可能含思考内容） | 2610 |
+| `Q13_r3_t1.exec.json` | 执行结果 | 23465 |
+| `Q13_r3_t1.json` | API 回包（可能含思考内容） | 1208 |
+| `Q14_r1_t0.exec.json` | 执行结果 | 632 |
+| `Q14_r1_t0.json` | API 回包（可能含思考内容） | 1533 |
+| `Q14_r1_t1.exec.json` | 执行结果 | 138 |
+| `Q14_r1_t1.json` | API 回包（可能含思考内容） | 961 |
+| `Q14_r2_t0.exec.json` | 执行结果 | 143 |
+| `Q14_r2_t0.json` | API 回包（可能含思考内容） | 4231 |
+| `Q14_r3_t0.exec.json` | 执行结果 | 143 |
+| `Q14_r3_t0.json` | API 回包（可能含思考内容） | 1925 |
+| `Q15_r1_t0.exec.json` | 执行结果 | 698 |
+| `Q15_r1_t0.json` | API 回包（可能含思考内容） | 1880 |
+| `Q15_r1_t1.exec.json` | 执行结果 | 1129 |
+| `Q15_r1_t1.json` | API 回包（可能含思考内容） | 1118 |
+| `Q15_r2_t0.exec.json` | 执行结果 | 698 |
+| `Q15_r2_t0.json` | API 回包（可能含思考内容） | 1422 |
+| `Q15_r2_t1.exec.json` | 执行结果 | 1128 |
+| `Q15_r2_t1.json` | API 回包（可能含思考内容） | 1143 |
+| `Q15_r3_t0.exec.json` | 执行结果 | 702 |
+| `Q15_r3_t0.json` | API 回包（可能含思考内容） | 2125 |
+| `Q15_r3_t1.exec.json` | 执行结果 | 1135 |
+| `Q15_r3_t1.json` | API 回包（可能含思考内容） | 1219 |
+| `Q16_r1_t0.exec.json` | 执行结果 | 374 |
+| `Q16_r1_t0.json` | API 回包（可能含思考内容） | 5232 |
+| `Q16_r2_t0.exec.json` | 执行结果 | 732 |
+| `Q16_r2_t0.json` | API 回包（可能含思考内容） | 3716 |
+| `Q16_r2_t1.exec.json` | 执行结果 | 385 |
+| `Q16_r2_t1.json` | API 回包（可能含思考内容） | 1668 |
+| `Q16_r3_t0.exec.json` | 执行结果 | 718 |
+| `Q16_r3_t0.json` | API 回包（可能含思考内容） | 3519 |
+| `Q16_r3_t1.exec.json` | 执行结果 | 360 |
+| `Q16_r3_t1.json` | API 回包（可能含思考内容） | 1352 |
+| `Q17_r1_t0.exec.json` | 执行结果 | 428 |
+| `Q17_r1_t0.json` | API 回包（可能含思考内容） | 10714 |
+| `Q17_r2_t0.exec.json` | 执行结果 | 340 |
+| `Q17_r2_t0.json` | API 回包（可能含思考内容） | 7142 |
+| `Q17_r3_t0.exec.json` | 执行结果 | 407 |
+| `Q17_r3_t0.json` | API 回包（可能含思考内容） | 4052 |
+| `Q18_r1_t0.exec.json` | 执行结果 | 237 |
+| `Q18_r1_t0.json` | API 回包（可能含思考内容） | 3727 |
+| `Q18_r2_t0.exec.json` | 执行结果 | 708 |
+| `Q18_r2_t0.json` | API 回包（可能含思考内容） | 4511 |
+| `Q18_r2_t1.exec.json` | 执行结果 | 658 |
+| `Q18_r2_t1.json` | API 回包（可能含思考内容） | 1112 |
+| `Q18_r3_t0.exec.json` | 执行结果 | 237 |
+| `Q18_r3_t0.json` | API 回包（可能含思考内容） | 3340 |
+| `Q19_r1_t0.exec.json` | 执行结果 | 710 |
+| `Q19_r1_t0.json` | API 回包（可能含思考内容） | 1954 |
+| `Q19_r1_t1.exec.json` | 执行结果 | 382 |
+| `Q19_r1_t1.json` | API 回包（可能含思考内容） | 1218 |
+| `Q19_r2_t0.exec.json` | 执行结果 | 710 |
+| `Q19_r2_t0.json` | API 回包（可能含思考内容） | 5536 |
+| `Q19_r2_t1.exec.json` | 执行结果 | 381 |
+| `Q19_r2_t1.json` | API 回包（可能含思考内容） | 1351 |
+| `Q19_r3_t0.exec.json` | 执行结果 | 225 |
+| `Q19_r3_t0.json` | API 回包（可能含思考内容） | 6771 |
+| `Q20_r1_t0.exec.json` | 执行结果 | 32377 |
+| `Q20_r1_t0.json` | API 回包（可能含思考内容） | 7549 |
+| `Q20_r2_t0.exec.json` | 执行结果 | 734 |
+| `Q20_r2_t0.json` | API 回包（可能含思考内容） | 6854 |
+| `Q20_r2_t1.exec.json` | 执行结果 | 164843 |
+| `Q20_r2_t1.json` | API 回包（可能含思考内容） | 2390 |
+| `Q20_r3_t0.exec.json` | 执行结果 | 35310 |
+| `Q20_r3_t0.json` | API 回包（可能含思考内容） | 8440 |
+| `Q21_r1_t0.exec.json` | 执行结果 | 11341 |
+| `Q21_r1_t0.json` | API 回包（可能含思考内容） | 3130 |
+| `Q21_r2_t0.exec.json` | 执行结果 | 11341 |
+| `Q21_r2_t0.json` | API 回包（可能含思考内容） | 2776 |
+| `Q21_r3_t0.exec.json` | 执行结果 | 12813 |
+| `Q21_r3_t0.json` | API 回包（可能含思考内容） | 2636 |
+| `Q22_r1_t0.exec.json` | 执行结果 | 4010 |
+| `Q22_r1_t0.json` | API 回包（可能含思考内容） | 8207 |
+| `Q22_r2_t0.exec.json` | 执行结果 | 3455 |
+| `Q22_r2_t0.json` | API 回包（可能含思考内容） | 4690 |
+| `Q22_r3_t0.exec.json` | 执行结果 | 3187 |
+| `Q22_r3_t0.json` | API 回包（可能含思考内容） | 7370 |
+| `Q23_r1_t0.exec.json` | 执行结果 | 553 |
+| `Q23_r1_t0.json` | API 回包（可能含思考内容） | 6984 |
+| `Q23_r2_t0.exec.json` | 执行结果 | 828 |
+| `Q23_r2_t0.json` | API 回包（可能含思考内容） | 3109 |
+| `Q23_r3_t0.exec.json` | 执行结果 | 692 |
+| `Q23_r3_t0.json` | API 回包（可能含思考内容） | 3343 |
+| `Q23_r3_t1.exec.json` | 执行结果 | 827 |
+| `Q23_r3_t1.json` | API 回包（可能含思考内容） | 1319 |
+| `Q24_r1_t0.exec.json` | 执行结果 | 625 |
+| `Q24_r1_t0.json` | API 回包（可能含思考内容） | 17115 |
+| `Q24_r2_t0.exec.json` | 执行结果 | 667 |
+| `Q24_r2_t0.json` | API 回包（可能含思考内容） | 10558 |
+| `Q24_r3_t0.exec.json` | 执行结果 | 712 |
+| `Q24_r3_t0.json` | API 回包（可能含思考内容） | 4291 |
+| `Q24_r3_t1.exec.json` | 执行结果 | 673 |
+| `Q24_r3_t1.json` | API 回包（可能含思考内容） | 1779 |
+| `Q25_r1_t0.exec.json` | 执行结果 | 211 |
+| `Q25_r1_t0.json` | API 回包（可能含思考内容） | 12013 |
+| `Q25_r2_t0.exec.json` | 执行结果 | 211 |
+| `Q25_r2_t0.json` | API 回包（可能含思考内容） | 13012 |
+| `Q25_r3_t0.exec.json` | 执行结果 | 561 |
+| `Q25_r3_t0.json` | API 回包（可能含思考内容） | 7194 |
+| `Q26_r1_t0.exec.json` | 执行结果 | 202 |
+| `Q26_r1_t0.json` | API 回包（可能含思考内容） | 4174 |
+| `Q26_r2_t0.exec.json` | 执行结果 | 209 |
+| `Q26_r2_t0.json` | API 回包（可能含思考内容） | 2548 |
+| `Q26_r3_t0.exec.json` | 执行结果 | 202 |
+| `Q26_r3_t0.json` | API 回包（可能含思考内容） | 2985 |
+| `Q27_r1_t0.exec.json` | 执行结果 | 1210 |
+| `Q27_r1_t0.json` | API 回包（可能含思考内容） | 2651 |
+| `Q27_r2_t0.exec.json` | 执行结果 | 1260 |
+| `Q27_r2_t0.json` | API 回包（可能含思考内容） | 2253 |
+| `Q27_r3_t0.exec.json` | 执行结果 | 748 |
+| `Q27_r3_t0.json` | API 回包（可能含思考内容） | 2431 |
+| `Q27_r3_t1.exec.json` | 执行结果 | 1036 |
+| `Q27_r3_t1.json` | API 回包（可能含思考内容） | 1506 |
+| `Q28_r1_t0.exec.json` | 执行结果 | 270 |
+| `Q28_r1_t0.json` | API 回包（可能含思考内容） | 6660 |
+| `Q28_r2_t0.exec.json` | 执行结果 | 437 |
+| `Q28_r2_t0.json` | API 回包（可能含思考内容） | 11101 |
+| `Q28_r3_t0.exec.json` | 执行结果 | 389 |
+| `Q28_r3_t0.json` | API 回包（可能含思考内容） | 5517 |
+| `Q29_r1_t0.exec.json` | 执行结果 | 726 |
+| `Q29_r1_t0.json` | API 回包（可能含思考内容） | 4550 |
+| `Q29_r1_t1.exec.json` | 执行结果 | 403 |
+| `Q29_r1_t1.json` | API 回包（可能含思考内容） | 2133 |
+| `Q29_r2_t0.exec.json` | 执行结果 | 509 |
+| `Q29_r2_t0.json` | API 回包（可能含思考内容） | 7623 |
+| `Q29_r3_t0.exec.json` | 执行结果 | 710 |
+| `Q29_r3_t0.json` | API 回包（可能含思考内容） | 6084 |
+| `Q29_r3_t1.exec.json` | 执行结果 | 482 |
+| `Q29_r3_t1.json` | API 回包（可能含思考内容） | 2194 |
+| `Q30_r1_t0.exec.json` | 执行结果 | 1479 |
+| `Q30_r1_t0.json` | API 回包（可能含思考内容） | 2909 |
+| `Q30_r2_t0.exec.json` | 执行结果 | 1927 |
+| `Q30_r2_t0.json` | API 回包（可能含思考内容） | 8929 |
+| `Q30_r3_t0.exec.json` | 执行结果 | 1461 |
+| `Q30_r3_t0.json` | API 回包（可能含思考内容） | 3823 |
+| `Q31_r1_t0.exec.json` | 执行结果 | 1016 |
+| `Q31_r1_t0.json` | API 回包（可能含思考内容） | 5059 |
+| `Q31_r2_t0.exec.json` | 执行结果 | 984 |
+| `Q31_r2_t0.json` | API 回包（可能含思考内容） | 11000 |
+| `Q31_r3_t0.exec.json` | 执行结果 | 863 |
+| `Q31_r3_t0.json` | API 回包（可能含思考内容） | 10667 |
+| `Q32_r1_t0.exec.json` | 执行结果 | 216 |
+| `Q32_r1_t0.json` | API 回包（可能含思考内容） | 3443 |
+| `Q32_r2_t0.exec.json` | 执行结果 | 218 |
+| `Q32_r2_t0.json` | API 回包（可能含思考内容） | 3386 |
+| `Q32_r3_t0.exec.json` | 执行结果 | 696 |
+| `Q32_r3_t0.json` | API 回包（可能含思考内容） | 4339 |
+| `Q32_r3_t1.exec.json` | 执行结果 | 214 |
+| `Q32_r3_t1.json` | API 回包（可能含思考内容） | 1435 |
+| `Q34_r1_t0.exec.json` | 执行结果 | 724 |
+| `Q34_r1_t0.json` | API 回包（可能含思考内容） | 32520 |
+| `Q34_r1_t1.exec.json` | 执行结果 | 281620 |
+| `Q34_r1_t1.json` | API 回包（可能含思考内容） | 2602 |
+| `Q34_r2_t0.exec.json` | 执行结果 | 742 |
+| `Q34_r2_t0.json` | API 回包（可能含思考内容） | 32421 |
+| `Q34_r2_t1.exec.json` | 执行结果 | 230821 |
+| `Q34_r2_t1.json` | API 回包（可能含思考内容） | 2300 |
+| `Q34_r3_t0.exec.json` | 执行结果 | 722 |
+| `Q34_r3_t0.json` | API 回包（可能含思考内容） | 12762 |
+| `Q34_r3_t1.exec.json` | 执行结果 | 212609 |
+| `Q34_r3_t1.json` | API 回包（可能含思考内容） | 2586 |
+| `Q35_r1_t0.exec.json` | 执行结果 | 728 |
+| `Q35_r1_t0.json` | API 回包（可能含思考内容） | 2855 |
+| `Q35_r1_t1.exec.json` | 执行结果 | 12992 |
+| `Q35_r1_t1.json` | API 回包（可能含思考内容） | 1153 |
+| `Q35_r2_t0.exec.json` | 执行结果 | 720 |
+| `Q35_r2_t0.json` | API 回包（可能含思考内容） | 2916 |
+| `Q35_r2_t1.exec.json` | 执行结果 | 12982 |
+| `Q35_r2_t1.json` | API 回包（可能含思考内容） | 1172 |
+| `Q35_r3_t0.exec.json` | 执行结果 | 19778 |
+| `Q35_r3_t0.json` | API 回包（可能含思考内容） | 1691 |
+| `Q36_r1_t0.exec.json` | 执行结果 | 704 |
+| `Q36_r1_t0.json` | API 回包（可能含思考内容） | 2725 |
+| `Q36_r1_t1.exec.json` | 执行结果 | 259 |
+| `Q36_r1_t1.json` | API 回包（可能含思考内容） | 3464 |
+| `Q36_r2_t0.exec.json` | 执行结果 | 267 |
+| `Q36_r2_t0.json` | API 回包（可能含思考内容） | 3743 |
+| `Q36_r3_t0.exec.json` | 执行结果 | 762 |
+| `Q36_r3_t0.json` | API 回包（可能含思考内容） | 5416 |
+| `Q36_r3_t1.exec.json` | 执行结果 | 241 |
+| `Q36_r3_t1.json` | API 回包（可能含思考内容） | 1736 |
+| `Q37_r1_t0.exec.json` | 执行结果 | 18307 |
+| `Q37_r1_t0.json` | API 回包（可能含思考内容） | 6660 |
+| `Q37_r2_t0.exec.json` | 执行结果 | 18758 |
+| `Q37_r2_t0.json` | API 回包（可能含思考内容） | 3960 |
+| `Q37_r3_t0.exec.json` | 执行结果 | 17286 |
+| `Q37_r3_t0.json` | API 回包（可能含思考内容） | 4727 |
+| `Q38_r1_t0.exec.json` | 执行结果 | 491 |
+| `Q38_r1_t0.json` | API 回包（可能含思考内容） | 7106 |
+| `Q38_r2_t0.exec.json` | 执行结果 | 566 |
+| `Q38_r2_t0.json` | API 回包（可能含思考内容） | 14826 |
+| `Q38_r3_t0.exec.json` | 执行结果 | 345 |
+| `Q38_r3_t0.json` | API 回包（可能含思考内容） | 5060 |
+| `Q41_r1_t0.exec.json` | 执行结果 | 578 |
+| `Q41_r1_t0.json` | API 回包（可能含思考内容） | 1796 |
+| `Q41_r1_t1.exec.json` | 执行结果 | 152 |
+| `Q41_r1_t1.json` | API 回包（可能含思考内容） | 832 |
+| `Q41_r2_t0.exec.json` | 执行结果 | 646 |
+| `Q41_r2_t0.json` | API 回包（可能含思考内容） | 1614 |
+| `Q41_r2_t1.exec.json` | 执行结果 | 201 |
+| `Q41_r2_t1.json` | API 回包（可能含思考内容） | 1006 |
+| `Q41_r3_t0.exec.json` | 执行结果 | 706 |
+| `Q41_r3_t0.json` | API 回包（可能含思考内容） | 2418 |
+| `Q41_r3_t1.exec.json` | 执行结果 | 203 |
+| `Q41_r3_t1.json` | API 回包（可能含思考内容） | 1050 |
+| `Q43_r1_t0.exec.json` | 执行结果 | 700 |
+| `Q43_r1_t0.json` | API 回包（可能含思考内容） | 2519 |
+| `Q43_r1_t1.exec.json` | 执行结果 | 1126 |
+| `Q43_r1_t1.json` | API 回包（可能含思考内容） | 1154 |
+| `Q43_r2_t0.exec.json` | 执行结果 | 696 |
+| `Q43_r2_t0.json` | API 回包（可能含思考内容） | 2889 |
+| `Q43_r2_t1.exec.json` | 执行结果 | 1130 |
+| `Q43_r2_t1.json` | API 回包（可能含思考内容） | 1112 |
+| `Q43_r3_t0.exec.json` | 执行结果 | 712 |
+| `Q43_r3_t0.json` | API 回包（可能含思考内容） | 3516 |
+| `Q43_r3_t1.exec.json` | 执行结果 | 2319 |
+| `Q43_r3_t1.json` | API 回包（可能含思考内容） | 1425 |
+| `Q47_r1_t0.exec.json` | 执行结果 | 15126 |
+| `Q47_r1_t0.json` | API 回包（可能含思考内容） | 3585 |
+| `Q47_r2_t0.exec.json` | 执行结果 | 16308 |
+| `Q47_r2_t0.json` | API 回包（可能含思考内容） | 6516 |
+| `Q47_r3_t0.exec.json` | 执行结果 | 10981 |
+| `Q47_r3_t0.json` | API 回包（可能含思考内容） | 26802 |
+| `Q49_r1_t0.exec.json` | 执行结果 | 32315 |
+| `Q49_r1_t0.json` | API 回包（可能含思考内容） | 35457 |
+| `Q49_r2_t0.exec.json` | 执行结果 | 22783 |
+| `Q49_r2_t0.json` | API 回包（可能含思考内容） | 22356 |
+| `Q49_r3_t0.exec.json` | 执行结果 | 369 |
+| `Q49_r3_t0.json` | API 回包（可能含思考内容） | 40995 |
+| `Q50_r1_t0.exec.json` | 执行结果 | 357 |
+| `Q50_r1_t0.json` | API 回包（可能含思考内容） | 9686 |
+| `Q50_r2_t0.exec.json` | 执行结果 | 348 |
+| `Q50_r2_t0.json` | API 回包（可能含思考内容） | 3184 |
+| `Q50_r3_t0.exec.json` | 执行结果 | 372 |
+| `Q50_r3_t0.json` | API 回包（可能含思考内容） | 3765 |
+| `Q51_r1_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r1_t0.json` | API 回包（可能含思考内容） | 1973 |
+| `Q51_r1_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r1_t1.json` | API 回包（可能含思考内容） | 792 |
+| `Q51_r2_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r2_t0.json` | API 回包（可能含思考内容） | 2111 |
+| `Q51_r2_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r2_t1.json` | API 回包（可能含思考内容） | 887 |
+| `Q51_r3_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r3_t0.json` | API 回包（可能含思考内容） | 1530 |
+| `Q51_r3_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r3_t1.json` | API 回包（可能含思考内容） | 801 |
+| `Q52_r1_t0.exec.json` | 执行结果 | 158 |
+| `Q52_r1_t0.json` | API 回包（可能含思考内容） | 1788 |
+| `Q52_r2_t0.exec.json` | 执行结果 | 961 |
+| `Q52_r2_t0.json` | API 回包（可能含思考内容） | 1666 |
+| `Q52_r3_t0.exec.json` | 执行结果 | 233 |
+| `Q52_r3_t0.json` | API 回包（可能含思考内容） | 1289 |
+| `Q53_r1_t0.exec.json` | 执行结果 | 574 |
+| `Q53_r1_t0.json` | API 回包（可能含思考内容） | 837 |
+| `Q53_r1_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r1_t1.json` | API 回包（可能含思考内容） | 763 |
+| `Q53_r2_t0.exec.json` | 执行结果 | 154 |
+| `Q53_r2_t0.json` | API 回包（可能含思考内容） | 1198 |
+| `Q53_r3_t0.exec.json` | 执行结果 | 606 |
+| `Q53_r3_t0.json` | API 回包（可能含思考内容） | 863 |
+| `Q53_r3_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r3_t1.json` | API 回包（可能含思考内容） | 824 |
+| `Q54_r1_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r1_t0.json` | API 回包（可能含思考内容） | 723 |
+| `Q54_r1_t1.exec.json` | 执行结果 | 163 |
+| `Q54_r1_t1.json` | API 回包（可能含思考内容） | 699 |
+| `Q54_r2_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r2_t0.json` | API 回包（可能含思考内容） | 733 |
+| `Q54_r2_t1.exec.json` | 执行结果 | 163 |
+| `Q54_r2_t1.json` | API 回包（可能含思考内容） | 696 |
+| `Q54_r3_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r3_t0.json` | API 回包（可能含思考内容） | 694 |
+| `Q54_r3_t1.exec.json` | 执行结果 | 162 |
+| `Q54_r3_t1.json` | API 回包（可能含思考内容） | 699 |
+| `Q55_r1_t0.exec.json` | 执行结果 | 468 |
+| `Q55_r1_t0.json` | API 回包（可能含思考内容） | 828 |
+| `Q55_r1_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r1_t1.json` | API 回包（可能含思考内容） | 810 |
+| `Q55_r2_t0.exec.json` | 执行结果 | 490 |
+| `Q55_r2_t0.json` | API 回包（可能含思考内容） | 802 |
+| `Q55_r2_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r2_t1.json` | API 回包（可能含思考内容） | 804 |
+| `Q55_r3_t0.exec.json` | 执行结果 | 468 |
+| `Q55_r3_t0.json` | API 回包（可能含思考内容） | 759 |
+| `Q55_r3_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r3_t1.json` | API 回包（可能含思考内容） | 702 |
+| `Q56_r1_t0.exec.json` | 执行结果 | 171 |
+| `Q56_r1_t0.json` | API 回包（可能含思考内容） | 5778 |
+| `Q56_r2_t0.exec.json` | 执行结果 | 648 |
+| `Q56_r2_t0.json` | API 回包（可能含思考内容） | 2697 |
+| `Q56_r2_t1.exec.json` | 执行结果 | 208 |
+| `Q56_r2_t1.json` | API 回包（可能含思考内容） | 1099 |
+| `Q56_r3_t0.exec.json` | 执行结果 | 492 |
+| `Q56_r3_t0.json` | API 回包（可能含思考内容） | 8694 |
+| `Q56_r3_t1.exec.json` | 执行结果 | 169 |
+| `Q56_r3_t1.json` | API 回包（可能含思考内容） | 807 |
+| `Q57_r1_t0.exec.json` | 执行结果 | 414 |
+| `Q57_r1_t0.json` | API 回包（可能含思考内容） | 1111 |
+| `Q57_r1_t1.exec.json` | 执行结果 | 137 |
+| `Q57_r1_t1.json` | API 回包（可能含思考内容） | 785 |
+| `Q57_r2_t0.exec.json` | 执行结果 | 139 |
+| `Q57_r2_t0.json` | API 回包（可能含思考内容） | 1069 |
+| `Q57_r3_t0.exec.json` | 执行结果 | 138 |
+| `Q57_r3_t0.json` | API 回包（可能含思考内容） | 1199 |
+| `Q58_r1_t0.exec.json` | 执行结果 | 384 |
+| `Q58_r1_t0.json` | API 回包（可能含思考内容） | 6151 |
+| `Q58_r2_t0.exec.json` | 执行结果 | 732 |
+| `Q58_r2_t0.json` | API 回包（可能含思考内容） | 2428 |
+| `Q58_r2_t1.exec.json` | 执行结果 | 363 |
+| `Q58_r2_t1.json` | API 回包（可能含思考内容） | 1081 |
+| `Q58_r3_t0.exec.json` | 执行结果 | 714 |
+| `Q58_r3_t0.json` | API 回包（可能含思考内容） | 3218 |
+| `Q58_r3_t1.exec.json` | 执行结果 | 267 |
+| `Q58_r3_t1.json` | API 回包（可能含思考内容） | 1115 |
+| `Q59_r1_t0.exec.json` | 执行结果 | 470 |
+| `Q59_r1_t0.json` | API 回包（可能含思考内容） | 1949 |
+| `Q59_r1_t1.exec.json` | 执行结果 | 144 |
+| `Q59_r1_t1.json` | API 回包（可能含思考内容） | 871 |
+| `Q59_r2_t0.exec.json` | 执行结果 | 140 |
+| `Q59_r2_t0.json` | API 回包（可能含思考内容） | 1073 |
+| `Q59_r3_t0.exec.json` | 执行结果 | 470 |
+| `Q59_r3_t0.json` | API 回包（可能含思考内容） | 1184 |
+| `Q59_r3_t1.exec.json` | 执行结果 | 144 |
+| `Q59_r3_t1.json` | API 回包（可能含思考内容） | 892 |
+| `Q60_r1_t0.exec.json` | 执行结果 | 540 |
+| `Q60_r1_t0.json` | API 回包（可能含思考内容） | 1077 |
+| `Q60_r1_t1.exec.json` | 执行结果 | 208 |
+| `Q60_r1_t1.json` | API 回包（可能含思考内容） | 926 |
+| `Q60_r2_t0.exec.json` | 执行结果 | 490 |
+| `Q60_r2_t0.json` | API 回包（可能含思考内容） | 1013 |
+| `Q60_r2_t1.exec.json` | 执行结果 | 138 |
+| `Q60_r2_t1.json` | API 回包（可能含思考内容） | 798 |
+| `Q60_r3_t0.exec.json` | 执行结果 | 212 |
+| `Q60_r3_t0.json` | API 回包（可能含思考内容） | 1421 |
+| `Q61_r1_t0.exec.json` | 执行结果 | 704 |
+| `Q61_r1_t0.json` | API 回包（可能含思考内容） | 5549 |
+| `Q61_r1_t1.exec.json` | 执行结果 | 1375 |
+| `Q61_r1_t1.json` | API 回包（可能含思考内容） | 1352 |
+| `Q61_r2_t0.exec.json` | 执行结果 | 1543 |
+| `Q61_r2_t0.json` | API 回包（可能含思考内容） | 9729 |
+| `Q61_r3_t0.exec.json` | 执行结果 | 712 |
+| `Q61_r3_t0.json` | API 回包（可能含思考内容） | 5072 |
+| `Q61_r3_t1.exec.json` | 执行结果 | 1386 |
+| `Q61_r3_t1.json` | API 回包（可能含思考内容） | 1341 |
+| `Q62_r1_t0.exec.json` | 执行结果 | 704 |
+| `Q62_r1_t0.json` | API 回包（可能含思考内容） | 8074 |
+| `Q62_r1_t1.exec.json` | 执行结果 | 752 |
+| `Q62_r1_t1.json` | API 回包（可能含思考内容） | 1158 |
+| `Q62_r2_t0.exec.json` | 执行结果 | 725 |
+| `Q62_r2_t0.json` | API 回包（可能含思考内容） | 7708 |
+| `Q62_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q62_r3_t0.json` | API 回包（可能含思考内容） | 8745 |
+| `Q62_r3_t1.exec.json` | 执行结果 | 724 |
+| `Q62_r3_t1.json` | API 回包（可能含思考内容） | 1597 |
+| `Q63_r1_t0.exec.json` | 执行结果 | 532 |
+| `Q63_r1_t0.json` | API 回包（可能含思考内容） | 4973 |
+| `Q63_r2_t0.exec.json` | 执行结果 | 532 |
+| `Q63_r2_t0.json` | API 回包（可能含思考内容） | 7726 |
+| `Q63_r3_t0.exec.json` | 执行结果 | 595 |
+| `Q63_r3_t0.json` | API 回包（可能含思考内容） | 8794 |
+| `Q64_r1_t0.exec.json` | 执行结果 | 1106 |
+| `Q64_r1_t0.json` | API 回包（可能含思考内容） | 4770 |
+| `Q64_r2_t0.exec.json` | 执行结果 | 1000 |
+| `Q64_r2_t0.json` | API 回包（可能含思考内容） | 8630 |
+| `Q64_r3_t0.exec.json` | 执行结果 | 698 |
+| `Q64_r3_t0.json` | API 回包（可能含思考内容） | 10010 |
+| `Q64_r3_t1.exec.json` | 执行结果 | 1111 |
+| `Q64_r3_t1.json` | API 回包（可能含思考内容） | 1081 |
+| `Q65_r1_t0.exec.json` | 执行结果 | 23159 |
+| `Q65_r1_t0.json` | API 回包（可能含思考内容） | 37289 |
+| `Q65_r2_t0.exec.json` | 执行结果 | 20204 |
+| `Q65_r2_t0.json` | API 回包（可能含思考内容） | 20381 |
+| `Q65_r3_t0.exec.json` | 执行结果 | 20300 |
+| `Q65_r3_t0.json` | API 回包（可能含思考内容） | 23482 |
+| `Q66_r1_t0.exec.json` | 执行结果 | 420 |
+| `Q66_r1_t0.json` | API 回包（可能含思考内容） | 3841 |
+| `Q66_r2_t0.exec.json` | 执行结果 | 285 |
+| `Q66_r2_t0.json` | API 回包（可能含思考内容） | 2444 |
+| `Q66_r3_t0.exec.json` | 执行结果 | 704 |
+| `Q66_r3_t0.json` | API 回包（可能含思考内容） | 2355 |
+| `Q66_r3_t1.exec.json` | 执行结果 | 284 |
+| `Q66_r3_t1.json` | API 回包（可能含思考内容） | 1177 |
+| `Q67_r1_t0.exec.json` | 执行结果 | 1275 |
+| `Q67_r1_t0.json` | API 回包（可能含思考内容） | 7336 |
+| `Q67_r2_t0.exec.json` | 执行结果 | 664 |
+| `Q67_r2_t0.json` | API 回包（可能含思考内容） | 5676 |
+| `Q67_r2_t1.exec.json` | 执行结果 | 985 |
+| `Q67_r2_t1.json` | API 回包（可能含思考内容） | 1722 |
+| `Q67_r3_t0.exec.json` | 执行结果 | 900 |
+| `Q67_r3_t0.json` | API 回包（可能含思考内容） | 7226 |
+| `Q68_r1_t0.exec.json` | 执行结果 | 286 |
+| `Q68_r1_t0.json` | API 回包（可能含思考内容） | 2979 |
+| `Q68_r2_t0.exec.json` | 执行结果 | 517 |
+| `Q68_r2_t0.json` | API 回包（可能含思考内容） | 5901 |
+| `Q68_r3_t0.exec.json` | 执行结果 | 292 |
+| `Q68_r3_t0.json` | API 回包（可能含思考内容） | 2127 |
+| `Q69_r1_t0.exec.json` | 执行结果 | 429 |
+| `Q69_r1_t0.json` | API 回包（可能含思考内容） | 21555 |
+| `Q69_r2_t0.exec.json` | 执行结果 | 447 |
+| `Q69_r2_t0.json` | API 回包（可能含思考内容） | 6868 |
+| `Q69_r3_t0.exec.json` | 执行结果 | 710 |
+| `Q69_r3_t0.json` | API 回包（可能含思考内容） | 7924 |
+| `Q69_r3_t1.exec.json` | 执行结果 | 457 |
+| `Q69_r3_t1.json` | API 回包（可能含思考内容） | 1700 |
+| `Q70_r1_t0.exec.json` | 执行结果 | 447 |
+| `Q70_r1_t0.json` | API 回包（可能含思考内容） | 15643 |
+| `Q70_r2_t0.exec.json` | 执行结果 | 433 |
+| `Q70_r2_t0.json` | API 回包（可能含思考内容） | 2990 |
+| `Q70_r3_t0.exec.json` | 执行结果 | 730 |
+| `Q70_r3_t0.json` | API 回包（可能含思考内容） | 6972 |
+| `Q70_r3_t1.exec.json` | 执行结果 | 452 |
+| `Q70_r3_t1.json` | API 回包（可能含思考内容） | 1460 |
+| `Q71_r1_t0.exec.json` | 执行结果 | 734 |
+| `Q71_r1_t0.json` | API 回包（可能含思考内容） | 17547 |
+| `Q71_r2_t0.exec.json` | 执行结果 | 685 |
+| `Q71_r2_t0.json` | API 回包（可能含思考内容） | 12409 |
+| `Q71_r3_t0.exec.json` | 执行结果 | 677 |
+| `Q71_r3_t0.json` | API 回包（可能含思考内容） | 9786 |
+| `Q72_r1_t0.exec.json` | 执行结果 | 710 |
+| `Q72_r1_t0.json` | API 回包（可能含思考内容） | 2659 |
+| `Q72_r1_t1.exec.json` | 执行结果 | 615 |
+| `Q72_r1_t1.json` | API 回包（可能含思考内容） | 1173 |
+| `Q72_r2_t0.exec.json` | 执行结果 | 904 |
+| `Q72_r2_t0.json` | API 回包（可能含思考内容） | 3381 |
+| `Q72_r3_t0.exec.json` | 执行结果 | 710 |
+| `Q72_r3_t0.json` | API 回包（可能含思考内容） | 3605 |
+| `Q72_r3_t1.exec.json` | 执行结果 | 619 |
+| `Q72_r3_t1.json` | API 回包（可能含思考内容） | 1284 |
+| `Q73_r1_t0.exec.json` | 执行结果 | 728 |
+| `Q73_r1_t0.json` | API 回包（可能含思考内容） | 5632 |
+| `Q73_r1_t1.exec.json` | 执行结果 | 1094 |
+| `Q73_r1_t1.json` | API 回包（可能含思考内容） | 3301 |
+| `Q73_r2_t0.exec.json` | 执行结果 | 714 |
+| `Q73_r2_t0.json` | API 回包（可能含思考内容） | 4408 |
+| `Q73_r2_t1.exec.json` | 执行结果 | 1197 |
+| `Q73_r2_t1.json` | API 回包（可能含思考内容） | 1997 |
+| `Q73_r3_t0.exec.json` | 执行结果 | 1227 |
+| `Q73_r3_t0.json` | API 回包（可能含思考内容） | 6241 |
+| `Q74_r1_t0.exec.json` | 执行结果 | 112163 |
+| `Q74_r1_t0.json` | API 回包（可能含思考内容） | 20289 |
+| `Q74_r2_t0.exec.json` | 执行结果 | 104316 |
+| `Q74_r2_t0.json` | API 回包（可能含思考内容） | 10928 |
+| `Q74_r3_t0.exec.json` | 执行结果 | 119938 |
+| `Q74_r3_t0.json` | API 回包（可能含思考内容） | 21551 |
+| `Q75_r1_t0.exec.json` | 执行结果 | 117989 |
+| `Q75_r1_t0.json` | API 回包（可能含思考内容） | 11299 |
+| `Q75_r2_t0.exec.json` | 执行结果 | 116334 |
+| `Q75_r2_t0.json` | API 回包（可能含思考内容） | 8721 |
+| `Q75_r3_t0.exec.json` | 执行结果 | 91535 |
+| `Q75_r3_t0.json` | API 回包（可能含思考内容） | 10194 |
+| `Q76_r1_t0.exec.json` | 执行结果 | 716 |
+| `Q76_r1_t0.json` | API 回包（可能含思考内容） | 11350 |
+| `Q76_r1_t1.exec.json` | 执行结果 | 854 |
+| `Q76_r1_t1.json` | API 回包（可能含思考内容） | 2347 |
+| `Q76_r2_t0.exec.json` | 执行结果 | 809 |
+| `Q76_r2_t0.json` | API 回包（可能含思考内容） | 17382 |
+| `Q76_r3_t0.exec.json` | 执行结果 | 989 |
+| `Q76_r3_t0.json` | API 回包（可能含思考内容） | 17880 |
+| `Q77_r1_t0.exec.json` | 执行结果 | 722 |
+| `Q77_r1_t0.json` | API 回包（可能含思考内容） | 13120 |
+| `Q77_r1_t1.exec.json` | 执行结果 | 1007 |
+| `Q77_r1_t1.json` | API 回包（可能含思考内容） | 1315 |
+| `Q77_r2_t0.exec.json` | 执行结果 | 1052 |
+| `Q77_r2_t0.json` | API 回包（可能含思考内容） | 9281 |
+| `Q77_r3_t0.exec.json` | 执行结果 | 1030 |
+| `Q77_r3_t0.json` | API 回包（可能含思考内容） | 3983 |
+| `Q78_r1_t0.exec.json` | 执行结果 | 724 |
+| `Q78_r1_t0.json` | API 回包（可能含思考内容） | 8928 |
+| `Q78_r1_t1.exec.json` | 执行结果 | 1085 |
+| `Q78_r1_t1.json` | API 回包（可能含思考内容） | 2435 |
+| `Q78_r2_t0.exec.json` | 执行结果 | 826 |
+| `Q78_r2_t0.json` | API 回包（可能含思考内容） | 8307 |
+| `Q78_r3_t0.exec.json` | 执行结果 | 724 |
+| `Q78_r3_t0.json` | API 回包（可能含思考内容） | 7308 |
+| `Q78_r3_t1.exec.json` | 执行结果 | 1042 |
+| `Q78_r3_t1.json` | API 回包（可能含思考内容） | 2282 |
+| `Q79_r1_t0.exec.json` | 执行结果 | 1336 |
+| `Q79_r1_t0.json` | API 回包（可能含思考内容） | 6373 |
+| `Q79_r2_t0.exec.json` | 执行结果 | 1205 |
+| `Q79_r2_t0.json` | API 回包（可能含思考内容） | 9219 |
+| `Q79_r3_t0.exec.json` | 执行结果 | 1132 |
+| `Q79_r3_t0.json` | API 回包（可能含思考内容） | 17677 |
+| `Q80_r1_t0.exec.json` | 执行结果 | 935 |
+| `Q80_r1_t0.json` | API 回包（可能含思考内容） | 2882 |
+| `Q80_r2_t0.exec.json` | 执行结果 | 780 |
+| `Q80_r2_t0.json` | API 回包（可能含思考内容） | 7365 |
+| `Q80_r3_t0.exec.json` | 执行结果 | 935 |
+| `Q80_r3_t0.json` | API 回包（可能含思考内容） | 2993 |
+| `Q81_r1_t0.exec.json` | 执行结果 | 317 |
+| `Q81_r1_t0.json` | API 回包（可能含思考内容） | 5324 |
+| `Q81_r2_t0.exec.json` | 执行结果 | 285 |
+| `Q81_r2_t0.json` | API 回包（可能含思考内容） | 2569 |
+| `Q81_r3_t0.exec.json` | 执行结果 | 303 |
+| `Q81_r3_t0.json` | API 回包（可能含思考内容） | 2855 |
+| `Q82_r1_t0.exec.json` | 执行结果 | 642 |
+| `Q82_r1_t0.json` | API 回包（可能含思考内容） | 9700 |
+| `Q82_r2_t0.exec.json` | 执行结果 | 949 |
+| `Q82_r2_t0.json` | API 回包（可能含思考内容） | 3510 |
+| `Q82_r3_t0.exec.json` | 执行结果 | 649 |
+| `Q82_r3_t0.json` | API 回包（可能含思考内容） | 15762 |
+| `Q83_r1_t0.exec.json` | 执行结果 | 447 |
+| `Q83_r1_t0.json` | API 回包（可能含思考内容） | 6427 |
+| `Q83_r2_t0.exec.json` | 执行结果 | 506 |
+| `Q83_r2_t0.json` | API 回包（可能含思考内容） | 18828 |
+| `Q83_r3_t0.exec.json` | 执行结果 | 347 |
+| `Q83_r3_t0.json` | API 回包（可能含思考内容） | 8192 |
+| `Q84_r1_t0.exec.json` | 执行结果 | 224 |
+| `Q84_r1_t0.json` | API 回包（可能含思考内容） | 11169 |
+| `Q84_r2_t0.exec.json` | 执行结果 | 222 |
+| `Q84_r2_t0.json` | API 回包（可能含思考内容） | 5901 |
+| `Q84_r3_t0.exec.json` | 执行结果 | 388 |
+| `Q84_r3_t0.json` | API 回包（可能含思考内容） | 5838 |
+| `Q84_r3_t1.exec.json` | 执行结果 | 1742 |
+| `Q84_r3_t1.json` | API 回包（可能含思考内容） | 3938 |
+| `Q85_r1_t0.exec.json` | 执行结果 | 732 |
+| `Q85_r1_t0.json` | API 回包（可能含思考内容） | 30142 |
+| `Q85_r1_t1.exec.json` | 执行结果 | 1252 |
+| `Q85_r1_t1.json` | API 回包（可能含思考内容） | 3048 |
+| `Q85_r2_t0.exec.json` | 执行结果 | 1232 |
+| `Q85_r2_t0.json` | API 回包（可能含思考内容） | 29850 |
+| `Q85_r3_t0.exec.json` | 执行结果 | 1221 |
+| `Q85_r3_t0.json` | API 回包（可能含思考内容） | 7145 |
+| `Q87_r1_t0.exec.json` | 执行结果 | 1311 |
+| `Q87_r1_t0.json` | API 回包（可能含思考内容） | 25337 |
+| `Q87_r2_t0.exec.json` | 执行结果 | 1146 |
+| `Q87_r2_t0.json` | API 回包（可能含思考内容） | 28078 |
+| `Q87_r3_t0.exec.json` | 执行结果 | 1492 |
+| `Q87_r3_t0.json` | API 回包（可能含思考内容） | 21029 |
+| `Q88_r1_t0.exec.json` | 执行结果 | 604 |
+| `Q88_r1_t0.json` | API 回包（可能含思考内容） | 18994 |
+| `Q88_r1_t1.exec.json` | 执行结果 | 1127 |
+| `Q88_r1_t1.json` | API 回包（可能含思考内容） | 1874 |
+| `Q88_r2_t0.exec.json` | 执行结果 | 1148 |
+| `Q88_r2_t0.json` | API 回包（可能含思考内容） | 13887 |
+| `Q88_r3_t0.exec.json` | 执行结果 | 1150 |
+| `Q88_r3_t0.json` | API 回包（可能含思考内容） | 11296 |
+| `Q89_r1_t0.exec.json` | 执行结果 | 349 |
+| `Q89_r1_t0.json` | API 回包（可能含思考内容） | 15094 |
+| `Q89_r2_t0.exec.json` | 执行结果 | 744 |
+| `Q89_r2_t0.json` | API 回包（可能含思考内容） | 9090 |
+| `Q89_r2_t1.exec.json` | 执行结果 | 466 |
+| `Q89_r2_t1.json` | API 回包（可能含思考内容） | 2531 |
+| `Q89_r3_t0.exec.json` | 执行结果 | 468 |
+| `Q89_r3_t0.json` | API 回包（可能含思考内容） | 8508 |
+| `Q90_r1_t0.exec.json` | 执行结果 | 408 |
+| `Q90_r1_t0.json` | API 回包（可能含思考内容） | 26256 |
+| `Q90_r1_t1.exec.json` | 执行结果 | 2499 |
+| `Q90_r1_t1.json` | API 回包（可能含思考内容） | 6177 |
+| `Q90_r2_t0.exec.json` | 执行结果 | 2491 |
+| `Q90_r2_t0.json` | API 回包（可能含思考内容） | 25155 |
+| `Q90_r3_t0.exec.json` | 执行结果 | 1968 |
+| `Q90_r3_t0.json` | API 回包（可能含思考内容） | 19661 |
+| `Q92_r1_t0.exec.json` | 执行结果 | 724 |
+| `Q92_r1_t0.json` | API 回包（可能含思考内容） | 16696 |
+| `Q92_r1_t1.exec.json` | 执行结果 | 1275 |
+| `Q92_r1_t1.json` | API 回包（可能含思考内容） | 2076 |
+| `Q92_r2_t0.exec.json` | 执行结果 | 1057 |
+| `Q92_r2_t0.json` | API 回包（可能含思考内容） | 10089 |
+| `Q92_r3_t0.exec.json` | 执行结果 | 1202 |
+| `Q92_r3_t0.json` | API 回包（可能含思考内容） | 15168 |
+| `Q94_r1_t0.exec.json` | 执行结果 | 10086 |
+| `Q94_r1_t0.json` | API 回包（可能含思考内容） | 7489 |
+| `Q94_r2_t0.exec.json` | 执行结果 | 694 |
+| `Q94_r2_t0.json` | API 回包（可能含思考内容） | 5435 |
+| `Q94_r2_t1.exec.json` | 执行结果 | 7664 |
+| `Q94_r2_t1.json` | API 回包（可能含思考内容） | 2079 |
+| `Q94_r3_t0.exec.json` | 执行结果 | 738 |
+| `Q94_r3_t0.json` | API 回包（可能含思考内容） | 4103 |
+| `Q94_r3_t1.exec.json` | 执行结果 | 1986 |
+| `Q94_r3_t1.json` | API 回包（可能含思考内容） | 1985 |
+| `Q96_r1_t0.exec.json` | 执行结果 | 352 |
+| `Q96_r1_t0.json` | API 回包（可能含思考内容） | 8112 |
+| `Q96_r2_t0.exec.json` | 执行结果 | 804 |
+| `Q96_r2_t0.json` | API 回包（可能含思考内容） | 10413 |
+| `Q96_r2_t1.exec.json` | 执行结果 | 351 |
+| `Q96_r2_t1.json` | API 回包（可能含思考内容） | 3139 |
+| `Q96_r3_t0.exec.json` | 执行结果 | 750 |
+| `Q96_r3_t0.json` | API 回包（可能含思考内容） | 6047 |
+| `Q96_r3_t1.exec.json` | 执行结果 | 346 |
+| `Q96_r3_t1.json` | API 回包（可能含思考内容） | 1713 |
+| `Q98_r1_t0.exec.json` | 执行结果 | 1094 |
+| `Q98_r1_t0.json` | API 回包（可能含思考内容） | 19721 |
+| `Q98_r2_t0.exec.json` | 执行结果 | 1010 |
+| `Q98_r2_t0.json` | API 回包（可能含思考内容） | 20185 |
+| `Q98_r3_t0.exec.json` | 执行结果 | 911 |
+| `Q98_r3_t0.json` | API 回包（可能含思考内容） | 18278 |
+| `Q99_r1_t0.exec.json` | 执行结果 | 865 |
+| `Q99_r1_t0.json` | API 回包（可能含思考内容） | 11049 |
+| `Q99_r2_t0.exec.json` | 执行结果 | 734 |
+| `Q99_r2_t0.json` | API 回包（可能含思考内容） | 7480 |
+| `Q99_r2_t1.exec.json` | 执行结果 | 869 |
+| `Q99_r2_t1.json` | API 回包（可能含思考内容） | 1994 |
+| `Q99_r3_t0.exec.json` | 执行结果 | 800 |
+| `Q99_r3_t0.json` | API 回包（可能含思考内容） | 13247 |
+
+#### `runs-raw/20261104-T34-ontology-full-01/SQL-L1plus/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `Q01_r1_t0.exec.json` | 执行结果 | 142 |
+| `Q01_r1_t0.json` | API 回包（可能含思考内容） | 1152 |
+| `Q01_r2_t0.exec.json` | 执行结果 | 142 |
+| `Q01_r2_t0.json` | API 回包（可能含思考内容） | 1271 |
+| `Q01_r3_t0.exec.json` | 执行结果 | 142 |
+| `Q01_r3_t0.json` | API 回包（可能含思考内容） | 928 |
+| `Q02_r1_t0.exec.json` | 执行结果 | 160 |
+| `Q02_r1_t0.json` | API 回包（可能含思考内容） | 1706 |
+| `Q02_r2_t0.exec.json` | 执行结果 | 160 |
+| `Q02_r2_t0.json` | API 回包（可能含思考内容） | 975 |
+| `Q02_r3_t0.exec.json` | 执行结果 | 436 |
+| `Q02_r3_t0.json` | API 回包（可能含思考内容） | 1229 |
+| `Q02_r3_t1.exec.json` | 执行结果 | 160 |
+| `Q02_r3_t1.json` | API 回包（可能含思考内容） | 896 |
+| `Q03_r1_t0.exec.json` | 执行结果 | 144 |
+| `Q03_r1_t0.json` | API 回包（可能含思考内容） | 2209 |
+| `Q03_r2_t0.exec.json` | 执行结果 | 140 |
+| `Q03_r2_t0.json` | API 回包（可能含思考内容） | 695 |
+| `Q03_r3_t0.exec.json` | 执行结果 | 140 |
+| `Q03_r3_t0.json` | API 回包（可能含思考内容） | 1127 |
+| `Q04_r1_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r1_t0.json` | API 回包（可能含思考内容） | 1137 |
+| `Q04_r2_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r2_t0.json` | API 回包（可能含思考内容） | 1637 |
+| `Q04_r3_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r3_t0.json` | API 回包（可能含思考内容） | 1409 |
+| `Q05_r1_t0.exec.json` | 执行结果 | 463 |
+| `Q05_r1_t0.json` | API 回包（可能含思考内容） | 2486 |
+| `Q05_r2_t0.exec.json` | 执行结果 | 698 |
+| `Q05_r2_t0.json` | API 回包（可能含思考内容） | 2142 |
+| `Q05_r2_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r2_t1.json` | API 回包（可能含思考内容） | 1191 |
+| `Q05_r3_t0.exec.json` | 执行结果 | 388 |
+| `Q05_r3_t0.json` | API 回包（可能含思考内容） | 2916 |
+| `Q06_r1_t0.exec.json` | 执行结果 | 155 |
+| `Q06_r1_t0.json` | API 回包（可能含思考内容） | 965 |
+| `Q06_r2_t0.exec.json` | 执行结果 | 152 |
+| `Q06_r2_t0.json` | API 回包（可能含思考内容） | 1215 |
+| `Q06_r3_t0.exec.json` | 执行结果 | 166 |
+| `Q06_r3_t0.json` | API 回包（可能含思考内容） | 1122 |
+| `Q07_r1_t0.exec.json` | 执行结果 | 706 |
+| `Q07_r1_t0.json` | API 回包（可能含思考内容） | 2575 |
+| `Q07_r1_t1.exec.json` | 执行结果 | 1059 |
+| `Q07_r1_t1.json` | API 回包（可能含思考内容） | 1367 |
+| `Q07_r2_t0.exec.json` | 执行结果 | 916 |
+| `Q07_r2_t0.json` | API 回包（可能含思考内容） | 1512 |
+| `Q07_r3_t0.exec.json` | 执行结果 | 918 |
+| `Q07_r3_t0.json` | API 回包（可能含思考内容） | 1797 |
+| `Q08_r1_t0.exec.json` | 执行结果 | 1244 |
+| `Q08_r1_t0.json` | API 回包（可能含思考内容） | 2820 |
+| `Q08_r2_t0.exec.json` | 执行结果 | 1123 |
+| `Q08_r2_t0.json` | API 回包（可能含思考内容） | 2865 |
+| `Q08_r3_t0.exec.json` | 执行结果 | 1244 |
+| `Q08_r3_t0.json` | API 回包（可能含思考内容） | 2413 |
+| `Q09_r1_t0.exec.json` | 执行结果 | 432 |
+| `Q09_r1_t0.json` | API 回包（可能含思考内容） | 1372 |
+| `Q09_r1_t1.exec.json` | 执行结果 | 173 |
+| `Q09_r1_t1.json` | API 回包（可能含思考内容） | 865 |
+| `Q09_r2_t0.exec.json` | 执行结果 | 173 |
+| `Q09_r2_t0.json` | API 回包（可能含思考内容） | 1348 |
+| `Q09_r3_t0.exec.json` | 执行结果 | 168 |
+| `Q09_r3_t0.json` | API 回包（可能含思考内容） | 1214 |
+| `Q100_r1_t0.exec.json` | 执行结果 | 5853 |
+| `Q100_r1_t0.json` | API 回包（可能含思考内容） | 15498 |
+| `Q100_r2_t0.exec.json` | 执行结果 | 5859 |
+| `Q100_r2_t0.json` | API 回包（可能含思考内容） | 18614 |
+| `Q100_r3_t0.exec.json` | 执行结果 | 3500 |
+| `Q100_r3_t0.json` | API 回包（可能含思考内容） | 6632 |
+| `Q101_r1_t0.exec.json` | 执行结果 | 146 |
+| `Q101_r1_t0.json` | API 回包（可能含思考内容） | 1476 |
+| `Q101_r2_t0.exec.json` | 执行结果 | 148 |
+| `Q101_r2_t0.json` | API 回包（可能含思考内容） | 1781 |
+| `Q101_r3_t0.exec.json` | 执行结果 | 148 |
+| `Q101_r3_t0.json` | API 回包（可能含思考内容） | 1766 |
+| `Q102_r1_t0.exec.json` | 执行结果 | 539 |
+| `Q102_r1_t0.json` | API 回包（可能含思考内容） | 4657 |
+| `Q102_r2_t0.exec.json` | 执行结果 | 538 |
+| `Q102_r2_t0.json` | API 回包（可能含思考内容） | 4519 |
+| `Q102_r3_t0.exec.json` | 执行结果 | 704 |
+| `Q102_r3_t0.json` | API 回包（可能含思考内容） | 4182 |
+| `Q102_r3_t1.exec.json` | 执行结果 | 519 |
+| `Q102_r3_t1.json` | API 回包（可能含思考内容） | 1810 |
+| `Q103_r1_t0.exec.json` | 执行结果 | 345 |
+| `Q103_r1_t0.json` | API 回包（可能含思考内容） | 4030 |
+| `Q103_r2_t0.exec.json` | 执行结果 | 359 |
+| `Q103_r2_t0.json` | API 回包（可能含思考内容） | 4508 |
+| `Q103_r3_t0.exec.json` | 执行结果 | 360 |
+| `Q103_r3_t0.json` | API 回包（可能含思考内容） | 9502 |
+| `Q104_r1_t0.exec.json` | 执行结果 | 671 |
+| `Q104_r1_t0.json` | API 回包（可能含思考内容） | 26359 |
+| `Q104_r2_t0.exec.json` | 执行结果 | 698 |
+| `Q104_r2_t0.json` | API 回包（可能含思考内容） | 25050 |
+| `Q104_r3_t0.exec.json` | 执行结果 | 406 |
+| `Q104_r3_t0.json` | API 回包（可能含思考内容） | 23633 |
+| `Q105_r1_t0.exec.json` | 执行结果 | 216 |
+| `Q105_r1_t0.json` | API 回包（可能含思考内容） | 2872 |
+| `Q105_r2_t0.exec.json` | 执行结果 | 271 |
+| `Q105_r2_t0.json` | API 回包（可能含思考内容） | 4216 |
+| `Q105_r3_t0.exec.json` | 执行结果 | 221 |
+| `Q105_r3_t0.json` | API 回包（可能含思考内容） | 3257 |
+| `Q106_r1_t0.exec.json` | 执行结果 | 418 |
+| `Q106_r1_t0.json` | API 回包（可能含思考内容） | 12129 |
+| `Q106_r2_t0.exec.json` | 执行结果 | 397 |
+| `Q106_r2_t0.json` | API 回包（可能含思考内容） | 11791 |
+| `Q106_r3_t0.exec.json` | 执行结果 | 362 |
+| `Q106_r3_t0.json` | API 回包（可能含思考内容） | 6900 |
+| `Q107_r1_t0.exec.json` | 执行结果 | 344 |
+| `Q107_r1_t0.json` | API 回包（可能含思考内容） | 11825 |
+| `Q107_r2_t0.exec.json` | 执行结果 | 379 |
+| `Q107_r2_t0.json` | API 回包（可能含思考内容） | 17219 |
+| `Q107_r3_t0.exec.json` | 执行结果 | 369 |
+| `Q107_r3_t0.json` | API 回包（可能含思考内容） | 12013 |
+| `Q108_r1_t0.exec.json` | 执行结果 | 706 |
+| `Q108_r1_t0.json` | API 回包（可能含思考内容） | 4837 |
+| `Q108_r1_t1.exec.json` | 执行结果 | 1326 |
+| `Q108_r1_t1.json` | API 回包（可能含思考内容） | 1208 |
+| `Q108_r2_t0.exec.json` | 执行结果 | 1326 |
+| `Q108_r2_t0.json` | API 回包（可能含思考内容） | 2595 |
+| `Q108_r3_t0.exec.json` | 执行结果 | 1329 |
+| `Q108_r3_t0.json` | API 回包（可能含思考内容） | 2426 |
+| `Q109_r1_t0.exec.json` | 执行结果 | 477 |
+| `Q109_r1_t0.json` | API 回包（可能含思考内容） | 11670 |
+| `Q109_r2_t0.exec.json` | 执行结果 | 711 |
+| `Q109_r2_t0.json` | API 回包（可能含思考内容） | 3564 |
+| `Q109_r3_t0.exec.json` | 执行结果 | 558 |
+| `Q109_r3_t0.json` | API 回包（可能含思考内容） | 5206 |
+| `Q10_r1_t0.exec.json` | 执行结果 | 470 |
+| `Q10_r1_t0.json` | API 回包（可能含思考内容） | 1075 |
+| `Q10_r1_t1.exec.json` | 执行结果 | 147 |
+| `Q10_r1_t1.json` | API 回包（可能含思考内容） | 837 |
+| `Q10_r2_t0.exec.json` | 执行结果 | 470 |
+| `Q10_r2_t0.json` | API 回包（可能含思考内容） | 1200 |
+| `Q10_r2_t1.exec.json` | 执行结果 | 147 |
+| `Q10_r2_t1.json` | API 回包（可能含思考内容） | 818 |
+| `Q10_r3_t0.exec.json` | 执行结果 | 147 |
+| `Q10_r3_t0.json` | API 回包（可能含思考内容） | 1065 |
+| `Q110_r1_t0.exec.json` | 执行结果 | 489 |
+| `Q110_r1_t0.json` | API 回包（可能含思考内容） | 13705 |
+| `Q110_r2_t0.exec.json` | 执行结果 | 485 |
+| `Q110_r2_t0.json` | API 回包（可能含思考内容） | 8817 |
+| `Q110_r3_t0.exec.json` | 执行结果 | 466 |
+| `Q110_r3_t0.json` | API 回包（可能含思考内容） | 11672 |
+| `Q111_r1_t0.exec.json` | 执行结果 | 39396 |
+| `Q111_r1_t0.json` | API 回包（可能含思考内容） | 10633 |
+| `Q111_r2_t0.exec.json` | 执行结果 | 39236 |
+| `Q111_r2_t0.json` | API 回包（可能含思考内容） | 15955 |
+| `Q111_r3_t0.exec.json` | 执行结果 | 39146 |
+| `Q111_r3_t0.json` | API 回包（可能含思考内容） | 14601 |
+| `Q112_r1_t0.exec.json` | 执行结果 | 8893 |
+| `Q112_r1_t0.json` | API 回包（可能含思考内容） | 22778 |
+| `Q112_r2_t0.exec.json` | 执行结果 | 8895 |
+| `Q112_r2_t0.json` | API 回包（可能含思考内容） | 35263 |
+| `Q112_r3_t0.exec.json` | 执行结果 | 9559 |
+| `Q112_r3_t0.json` | API 回包（可能含思考内容） | 26578 |
+| `Q113_r1_t0.exec.json` | 执行结果 | 2438 |
+| `Q113_r1_t0.json` | API 回包（可能含思考内容） | 15897 |
+| `Q113_r2_t0.exec.json` | 执行结果 | 2243 |
+| `Q113_r2_t0.json` | API 回包（可能含思考内容） | 31333 |
+| `Q113_r3_t0.exec.json` | 执行结果 | 320 |
+| `Q113_r3_t0.json` | API 回包（可能含思考内容） | 21257 |
+| `Q113_r3_t1.exec.json` | 执行结果 | 2438 |
+| `Q113_r3_t1.json` | API 回包（可能含思考内容） | 10780 |
+| `Q114_r1_t0.exec.json` | 执行结果 | 702 |
+| `Q114_r1_t0.json` | API 回包（可能含思考内容） | 5827 |
+| `Q114_r1_t1.exec.json` | 执行结果 | 304 |
+| `Q114_r1_t1.json` | API 回包（可能含思考内容） | 1654 |
+| `Q114_r2_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r2_t0.json` | API 回包（可能含思考内容） | 7289 |
+| `Q114_r3_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r3_t0.json` | API 回包（可能含思考内容） | 6339 |
+| `Q115_r1_t0.exec.json` | 执行结果 | 722 |
+| `Q115_r1_t0.json` | API 回包（可能含思考内容） | 15050 |
+| `Q115_r1_t1.exec.json` | 执行结果 | 524 |
+| `Q115_r1_t1.json` | API 回包（可能含思考内容） | 2321 |
+| `Q115_r2_t0.exec.json` | 执行结果 | 524 |
+| `Q115_r2_t0.json` | API 回包（可能含思考内容） | 13613 |
+| `Q115_r3_t0.exec.json` | 执行结果 | 527 |
+| `Q115_r3_t0.json` | API 回包（可能含思考内容） | 8500 |
+| `Q116_r1_t0.exec.json` | 执行结果 | 718 |
+| `Q116_r1_t0.json` | API 回包（可能含思考内容） | 27785 |
+| `Q116_r1_t1.exec.json` | 执行结果 | 530 |
+| `Q116_r1_t1.json` | API 回包（可能含思考内容） | 2908 |
+| `Q116_r2_t0.exec.json` | 执行结果 | 470 |
+| `Q116_r2_t0.json` | API 回包（可能含思考内容） | 17356 |
+| `Q116_r3_t0.exec.json` | 执行结果 | 429 |
+| `Q116_r3_t0.json` | API 回包（可能含思考内容） | 12440 |
+| `Q117_r1_t0.exec.json` | 执行结果 | 736 |
+| `Q117_r1_t0.json` | API 回包（可能含思考内容） | 15242 |
+| `Q117_r1_t1.exec.json` | 执行结果 | 619 |
+| `Q117_r1_t1.json` | API 回包（可能含思考内容） | 3572 |
+| `Q117_r2_t0.exec.json` | 执行结果 | 638 |
+| `Q117_r2_t0.json` | API 回包（可能含思考内容） | 33579 |
+| `Q117_r3_t0.exec.json` | 执行结果 | 991 |
+| `Q117_r3_t0.json` | API 回包（可能含思考内容） | 28745 |
+| `Q118_r1_t0.exec.json` | 执行结果 | 288 |
+| `Q118_r1_t0.json` | API 回包（可能含思考内容） | 7837 |
+| `Q118_r2_t0.exec.json` | 执行结果 | 302 |
+| `Q118_r2_t0.json` | API 回包（可能含思考内容） | 12764 |
+| `Q118_r3_t0.exec.json` | 执行结果 | 321 |
+| `Q118_r3_t0.json` | API 回包（可能含思考内容） | 11902 |
+| `Q119_r1_t0.exec.json` | 执行结果 | 33224 |
+| `Q119_r1_t0.json` | API 回包（可能含思考内容） | 12001 |
+| `Q119_r2_t0.exec.json` | 执行结果 | 34698 |
+| `Q119_r2_t0.json` | API 回包（可能含思考内容） | 15560 |
+| `Q119_r3_t0.exec.json` | 执行结果 | 38340 |
+| `Q119_r3_t0.json` | API 回包（可能含思考内容） | 23610 |
+| `Q11_r1_t0.exec.json` | 执行结果 | 518 |
+| `Q11_r1_t0.json` | API 回包（可能含思考内容） | 3096 |
+| `Q11_r2_t0.exec.json` | 执行结果 | 529 |
+| `Q11_r2_t0.json` | API 回包（可能含思考内容） | 2256 |
+| `Q11_r3_t0.exec.json` | 执行结果 | 536 |
+| `Q11_r3_t0.json` | API 回包（可能含思考内容） | 2865 |
+| `Q120_r1_t0.exec.json` | 执行结果 | 754 |
+| `Q120_r1_t0.json` | API 回包（可能含思考内容） | 11753 |
+| `Q120_r1_t1.exec.json` | 执行结果 | 578 |
+| `Q120_r1_t1.json` | API 回包（可能含思考内容） | 3522 |
+| `Q120_r2_t0.exec.json` | 执行结果 | 598 |
+| `Q120_r2_t0.json` | API 回包（可能含思考内容） | 21490 |
+| `Q120_r3_t0.exec.json` | 执行结果 | 605 |
+| `Q120_r3_t0.json` | API 回包（可能含思考内容） | 12158 |
+| `Q121_r1_t0.exec.json` | 执行结果 | 768 |
+| `Q121_r1_t0.json` | API 回包（可能含思考内容） | 12380 |
+| `Q121_r2_t0.exec.json` | 执行结果 | 918 |
+| `Q121_r2_t0.json` | API 回包（可能含思考内容） | 10265 |
+| `Q121_r3_t0.exec.json` | 执行结果 | 2826 |
+| `Q121_r3_t0.json` | API 回包（可能含思考内容） | 21199 |
+| `Q121_r3_t1.exec.json` | 执行结果 | 770 |
+| `Q121_r3_t1.json` | API 回包（可能含思考内容） | 7091 |
+| `Q122_r1_t0.exec.json` | 执行结果 | 1447 |
+| `Q122_r1_t0.json` | API 回包（可能含思考内容） | 11322 |
+| `Q122_r2_t0.exec.json` | 执行结果 | 1397 |
+| `Q122_r2_t0.json` | API 回包（可能含思考内容） | 20912 |
+| `Q122_r3_t0.exec.json` | 执行结果 | 1539 |
+| `Q122_r3_t0.json` | API 回包（可能含思考内容） | 21192 |
+| `Q12_r1_t0.exec.json` | 执行结果 | 546 |
+| `Q12_r1_t0.json` | API 回包（可能含思考内容） | 4618 |
+| `Q12_r2_t0.exec.json` | 执行结果 | 702 |
+| `Q12_r2_t0.json` | API 回包（可能含思考内容） | 1872 |
+| `Q12_r2_t1.exec.json` | 执行结果 | 544 |
+| `Q12_r2_t1.json` | API 回包（可能含思考内容） | 1240 |
+| `Q12_r3_t0.exec.json` | 执行结果 | 710 |
+| `Q12_r3_t0.json` | API 回包（可能含思考内容） | 1781 |
+| `Q12_r3_t1.exec.json` | 执行结果 | 551 |
+| `Q12_r3_t1.json` | API 回包（可能含思考内容） | 2353 |
+| `Q13_r1_t0.exec.json` | 执行结果 | 24936 |
+| `Q13_r1_t0.json` | API 回包（可能含思考内容） | 2228 |
+| `Q13_r2_t0.exec.json` | 执行结果 | 24919 |
+| `Q13_r2_t0.json` | API 回包（可能含思考内容） | 2495 |
+| `Q13_r3_t0.exec.json` | 执行结果 | 24952 |
+| `Q13_r3_t0.json` | API 回包（可能含思考内容） | 3603 |
+| `Q14_r1_t0.exec.json` | 执行结果 | 710 |
+| `Q14_r1_t0.json` | API 回包（可能含思考内容） | 2032 |
+| `Q14_r1_t1.exec.json` | 执行结果 | 138 |
+| `Q14_r1_t1.json` | API 回包（可能含思考内容） | 1128 |
+| `Q14_r2_t0.exec.json` | 执行结果 | 143 |
+| `Q14_r2_t0.json` | API 回包（可能含思考内容） | 1561 |
+| `Q14_r3_t0.exec.json` | 执行结果 | 142 |
+| `Q14_r3_t0.json` | API 回包（可能含思考内容） | 2785 |
+| `Q15_r1_t0.exec.json` | 执行结果 | 1138 |
+| `Q15_r1_t0.json` | API 回包（可能含思考内容） | 3101 |
+| `Q15_r2_t0.exec.json` | 执行结果 | 1144 |
+| `Q15_r2_t0.json` | API 回包（可能含思考内容） | 1864 |
+| `Q15_r3_t0.exec.json` | 执行结果 | 1140 |
+| `Q15_r3_t0.json` | API 回包（可能含思考内容） | 2500 |
+| `Q16_r1_t0.exec.json` | 执行结果 | 419 |
+| `Q16_r1_t0.json` | API 回包（可能含思考内容） | 9094 |
+| `Q16_r2_t0.exec.json` | 执行结果 | 359 |
+| `Q16_r2_t0.json` | API 回包（可能含思考内容） | 5872 |
+| `Q16_r3_t0.exec.json` | 执行结果 | 399 |
+| `Q16_r3_t0.json` | API 回包（可能含思考内容） | 7760 |
+| `Q17_r1_t0.exec.json` | 执行结果 | 334 |
+| `Q17_r1_t0.json` | API 回包（可能含思考内容） | 2331 |
+| `Q17_r2_t0.exec.json` | 执行结果 | 716 |
+| `Q17_r2_t0.json` | API 回包（可能含思考内容） | 13023 |
+| `Q17_r2_t1.exec.json` | 执行结果 | 394 |
+| `Q17_r2_t1.json` | API 回包（可能含思考内容） | 3676 |
+| `Q17_r3_t0.exec.json` | 执行结果 | 426 |
+| `Q17_r3_t0.json` | API 回包（可能含思考内容） | 2674 |
+| `Q18_r1_t0.exec.json` | 执行结果 | 238 |
+| `Q18_r1_t0.json` | API 回包（可能含思考内容） | 7204 |
+| `Q18_r2_t0.exec.json` | 执行结果 | 238 |
+| `Q18_r2_t0.json` | API 回包（可能含思考内容） | 3215 |
+| `Q18_r3_t0.exec.json` | 执行结果 | 712 |
+| `Q18_r3_t0.json` | API 回包（可能含思考内容） | 7109 |
+| `Q18_r3_t1.exec.json` | 执行结果 | 665 |
+| `Q18_r3_t1.json` | API 回包（可能含思考内容） | 1148 |
+| `Q19_r1_t0.exec.json` | 执行结果 | 390 |
+| `Q19_r1_t0.json` | API 回包（可能含思考内容） | 2670 |
+| `Q19_r2_t0.exec.json` | 执行结果 | 381 |
+| `Q19_r2_t0.json` | API 回包（可能含思考内容） | 1701 |
+| `Q19_r3_t0.exec.json` | 执行结果 | 369 |
+| `Q19_r3_t0.json` | API 回包（可能含思考内容） | 8919 |
+| `Q20_r1_t0.exec.json` | 执行结果 | 30247 |
+| `Q20_r1_t0.json` | API 回包（可能含思考内容） | 4701 |
+| `Q20_r2_t0.exec.json` | 执行结果 | 416 |
+| `Q20_r2_t0.json` | API 回包（可能含思考内容） | 9452 |
+| `Q20_r2_t1.exec.json` | 执行结果 | 28003 |
+| `Q20_r2_t1.json` | API 回包（可能含思考内容） | 1978 |
+| `Q20_r3_t0.exec.json` | 执行结果 | 416 |
+| `Q20_r3_t0.json` | API 回包（可能含思考内容） | 4735 |
+| `Q20_r3_t1.exec.json` | 执行结果 | 27987 |
+| `Q20_r3_t1.json` | API 回包（可能含思考内容） | 1892 |
+| `Q21_r1_t0.exec.json` | 执行结果 | 12796 |
+| `Q21_r1_t0.json` | API 回包（可能含思考内容） | 6520 |
+| `Q21_r2_t0.exec.json` | 执行结果 | 12803 |
+| `Q21_r2_t0.json` | API 回包（可能含思考内容） | 2715 |
+| `Q21_r3_t0.exec.json` | 执行结果 | 12798 |
+| `Q21_r3_t0.json` | API 回包（可能含思考内容） | 2567 |
+| `Q22_r1_t0.exec.json` | 执行结果 | 4974 |
+| `Q22_r1_t0.json` | API 回包（可能含思考内容） | 4795 |
+| `Q22_r2_t0.exec.json` | 执行结果 | 3512 |
+| `Q22_r2_t0.json` | API 回包（可能含思考内容） | 7941 |
+| `Q22_r3_t0.exec.json` | 执行结果 | 3513 |
+| `Q22_r3_t0.json` | API 回包（可能含思考内容） | 4427 |
+| `Q23_r1_t0.exec.json` | 执行结果 | 885 |
+| `Q23_r1_t0.json` | API 回包（可能含思考内容） | 3240 |
+| `Q23_r2_t0.exec.json` | 执行结果 | 873 |
+| `Q23_r2_t0.json` | API 回包（可能含思考内容） | 2394 |
+| `Q23_r3_t0.exec.json` | 执行结果 | 877 |
+| `Q23_r3_t0.json` | API 回包（可能含思考内容） | 3008 |
+| `Q24_r1_t0.exec.json` | 执行结果 | 772 |
+| `Q24_r1_t0.json` | API 回包（可能含思考内容） | 6323 |
+| `Q24_r2_t0.exec.json` | 执行结果 | 795 |
+| `Q24_r2_t0.json` | API 回包（可能含思考内容） | 7620 |
+| `Q24_r3_t0.exec.json` | 执行结果 | 795 |
+| `Q24_r3_t0.json` | API 回包（可能含思考内容） | 12962 |
+| `Q25_r1_t0.exec.json` | 执行结果 | 324 |
+| `Q25_r1_t0.json` | API 回包（可能含思考内容） | 13386 |
+| `Q25_r2_t0.exec.json` | 执行结果 | 333 |
+| `Q25_r2_t0.json` | API 回包（可能含思考内容） | 10029 |
+| `Q25_r3_t0.exec.json` | 执行结果 | 211 |
+| `Q25_r3_t0.json` | API 回包（可能含思考内容） | 8030 |
+| `Q26_r1_t0.exec.json` | 执行结果 | 201 |
+| `Q26_r1_t0.json` | API 回包（可能含思考内容） | 2119 |
+| `Q26_r2_t0.exec.json` | 执行结果 | 201 |
+| `Q26_r2_t0.json` | API 回包（可能含思考内容） | 2630 |
+| `Q26_r3_t0.exec.json` | 执行结果 | 219 |
+| `Q26_r3_t0.json` | API 回包（可能含思考内容） | 2923 |
+| `Q27_r1_t0.exec.json` | 执行结果 | 734 |
+| `Q27_r1_t0.json` | API 回包（可能含思考内容） | 2292 |
+| `Q27_r1_t1.exec.json` | 执行结果 | 1257 |
+| `Q27_r1_t1.json` | API 回包（可能含思考内容） | 1406 |
+| `Q27_r2_t0.exec.json` | 执行结果 | 1243 |
+| `Q27_r2_t0.json` | API 回包（可能含思考内容） | 2663 |
+| `Q27_r3_t0.exec.json` | 执行结果 | 732 |
+| `Q27_r3_t0.json` | API 回包（可能含思考内容） | 3350 |
+| `Q27_r3_t1.exec.json` | 执行结果 | 1257 |
+| `Q27_r3_t1.json` | API 回包（可能含思考内容） | 1535 |
+| `Q28_r1_t0.exec.json` | 执行结果 | 700 |
+| `Q28_r1_t0.json` | API 回包（可能含思考内容） | 4124 |
+| `Q28_r1_t1.exec.json` | 执行结果 | 246 |
+| `Q28_r1_t1.json` | API 回包（可能含思考内容） | 1117 |
+| `Q28_r2_t0.exec.json` | 执行结果 | 251 |
+| `Q28_r2_t0.json` | API 回包（可能含思考内容） | 8954 |
+| `Q28_r3_t0.exec.json` | 执行结果 | 298 |
+| `Q28_r3_t0.json` | API 回包（可能含思考内容） | 4814 |
+| `Q29_r1_t0.exec.json` | 执行结果 | 508 |
+| `Q29_r1_t0.json` | API 回包（可能含思考内容） | 18932 |
+| `Q29_r2_t0.exec.json` | 执行结果 | 479 |
+| `Q29_r2_t0.json` | API 回包（可能含思考内容） | 10483 |
+| `Q29_r3_t0.exec.json` | 执行结果 | 444 |
+| `Q29_r3_t0.json` | API 回包（可能含思考内容） | 16205 |
+| `Q30_r1_t0.exec.json` | 执行结果 | 1464 |
+| `Q30_r1_t0.json` | API 回包（可能含思考内容） | 3513 |
+| `Q30_r2_t0.exec.json` | 执行结果 | 1912 |
+| `Q30_r2_t0.json` | API 回包（可能含思考内容） | 5838 |
+| `Q30_r3_t0.exec.json` | 执行结果 | 1905 |
+| `Q30_r3_t0.json` | API 回包（可能含思考内容） | 6123 |
+| `Q31_r1_t0.exec.json` | 执行结果 | 879 |
+| `Q31_r1_t0.json` | API 回包（可能含思考内容） | 4732 |
+| `Q31_r2_t0.exec.json` | 执行结果 | 1137 |
+| `Q31_r2_t0.json` | API 回包（可能含思考内容） | 11144 |
+| `Q31_r3_t0.exec.json` | 执行结果 | 1116 |
+| `Q31_r3_t0.json` | API 回包（可能含思考内容） | 10284 |
+| `Q32_r1_t0.exec.json` | 执行结果 | 662 |
+| `Q32_r1_t0.json` | API 回包（可能含思考内容） | 3527 |
+| `Q32_r1_t1.exec.json` | 执行结果 | 217 |
+| `Q32_r1_t1.json` | API 回包（可能含思考内容） | 1281 |
+| `Q32_r2_t0.exec.json` | 执行结果 | 213 |
+| `Q32_r2_t0.json` | API 回包（可能含思考内容） | 3290 |
+| `Q32_r3_t0.exec.json` | 执行结果 | 215 |
+| `Q32_r3_t0.json` | API 回包（可能含思考内容） | 2362 |
+| `Q34_r1_t0.exec.json` | 执行结果 | 742 |
+| `Q34_r1_t0.json` | API 回包（可能含思考内容） | 19187 |
+| `Q34_r1_t1.exec.json` | 执行结果 | 257502 |
+| `Q34_r1_t1.json` | API 回包（可能含思考内容） | 2469 |
+| `Q34_r2_t0.exec.json` | 执行结果 | 730 |
+| `Q34_r2_t0.json` | API 回包（可能含思考内容） | 21652 |
+| `Q34_r2_t1.exec.json` | 执行结果 | 257665 |
+| `Q34_r2_t1.json` | API 回包（可能含思考内容） | 2519 |
+| `Q34_r3_t0.exec.json` | 执行结果 | 728 |
+| `Q34_r3_t0.json` | API 回包（可能含思考内容） | 7136 |
+| `Q34_r3_t1.exec.json` | 执行结果 | 257125 |
+| `Q34_r3_t1.json` | API 回包（可能含思考内容） | 2328 |
+| `Q35_r1_t0.exec.json` | 执行结果 | 12976 |
+| `Q35_r1_t0.json` | API 回包（可能含思考内容） | 2513 |
+| `Q35_r2_t0.exec.json` | 执行结果 | 12966 |
+| `Q35_r2_t0.json` | API 回包（可能含思考内容） | 2335 |
+| `Q35_r3_t0.exec.json` | 执行结果 | 12976 |
+| `Q35_r3_t0.json` | API 回包（可能含思考内容） | 2481 |
+| `Q36_r1_t0.exec.json` | 执行结果 | 247 |
+| `Q36_r1_t0.json` | API 回包（可能含思考内容） | 3766 |
+| `Q36_r2_t0.exec.json` | 执行结果 | 241 |
+| `Q36_r2_t0.json` | API 回包（可能含思考内容） | 2540 |
+| `Q36_r3_t0.exec.json` | 执行结果 | 712 |
+| `Q36_r3_t0.json` | API 回包（可能含思考内容） | 5825 |
+| `Q36_r3_t1.exec.json` | 执行结果 | 259 |
+| `Q36_r3_t1.json` | API 回包（可能含思考内容） | 2290 |
+| `Q37_r1_t0.exec.json` | 执行结果 | 20550 |
+| `Q37_r1_t0.json` | API 回包（可能含思考内容） | 3343 |
+| `Q37_r2_t0.exec.json` | 执行结果 | 20544 |
+| `Q37_r2_t0.json` | API 回包（可能含思考内容） | 3242 |
+| `Q37_r3_t0.exec.json` | 执行结果 | 716 |
+| `Q37_r3_t0.json` | API 回包（可能含思考内容） | 2983 |
+| `Q37_r3_t1.exec.json` | 执行结果 | 20215 |
+| `Q37_r3_t1.json` | API 回包（可能含思考内容） | 1632 |
+| `Q38_r1_t0.exec.json` | 执行结果 | 670 |
+| `Q38_r1_t0.json` | API 回包（可能含思考内容） | 9789 |
+| `Q38_r2_t0.exec.json` | 执行结果 | 468 |
+| `Q38_r2_t0.json` | API 回包（可能含思考内容） | 14180 |
+| `Q38_r3_t0.exec.json` | 执行结果 | 363 |
+| `Q38_r3_t0.json` | API 回包（可能含思考内容） | 12698 |
+| `Q41_r1_t0.exec.json` | 执行结果 | 153 |
+| `Q41_r1_t0.json` | API 回包（可能含思考内容） | 2167 |
+| `Q41_r2_t0.exec.json` | 执行结果 | 238 |
+| `Q41_r2_t0.json` | API 回包（可能含思考内容） | 2414 |
+| `Q41_r3_t0.exec.json` | 执行结果 | 152 |
+| `Q41_r3_t0.json` | API 回包（可能含思考内容） | 1458 |
+| `Q43_r1_t0.exec.json` | 执行结果 | 1127 |
+| `Q43_r1_t0.json` | API 回包（可能含思考内容） | 4377 |
+| `Q43_r2_t0.exec.json` | 执行结果 | 1121 |
+| `Q43_r2_t0.json` | API 回包（可能含思考内容） | 5611 |
+| `Q43_r3_t0.exec.json` | 执行结果 | 698 |
+| `Q43_r3_t0.json` | API 回包（可能含思考内容） | 3987 |
+| `Q43_r3_t1.exec.json` | 执行结果 | 1732 |
+| `Q43_r3_t1.json` | API 回包（可能含思考内容） | 1434 |
+| `Q47_r1_t0.exec.json` | 执行结果 | 15116 |
+| `Q47_r1_t0.json` | API 回包（可能含思考内容） | 4097 |
+| `Q47_r2_t0.exec.json` | 执行结果 | 726 |
+| `Q47_r2_t0.json` | API 回包（可能含思考内容） | 3438 |
+| `Q47_r2_t1.exec.json` | 执行结果 | 15375 |
+| `Q47_r2_t1.json` | API 回包（可能含思考内容） | 1268 |
+| `Q47_r3_t0.exec.json` | 执行结果 | 708 |
+| `Q47_r3_t0.json` | API 回包（可能含思考内容） | 2862 |
+| `Q47_r3_t1.exec.json` | 执行结果 | 13460 |
+| `Q47_r3_t1.json` | API 回包（可能含思考内容） | 1116 |
+| `Q49_r1_t0.exec.json` | 执行结果 | 376 |
+| `Q49_r1_t0.json` | API 回包（可能含思考内容） | 23170 |
+| `Q49_r2_t0.exec.json` | 执行结果 | 34045 |
+| `Q49_r2_t0.json` | API 回包（可能含思考内容） | 34282 |
+| `Q49_r3_t0.exec.json` | 执行结果 | 366 |
+| `Q49_r3_t0.json` | API 回包（可能含思考内容） | 28307 |
+| `Q50_r1_t0.exec.json` | 执行结果 | 456 |
+| `Q50_r1_t0.json` | API 回包（可能含思考内容） | 9559 |
+| `Q50_r2_t0.exec.json` | 执行结果 | 368 |
+| `Q50_r2_t0.json` | API 回包（可能含思考内容） | 9593 |
+| `Q50_r3_t0.exec.json` | 执行结果 | 373 |
+| `Q50_r3_t0.json` | API 回包（可能含思考内容） | 4072 |
+| `Q51_r1_t0.exec.json` | 执行结果 | 139 |
+| `Q51_r1_t0.json` | API 回包（可能含思考内容） | 970 |
+| `Q51_r2_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r2_t0.json` | API 回包（可能含思考内容） | 1095 |
+| `Q51_r2_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r2_t1.json` | API 回包（可能含思考内容） | 786 |
+| `Q51_r3_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r3_t0.json` | API 回包（可能含思考内容） | 1364 |
+| `Q51_r3_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r3_t1.json` | API 回包（可能含思考内容） | 800 |
+| `Q52_r1_t0.exec.json` | 执行结果 | 532 |
+| `Q52_r1_t0.json` | API 回包（可能含思考内容） | 2183 |
+| `Q52_r1_t1.exec.json` | 执行结果 | 256 |
+| `Q52_r1_t1.json` | API 回包（可能含思考内容） | 1354 |
+| `Q52_r2_t0.exec.json` | 执行结果 | 156 |
+| `Q52_r2_t0.json` | API 回包（可能含思考内容） | 903 |
+| `Q52_r3_t0.exec.json` | 执行结果 | 420 |
+| `Q52_r3_t0.json` | API 回包（可能含思考内容） | 2665 |
+| `Q52_r3_t1.exec.json` | 执行结果 | 156 |
+| `Q52_r3_t1.json` | API 回包（可能含思考内容） | 799 |
+| `Q53_r1_t0.exec.json` | 执行结果 | 574 |
+| `Q53_r1_t0.json` | API 回包（可能含思考内容） | 863 |
+| `Q53_r1_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r1_t1.json` | API 回包（可能含思考内容） | 764 |
+| `Q53_r2_t0.exec.json` | 执行结果 | 580 |
+| `Q53_r2_t0.json` | API 回包（可能含思考内容） | 1190 |
+| `Q53_r2_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r2_t1.json` | API 回包（可能含思考内容） | 775 |
+| `Q53_r3_t0.exec.json` | 执行结果 | 574 |
+| `Q53_r3_t0.json` | API 回包（可能含思考内容） | 862 |
+| `Q53_r3_t1.exec.json` | 执行结果 | 143 |
+| `Q53_r3_t1.json` | API 回包（可能含思考内容） | 778 |
+| `Q54_r1_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r1_t0.json` | API 回包（可能含思考内容） | 693 |
+| `Q54_r1_t1.exec.json` | 执行结果 | 163 |
+| `Q54_r1_t1.json` | API 回包（可能含思考内容） | 733 |
+| `Q54_r2_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r2_t0.json` | API 回包（可能含思考内容） | 693 |
+| `Q54_r2_t1.exec.json` | 执行结果 | 163 |
+| `Q54_r2_t1.json` | API 回包（可能含思考内容） | 745 |
+| `Q54_r3_t0.exec.json` | 执行结果 | 156 |
+| `Q54_r3_t0.json` | API 回包（可能含思考内容） | 807 |
+| `Q55_r1_t0.exec.json` | 执行结果 | 145 |
+| `Q55_r1_t0.json` | API 回包（可能含思考内容） | 1227 |
+| `Q55_r2_t0.exec.json` | 执行结果 | 468 |
+| `Q55_r2_t0.json` | API 回包（可能含思考内容） | 767 |
+| `Q55_r2_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r2_t1.json` | API 回包（可能含思考内容） | 695 |
+| `Q55_r3_t0.exec.json` | 执行结果 | 151 |
+| `Q55_r3_t0.json` | API 回包（可能含思考内容） | 773 |
+| `Q56_r1_t0.exec.json` | 执行结果 | 169 |
+| `Q56_r1_t0.json` | API 回包（可能含思考内容） | 992 |
+| `Q56_r2_t0.exec.json` | 执行结果 | 171 |
+| `Q56_r2_t0.json` | API 回包（可能含思考内容） | 1801 |
+| `Q56_r3_t0.exec.json` | 执行结果 | 169 |
+| `Q56_r3_t0.json` | API 回包（可能含思考内容） | 1263 |
+| `Q57_r1_t0.exec.json` | 执行结果 | 138 |
+| `Q57_r1_t0.json` | API 回包（可能含思考内容） | 1339 |
+| `Q57_r2_t0.exec.json` | 执行结果 | 414 |
+| `Q57_r2_t0.json` | API 回包（可能含思考内容） | 993 |
+| `Q57_r2_t1.exec.json` | 执行结果 | 137 |
+| `Q57_r2_t1.json` | API 回包（可能含思考内容） | 800 |
+| `Q57_r3_t0.exec.json` | 执行结果 | 414 |
+| `Q57_r3_t0.json` | API 回包（可能含思考内容） | 1104 |
+| `Q57_r3_t1.exec.json` | 执行结果 | 137 |
+| `Q57_r3_t1.json` | API 回包（可能含思考内容） | 806 |
+| `Q58_r1_t0.exec.json` | 执行结果 | 698 |
+| `Q58_r1_t0.json` | API 回包（可能含思考内容） | 6221 |
+| `Q58_r1_t1.exec.json` | 执行结果 | 302 |
+| `Q58_r1_t1.json` | API 回包（可能含思考内容） | 1114 |
+| `Q58_r2_t0.exec.json` | 执行结果 | 273 |
+| `Q58_r2_t0.json` | API 回包（可能含思考内容） | 3027 |
+| `Q58_r3_t0.exec.json` | 执行结果 | 273 |
+| `Q58_r3_t0.json` | API 回包（可能含思考内容） | 4560 |
+| `Q59_r1_t0.exec.json` | 执行结果 | 140 |
+| `Q59_r1_t0.json` | API 回包（可能含思考内容） | 1222 |
+| `Q59_r2_t0.exec.json` | 执行结果 | 140 |
+| `Q59_r2_t0.json` | API 回包（可能含思考内容） | 864 |
+| `Q59_r3_t0.exec.json` | 执行结果 | 141 |
+| `Q59_r3_t0.json` | API 回包（可能含思考内容） | 1047 |
+| `Q60_r1_t0.exec.json` | 执行结果 | 142 |
+| `Q60_r1_t0.json` | API 回包（可能含思考内容） | 1052 |
+| `Q60_r2_t0.exec.json` | 执行结果 | 142 |
+| `Q60_r2_t0.json` | API 回包（可能含思考内容） | 1043 |
+| `Q60_r3_t0.exec.json` | 执行结果 | 490 |
+| `Q60_r3_t0.json` | API 回包（可能含思考内容） | 1597 |
+| `Q60_r3_t1.exec.json` | 执行结果 | 138 |
+| `Q60_r3_t1.json` | API 回包（可能含思考内容） | 726 |
+| `Q61_r1_t0.exec.json` | 执行结果 | 708 |
+| `Q61_r1_t0.json` | API 回包（可能含思考内容） | 13485 |
+| `Q61_r1_t1.exec.json` | 执行结果 | 1400 |
+| `Q61_r1_t1.json` | API 回包（可能含思考内容） | 1365 |
+| `Q61_r2_t0.exec.json` | 执行结果 | 1668 |
+| `Q61_r2_t0.json` | API 回包（可能含思考内容） | 13964 |
+| `Q61_r2_t1.exec.json` | 执行结果 | 1424 |
+| `Q61_r2_t1.json` | API 回包（可能含思考内容） | 2407 |
+| `Q61_r3_t0.exec.json` | 执行结果 | 1416 |
+| `Q61_r3_t0.json` | API 回包（可能含思考内容） | 13536 |
+| `Q62_r1_t0.exec.json` | 执行结果 | 760 |
+| `Q62_r1_t0.json` | API 回包（可能含思考内容） | 10671 |
+| `Q62_r2_t0.exec.json` | 执行结果 | 749 |
+| `Q62_r2_t0.json` | API 回包（可能含思考内容） | 9223 |
+| `Q62_r3_t0.exec.json` | 执行结果 | 750 |
+| `Q62_r3_t0.json` | API 回包（可能含思考内容） | 6945 |
+| `Q63_r1_t0.exec.json` | 执行结果 | 710 |
+| `Q63_r1_t0.json` | API 回包（可能含思考内容） | 3143 |
+| `Q63_r1_t1.exec.json` | 执行结果 | 588 |
+| `Q63_r1_t1.json` | API 回包（可能含思考内容） | 1180 |
+| `Q63_r2_t0.exec.json` | 执行结果 | 587 |
+| `Q63_r2_t0.json` | API 回包（可能含思考内容） | 4900 |
+| `Q63_r3_t0.exec.json` | 执行结果 | 602 |
+| `Q63_r3_t0.json` | API 回包（可能含思考内容） | 4558 |
+| `Q64_r1_t0.exec.json` | 执行结果 | 951 |
+| `Q64_r1_t0.json` | API 回包（可能含思考内容） | 11811 |
+| `Q64_r2_t0.exec.json` | 执行结果 | 1118 |
+| `Q64_r2_t0.json` | API 回包（可能含思考内容） | 10912 |
+| `Q64_r3_t0.exec.json` | 执行结果 | 1116 |
+| `Q64_r3_t0.json` | API 回包（可能含思考内容） | 12703 |
+| `Q65_r1_t0.exec.json` | 执行结果 | 11466 |
+| `Q65_r1_t0.json` | API 回包（可能含思考内容） | 9993 |
+| `Q65_r2_t0.exec.json` | 执行结果 | 12252 |
+| `Q65_r2_t0.json` | API 回包（可能含思考内容） | 18801 |
+| `Q65_r3_t0.exec.json` | 执行结果 | 11465 |
+| `Q65_r3_t0.json` | API 回包（可能含思考内容） | 19095 |
+| `Q66_r1_t0.exec.json` | 执行结果 | 289 |
+| `Q66_r1_t0.json` | API 回包（可能含思考内容） | 11849 |
+| `Q66_r2_t0.exec.json` | 执行结果 | 288 |
+| `Q66_r2_t0.json` | API 回包（可能含思考内容） | 2906 |
+| `Q66_r3_t0.exec.json` | 执行结果 | 288 |
+| `Q66_r3_t0.json` | API 回包（可能含思考内容） | 2320 |
+| `Q67_r1_t0.exec.json` | 执行结果 | 1025 |
+| `Q67_r1_t0.json` | API 回包（可能含思考内容） | 17007 |
+| `Q67_r2_t0.exec.json` | 执行结果 | 1037 |
+| `Q67_r2_t0.json` | API 回包（可能含思考内容） | 18111 |
+| `Q67_r3_t0.exec.json` | 执行结果 | 742 |
+| `Q67_r3_t0.json` | API 回包（可能含思考内容） | 11755 |
+| `Q68_r1_t0.exec.json` | 执行结果 | 284 |
+| `Q68_r1_t0.json` | API 回包（可能含思考内容） | 1463 |
+| `Q68_r2_t0.exec.json` | 执行结果 | 708 |
+| `Q68_r2_t0.json` | API 回包（可能含思考内容） | 3159 |
+| `Q68_r2_t1.exec.json` | 执行结果 | 286 |
+| `Q68_r2_t1.json` | API 回包（可能含思考内容） | 1102 |
+| `Q68_r3_t0.exec.json` | 执行结果 | 286 |
+| `Q68_r3_t0.json` | API 回包（可能含思考内容） | 1697 |
+| `Q69_r1_t0.exec.json` | 执行结果 | 299 |
+| `Q69_r1_t0.json` | API 回包（可能含思考内容） | 2739 |
+| `Q69_r2_t0.exec.json` | 执行结果 | 452 |
+| `Q69_r2_t0.json` | API 回包（可能含思考内容） | 15096 |
+| `Q69_r3_t0.exec.json` | 执行结果 | 446 |
+| `Q69_r3_t0.json` | API 回包（可能含思考内容） | 22945 |
+| `Q70_r1_t0.exec.json` | 执行结果 | 436 |
+| `Q70_r1_t0.json` | API 回包（可能含思考内容） | 4652 |
+| `Q70_r2_t0.exec.json` | 执行结果 | 452 |
+| `Q70_r2_t0.json` | API 回包（可能含思考内容） | 4574 |
+| `Q70_r3_t0.exec.json` | 执行结果 | 444 |
+| `Q70_r3_t0.json` | API 回包（可能含思考内容） | 5411 |
+| `Q71_r1_t0.exec.json` | 执行结果 | 724 |
+| `Q71_r1_t0.json` | API 回包（可能含思考内容） | 15406 |
+| `Q71_r2_t0.exec.json` | 执行结果 | 741 |
+| `Q71_r2_t0.json` | API 回包（可能含思考内容） | 15343 |
+| `Q71_r3_t0.exec.json` | 执行结果 | 731 |
+| `Q71_r3_t0.json` | API 回包（可能含思考内容） | 8960 |
+| `Q72_r1_t0.exec.json` | 执行结果 | 911 |
+| `Q72_r1_t0.json` | API 回包（可能含思考内容） | 9553 |
+| `Q72_r2_t0.exec.json` | 执行结果 | 568 |
+| `Q72_r2_t0.json` | API 回包（可能含思考内容） | 8506 |
+| `Q72_r3_t0.exec.json` | 执行结果 | 619 |
+| `Q72_r3_t0.json` | API 回包（可能含思考内容） | 8663 |
+| `Q73_r1_t0.exec.json` | 执行结果 | 436 |
+| `Q73_r1_t0.json` | API 回包（可能含思考内容） | 10958 |
+| `Q73_r1_t1.exec.json` | 执行结果 | 1203 |
+| `Q73_r1_t1.json` | API 回包（可能含思考内容） | 2225 |
+| `Q73_r2_t0.exec.json` | 执行结果 | 724 |
+| `Q73_r2_t0.json` | API 回包（可能含思考内容） | 13388 |
+| `Q73_r2_t1.exec.json` | 执行结果 | 1203 |
+| `Q73_r2_t1.json` | API 回包（可能含思考内容） | 3881 |
+| `Q73_r3_t0.exec.json` | 执行结果 | 1203 |
+| `Q73_r3_t0.json` | API 回包（可能含思考内容） | 11584 |
+| `Q74_r1_t0.exec.json` | 执行结果 | 734 |
+| `Q74_r1_t0.json` | API 回包（可能含思考内容） | 17614 |
+| `Q74_r1_t1.exec.json` | 执行结果 | 123205 |
+| `Q74_r1_t1.json` | API 回包（可能含思考内容） | 2518 |
+| `Q74_r2_t0.exec.json` | 执行结果 | 752 |
+| `Q74_r2_t0.json` | API 回包（可能含思考内容） | 3903 |
+| `Q74_r2_t1.exec.json` | 执行结果 | 103208 |
+| `Q74_r2_t1.json` | API 回包（可能含思考内容） | 1979 |
+| `Q74_r3_t0.exec.json` | 执行结果 | 98114 |
+| `Q74_r3_t0.json` | API 回包（可能含思考内容） | 6314 |
+| `Q75_r1_t0.exec.json` | 执行结果 | 135099 |
+| `Q75_r1_t0.json` | API 回包（可能含思考内容） | 19667 |
+| `Q75_r2_t0.exec.json` | 执行结果 | 135123 |
+| `Q75_r2_t0.json` | API 回包（可能含思考内容） | 10968 |
+| `Q75_r3_t0.exec.json` | 执行结果 | 144099 |
+| `Q75_r3_t0.json` | API 回包（可能含思考内容） | 13907 |
+| `Q76_r1_t0.exec.json` | 执行结果 | 868 |
+| `Q76_r1_t0.json` | API 回包（可能含思考内容） | 11376 |
+| `Q76_r2_t0.exec.json` | 执行结果 | 886 |
+| `Q76_r2_t0.json` | API 回包（可能含思考内容） | 14782 |
+| `Q76_r3_t0.exec.json` | 执行结果 | 859 |
+| `Q76_r3_t0.json` | API 回包（可能含思考内容） | 16474 |
+| `Q77_r1_t0.exec.json` | 执行结果 | 1185 |
+| `Q77_r1_t0.json` | API 回包（可能含思考内容） | 7216 |
+| `Q77_r2_t0.exec.json` | 执行结果 | 722 |
+| `Q77_r2_t0.json` | API 回包（可能含思考内容） | 12966 |
+| `Q77_r2_t1.exec.json` | 执行结果 | 1186 |
+| `Q77_r2_t1.json` | API 回包（可能含思考内容） | 1696 |
+| `Q77_r3_t0.exec.json` | 执行结果 | 1143 |
+| `Q77_r3_t0.json` | API 回包（可能含思考内容） | 9017 |
+| `Q78_r1_t0.exec.json` | 执行结果 | 306 |
+| `Q78_r1_t0.json` | API 回包（可能含思考内容） | 6360 |
+| `Q78_r2_t0.exec.json` | 执行结果 | 420 |
+| `Q78_r2_t0.json` | API 回包（可能含思考内容） | 17767 |
+| `Q78_r3_t0.exec.json` | 执行结果 | 312 |
+| `Q78_r3_t0.json` | API 回包（可能含思考内容） | 14995 |
+| `Q79_r1_t0.exec.json` | 执行结果 | 1222 |
+| `Q79_r1_t0.json` | API 回包（可能含思考内容） | 13107 |
+| `Q79_r2_t0.exec.json` | 执行结果 | 1336 |
+| `Q79_r2_t0.json` | API 回包（可能含思考内容） | 13675 |
+| `Q79_r3_t0.exec.json` | 执行结果 | 1333 |
+| `Q79_r3_t0.json` | API 回包（可能含思考内容） | 12080 |
+| `Q80_r1_t0.exec.json` | 执行结果 | 849 |
+| `Q80_r1_t0.json` | API 回包（可能含思考内容） | 8458 |
+| `Q80_r2_t0.exec.json` | 执行结果 | 1023 |
+| `Q80_r2_t0.json` | API 回包（可能含思考内容） | 7422 |
+| `Q80_r3_t0.exec.json` | 执行结果 | 1023 |
+| `Q80_r3_t0.json` | API 回包（可能含思考内容） | 7982 |
+| `Q81_r1_t0.exec.json` | 执行结果 | 299 |
+| `Q81_r1_t0.json` | API 回包（可能含思考内容） | 2340 |
+| `Q81_r2_t0.exec.json` | 执行结果 | 299 |
+| `Q81_r2_t0.json` | API 回包（可能含思考内容） | 2768 |
+| `Q81_r3_t0.exec.json` | 执行结果 | 313 |
+| `Q81_r3_t0.json` | API 回包（可能含思考内容） | 4436 |
+| `Q82_r1_t0.exec.json` | 执行结果 | 641 |
+| `Q82_r1_t0.json` | API 回包（可能含思考内容） | 14393 |
+| `Q82_r2_t0.exec.json` | 执行结果 | 641 |
+| `Q82_r2_t0.json` | API 回包（可能含思考内容） | 15055 |
+| `Q82_r3_t0.exec.json` | 执行结果 | 641 |
+| `Q82_r3_t0.json` | API 回包（可能含思考内容） | 21467 |
+| `Q83_r1_t0.exec.json` | 执行结果 | 458 |
+| `Q83_r1_t0.json` | API 回包（可能含思考内容） | 12354 |
+| `Q83_r2_t0.exec.json` | 执行结果 | 483 |
+| `Q83_r2_t0.json` | API 回包（可能含思考内容） | 10300 |
+| `Q83_r3_t0.exec.json` | 执行结果 | 499 |
+| `Q83_r3_t0.json` | API 回包（可能含思考内容） | 6393 |
+| `Q84_r1_t0.exec.json` | 执行结果 | 211 |
+| `Q84_r1_t0.json` | API 回包（可能含思考内容） | 9540 |
+| `Q84_r2_t0.exec.json` | 执行结果 | 213 |
+| `Q84_r2_t0.json` | API 回包（可能含思考内容） | 12590 |
+| `Q84_r3_t0.exec.json` | 执行结果 | 213 |
+| `Q84_r3_t0.json` | API 回包（可能含思考内容） | 8318 |
+| `Q85_r1_t0.exec.json` | 执行结果 | 1331 |
+| `Q85_r1_t0.json` | API 回包（可能含思考内容） | 20583 |
+| `Q85_r2_t0.exec.json` | 执行结果 | 764 |
+| `Q85_r2_t0.json` | API 回包（可能含思考内容） | 16746 |
+| `Q85_r2_t1.exec.json` | 执行结果 | 1432 |
+| `Q85_r2_t1.json` | API 回包（可能含思考内容） | 3228 |
+| `Q85_r3_t0.exec.json` | 执行结果 | 746 |
+| `Q85_r3_t0.json` | API 回包（可能含思考内容） | 15062 |
+| `Q85_r3_t1.exec.json` | 执行结果 | 1432 |
+| `Q85_r3_t1.json` | API 回包（可能含思考内容） | 4172 |
+| `Q87_r1_t0.exec.json` | 执行结果 | 1799 |
+| `Q87_r1_t0.json` | API 回包（可能含思考内容） | 28470 |
+| `Q87_r2_t0.exec.json` | 执行结果 | 718 |
+| `Q87_r2_t0.json` | API 回包（可能含思考内容） | 23037 |
+| `Q87_r2_t1.exec.json` | 执行结果 | 2013 |
+| `Q87_r2_t1.json` | API 回包（可能含思考内容） | 2789 |
+| `Q87_r3_t0.exec.json` | 执行结果 | 1771 |
+| `Q87_r3_t0.json` | API 回包（可能含思考内容） | 18120 |
+| `Q88_r1_t0.exec.json` | 执行结果 | 1127 |
+| `Q88_r1_t0.json` | API 回包（可能含思考内容） | 12574 |
+| `Q88_r2_t0.exec.json` | 执行结果 | 1127 |
+| `Q88_r2_t0.json` | API 回包（可能含思考内容） | 9770 |
+| `Q88_r3_t0.exec.json` | 执行结果 | 1163 |
+| `Q88_r3_t0.json` | API 回包（可能含思考内容） | 13577 |
+| `Q89_r1_t0.exec.json` | 执行结果 | 485 |
+| `Q89_r1_t0.json` | API 回包（可能含思考内容） | 22492 |
+| `Q89_r2_t0.exec.json` | 执行结果 | 408 |
+| `Q89_r2_t0.json` | API 回包（可能含思考内容） | 16031 |
+| `Q89_r3_t0.exec.json` | 执行结果 | 760 |
+| `Q89_r3_t0.json` | API 回包（可能含思考内容） | 4717 |
+| `Q89_r3_t1.exec.json` | 执行结果 | 484 |
+| `Q89_r3_t1.json` | API 回包（可能含思考内容） | 2517 |
+| `Q90_r1_t0.exec.json` | 执行结果 | 2511 |
+| `Q90_r1_t0.json` | API 回包（可能含思考内容） | 20914 |
+| `Q90_r2_t0.exec.json` | 执行结果 | 3070 |
+| `Q90_r2_t0.json` | API 回包（可能含思考内容） | 22839 |
+| `Q90_r3_t0.exec.json` | 执行结果 | 2561 |
+| `Q90_r3_t0.json` | API 回包（可能含思考内容） | 19935 |
+| `Q92_r1_t0.exec.json` | 执行结果 | 1276 |
+| `Q92_r1_t0.json` | API 回包（可能含思考内容） | 15833 |
+| `Q92_r2_t0.exec.json` | 执行结果 | 1263 |
+| `Q92_r2_t0.json` | API 回包（可能含思考内容） | 12745 |
+| `Q92_r3_t0.exec.json` | 执行结果 | 1267 |
+| `Q92_r3_t0.json` | API 回包（可能含思考内容） | 13119 |
+| `Q94_r1_t0.exec.json` | 执行结果 | 11318 |
+| `Q94_r1_t0.json` | API 回包（可能含思考内容） | 7134 |
+| `Q94_r2_t0.exec.json` | 执行结果 | 1988 |
+| `Q94_r2_t0.json` | API 回包（可能含思考内容） | 8758 |
+| `Q94_r2_t1.exec.json` | 执行结果 | 11384 |
+| `Q94_r2_t1.json` | API 回包（可能含思考内容） | 11240 |
+| `Q94_r3_t0.exec.json` | 执行结果 | 11050 |
+| `Q94_r3_t0.json` | API 回包（可能含思考内容） | 9950 |
+| `Q96_r1_t0.exec.json` | 执行结果 | 365 |
+| `Q96_r1_t0.json` | API 回包（可能含思考内容） | 12369 |
+| `Q96_r2_t0.exec.json` | 执行结果 | 390 |
+| `Q96_r2_t0.json` | API 回包（可能含思考内容） | 5090 |
+| `Q96_r3_t0.exec.json` | 执行结果 | 720 |
+| `Q96_r3_t0.json` | API 回包（可能含思考内容） | 4548 |
+| `Q96_r3_t1.exec.json` | 执行结果 | 346 |
+| `Q96_r3_t1.json` | API 回包（可能含思考内容） | 2585 |
+| `Q98_r1_t0.exec.json` | 执行结果 | 1160 |
+| `Q98_r1_t0.json` | API 回包（可能含思考内容） | 19397 |
+| `Q98_r2_t0.exec.json` | 执行结果 | 740 |
+| `Q98_r2_t0.json` | API 回包（可能含思考内容） | 32179 |
+| `Q98_r2_t1.exec.json` | 执行结果 | 897 |
+| `Q98_r2_t1.json` | API 回包（可能含思考内容） | 2467 |
+| `Q98_r3_t0.exec.json` | 执行结果 | 1276 |
+| `Q98_r3_t0.json` | API 回包（可能含思考内容） | 23745 |
+| `Q99_r1_t0.exec.json` | 执行结果 | 1288 |
+| `Q99_r1_t0.json` | API 回包（可能含思考内容） | 26651 |
+| `Q99_r2_t0.exec.json` | 执行结果 | 1236 |
+| `Q99_r2_t0.json` | API 回包（可能含思考内容） | 7675 |
+| `Q99_r3_t0.exec.json` | 执行结果 | 837 |
+| `Q99_r3_t0.json` | API 回包（可能含思考内容） | 6899 |
+
+#### `runs-raw/20261104-T34-ontology-full-01/SQL-L3a-full/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `Q01_r1_t0.exec.json` | 执行结果 | 414 |
+| `Q01_r1_t0.json` | API 回包（可能含思考内容） | 1597 |
+| `Q01_r1_t1.exec.json` | 执行结果 | 139 |
+| `Q01_r1_t1.json` | API 回包（可能含思考内容） | 946 |
+| `Q01_r2_t0.exec.json` | 执行结果 | 414 |
+| `Q01_r2_t0.json` | API 回包（可能含思考内容） | 1664 |
+| `Q01_r2_t1.exec.json` | 执行结果 | 139 |
+| `Q01_r2_t1.json` | API 回包（可能含思考内容） | 831 |
+| `Q01_r3_t0.exec.json` | 执行结果 | 414 |
+| `Q01_r3_t0.json` | API 回包（可能含思考内容） | 2603 |
+| `Q01_r3_t1.exec.json` | 执行结果 | 139 |
+| `Q01_r3_t1.json` | API 回包（可能含思考内容） | 826 |
+| `Q02_r1_t0.exec.json` | 执行结果 | 436 |
+| `Q02_r1_t0.json` | API 回包（可能含思考内容） | 1164 |
+| `Q02_r1_t1.exec.json` | 执行结果 | 160 |
+| `Q02_r1_t1.json` | API 回包（可能含思考内容） | 878 |
+| `Q02_r2_t0.exec.json` | 执行结果 | 159 |
+| `Q02_r2_t0.json` | API 回包（可能含思考内容） | 1819 |
+| `Q02_r3_t0.exec.json` | 执行结果 | 424 |
+| `Q02_r3_t0.json` | API 回包（可能含思考内容） | 1049 |
+| `Q02_r3_t1.exec.json` | 执行结果 | 153 |
+| `Q02_r3_t1.json` | API 回包（可能含思考内容） | 830 |
+| `Q03_r1_t0.exec.json` | 执行结果 | 140 |
+| `Q03_r1_t0.json` | API 回包（可能含思考内容） | 1538 |
+| `Q03_r2_t0.exec.json` | 执行结果 | 424 |
+| `Q03_r2_t0.json` | API 回包（可能含思考内容） | 1318 |
+| `Q03_r2_t1.exec.json` | 执行结果 | 140 |
+| `Q03_r2_t1.json` | API 回包（可能含思考内容） | 858 |
+| `Q03_r3_t0.exec.json` | 执行结果 | 424 |
+| `Q03_r3_t0.json` | API 回包（可能含思考内容） | 1121 |
+| `Q03_r3_t1.exec.json` | 执行结果 | 140 |
+| `Q03_r3_t1.json` | API 回包（可能含思考内容） | 914 |
+| `Q04_r1_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r1_t0.json` | API 回包（可能含思考内容） | 2402 |
+| `Q04_r2_t0.exec.json` | 执行结果 | 46553 |
+| `Q04_r2_t0.json` | API 回包（可能含思考内容） | 2027 |
+| `Q04_r3_t0.exec.json` | 执行结果 | 35346 |
+| `Q04_r3_t0.json` | API 回包（可能含思考内容） | 1440 |
+| `Q05_r1_t0.exec.json` | 执行结果 | 372 |
+| `Q05_r1_t0.json` | API 回包（可能含思考内容） | 3805 |
+| `Q05_r2_t0.exec.json` | 执行结果 | 398 |
+| `Q05_r2_t0.json` | API 回包（可能含思考内容） | 3434 |
+| `Q05_r3_t0.exec.json` | 执行结果 | 698 |
+| `Q05_r3_t0.json` | API 回包（可能含思考内容） | 2532 |
+| `Q05_r3_t1.exec.json` | 执行结果 | 372 |
+| `Q05_r3_t1.json` | API 回包（可能含思考内容） | 1206 |
+| `Q06_r1_t0.exec.json` | 执行结果 | 153 |
+| `Q06_r1_t0.json` | API 回包（可能含思考内容） | 1332 |
+| `Q06_r2_t0.exec.json` | 执行结果 | 562 |
+| `Q06_r2_t0.json` | API 回包（可能含思考内容） | 1194 |
+| `Q06_r2_t1.exec.json` | 执行结果 | 153 |
+| `Q06_r2_t1.json` | API 回包（可能含思考内容） | 946 |
+| `Q06_r3_t0.exec.json` | 执行结果 | 153 |
+| `Q06_r3_t0.json` | API 回包（可能含思考内容） | 1500 |
+| `Q07_r1_t0.exec.json` | 执行结果 | 720 |
+| `Q07_r1_t0.json` | API 回包（可能含思考内容） | 1890 |
+| `Q07_r1_t1.exec.json` | 执行结果 | 918 |
+| `Q07_r1_t1.json` | API 回包（可能含思考内容） | 1133 |
+| `Q07_r2_t0.exec.json` | 执行结果 | 918 |
+| `Q07_r2_t0.json` | API 回包（可能含思考内容） | 2365 |
+| `Q07_r3_t0.exec.json` | 执行结果 | 646 |
+| `Q07_r3_t0.json` | API 回包（可能含思考内容） | 2108 |
+| `Q07_r3_t1.exec.json` | 执行结果 | 918 |
+| `Q07_r3_t1.json` | API 回包（可能含思考内容） | 1070 |
+| `Q08_r1_t0.exec.json` | 执行结果 | 1123 |
+| `Q08_r1_t0.json` | API 回包（可能含思考内容） | 2218 |
+| `Q08_r2_t0.exec.json` | 执行结果 | 1332 |
+| `Q08_r2_t0.json` | API 回包（可能含思考内容） | 2506 |
+| `Q08_r3_t0.exec.json` | 执行结果 | 1532 |
+| `Q08_r3_t0.json` | API 回包（可能含思考内容） | 2606 |
+| `Q09_r1_t0.exec.json` | 执行结果 | 168 |
+| `Q09_r1_t0.json` | API 回包（可能含思考内容） | 1177 |
+| `Q09_r2_t0.exec.json` | 执行结果 | 432 |
+| `Q09_r2_t0.json` | API 回包（可能含思考内容） | 2370 |
+| `Q09_r2_t1.exec.json` | 执行结果 | 173 |
+| `Q09_r2_t1.json` | API 回包（可能含思考内容） | 839 |
+| `Q09_r3_t0.exec.json` | 执行结果 | 173 |
+| `Q09_r3_t0.json` | API 回包（可能含思考内容） | 1168 |
+| `Q100_r1_t0.exec.json` | 执行结果 | 5877 |
+| `Q100_r1_t0.json` | API 回包（可能含思考内容） | 18945 |
+| `Q100_r2_t0.exec.json` | 执行结果 | 6254 |
+| `Q100_r2_t0.json` | API 回包（可能含思考内容） | 16106 |
+| `Q100_r3_t0.exec.json` | 执行结果 | 6843 |
+| `Q100_r3_t0.json` | API 回包（可能含思考内容） | 28161 |
+| `Q101_r1_t0.exec.json` | 执行结果 | 146 |
+| `Q101_r1_t0.json` | API 回包（可能含思考内容） | 1215 |
+| `Q101_r2_t0.exec.json` | 执行结果 | 146 |
+| `Q101_r2_t0.json` | API 回包（可能含思考内容） | 2488 |
+| `Q101_r3_t0.exec.json` | 执行结果 | 252 |
+| `Q101_r3_t0.json` | API 回包（可能含思考内容） | 1787 |
+| `Q102_r1_t0.exec.json` | 执行结果 | 531 |
+| `Q102_r1_t0.json` | API 回包（可能含思考内容） | 9288 |
+| `Q102_r2_t0.exec.json` | 执行结果 | 527 |
+| `Q102_r2_t0.json` | API 回包（可能含思考内容） | 10965 |
+| `Q102_r3_t0.exec.json` | 执行结果 | 535 |
+| `Q102_r3_t0.json` | API 回包（可能含思考内容） | 14692 |
+| `Q103_r1_t0.exec.json` | 执行结果 | 399 |
+| `Q103_r1_t0.json` | API 回包（可能含思考内容） | 7084 |
+| `Q103_r2_t0.exec.json` | 执行结果 | 364 |
+| `Q103_r2_t0.json` | API 回包（可能含思考内容） | 7894 |
+| `Q103_r3_t0.exec.json` | 执行结果 | 488 |
+| `Q103_r3_t0.json` | API 回包（可能含思考内容） | 4302 |
+| `Q104_r1_t0.exec.json` | 执行结果 | 666 |
+| `Q104_r1_t0.json` | API 回包（可能含思考内容） | 20570 |
+| `Q104_r2_t0.exec.json` | 执行结果 | 452 |
+| `Q104_r2_t0.json` | API 回包（可能含思考内容） | 16776 |
+| `Q104_r3_t0.exec.json` | 执行结果 | 534 |
+| `Q104_r3_t0.json` | API 回包（可能含思考内容） | 9063 |
+| `Q104_r3_t1.exec.json` | 执行结果 | 398 |
+| `Q104_r3_t1.json` | API 回包（可能含思考内容） | 4345 |
+| `Q105_r1_t0.exec.json` | 执行结果 | 216 |
+| `Q105_r1_t0.json` | API 回包（可能含思考内容） | 5602 |
+| `Q105_r2_t0.exec.json` | 执行结果 | 270 |
+| `Q105_r2_t0.json` | API 回包（可能含思考内容） | 7254 |
+| `Q105_r3_t0.exec.json` | 执行结果 | 259 |
+| `Q105_r3_t0.json` | API 回包（可能含思考内容） | 3156 |
+| `Q106_r1_t0.exec.json` | 执行结果 | 411 |
+| `Q106_r1_t0.json` | API 回包（可能含思考内容） | 8545 |
+| `Q106_r2_t0.exec.json` | 执行结果 | 368 |
+| `Q106_r2_t0.json` | API 回包（可能含思考内容） | 7388 |
+| `Q106_r3_t0.exec.json` | 执行结果 | 396 |
+| `Q106_r3_t0.json` | API 回包（可能含思考内容） | 9563 |
+| `Q107_r1_t0.exec.json` | 执行结果 | 398 |
+| `Q107_r1_t0.json` | API 回包（可能含思考内容） | 16469 |
+| `Q107_r2_t0.exec.json` | 执行结果 | 2554 |
+| `Q107_r2_t0.json` | API 回包（可能含思考内容） | 17816 |
+| `Q107_r2_t1.exec.json` | 执行结果 | 383 |
+| `Q107_r2_t1.json` | API 回包（可能含思考内容） | 2344 |
+| `Q107_r3_t0.exec.json` | 执行结果 | 375 |
+| `Q107_r3_t0.json` | API 回包（可能含思考内容） | 13298 |
+| `Q108_r1_t0.exec.json` | 执行结果 | 1319 |
+| `Q108_r1_t0.json` | API 回包（可能含思考内容） | 2017 |
+| `Q108_r2_t0.exec.json` | 执行结果 | 706 |
+| `Q108_r2_t0.json` | API 回包（可能含思考内容） | 2726 |
+| `Q108_r2_t1.exec.json` | 执行结果 | 1326 |
+| `Q108_r2_t1.json` | API 回包（可能含思考内容） | 1301 |
+| `Q108_r3_t0.exec.json` | 执行结果 | 702 |
+| `Q108_r3_t0.json` | API 回包（可能含思考内容） | 3178 |
+| `Q108_r3_t1.exec.json` | 执行结果 | 1323 |
+| `Q108_r3_t1.json` | API 回包（可能含思考内容） | 1155 |
+| `Q109_r1_t0.exec.json` | 执行结果 | 703 |
+| `Q109_r1_t0.json` | API 回包（可能含思考内容） | 13815 |
+| `Q109_r2_t0.exec.json` | 执行结果 | 740 |
+| `Q109_r2_t0.json` | API 回包（可能含思考内容） | 5999 |
+| `Q109_r2_t1.exec.json` | 执行结果 | 737 |
+| `Q109_r2_t1.json` | API 回包（可能含思考内容） | 2724 |
+| `Q109_r3_t0.exec.json` | 执行结果 | 517 |
+| `Q109_r3_t0.json` | API 回包（可能含思考内容） | 9162 |
+| `Q10_r1_t0.exec.json` | 执行结果 | 147 |
+| `Q10_r1_t0.json` | API 回包（可能含思考内容） | 1580 |
+| `Q10_r2_t0.exec.json` | 执行结果 | 147 |
+| `Q10_r2_t0.json` | API 回包（可能含思考内容） | 1375 |
+| `Q10_r3_t0.exec.json` | 执行结果 | 470 |
+| `Q10_r3_t0.json` | API 回包（可能含思考内容） | 1973 |
+| `Q10_r3_t1.exec.json` | 执行结果 | 147 |
+| `Q10_r3_t1.json` | API 回包（可能含思考内容） | 843 |
+| `Q110_r1_t0.exec.json` | 执行结果 | 498 |
+| `Q110_r1_t0.json` | API 回包（可能含思考内容） | 15267 |
+| `Q110_r2_t0.exec.json` | 执行结果 | 482 |
+| `Q110_r2_t0.json` | API 回包（可能含思考内容） | 8333 |
+| `Q110_r3_t0.exec.json` | 执行结果 | 518 |
+| `Q110_r3_t0.json` | API 回包（可能含思考内容） | 14225 |
+| `Q111_r1_t0.exec.json` | 执行结果 | 31540 |
+| `Q111_r1_t0.json` | API 回包（可能含思考内容） | 9280 |
+| `Q111_r2_t0.exec.json` | 执行结果 | 31494 |
+| `Q111_r2_t0.json` | API 回包（可能含思考内容） | 19851 |
+| `Q111_r3_t0.exec.json` | 执行结果 | 31540 |
+| `Q111_r3_t0.json` | API 回包（可能含思考内容） | 22139 |
+| `Q112_r1_t0.exec.json` | 执行结果 | 8929 |
+| `Q112_r1_t0.json` | API 回包（可能含思考内容） | 27845 |
+| `Q112_r2_t0.exec.json` | 执行结果 | 7142 |
+| `Q112_r2_t0.json` | API 回包（可能含思考内容） | 9873 |
+| `Q112_r3_t0.exec.json` | 执行结果 | 8909 |
+| `Q112_r3_t0.json` | API 回包（可能含思考内容） | 28604 |
+| `Q113_r1_t0.exec.json` | 执行结果 | 2433 |
+| `Q113_r1_t0.json` | API 回包（可能含思考内容） | 21829 |
+| `Q113_r2_t0.exec.json` | 执行结果 | 2248 |
+| `Q113_r2_t0.json` | API 回包（可能含思考内容） | 18568 |
+| `Q113_r3_t0.exec.json` | 执行结果 | 2438 |
+| `Q113_r3_t0.json` | API 回包（可能含思考内容） | 36602 |
+| `Q114_r1_t0.exec.json` | 执行结果 | 315 |
+| `Q114_r1_t0.json` | API 回包（可能含思考内容） | 8197 |
+| `Q114_r2_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r2_t0.json` | API 回包（可能含思考内容） | 3035 |
+| `Q114_r3_t0.exec.json` | 执行结果 | 304 |
+| `Q114_r3_t0.json` | API 回包（可能含思考内容） | 4225 |
+| `Q115_r1_t0.exec.json` | 执行结果 | 527 |
+| `Q115_r1_t0.json` | API 回包（可能含思考内容） | 15535 |
+| `Q115_r2_t0.exec.json` | 执行结果 | 696 |
+| `Q115_r2_t0.json` | API 回包（可能含思考内容） | 18585 |
+| `Q115_r2_t1.exec.json` | 执行结果 | 524 |
+| `Q115_r2_t1.json` | API 回包（可能含思考内容） | 2532 |
+| `Q115_r3_t0.exec.json` | 执行结果 | 527 |
+| `Q115_r3_t0.json` | API 回包（可能含思考内容） | 11316 |
+| `Q116_r1_t0.exec.json` | 执行结果 | 728 |
+| `Q116_r1_t0.json` | API 回包（可能含思考内容） | 22372 |
+| `Q116_r1_t1.exec.json` | 执行结果 | 445 |
+| `Q116_r1_t1.json` | API 回包（可能含思考内容） | 4794 |
+| `Q116_r2_t0.exec.json` | 执行结果 | 438 |
+| `Q116_r2_t0.json` | API 回包（可能含思考内容） | 20062 |
+| `Q116_r3_t0.exec.json` | 执行结果 | 435 |
+| `Q116_r3_t0.json` | API 回包（可能含思考内容） | 8340 |
+| `Q117_r1_t0.exec.json` | 执行结果 | 696 |
+| `Q117_r1_t0.json` | API 回包（可能含思考内容） | 43349 |
+| `Q117_r2_t0.exec.json` | 执行结果 | 342 |
+| `Q117_r2_t0.json` | API 回包（可能含思考内容） | 36560 |
+| `Q117_r2_t1.exec.json` | 执行结果 | 408 |
+| `Q117_r2_t1.json` | API 回包（可能含思考内容） | 17290 |
+| `Q117_r3_t0.exec.json` | 执行结果 | 942 |
+| `Q117_r3_t0.json` | API 回包（可能含思考内容） | 37150 |
+| `Q118_r1_t0.exec.json` | 执行结果 | 375 |
+| `Q118_r1_t0.json` | API 回包（可能含思考内容） | 18455 |
+| `Q118_r2_t0.exec.json` | 执行结果 | 329 |
+| `Q118_r2_t0.json` | API 回包（可能含思考内容） | 15161 |
+| `Q118_r3_t0.exec.json` | 执行结果 | 368 |
+| `Q118_r3_t0.json` | API 回包（可能含思考内容） | 15135 |
+| `Q119_r1_t0.exec.json` | 执行结果 | 34683 |
+| `Q119_r1_t0.json` | API 回包（可能含思考内容） | 12642 |
+| `Q119_r2_t0.exec.json` | 执行结果 | 34675 |
+| `Q119_r2_t0.json` | API 回包（可能含思考内容） | 11107 |
+| `Q119_r3_t0.exec.json` | 执行结果 | 34692 |
+| `Q119_r3_t0.json` | API 回包（可能含思考内容） | 16962 |
+| `Q11_r1_t0.exec.json` | 执行结果 | 536 |
+| `Q11_r1_t0.json` | API 回包（可能含思考内容） | 10308 |
+| `Q11_r2_t0.exec.json` | 执行结果 | 537 |
+| `Q11_r2_t0.json` | API 回包（可能含思考内容） | 4841 |
+| `Q11_r3_t0.exec.json` | 执行结果 | 532 |
+| `Q11_r3_t0.json` | API 回包（可能含思考内容） | 6771 |
+| `Q120_r1_t0.exec.json` | 执行结果 | 590 |
+| `Q120_r1_t0.json` | API 回包（可能含思考内容） | 13609 |
+| `Q120_r2_t0.exec.json` | 执行结果 | 579 |
+| `Q120_r2_t0.json` | API 回包（可能含思考内容） | 8164 |
+| `Q120_r3_t0.exec.json` | 执行结果 | 748 |
+| `Q120_r3_t0.json` | API 回包（可能含思考内容） | 14370 |
+| `Q120_r3_t1.exec.json` | 执行结果 | 589 |
+| `Q120_r3_t1.json` | API 回包（可能含思考内容） | 1845 |
+| `Q121_r1_t0.exec.json` | 执行结果 | 774 |
+| `Q121_r1_t0.json` | API 回包（可能含思考内容） | 20936 |
+| `Q121_r2_t0.exec.json` | 执行结果 | 777 |
+| `Q121_r2_t0.json` | API 回包（可能含思考内容） | 20451 |
+| `Q121_r3_t0.exec.json` | 执行结果 | 780 |
+| `Q121_r3_t0.json` | API 回包（可能含思考内容） | 21352 |
+| `Q122_r1_t0.exec.json` | 执行结果 | 1549 |
+| `Q122_r1_t0.json` | API 回包（可能含思考内容） | 24981 |
+| `Q122_r2_t0.exec.json` | 执行结果 | 2002 |
+| `Q122_r2_t0.json` | API 回包（可能含思考内容） | 13626 |
+| `Q122_r3_t0.exec.json` | 执行结果 | 1549 |
+| `Q122_r3_t0.json` | API 回包（可能含思考内容） | 19315 |
+| `Q12_r1_t0.exec.json` | 执行结果 | 712 |
+| `Q12_r1_t0.json` | API 回包（可能含思考内容） | 2316 |
+| `Q12_r1_t1.exec.json` | 执行结果 | 549 |
+| `Q12_r1_t1.json` | API 回包（可能含思考内容） | 1984 |
+| `Q12_r2_t0.exec.json` | 执行结果 | 543 |
+| `Q12_r2_t0.json` | API 回包（可能含思考内容） | 3883 |
+| `Q12_r3_t0.exec.json` | 执行结果 | 552 |
+| `Q12_r3_t0.json` | API 回包（可能含思考内容） | 2592 |
+| `Q13_r1_t0.exec.json` | 执行结果 | 24935 |
+| `Q13_r1_t0.json` | API 回包（可能含思考内容） | 4992 |
+| `Q13_r2_t0.exec.json` | 执行结果 | 24898 |
+| `Q13_r2_t0.json` | API 回包（可能含思考内容） | 4122 |
+| `Q13_r3_t0.exec.json` | 执行结果 | 24935 |
+| `Q13_r3_t0.json` | API 回包（可能含思考内容） | 4394 |
+| `Q14_r1_t0.exec.json` | 执行结果 | 706 |
+| `Q14_r1_t0.json` | API 回包（可能含思考内容） | 3389 |
+| `Q14_r1_t1.exec.json` | 执行结果 | 138 |
+| `Q14_r1_t1.json` | API 回包（可能含思考内容） | 928 |
+| `Q14_r2_t0.exec.json` | 执行结果 | 143 |
+| `Q14_r2_t0.json` | API 回包（可能含思考内容） | 3459 |
+| `Q14_r3_t0.exec.json` | 执行结果 | 138 |
+| `Q14_r3_t0.json` | API 回包（可能含思考内容） | 5142 |
+| `Q15_r1_t0.exec.json` | 执行结果 | 1130 |
+| `Q15_r1_t0.json` | API 回包（可能含思考内容） | 4807 |
+| `Q15_r2_t0.exec.json` | 执行结果 | 1134 |
+| `Q15_r2_t0.json` | API 回包（可能含思考内容） | 2149 |
+| `Q15_r3_t0.exec.json` | 执行结果 | 1132 |
+| `Q15_r3_t0.json` | API 回包（可能含思考内容） | 4448 |
+| `Q16_r1_t0.exec.json` | 执行结果 | 368 |
+| `Q16_r1_t0.json` | API 回包（可能含思考内容） | 4852 |
+| `Q16_r2_t0.exec.json` | 执行结果 | 710 |
+| `Q16_r2_t0.json` | API 回包（可能含思考内容） | 4168 |
+| `Q16_r2_t1.exec.json` | 执行结果 | 405 |
+| `Q16_r2_t1.json` | API 回包（可能含思考内容） | 3855 |
+| `Q16_r3_t0.exec.json` | 执行结果 | 388 |
+| `Q16_r3_t0.json` | API 回包（可能含思考内容） | 6767 |
+| `Q17_r1_t0.exec.json` | 执行结果 | 385 |
+| `Q17_r1_t0.json` | API 回包（可能含思考内容） | 3291 |
+| `Q17_r2_t0.exec.json` | 执行结果 | 401 |
+| `Q17_r2_t0.json` | API 回包（可能含思考内容） | 2849 |
+| `Q17_r3_t0.exec.json` | 执行结果 | 716 |
+| `Q17_r3_t0.json` | API 回包（可能含思考内容） | 9263 |
+| `Q17_r3_t1.exec.json` | 执行结果 | 413 |
+| `Q17_r3_t1.json` | API 回包（可能含思考内容） | 1292 |
+| `Q18_r1_t0.exec.json` | 执行结果 | 237 |
+| `Q18_r1_t0.json` | API 回包（可能含思考内容） | 15928 |
+| `Q18_r2_t0.exec.json` | 执行结果 | 663 |
+| `Q18_r2_t0.json` | API 回包（可能含思考内容） | 8500 |
+| `Q18_r3_t0.exec.json` | 执行结果 | 237 |
+| `Q18_r3_t0.json` | API 回包（可能含思考内容） | 17595 |
+| `Q19_r1_t0.exec.json` | 执行结果 | 383 |
+| `Q19_r1_t0.json` | API 回包（可能含思考内容） | 9165 |
+| `Q19_r2_t0.exec.json` | 执行结果 | 698 |
+| `Q19_r2_t0.json` | API 回包（可能含思考内容） | 5420 |
+| `Q19_r2_t1.exec.json` | 执行结果 | 242 |
+| `Q19_r2_t1.json` | API 回包（可能含思考内容） | 1031 |
+| `Q19_r3_t0.exec.json` | 执行结果 | 710 |
+| `Q19_r3_t0.json` | API 回包（可能含思考内容） | 2582 |
+| `Q19_r3_t1.exec.json` | 执行结果 | 382 |
+| `Q19_r3_t1.json` | API 回包（可能含思考内容） | 1224 |
+| `Q20_r1_t0.exec.json` | 执行结果 | 30247 |
+| `Q20_r1_t0.json` | API 回包（可能含思考内容） | 3853 |
+| `Q20_r2_t0.exec.json` | 执行结果 | 31228 |
+| `Q20_r2_t0.json` | API 回包（可能含思考内容） | 4505 |
+| `Q20_r3_t0.exec.json` | 执行结果 | 31358 |
+| `Q20_r3_t0.json` | API 回包（可能含思考内容） | 4190 |
+| `Q21_r1_t0.exec.json` | 执行结果 | 12796 |
+| `Q21_r1_t0.json` | API 回包（可能含思考内容） | 5517 |
+| `Q21_r2_t0.exec.json` | 执行结果 | 12813 |
+| `Q21_r2_t0.json` | API 回包（可能含思考内容） | 3149 |
+| `Q21_r3_t0.exec.json` | 执行结果 | 12796 |
+| `Q21_r3_t0.json` | API 回包（可能含思考内容） | 3081 |
+| `Q22_r1_t0.exec.json` | 执行结果 | 3691 |
+| `Q22_r1_t0.json` | API 回包（可能含思考内容） | 13686 |
+| `Q22_r2_t0.exec.json` | 执行结果 | 3695 |
+| `Q22_r2_t0.json` | API 回包（可能含思考内容） | 12405 |
+| `Q22_r3_t0.exec.json` | 执行结果 | 3699 |
+| `Q22_r3_t0.json` | API 回包（可能含思考内容） | 25623 |
+| `Q23_r1_t0.exec.json` | 执行结果 | 555 |
+| `Q23_r1_t0.json` | API 回包（可能含思考内容） | 5615 |
+| `Q23_r2_t0.exec.json` | 执行结果 | 876 |
+| `Q23_r2_t0.json` | API 回包（可能含思考内容） | 3342 |
+| `Q23_r3_t0.exec.json` | 执行结果 | 867 |
+| `Q23_r3_t0.json` | API 回包（可能含思考内容） | 2641 |
+| `Q24_r1_t0.exec.json` | 执行结果 | 795 |
+| `Q24_r1_t0.json` | API 回包（可能含思考内容） | 14234 |
+| `Q24_r2_t0.exec.json` | 执行结果 | 795 |
+| `Q24_r2_t0.json` | API 回包（可能含思考内容） | 7150 |
+| `Q24_r3_t0.exec.json` | 执行结果 | 795 |
+| `Q24_r3_t0.json` | API 回包（可能含思考内容） | 4331 |
+| `Q25_r1_t0.exec.json` | 执行结果 | 258 |
+| `Q25_r1_t0.json` | API 回包（可能含思考内容） | 6300 |
+| `Q25_r2_t0.exec.json` | 执行结果 | 211 |
+| `Q25_r2_t0.json` | API 回包（可能含思考内容） | 14064 |
+| `Q25_r3_t0.exec.json` | 执行结果 | 209 |
+| `Q25_r3_t0.json` | API 回包（可能含思考内容） | 10224 |
+| `Q26_r1_t0.exec.json` | 执行结果 | 223 |
+| `Q26_r1_t0.json` | API 回包（可能含思考内容） | 3699 |
+| `Q26_r2_t0.exec.json` | 执行结果 | 201 |
+| `Q26_r2_t0.json` | API 回包（可能含思考内容） | 2676 |
+| `Q26_r3_t0.exec.json` | 执行结果 | 209 |
+| `Q26_r3_t0.json` | API 回包（可能含思考内容） | 2508 |
+| `Q27_r1_t0.exec.json` | 执行结果 | 1172 |
+| `Q27_r1_t0.json` | API 回包（可能含思考内容） | 2969 |
+| `Q27_r2_t0.exec.json` | 执行结果 | 1245 |
+| `Q27_r2_t0.json` | API 回包（可能含思考内容） | 2266 |
+| `Q27_r3_t0.exec.json` | 执行结果 | 746 |
+| `Q27_r3_t0.json` | API 回包（可能含思考内容） | 3582 |
+| `Q27_r3_t1.exec.json` | 执行结果 | 1248 |
+| `Q27_r3_t1.json` | API 回包（可能含思考内容） | 1635 |
+| `Q28_r1_t0.exec.json` | 执行结果 | 389 |
+| `Q28_r1_t0.json` | API 回包（可能含思考内容） | 6625 |
+| `Q28_r2_t0.exec.json` | 执行结果 | 700 |
+| `Q28_r2_t0.json` | API 回包（可能含思考内容） | 7488 |
+| `Q28_r2_t1.exec.json` | 执行结果 | 246 |
+| `Q28_r2_t1.json` | API 回包（可能含思考内容） | 1321 |
+| `Q28_r3_t0.exec.json` | 执行结果 | 411 |
+| `Q28_r3_t0.json` | API 回包（可能含思考内容） | 8255 |
+| `Q29_r1_t0.exec.json` | 执行结果 | 455 |
+| `Q29_r1_t0.json` | API 回包（可能含思考内容） | 23721 |
+| `Q29_r2_t0.exec.json` | 执行结果 | 557 |
+| `Q29_r2_t0.json` | API 回包（可能含思考内容） | 21470 |
+| `Q29_r3_t0.exec.json` | 执行结果 | 582 |
+| `Q29_r3_t0.json` | API 回包（可能含思考内容） | 12670 |
+| `Q30_r1_t0.exec.json` | 执行结果 | 1911 |
+| `Q30_r1_t0.json` | API 回包（可能含思考内容） | 5507 |
+| `Q30_r2_t0.exec.json` | 执行结果 | 1925 |
+| `Q30_r2_t0.json` | API 回包（可能含思考内容） | 11338 |
+| `Q30_r3_t0.exec.json` | 执行结果 | 1928 |
+| `Q30_r3_t0.json` | API 回包（可能含思考内容） | 8481 |
+| `Q31_r1_t0.exec.json` | 执行结果 | 1089 |
+| `Q31_r1_t0.json` | API 回包（可能含思考内容） | 9613 |
+| `Q31_r2_t0.exec.json` | 执行结果 | 1093 |
+| `Q31_r2_t0.json` | API 回包（可能含思考内容） | 5488 |
+| `Q31_r3_t0.exec.json` | 执行结果 | 1133 |
+| `Q31_r3_t0.json` | API 回包（可能含思考内容） | 7410 |
+| `Q32_r1_t0.exec.json` | 执行结果 | 696 |
+| `Q32_r1_t0.json` | API 回包（可能含思考内容） | 3562 |
+| `Q32_r1_t1.exec.json` | 执行结果 | 217 |
+| `Q32_r1_t1.json` | API 回包（可能含思考内容） | 1261 |
+| `Q32_r2_t0.exec.json` | 执行结果 | 217 |
+| `Q32_r2_t0.json` | API 回包（可能含思考内容） | 3328 |
+| `Q32_r3_t0.exec.json` | 执行结果 | 650 |
+| `Q32_r3_t0.json` | API 回包（可能含思考内容） | 4290 |
+| `Q32_r3_t1.exec.json` | 执行结果 | 214 |
+| `Q32_r3_t1.json` | API 回包（可能含思考内容） | 1392 |
+| `Q34_r1_t0.exec.json` | 执行结果 | 227674 |
+| `Q34_r1_t0.json` | API 回包（可能含思考内容） | 23280 |
+| `Q34_r2_t0.exec.json` | 执行结果 | 722 |
+| `Q34_r2_t0.json` | API 回包（可能含思考内容） | 20964 |
+| `Q34_r2_t1.exec.json` | 执行结果 | 257537 |
+| `Q34_r2_t1.json` | API 回包（可能含思考内容） | 2516 |
+| `Q34_r3_t0.exec.json` | 执行结果 | 257569 |
+| `Q34_r3_t0.json` | API 回包（可能含思考内容） | 23391 |
+| `Q35_r1_t0.exec.json` | 执行结果 | 12984 |
+| `Q35_r1_t0.json` | API 回包（可能含思考内容） | 3431 |
+| `Q35_r2_t0.exec.json` | 执行结果 | 12966 |
+| `Q35_r2_t0.json` | API 回包（可能含思考内容） | 7796 |
+| `Q35_r3_t0.exec.json` | 执行结果 | 12963 |
+| `Q35_r3_t0.json` | API 回包（可能含思考内容） | 5349 |
+| `Q36_r1_t0.exec.json` | 执行结果 | 582 |
+| `Q36_r1_t0.json` | API 回包（可能含思考内容） | 3895 |
+| `Q36_r1_t1.exec.json` | 执行结果 | 241 |
+| `Q36_r1_t1.json` | API 回包（可能含思考内容） | 1540 |
+| `Q36_r2_t0.exec.json` | 执行结果 | 259 |
+| `Q36_r2_t0.json` | API 回包（可能含思考内容） | 1983 |
+| `Q36_r3_t0.exec.json` | 执行结果 | 265 |
+| `Q36_r3_t0.json` | API 回包（可能含思考内容） | 4963 |
+| `Q37_r1_t0.exec.json` | 执行结果 | 718 |
+| `Q37_r1_t0.json` | API 回包（可能含思考内容） | 4988 |
+| `Q37_r1_t1.exec.json` | 执行结果 | 20228 |
+| `Q37_r1_t1.json` | API 回包（可能含思考内容） | 1919 |
+| `Q37_r2_t0.exec.json` | 执行结果 | 24271 |
+| `Q37_r2_t0.json` | API 回包（可能含思考内容） | 4709 |
+| `Q37_r3_t0.exec.json` | 执行结果 | 20554 |
+| `Q37_r3_t0.json` | API 回包（可能含思考内容） | 6207 |
+| `Q38_r1_t0.exec.json` | 执行结果 | 430 |
+| `Q38_r1_t0.json` | API 回包（可能含思考内容） | 5866 |
+| `Q38_r2_t0.exec.json` | 执行结果 | 507 |
+| `Q38_r2_t0.json` | API 回包（可能含思考内容） | 11114 |
+| `Q38_r3_t0.exec.json` | 执行结果 | 533 |
+| `Q38_r3_t0.json` | API 回包（可能含思考内容） | 4551 |
+| `Q41_r1_t0.exec.json` | 执行结果 | 706 |
+| `Q41_r1_t0.json` | API 回包（可能含思考内容） | 2406 |
+| `Q41_r1_t1.exec.json` | 执行结果 | 241 |
+| `Q41_r1_t1.json` | API 回包（可能含思考内容） | 1116 |
+| `Q41_r2_t0.exec.json` | 执行结果 | 201 |
+| `Q41_r2_t0.json` | API 回包（可能含思考内容） | 3987 |
+| `Q41_r3_t0.exec.json` | 执行结果 | 562 |
+| `Q41_r3_t0.json` | API 回包（可能含思考内容） | 2692 |
+| `Q41_r3_t1.exec.json` | 执行结果 | 154 |
+| `Q41_r3_t1.json` | API 回包（可能含思考内容） | 867 |
+| `Q43_r1_t0.exec.json` | 执行结果 | 1128 |
+| `Q43_r1_t0.json` | API 回包（可能含思考内容） | 8548 |
+| `Q43_r2_t0.exec.json` | 执行结果 | 1125 |
+| `Q43_r2_t0.json` | API 回包（可能含思考内容） | 3132 |
+| `Q43_r3_t0.exec.json` | 执行结果 | 1124 |
+| `Q43_r3_t0.json` | API 回包（可能含思考内容） | 3424 |
+| `Q47_r1_t0.exec.json` | 执行结果 | 16758 |
+| `Q47_r1_t0.json` | API 回包（可能含思考内容） | 5045 |
+| `Q47_r2_t0.exec.json` | 执行结果 | 16089 |
+| `Q47_r2_t0.json` | API 回包（可能含思考内容） | 4412 |
+| `Q47_r3_t0.exec.json` | 执行结果 | 15115 |
+| `Q47_r3_t0.json` | API 回包（可能含思考内容） | 40312 |
+| `Q49_r1_t0.exec.json` | 执行结果 | 377 |
+| `Q49_r1_t0.json` | API 回包（可能含思考内容） | 24825 |
+| `Q49_r2_t0.exec.json` | 执行结果 | 23951 |
+| `Q49_r2_t0.json` | API 回包（可能含思考内容） | 15910 |
+| `Q49_r3_t0.exec.json` | 执行结果 | 726 |
+| `Q49_r3_t0.json` | API 回包（可能含思考内容） | 16838 |
+| `Q49_r3_t1.exec.json` | 执行结果 | 26556 |
+| `Q49_r3_t1.json` | API 回包（可能含思考内容） | 3814 |
+| `Q50_r1_t0.exec.json` | 执行结果 | 446 |
+| `Q50_r1_t0.json` | API 回包（可能含思考内容） | 8035 |
+| `Q50_r2_t0.exec.json` | 执行结果 | 501 |
+| `Q50_r2_t0.json` | API 回包（可能含思考内容） | 11677 |
+| `Q50_r3_t0.exec.json` | 执行结果 | 489 |
+| `Q50_r3_t0.json` | API 回包（可能含思考内容） | 15036 |
+| `Q51_r1_t0.exec.json` | 执行结果 | 410 |
+| `Q51_r1_t0.json` | API 回包（可能含思考内容） | 1297 |
+| `Q51_r1_t1.exec.json` | 执行结果 | 138 |
+| `Q51_r1_t1.json` | API 回包（可能含思考内容） | 1015 |
+| `Q51_r2_t0.exec.json` | 执行结果 | 138 |
+| `Q51_r2_t0.json` | API 回包（可能含思考内容） | 1183 |
+| `Q51_r3_t0.exec.json` | 执行结果 | 139 |
+| `Q51_r3_t0.json` | API 回包（可能含思考内容） | 883 |
+| `Q52_r1_t0.exec.json` | 执行结果 | 1086 |
+| `Q52_r1_t0.json` | API 回包（可能含思考内容） | 2111 |
+| `Q52_r2_t0.exec.json` | 执行结果 | 1086 |
+| `Q52_r2_t0.json` | API 回包（可能含思考内容） | 2483 |
+| `Q52_r3_t0.exec.json` | 执行结果 | 961 |
+| `Q52_r3_t0.json` | API 回包（可能含思考内容） | 1810 |
+| `Q53_r1_t0.exec.json` | 执行结果 | 484 |
+| `Q53_r1_t0.json` | API 回包（可能含思考内容） | 956 |
+| `Q53_r1_t1.exec.json` | 执行结果 | 141 |
+| `Q53_r1_t1.json` | API 回包（可能含思考内容） | 865 |
+| `Q53_r2_t0.exec.json` | 执行结果 | 141 |
+| `Q53_r2_t0.json` | API 回包（可能含思考内容） | 1342 |
+| `Q53_r3_t0.exec.json` | 执行结果 | 141 |
+| `Q53_r3_t0.json` | API 回包（可能含思考内容） | 998 |
+| `Q54_r1_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r1_t0.json` | API 回包（可能含思考内容） | 1294 |
+| `Q54_r1_t1.exec.json` | 执行结果 | 158 |
+| `Q54_r1_t1.json` | API 回包（可能含思考内容） | 823 |
+| `Q54_r2_t0.exec.json` | 执行结果 | 158 |
+| `Q54_r2_t0.json` | API 回包（可能含思考内容） | 967 |
+| `Q54_r3_t0.exec.json` | 执行结果 | 442 |
+| `Q54_r3_t0.json` | API 回包（可能含思考内容） | 790 |
+| `Q54_r3_t1.exec.json` | 执行结果 | 163 |
+| `Q54_r3_t1.json` | API 回包（可能含思考内容） | 703 |
+| `Q55_r1_t0.exec.json` | 执行结果 | 151 |
+| `Q55_r1_t0.json` | API 回包（可能含思考内容） | 772 |
+| `Q55_r2_t0.exec.json` | 执行结果 | 151 |
+| `Q55_r2_t0.json` | API 回包（可能含思考内容） | 761 |
+| `Q55_r3_t0.exec.json` | 执行结果 | 468 |
+| `Q55_r3_t0.json` | API 回包（可能含思考内容） | 879 |
+| `Q55_r3_t1.exec.json` | 执行结果 | 145 |
+| `Q55_r3_t1.json` | API 回包（可能含思考内容） | 787 |
+| `Q56_r1_t0.exec.json` | 执行结果 | 171 |
+| `Q56_r1_t0.json` | API 回包（可能含思考内容） | 1561 |
+| `Q56_r2_t0.exec.json` | 执行结果 | 224 |
+| `Q56_r2_t0.json` | API 回包（可能含思考内容） | 1962 |
+| `Q56_r3_t0.exec.json` | 执行结果 | 217 |
+| `Q56_r3_t0.json` | API 回包（可能含思考内容） | 1486 |
+| `Q57_r1_t0.exec.json` | 执行结果 | 139 |
+| `Q57_r1_t0.json` | API 回包（可能含思考内容） | 1567 |
+| `Q57_r2_t0.exec.json` | 执行结果 | 137 |
+| `Q57_r2_t0.json` | API 回包（可能含思考内容） | 1176 |
+| `Q57_r3_t0.exec.json` | 执行结果 | 139 |
+| `Q57_r3_t0.json` | API 回包（可能含思考内容） | 2198 |
+| `Q58_r1_t0.exec.json` | 执行结果 | 724 |
+| `Q58_r1_t0.json` | API 回包（可能含思考内容） | 4753 |
+| `Q58_r1_t1.exec.json` | 执行结果 | 816941 |
+| `Q58_r1_t1.json` | API 回包（可能含思考内容） | 1415 |
+| `Q58_r2_t0.exec.json` | 执行结果 | 445 |
+| `Q58_r2_t0.json` | API 回包（可能含思考内容） | 3482 |
+| `Q58_r3_t0.exec.json` | 执行结果 | 506 |
+| `Q58_r3_t0.json` | API 回包（可能含思考内容） | 5369 |
+| `Q59_r1_t0.exec.json` | 执行结果 | 144 |
+| `Q59_r1_t0.json` | API 回包（可能含思考内容） | 1365 |
+| `Q59_r2_t0.exec.json` | 执行结果 | 144 |
+| `Q59_r2_t0.json` | API 回包（可能含思考内容） | 1397 |
+| `Q59_r3_t0.exec.json` | 执行结果 | 141 |
+| `Q59_r3_t0.json` | API 回包（可能含思考内容） | 1281 |
+| `Q60_r1_t0.exec.json` | 执行结果 | 212 |
+| `Q60_r1_t0.json` | API 回包（可能含思考内容） | 1574 |
+| `Q60_r2_t0.exec.json` | 执行结果 | 142 |
+| `Q60_r2_t0.json` | API 回包（可能含思考内容） | 1056 |
+| `Q60_r3_t0.exec.json` | 执行结果 | 490 |
+| `Q60_r3_t0.json` | API 回包（可能含思考内容） | 820 |
+| `Q60_r3_t1.exec.json` | 执行结果 | 138 |
+| `Q60_r3_t1.json` | API 回包（可能含思考内容） | 730 |
+| `Q61_r1_t0.exec.json` | 执行结果 | 722 |
+| `Q61_r1_t0.json` | API 回包（可能含思考内容） | 5133 |
+| `Q61_r1_t1.exec.json` | 执行结果 | 1596 |
+| `Q61_r1_t1.json` | API 回包（可能含思考内容） | 1488 |
+| `Q61_r2_t0.exec.json` | 执行结果 | 1408 |
+| `Q61_r2_t0.json` | API 回包（可能含思考内容） | 15104 |
+| `Q61_r3_t0.exec.json` | 执行结果 | 1594 |
+| `Q61_r3_t0.json` | API 回包（可能含思考内容） | 13955 |
+| `Q62_r1_t0.exec.json` | 执行结果 | 758 |
+| `Q62_r1_t0.json` | API 回包（可能含思考内容） | 7072 |
+| `Q62_r2_t0.exec.json` | 执行结果 | 710 |
+| `Q62_r2_t0.json` | API 回包（可能含思考内容） | 13043 |
+| `Q62_r2_t1.exec.json` | 执行结果 | 761 |
+| `Q62_r2_t1.json` | API 回包（可能含思考内容） | 1750 |
+| `Q62_r3_t0.exec.json` | 执行结果 | 748 |
+| `Q62_r3_t0.json` | API 回包（可能含思考内容） | 9445 |
+| `Q63_r1_t0.exec.json` | 执行结果 | 586 |
+| `Q63_r1_t0.json` | API 回包（可能含思考内容） | 6240 |
+| `Q63_r2_t0.exec.json` | 执行结果 | 585 |
+| `Q63_r2_t0.json` | API 回包（可能含思考内容） | 5455 |
+| `Q63_r3_t0.exec.json` | 执行结果 | 586 |
+| `Q63_r3_t0.json` | API 回包（可能含思考内容） | 3666 |
+| `Q64_r1_t0.exec.json` | 执行结果 | 1157 |
+| `Q64_r1_t0.json` | API 回包（可能含思考内容） | 5047 |
+| `Q64_r2_t0.exec.json` | 执行结果 | 1161 |
+| `Q64_r2_t0.json` | API 回包（可能含思考内容） | 8601 |
+| `Q64_r3_t0.exec.json` | 执行结果 | 1042 |
+| `Q64_r3_t0.json` | API 回包（可能含思考内容） | 3842 |
+| `Q65_r1_t0.exec.json` | 执行结果 | 11425 |
+| `Q65_r1_t0.json` | API 回包（可能含思考内容） | 22643 |
+| `Q65_r2_t0.exec.json` | 执行结果 | 11434 |
+| `Q65_r2_t0.json` | API 回包（可能含思考内容） | 15064 |
+| `Q65_r3_t0.exec.json` | 执行结果 | 20642 |
+| `Q65_r3_t0.json` | API 回包（可能含思考内容） | 20770 |
+| `Q66_r1_t0.exec.json` | 执行结果 | 410 |
+| `Q66_r1_t0.json` | API 回包（可能含思考内容） | 5069 |
+| `Q66_r2_t0.exec.json` | 执行结果 | 287 |
+| `Q66_r2_t0.json` | API 回包（可能含思考内容） | 2744 |
+| `Q66_r3_t0.exec.json` | 执行结果 | 704 |
+| `Q66_r3_t0.json` | API 回包（可能含思考内容） | 2483 |
+| `Q66_r3_t1.exec.json` | 执行结果 | 283 |
+| `Q66_r3_t1.json` | API 回包（可能含思考内容） | 1200 |
+| `Q67_r1_t0.exec.json` | 执行结果 | 1032 |
+| `Q67_r1_t0.json` | API 回包（可能含思考内容） | 17113 |
+| `Q67_r2_t0.exec.json` | 执行结果 | 718 |
+| `Q67_r2_t0.json` | API 回包（可能含思考内容） | 22507 |
+| `Q67_r2_t1.exec.json` | 执行结果 | 1028 |
+| `Q67_r2_t1.json` | API 回包（可能含思考内容） | 2011 |
+| `Q67_r3_t0.exec.json` | 执行结果 | 1032 |
+| `Q67_r3_t0.json` | API 回包（可能含思考内容） | 18407 |
+| `Q68_r1_t0.exec.json` | 执行结果 | 292 |
+| `Q68_r1_t0.json` | API 回包（可能含思考内容） | 2236 |
+| `Q68_r2_t0.exec.json` | 执行结果 | 716 |
+| `Q68_r2_t0.json` | API 回包（可能含思考内容） | 5822 |
+| `Q68_r2_t1.exec.json` | 执行结果 | 293 |
+| `Q68_r2_t1.json` | API 回包（可能含思考内容） | 1193 |
+| `Q68_r3_t0.exec.json` | 执行结果 | 292 |
+| `Q68_r3_t0.json` | API 回包（可能含思考内容） | 2211 |
+| `Q69_r1_t0.exec.json` | 执行结果 | 455 |
+| `Q69_r1_t0.json` | API 回包（可能含思考内容） | 23529 |
+| `Q69_r2_t0.exec.json` | 执行结果 | 443 |
+| `Q69_r2_t0.json` | API 回包（可能含思考内容） | 19122 |
+| `Q69_r3_t0.exec.json` | 执行结果 | 454 |
+| `Q69_r3_t0.json` | API 回包（可能含思考内容） | 14808 |
+| `Q70_r1_t0.exec.json` | 执行结果 | 452 |
+| `Q70_r1_t0.json` | API 回包（可能含思考内容） | 6557 |
+| `Q70_r2_t0.exec.json` | 执行结果 | 447 |
+| `Q70_r2_t0.json` | API 回包（可能含思考内容） | 9646 |
+| `Q70_r3_t0.exec.json` | 执行结果 | 451 |
+| `Q70_r3_t0.json` | API 回包（可能含思考内容） | 10060 |
+| `Q71_r1_t0.exec.json` | 执行结果 | 701 |
+| `Q71_r1_t0.json` | API 回包（可能含思考内容） | 10793 |
+| `Q71_r2_t0.exec.json` | 执行结果 | 689 |
+| `Q71_r2_t0.json` | API 回包（可能含思考内容） | 18660 |
+| `Q71_r3_t0.exec.json` | 执行结果 | 742 |
+| `Q71_r3_t0.json` | API 回包（可能含思考内容） | 14262 |
+| `Q72_r1_t0.exec.json` | 执行结果 | 894 |
+| `Q72_r1_t0.json` | API 回包（可能含思考内容） | 6750 |
+| `Q72_r2_t0.exec.json` | 执行结果 | 917 |
+| `Q72_r2_t0.json` | API 回包（可能含思考内容） | 10456 |
+| `Q72_r3_t0.exec.json` | 执行结果 | 722 |
+| `Q72_r3_t0.json` | API 回包（可能含思考内容） | 10888 |
+| `Q73_r1_t0.exec.json` | 执行结果 | 416 |
+| `Q73_r1_t0.json` | API 回包（可能含思考内容） | 11431 |
+| `Q73_r1_t1.exec.json` | 执行结果 | 1187 |
+| `Q73_r1_t1.json` | API 回包（可能含思考内容） | 2504 |
+| `Q73_r2_t0.exec.json` | 执行结果 | 368 |
+| `Q73_r2_t0.json` | API 回包（可能含思考内容） | 7242 |
+| `Q73_r2_t1.exec.json` | 执行结果 | 1209 |
+| `Q73_r2_t1.json` | API 回包（可能含思考内容） | 1955 |
+| `Q73_r3_t0.exec.json` | 执行结果 | 1213 |
+| `Q73_r3_t0.json` | API 回包（可能含思考内容） | 11632 |
+| `Q74_r1_t0.exec.json` | 执行结果 | 108073 |
+| `Q74_r1_t0.json` | API 回包（可能含思考内容） | 25706 |
+| `Q74_r2_t0.exec.json` | 执行结果 | 107456 |
+| `Q74_r2_t0.json` | API 回包（可能含思考内容） | 12960 |
+| `Q74_r3_t0.exec.json` | 执行结果 | 123290 |
+| `Q74_r3_t0.json` | API 回包（可能含思考内容） | 10709 |
+| `Q75_r1_t0.exec.json` | 执行结果 | 119053 |
+| `Q75_r1_t0.json` | API 回包（可能含思考内容） | 16791 |
+| `Q75_r2_t0.exec.json` | 执行结果 | 118588 |
+| `Q75_r2_t0.json` | API 回包（可能含思考内容） | 14886 |
+| `Q75_r3_t0.exec.json` | 执行结果 | 135519 |
+| `Q75_r3_t0.json` | API 回包（可能含思考内容） | 15683 |
+| `Q76_r1_t0.exec.json` | 执行结果 | 863 |
+| `Q76_r1_t0.json` | API 回包（可能含思考内容） | 17257 |
+| `Q76_r2_t0.exec.json` | 执行结果 | 844 |
+| `Q76_r2_t0.json` | API 回包（可能含思考内容） | 13760 |
+| `Q76_r3_t0.exec.json` | 执行结果 | 720 |
+| `Q76_r3_t0.json` | API 回包（可能含思考内容） | 14670 |
+| `Q76_r3_t1.exec.json` | 执行结果 | 872 |
+| `Q76_r3_t1.json` | API 回包（可能含思考内容） | 2239 |
+| `Q77_r1_t0.exec.json` | 执行结果 | 1012 |
+| `Q77_r1_t0.json` | API 回包（可能含思考内容） | 16312 |
+| `Q77_r2_t0.exec.json` | 执行结果 | 1480 |
+| `Q77_r2_t0.json` | API 回包（可能含思考内容） | 7721 |
+| `Q77_r3_t0.exec.json` | 执行结果 | 1063 |
+| `Q77_r3_t0.json` | API 回包（可能含思考内容） | 13607 |
+| `Q78_r1_t0.exec.json` | 执行结果 | 1194 |
+| `Q78_r1_t0.json` | API 回包（可能含思考内容） | 25753 |
+| `Q78_r2_t0.exec.json` | 执行结果 | 340 |
+| `Q78_r2_t0.json` | API 回包（可能含思考内容） | 11774 |
+| `Q78_r3_t0.exec.json` | 执行结果 | 1212 |
+| `Q78_r3_t0.json` | API 回包（可能含思考内容） | 31039 |
+| `Q79_r1_t0.exec.json` | 执行结果 | 1234 |
+| `Q79_r1_t0.json` | API 回包（可能含思考内容） | 13368 |
+| `Q79_r2_t0.exec.json` | 执行结果 | 736 |
+| `Q79_r2_t0.json` | API 回包（可能含思考内容） | 9914 |
+| `Q79_r2_t1.exec.json` | 执行结果 | 2568 |
+| `Q79_r2_t1.json` | API 回包（可能含思考内容） | 2999 |
+| `Q79_r3_t0.exec.json` | 执行结果 | 1314 |
+| `Q79_r3_t0.json` | API 回包（可能含思考内容） | 17084 |
+| `Q80_r1_t0.exec.json` | 执行结果 | 917 |
+| `Q80_r1_t0.json` | API 回包（可能含思考内容） | 8043 |
+| `Q80_r2_t0.exec.json` | 执行结果 | 784 |
+| `Q80_r2_t0.json` | API 回包（可能含思考内容） | 8102 |
+| `Q80_r3_t0.exec.json` | 执行结果 | 849 |
+| `Q80_r3_t0.json` | API 回包（可能含思考内容） | 6026 |
+| `Q81_r1_t0.exec.json` | 执行结果 | 303 |
+| `Q81_r1_t0.json` | API 回包（可能含思考内容） | 7678 |
+| `Q81_r2_t0.exec.json` | 执行结果 | 298 |
+| `Q81_r2_t0.json` | API 回包（可能含思考内容） | 6925 |
+| `Q81_r3_t0.exec.json` | 执行结果 | 299 |
+| `Q81_r3_t0.json` | API 回包（可能含思考内容） | 6345 |
+| `Q82_r1_t0.exec.json` | 执行结果 | 730 |
+| `Q82_r1_t0.json` | API 回包（可能含思考内容） | 8404 |
+| `Q82_r2_t0.exec.json` | 执行结果 | 633 |
+| `Q82_r2_t0.json` | API 回包（可能含思考内容） | 6442 |
+| `Q82_r3_t0.exec.json` | 执行结果 | 789 |
+| `Q82_r3_t0.json` | API 回包（可能含思考内容） | 13987 |
+| `Q83_r1_t0.exec.json` | 执行结果 | 577 |
+| `Q83_r1_t0.json` | API 回包（可能含思考内容） | 10087 |
+| `Q83_r2_t0.exec.json` | 执行结果 | 515 |
+| `Q83_r2_t0.json` | API 回包（可能含思考内容） | 14193 |
+| `Q83_r3_t0.exec.json` | 执行结果 | 463 |
+| `Q83_r3_t0.json` | API 回包（可能含思考内容） | 7498 |
+| `Q84_r1_t0.exec.json` | 执行结果 | 213 |
+| `Q84_r1_t0.json` | API 回包（可能含思考内容） | 15554 |
+| `Q84_r2_t0.exec.json` | 执行结果 | 213 |
+| `Q84_r2_t0.json` | API 回包（可能含思考内容） | 8297 |
+| `Q84_r3_t0.exec.json` | 执行结果 | 213 |
+| `Q84_r3_t0.json` | API 回包（可能含思考内容） | 7254 |
+| `Q85_r1_t0.exec.json` | 执行结果 | 312 |
+| `Q85_r1_t0.json` | API 回包（可能含思考内容） | 17220 |
+| `Q85_r1_t1.exec.json` | 执行结果 | 1318 |
+| `Q85_r1_t1.json` | API 回包（可能含思考内容） | 8184 |
+| `Q85_r2_t0.exec.json` | 执行结果 | 1442 |
+| `Q85_r2_t0.json` | API 回包（可能含思考内容） | 10554 |
+| `Q85_r3_t0.exec.json` | 执行结果 | 1317 |
+| `Q85_r3_t0.json` | API 回包（可能含思考内容） | 25250 |
+| `Q87_r1_t0.exec.json` | 执行结果 | 1732 |
+| `Q87_r1_t0.json` | API 回包（可能含思考内容） | 10609 |
+| `Q87_r2_t0.exec.json` | 执行结果 | 2025 |
+| `Q87_r2_t0.json` | API 回包（可能含思考内容） | 24165 |
+| `Q87_r3_t0.exec.json` | 执行结果 | 1783 |
+| `Q87_r3_t0.json` | API 回包（可能含思考内容） | 28994 |
+| `Q88_r1_t0.exec.json` | 执行结果 | 1121 |
+| `Q88_r1_t0.json` | API 回包（可能含思考内容） | 13411 |
+| `Q88_r2_t0.exec.json` | 执行结果 | 1211 |
+| `Q88_r2_t0.json` | API 回包（可能含思考内容） | 15924 |
+| `Q88_r3_t0.exec.json` | 执行结果 | 1150 |
+| `Q88_r3_t0.json` | API 回包（可能含思考内容） | 13307 |
+| `Q89_r1_t0.exec.json` | 执行结果 | 764 |
+| `Q89_r1_t0.json` | API 回包（可能含思考内容） | 5109 |
+| `Q89_r1_t1.exec.json` | 执行结果 | 467 |
+| `Q89_r1_t1.json` | API 回包（可能含思考内容） | 2709 |
+| `Q89_r2_t0.exec.json` | 执行结果 | 426 |
+| `Q89_r2_t0.json` | API 回包（可能含思考内容） | 22412 |
+| `Q89_r3_t0.exec.json` | 执行结果 | 768 |
+| `Q89_r3_t0.json` | API 回包（可能含思考内容） | 4154 |
+| `Q89_r3_t1.exec.json` | 执行结果 | 467 |
+| `Q89_r3_t1.json` | API 回包（可能含思考内容） | 1773 |
+| `Q90_r1_t0.exec.json` | 执行结果 | 2646 |
+| `Q90_r1_t0.json` | API 回包（可能含思考内容） | 17911 |
+| `Q90_r2_t0.exec.json` | 执行结果 | 3078 |
+| `Q90_r2_t0.json` | API 回包（可能含思考内容） | 11308 |
+| `Q90_r3_t0.exec.json` | 执行结果 | 1353 |
+| `Q90_r3_t0.json` | API 回包（可能含思考内容） | 23958 |
+| `Q92_r1_t0.exec.json` | 执行结果 | 1258 |
+| `Q92_r1_t0.json` | API 回包（可能含思考内容） | 12375 |
+| `Q92_r2_t0.exec.json` | 执行结果 | 1273 |
+| `Q92_r2_t0.json` | API 回包（可能含思考内容） | 13574 |
+| `Q92_r3_t0.exec.json` | 执行结果 | 1266 |
+| `Q92_r3_t0.json` | API 回包（可能含思考内容） | 10494 |
+| `Q94_r1_t0.exec.json` | 执行结果 | 10963 |
+| `Q94_r1_t0.json` | API 回包（可能含思考内容） | 12948 |
+| `Q94_r2_t0.exec.json` | 执行结果 | 11030 |
+| `Q94_r2_t0.json` | API 回包（可能含思考内容） | 6359 |
+| `Q94_r3_t0.exec.json` | 执行结果 | 11655 |
+| `Q94_r3_t0.json` | API 回包（可能含思考内容） | 13055 |
+| `Q96_r1_t0.exec.json` | 执行结果 | 325 |
+| `Q96_r1_t0.json` | API 回包（可能含思考内容） | 13264 |
+| `Q96_r2_t0.exec.json` | 执行结果 | 333 |
+| `Q96_r2_t0.json` | API 回包（可能含思考内容） | 24039 |
+| `Q96_r3_t0.exec.json` | 执行结果 | 380 |
+| `Q96_r3_t0.json` | API 回包（可能含思考内容） | 5527 |
+| `Q98_r1_t0.exec.json` | 执行结果 | 985 |
+| `Q98_r1_t0.json` | API 回包（可能含思考内容） | 24815 |
+| `Q98_r2_t0.exec.json` | 执行结果 | 742 |
+| `Q98_r2_t0.json` | API 回包（可能含思考内容） | 16867 |
+| `Q98_r2_t1.exec.json` | 执行结果 | 1156 |
+| `Q98_r2_t1.json` | API 回包（可能含思考内容） | 2772 |
+| `Q98_r3_t0.exec.json` | 执行结果 | 1178 |
+| `Q98_r3_t0.json` | API 回包（可能含思考内容） | 21910 |
+| `Q99_r1_t0.exec.json` | 执行结果 | 1240 |
+| `Q99_r1_t0.json` | API 回包（可能含思考内容） | 11103 |
+| `Q99_r2_t0.exec.json` | 执行结果 | 1278 |
+| `Q99_r2_t0.json` | API 回包（可能含思考内容） | 12062 |
+| `Q99_r3_t0.exec.json` | 执行结果 | 1065 |
+| `Q99_r3_t0.json` | API 回包（可能含思考内容） | 14647 |
+
 
 ### t33-cited-private.zip
 
@@ -24410,6 +27722,50 @@ UV_CACHE_DIR="${TMPDIR}/uvcache" uv run --no-project --python "$SEMDEBT_MAIN_DIR
 |---|---|---:|
 | `codex-decisions.json` | 报告引用材料 | 614744 |
 | `d4-content-equivalence-audit.json` | 报告引用材料 | 49303 |
+
+#### `t34-run-20261104/claude-review/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `results.json` | 报告引用材料 | 24728 |
+
+#### `t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L1-onto/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `codex-decisions.json` | 报告引用材料 | 112648 |
+| `materials.json` | 报告引用材料 | 7008204 |
+| `system.txt` | 报告引用材料 | 219336 |
+
+#### `t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L1/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `codex-decisions.json` | 报告引用材料 | 113440 |
+| `materials.json` | 报告引用材料 | 6864229 |
+
+#### `t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L1plus/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `codex-decisions.json` | 报告引用材料 | 100391 |
+| `materials.json` | 报告引用材料 | 6835877 |
+
+#### `t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/SQL-L3a-full/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `codex-decisions.json` | 报告引用材料 | 100657 |
+| `materials.json` | 报告引用材料 | 7645924 |
+| `system.txt` | 报告引用材料 | 370770 |
+
+#### `t34-run-20261104/codex/20261104-T34-ontology-full-01-content-01/`
+
+| 文件名 | 类别 | 字节 |
+|---|---|---:|
+| `locked-verdicts.json` | 报告引用材料 | 328 |
+| `review-identity-map-non-v2-v2.json` | 报告引用材料 | 25937 |
+| `review-note-audit-final.json` | 报告引用材料 | 70893 |
 
 #### `v7-eval-20261030/`
 
