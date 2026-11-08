@@ -37,7 +37,7 @@ for r in published:
  own=d['main'][r['cell']]
  for pub,key in [('attempts','attempts'),('content_correct','correct'),('v2_correct','delivery')]:check('published/'+r['cell']+'/'+pub,own[key],int(r[pub]),0)
 with (ROOT/'reports/recheck/v10-comparison.csv').open('w') as f:
- w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
+ w=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator="\n");w.writeheader();w.writerows(rows)
 out=dict(checks=len(rows),outside_tolerance=[r for r in rows if not r['within_tolerance']],interval_zero_checks=intervals,
  independent_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),model_api_calls=0)
 (ROOT/'reports/recheck/v10-comparison.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
