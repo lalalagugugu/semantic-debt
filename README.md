@@ -13,13 +13,15 @@
 | L1+：在 L1 上补全内容、逐条消歧 | 93.2%（全部 98 题） |
 | L1 加上线后按错答复盘补的语义 | 92.5%（复盘没用过的测试集 49 题） |
 
-全部 18 种做法的结果在 `reports/results/accuracy-v5.md`。最低的是只给汇总表（39.8%）和只能调指标（41.8%），主要因为覆盖不到一半的题。
+主表全部单元的结果在 `reports/results/accuracy-v5.md`。最低的是只给汇总表（39.8%）和只能调指标（41.8%），主要因为覆盖不到一半的题。
 
-这些结果只来自一个模型和一份数据，换模型后绝对数字会变。准确率按结果内容判定，比较方法和局限见报告。
+把整个语义层换成本体写法（OWL 2 / SHACL，内容不变，模型仍写 SQL），L1 和 L1+ 两组都没有看出提升：本体减文字分别是 +0.3 和 +2.0 个百分点，区间都含 0（`reports/results/l3a-full.md`）。这组是在接口换成新版本模型之后跑的，同样的 L1 配方比主表低 5.4 个百分点，所以不和主表直接比较。
+
+这些结果只来自一个模型和一份数据，换模型或换模型版本后绝对数字会变。准确率按结果内容判定，比较方法和局限见报告。
 
 这套题已经公开，以后不能再当留出题用。
 
-完整报告：[reports/midterm-report.md](reports/midterm-report.md)。原始响应：[Release midterm-v1](https://github.com/lalalagugugu/semantic-debt/releases/tag/midterm-v1)。作答对照页：<https://lalalagugugu.github.io/semantic-debt/>。
+报告分上下两篇：[上篇](reports/midterm-report-part1.md)（语义内容）、[下篇](reports/midterm-report-part2.md)（agent、本体、指标层与上线护栏）。原始响应和报告引用的材料：[Release midterm-v1](https://github.com/lalalagugugu/semantic-debt/releases/tag/midterm-v1)。作答对照页：<https://lalalagugugu.github.io/semantic-debt/>。
 
 ## 两个仓库
 
