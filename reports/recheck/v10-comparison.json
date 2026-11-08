@@ -1,0 +1,45 @@
+{
+  "checks": 129,
+  "outside_tolerance": [
+    {
+      "item": "title/SQL-L1plus",
+      "independent": 93.19727891156462,
+      "claim": 93,
+      "difference": 0.19727891156462363,
+      "tolerance": 0.1,
+      "within_tolerance": false
+    },
+    {
+      "item": "gap_integer_upper",
+      "independent": 17.346938775510203,
+      "claim": 17,
+      "difference": 0.34693877551020336,
+      "tolerance": 0.1,
+      "within_tolerance": false
+    }
+  ],
+  "interval_zero_checks": [
+    {
+      "comparison": "SQL-L1-onto minus SQL-L1",
+      "contains_zero": true,
+      "source_contains_zero": true
+    },
+    {
+      "comparison": "SQL-L3a-full minus SQL-L1plus",
+      "contains_zero": true,
+      "source_contains_zero": true
+    },
+    {
+      "comparison": "SQL-L1",
+      "contains_zero": false,
+      "source_contains_zero": false
+    },
+    {
+      "comparison": "SQL-L1plus",
+      "contains_zero": true,
+      "source_contains_zero": true
+    }
+  ],
+  "independent_sha256": "95863243b22babaa416d253ca8d4c513ed9a1e6459e54698a0aa7eac911de80e",
+  "model_api_calls": 0
+}
