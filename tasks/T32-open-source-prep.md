@@ -49,7 +49,7 @@
 - [x] 主仓库重跑 gitleaks（2026-11-02，全部分支 459 个提交）：仍是那 2 处 `q.ScenarioKey =` 误报
 - [x] 题库仓库重跑 gitleaks（含 `scorer-v2-check`、PR #25）（题库侧 Codex；题库 PR #26，0 命中）
 - [x] 查公开文件里的「人工」：历史记录不改写，README 说明这个词的含义
-- [ ] 定稿报告导出到 `reports/midterm-report.md`（README 已指向它）
+- [ ] 定稿报告导出到 `reports/midterm-report-part1.md`、`reports/midterm-report-part2.md`（上下篇）（README 已指向它）
 - [ ] Release `midterm-v1` 草稿（T33 Codex）；对照页 `gh-pages` 分支（T33 Codex），转公开后开 Pages
 - [x] README 写明公开后这套题退役，不能再当留出题用
 - [ ] 解除硬规则「仓库不放题面」，用户转公开，发布后从未登录的浏览器核对

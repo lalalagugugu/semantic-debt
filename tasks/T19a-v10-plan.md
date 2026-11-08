@@ -151,12 +151,12 @@
 - [ ] 公众号重贴一次，确认排版风险消除
 
 **开源与发布（T32 / T33，暂停中，没做完）**
-- [ ] README 结果表补 T34（和 U2）单元，链接改到定稿报告
-- [ ] 定稿报告导出到 `reports/midterm-report.md`
+- [x] README 结果表补本体对照，链接改到上下篇（11-09，协调会话；文件在定稿导出时生成）
+- [ ] 定稿报告导出到 `reports/midterm-report-part1.md`、`reports/midterm-report-part2.md`（上下篇）
 - [ ] T33 重做：原始回包压缩包加入 T34 run（`20261104-T34-ontology-full-01` 及定稿判定），作答对照页同步；新 SHA256SUMS
 - [ ] 报告引用的私有材料是否随 Release 发布，用户定范围后扫密钥（T32 卡第 41 行）
-- [ ] 主仓库新分支（T34-*、coord-*）重跑 gitleaks
-- [ ] git 历史里残留的题面片段（v9 计划、数字出处的旧版本）转公开前决定是否处理
+- [x] 主仓库全分支重跑 gitleaks（11-09，500 个提交，4 条命中全是 SQL 字面值误报：SQL-R 两条 `q.ScenarioKey =` 即此前已知的两条，T34 SQL-L3a-full 两条 `EntityType = 'Group'` 等）
+- [x] ~~git 历史里残留的题面片段~~：不用处理，题库转公开时题面一并公开（11-09）
 - [ ] Release `midterm-v1` 草稿、gh-pages 对照页（Codex）
 - [ ] 解除「仓库不放题面」规则生效（`decisions/2026-11-02-lift-question-text-rule.md`），用户转公开，未登录浏览器核对
 - [ ] 公众号：正文放费用截图（账户总账口径），阅读原文填主仓库
