@@ -353,3 +353,8 @@ independent-check 复核 101 次（Codex 逐条判对的部分），99 次一致
 - 跨厂商复核：判对里需要复核的 174 条（规则放行 109 + Codex 人工判对 65），匿名编号 T34V2R0001–T34V2R0174，私有包在 `$SEMDEBT_DATA_DIR`。由本机普通模式 Claude Code 会话 `t13-ed`（在 `cards/T13` 里开）做，11-06 在进行中。做完后用户把条数和 SHA-256 转给 Codex，Codex 逐条处理分歧、报告定稿，用户再合并 #270。
 - 云端协调会话推不了 tag，也读不到 `~/dev`；需要这两样的事交本地会话或 Codex。
 - **11-07 T34 完成**：Claude Code `t13-ed` 复核 174 条，0 改判（results.json SHA-256 `1634d223…`）；Codex 定稿 `runs/20261107-T34-final-01/`（1,176 条 final=true），数字与首轮相同。PR #270 可审，协调会话验收通过。下一步：报告第 4 节按 v10 计划第七节用这些数字写；L3B 做不做等用户定（协调会话建议放第二期，写进「没有尝试回答的问题」）；拆上下篇等用户点头。
+
+## 转公开（2026-11-09 13:29）
+
+- 两个仓库已公开，README 里报告和 Release 写的是「即将上传 / 稍后发布」（#283）。
+- 剩下：v8-drafting 导出上下篇（上篇 v10.2、下篇 v10.3，用户改完局限那句）到 `reports/midterm-report-part1.md`、`part2.md`；Codex 建 Release `midterm-v1`（打 tag 前问用户）并上传 T33 三个包、建 gh-pages 对照页；最后 README 改回正式链接。
