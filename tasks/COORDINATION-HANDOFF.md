@@ -358,3 +358,9 @@ independent-check 复核 101 次（Codex 逐条判对的部分），99 次一致
 
 - 两个仓库已公开，README 里报告和 Release 写的是「即将上传 / 稍后发布」（#283）。
 - 剩下：v8-drafting 导出上下篇（上篇 v10.2、下篇 v10.3，用户改完局限那句）到 `reports/midterm-report-part1.md`、`part2.md`；Codex 建 Release `midterm-v1`（打 tag 前问用户）并上传 T33 三个包、建 gh-pages 对照页；最后 README 改回正式链接。
+
+## 发布（2026-11-09）
+
+- 两篇公众号已发。Release `midterm-v1` 和对照页（gh-pages）已上线（#285）。README 已链 Release 和对照页；报告上下篇待 v8-drafting 导出后再把 README 那句改成正式链接。
+- 新待办（用户提）：研究公众号自动排版（字号、行距），现在手工排版不美观。
+- 写作复盘进 skill：用 v10、v10.1、v10.2、v10.3 的用户批注（v10 计划第九节七条是起点）。
