@@ -77,7 +77,7 @@ uv run python data/load.py
 uv run python data/export_parquet.py
 ```
 
-**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包在 [Release midterm-v1](https://github.com/lalalagugugu/semantic-debt/releases/tag/midterm-v1)。先把题库切到报告用的版本：
+**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包稍后随 Release `midterm-v1` 发布。先把题库切到报告用的版本：
 
 ```bash
 git -C "$SEMDEBT_EVAL_DIR" checkout eval-v1.3
