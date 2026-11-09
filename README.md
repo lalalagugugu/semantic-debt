@@ -21,7 +21,7 @@
 
 这套题已经公开，以后不能再当留出题用。
 
-报告分上下两篇：[上篇](reports/midterm-report-part1.md)（语义内容）、[下篇](reports/midterm-report-part2.md)（agent、本体、指标层与上线护栏）。原始响应和报告引用的材料：[Release midterm-v1](https://github.com/lalalagugugu/semantic-debt/releases/tag/midterm-v1)。作答对照页：<https://lalalagugugu.github.io/semantic-debt/>。
+报告分上下两篇（上篇讲语义内容，下篇讲 agent、本体、指标层与上线护栏），即将上传到 `reports/`。每次作答的原始响应、报告引用的材料和作答对照页稍后随 Release `midterm-v1` 发布。结果数字已经在 `reports/results/` 里。
 
 ## 两个仓库
 
@@ -77,7 +77,7 @@ uv run python data/load.py
 uv run python data/export_parquet.py
 ```
 
-**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包在 [Release midterm-v1](https://github.com/lalalagugugu/semantic-debt/releases/tag/midterm-v1)。先把题库切到报告用的版本：
+**离线重评：** 需要原始回包，解压到 `$SEMDEBT_DATA_DIR/runs-raw/`。回包稍后随 Release `midterm-v1` 发布。先把题库切到报告用的版本：
 
 ```bash
 git -C "$SEMDEBT_EVAL_DIR" checkout eval-v1.3
