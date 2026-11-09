@@ -4,7 +4,8 @@ import pytest
 
 from scripts.t33_publication_artifacts import (
     LOCAL_PATH, U2_RUN, archive, completed_u2, decoded_text, encoded,
-    public_attempt, raw_hashes, referenced_members, sha,
+    public_attempt, raw_hashes, referenced_members, sha, T34_RUN, T34_AUDIT,
+    T34_CELLS, T34_NOTE, validate_t34_binding, question_page, index_page,
 )
 
 
@@ -82,3 +83,30 @@ def test_referenced_members_excludes_orphans_and_rejects_missing_results(tmp_pat
     (directory / 'Q01_r1_t0.exec.json').unlink()
     with pytest.raises(ValueError, match='missing referenced raw artifact'):
         referenced_members(tmp_path, U2_RUN, record)
+
+
+def test_t34_final_binding_rejects_changed_material_or_verdict():
+    material = dict(cell='SQL-L1', qid='Q01', rep=1, low=False)
+    material['material_sha256'] = sha((json.dumps(material, ensure_ascii=False, sort_keys=True) + '\n').encode())
+    label = dict(material, final=True, source_run=T34_RUN, content_audit=T34_AUDIT, content_correct=True)
+    verdict = dict(material, correct=True, basis='existing frozen credit')
+    validate_t34_binding(material, label, verdict)
+    with pytest.raises(ValueError, match='binding mismatch'):
+        validate_t34_binding(dict(material, rep=2), label, verdict)
+    with pytest.raises(ValueError, match='binding mismatch'):
+        validate_t34_binding(material, label, dict(verdict, correct=False))
+    with pytest.raises(ValueError, match='binding mismatch'):
+        validate_t34_binding(material, dict(label, final=False), verdict)
+
+
+def test_t34_pages_keep_batch_separate_and_label_model_version():
+    payload = dict(qid='Q01', question='', attempts={c: [] for c in T34_CELLS})
+    page = question_page(payload, list(T34_CELLS), ['Q01'], batch_note=T34_NOTE, default_right='SQL-L1-onto')
+    embedded = page.split('<script>const data=')[1].split(',cells=')[0]
+    assert set(json.loads(embedded)['attempts']) == set(T34_CELLS)
+    assert T34_NOTE in page and '新版本模型' in page and '不直接比较' in page
+    assert "params.get('right'):'SQL-L1-onto'" in page
+    assert 'SQL-L2' not in page and 'SQL-L0-u2' not in page
+    directory = index_page([payload], list(T34_CELLS), title='本体对照：98 题、4 单元',
+                           introduction=T34_NOTE, default_right='SQL-L1-onto')
+    assert T34_NOTE in directory and "$('right').value='SQL-L1-onto'" in directory
