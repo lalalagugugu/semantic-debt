@@ -1,0 +1,799 @@
+{
+  "scope_commit": "9fe12ecdad1d61306200ca17404577b2d18e776f",
+  "scope_sha256": "145e637519f3f50d54f8cf58e44b5e5347fe4aa8d9e094715f1add7e005dbc40",
+  "d3_source_comparison": "point within 0.1 pp; CI endpoints within 0.5 pp; contains zero agrees",
+  "summaries": {
+    "main_all_rows": {
+      "n": 126,
+      "min_pp": 3.0612244897959187,
+      "median_pp": 9.523809523809527,
+      "max_pp": 19.387755102040813,
+      "within_4_to_6": 23,
+      "within_4_to_6_fraction": 0.18253968253968253,
+      "minimum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L1-tuned",
+          "right": "SQL-L1-tuned-instr",
+          "split": "all",
+          "questions": 98,
+          "delta_pp": -0.340136054421769,
+          "lo_pp": -3.4013605442176873,
+          "hi_pp": 2.7210884353741496,
+          "halfwidth_pp": 3.0612244897959187
+        },
+        {
+          "source": "main",
+          "left": "SQL-L1-tuned",
+          "right": "SQL-L1-tuned-instr",
+          "split": "tuning",
+          "questions": 49,
+          "delta_pp": -1.360544217687075,
+          "lo_pp": -4.761904761904763,
+          "hi_pp": 1.360544217687075,
+          "halfwidth_pp": 3.0612244897959187
+        }
+      ],
+      "maximum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L0",
+          "right": "JSON-L2",
+          "split": "heldout",
+          "questions": 49,
+          "delta_pp": -8.843537414965985,
+          "lo_pp": -27.89115646258503,
+          "hi_pp": 10.884353741496598,
+          "halfwidth_pp": 19.387755102040813
+        }
+      ]
+    },
+    "main_all98": {
+      "n": 40,
+      "min_pp": 3.0612244897959187,
+      "median_pp": 8.843537414965986,
+      "max_pp": 13.095238095238095,
+      "within_4_to_6": 9,
+      "within_4_to_6_fraction": 0.225,
+      "minimum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L1-tuned",
+          "right": "SQL-L1-tuned-instr",
+          "split": "all",
+          "questions": 98,
+          "delta_pp": -0.340136054421769,
+          "lo_pp": -3.4013605442176873,
+          "hi_pp": 2.7210884353741496,
+          "halfwidth_pp": 3.0612244897959187
+        }
+      ],
+      "maximum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L0",
+          "right": "JSON-L2",
+          "split": "all",
+          "questions": 98,
+          "delta_pp": -6.122448979591836,
+          "lo_pp": -19.387755102040817,
+          "hi_pp": 6.802721088435375,
+          "halfwidth_pp": 13.095238095238095
+        }
+      ]
+    },
+    "main_heldout49": {
+      "n": 43,
+      "min_pp": 4.761904761904763,
+      "median_pp": 11.224489795918368,
+      "max_pp": 19.387755102040813,
+      "within_4_to_6": 9,
+      "within_4_to_6_fraction": 0.20930232558139536,
+      "minimum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L1",
+          "right": "SQL-L1-T2",
+          "split": "heldout",
+          "questions": 49,
+          "delta_pp": -2.0408163265306123,
+          "lo_pp": -6.802721088435375,
+          "hi_pp": 2.72108843537415,
+          "halfwidth_pp": 4.761904761904763
+        },
+        {
+          "source": "main",
+          "left": "SQL-L1",
+          "right": "SQL-L1-T3",
+          "split": "heldout",
+          "questions": 49,
+          "delta_pp": 1.360544217687075,
+          "lo_pp": -3.4013605442176873,
+          "hi_pp": 6.122448979591838,
+          "halfwidth_pp": 4.761904761904763
+        },
+        {
+          "source": "main",
+          "left": "SQL-L1",
+          "right": "SQL-L1-T4",
+          "split": "heldout",
+          "questions": 49,
+          "delta_pp": 0.6802721088435377,
+          "lo_pp": -4.081632653061225,
+          "hi_pp": 5.4421768707483,
+          "halfwidth_pp": 4.761904761904763
+        }
+      ],
+      "maximum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L0",
+          "right": "JSON-L2",
+          "split": "heldout",
+          "questions": 49,
+          "delta_pp": -8.843537414965985,
+          "lo_pp": -27.89115646258503,
+          "hi_pp": 10.884353741496598,
+          "halfwidth_pp": 19.387755102040813
+        }
+      ]
+    },
+    "main_T4_all49": {
+      "n": 3,
+      "min_pp": 4.761904761904763,
+      "median_pp": 5.102040816326531,
+      "max_pp": 6.802721088435375,
+      "within_4_to_6": 2,
+      "within_4_to_6_fraction": 0.6666666666666666,
+      "minimum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L1",
+          "right": "SQL-L1-T4",
+          "split": "all",
+          "questions": 49,
+          "delta_pp": 0.6802721088435377,
+          "lo_pp": -4.081632653061225,
+          "hi_pp": 5.4421768707483,
+          "halfwidth_pp": 4.761904761904763
+        }
+      ],
+      "maximum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L1-T2",
+          "right": "SQL-L1-T4",
+          "split": "all",
+          "questions": 49,
+          "delta_pp": 2.7210884353741496,
+          "lo_pp": -4.081632653061225,
+          "hi_pp": 9.523809523809526,
+          "halfwidth_pp": 6.802721088435375
+        }
+      ]
+    },
+    "ontology": {
+      "n": 2,
+      "min_pp": 3.74,
+      "median_pp": 3.995,
+      "max_pp": 4.25,
+      "within_4_to_6": 1,
+      "within_4_to_6_fraction": 0.5,
+      "minimum_rows": [
+        {
+          "source": "ontology",
+          "left": "SQL-L1plus",
+          "right": "SQL-L3a-full",
+          "split": "all",
+          "questions": 98,
+          "delta_pp": 2.04,
+          "lo_pp": -1.7,
+          "hi_pp": 5.78,
+          "halfwidth_pp": 3.74
+        }
+      ],
+      "maximum_rows": [
+        {
+          "source": "ontology",
+          "left": "SQL-L1",
+          "right": "SQL-L1-onto",
+          "split": "all",
+          "questions": 98,
+          "delta_pp": 0.34,
+          "lo_pp": -3.74,
+          "hi_pp": 4.76,
+          "halfwidth_pp": 4.25
+        }
+      ]
+    },
+    "combined_all98": {
+      "n": 42,
+      "min_pp": 3.0612244897959187,
+      "median_pp": 8.503401360544217,
+      "max_pp": 13.095238095238095,
+      "within_4_to_6": 10,
+      "within_4_to_6_fraction": 0.23809523809523808,
+      "minimum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L1-tuned",
+          "right": "SQL-L1-tuned-instr",
+          "split": "all",
+          "questions": 98,
+          "delta_pp": -0.340136054421769,
+          "lo_pp": -3.4013605442176873,
+          "hi_pp": 2.7210884353741496,
+          "halfwidth_pp": 3.0612244897959187
+        }
+      ],
+      "maximum_rows": [
+        {
+          "source": "main",
+          "left": "SQL-L0",
+          "right": "JSON-L2",
+          "split": "all",
+          "questions": 98,
+          "delta_pp": -6.122448979591836,
+          "lo_pp": -19.387755102040817,
+          "hi_pp": 6.802721088435375,
+          "halfwidth_pp": 13.095238095238095
+        }
+      ]
+    }
+  },
+  "ontology_drift": [
+    {
+      "cell": "SQL-L1",
+      "lo_pp": -9.86,
+      "hi_pp": -1.36,
+      "halfwidth_pp": 4.25
+    },
+    {
+      "cell": "SQL-L1plus",
+      "lo_pp": -5.78,
+      "hi_pp": 2.72,
+      "halfwidth_pp": 4.25
+    }
+  ],
+  "method": {
+    "alpha_two_sided": 0.05,
+    "power": 0.8,
+    "z_975": 1.9599639845400534,
+    "z_80": 0.8416212335729144,
+    "formula": "MDE=(z_.975+z_.80)*sd(per-question paired mean difference)/sqrt(n)",
+    "caveat": "Local normal approximation: fixes observed difference variance; not preregistered design power or a bootstrap power guarantee."
+  },
+  "empirical_mde": [
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "JSON-L2",
+      "se_pp": 6.688143727223868,
+      "mde80_pp": 18.73740460280536,
+      "normal_approx_power_for_5pp": 0.11607396754600546
+    },
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "SQL-L0-E",
+      "se_pp": 3.327804130773587,
+      "mde80_pp": 9.323126861550556,
+      "normal_approx_power_for_5pp": 0.3239336505746872
+    },
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "SQL-L1",
+      "se_pp": 4.880282484800944,
+      "mde80_pp": 13.67252726963395,
+      "normal_approx_power_for_5pp": 0.17620280073211808
+    },
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "SQL-L1.5S",
+      "se_pp": 6.286614692985122,
+      "mde80_pp": 17.61248679583891,
+      "normal_approx_power_for_5pp": 0.12501761597148675
+    },
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "SQL-L1.5W",
+      "se_pp": 5.173541120676078,
+      "mde80_pp": 14.4941163289857,
+      "normal_approx_power_for_5pp": 0.16194567571414686
+    },
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "SQL-L1c",
+      "se_pp": 4.625319169348612,
+      "mde80_pp": 12.958225813901622,
+      "normal_approx_power_for_5pp": 0.19089124389856893
+    },
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "SQL-L2",
+      "se_pp": 5.213043140155344,
+      "mde80_pp": 14.60478460284442,
+      "normal_approx_power_for_5pp": 0.16020942120031167
+    },
+    {
+      "source": "main",
+      "left": "SQL-L0",
+      "right": "SQL-R",
+      "se_pp": 3.2391726622010335,
+      "mde80_pp": 9.074818249338046,
+      "normal_approx_power_for_5pp": 0.3388028509905855
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "JSON-L2",
+      "se_pp": 4.767036598356687,
+      "mde80_pp": 13.35525926815962,
+      "normal_approx_power_for_5pp": 0.18243409858732385
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1-E",
+      "se_pp": 2.1063875171553477,
+      "mde80_pp": 5.901224131680097,
+      "normal_approx_power_for_5pp": 0.6604854212101194
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1-T2",
+      "se_pp": 1.8713060775493622,
+      "mde80_pp": 5.242623445427252,
+      "normal_approx_power_for_5pp": 0.761759091898103
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1-T3",
+      "se_pp": 2.2667553517845476,
+      "mde80_pp": 6.350508286638049,
+      "normal_approx_power_for_5pp": 0.5971093986572686
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned",
+      "se_pp": 2.7254681073462406,
+      "mde80_pp": 7.635631161979556,
+      "normal_approx_power_for_5pp": 0.4501707844363254
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1-tuned-instr",
+      "se_pp": 2.9249417251535768,
+      "mde80_pp": 8.194473501032103,
+      "normal_approx_power_for_5pp": 0.40121100307590224
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1.5S",
+      "se_pp": 5.122571311808748,
+      "mde80_pp": 14.351320065892944,
+      "normal_approx_power_for_5pp": 0.16424656529986104
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1.5W",
+      "se_pp": 2.281440639539116,
+      "mde80_pp": 6.3916503717349835,
+      "normal_approx_power_for_5pp": 0.591605241565694
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1c",
+      "se_pp": 3.6581645001813796,
+      "mde80_pp": 10.248659589133766,
+      "normal_approx_power_for_5pp": 0.27697690017671095
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L1plus",
+      "se_pp": 3.2093946128082056,
+      "mde80_pp": 8.991392506334861,
+      "normal_approx_power_for_5pp": 0.3440456109744871
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1",
+      "right": "SQL-L2",
+      "se_pp": 2.977279814267029,
+      "mde80_pp": 8.341103117836631,
+      "normal_approx_power_for_5pp": 0.3896534532454994
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1-T2",
+      "right": "SQL-L1-T3",
+      "se_pp": 2.413540718247606,
+      "mde80_pp": 6.761739999556249,
+      "normal_approx_power_for_5pp": 0.5444896038903205
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1-tuned",
+      "right": "SQL-L1-tuned-instr",
+      "se_pp": 1.5663324605282032,
+      "mde80_pp": 4.388213868066328,
+      "normal_approx_power_for_5pp": 0.8910641211021952
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1.5S",
+      "right": "JSON-L2",
+      "se_pp": 5.1126663090474755,
+      "mde80_pp": 14.323570356571594,
+      "normal_approx_power_for_5pp": 0.16470182731674926
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1.5S",
+      "right": "SQL-L2",
+      "se_pp": 5.243156807761605,
+      "mde80_pp": 14.68915060887329,
+      "normal_approx_power_for_5pp": 0.15891252446994464
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1.5W",
+      "right": "JSON-L2",
+      "se_pp": 5.025253806499259,
+      "mde80_pp": 14.078676781554247,
+      "normal_approx_power_for_5pp": 0.16883872596991212
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1.5W",
+      "right": "SQL-L1.5S",
+      "se_pp": 5.157840598185571,
+      "mde80_pp": 14.450129977259643,
+      "normal_approx_power_for_5pp": 0.16264705349776026
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1.5W",
+      "right": "SQL-L2",
+      "se_pp": 3.158448606302204,
+      "mde80_pp": 8.84866292758576,
+      "normal_approx_power_for_5pp": 0.3533186607126577
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1c",
+      "right": "JSON-L2",
+      "se_pp": 5.954259168873359,
+      "mde80_pp": 16.681364472329207,
+      "normal_approx_power_for_5pp": 0.13386561785719403
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1c",
+      "right": "SQL-L1.5S",
+      "se_pp": 5.7946757934155535,
+      "mde80_pp": 16.23427804659005,
+      "normal_approx_power_for_5pp": 0.1386783244552396
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1c",
+      "right": "SQL-L1.5W",
+      "se_pp": 3.8494397252934998,
+      "mde80_pp": 10.784533432399112,
+      "normal_approx_power_for_5pp": 0.25484185245817975
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1c",
+      "right": "SQL-L2",
+      "se_pp": 4.327847465927523,
+      "mde80_pp": 12.124833486790216,
+      "normal_approx_power_for_5pp": 0.21142820086596237
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1plus",
+      "right": "SQL-L1plus-tuned-instr",
+      "se_pp": 2.0090094502135343,
+      "mde80_pp": 5.628411178767498,
+      "normal_approx_power_for_5pp": 0.7015407899959698
+    },
+    {
+      "source": "main",
+      "left": "SQL-L1plus",
+      "right": "SQL-L3a",
+      "se_pp": 2.3435899109500964,
+      "mde80_pp": 6.565766851836477,
+      "normal_approx_power_for_5pp": 0.5688979611323645
+    },
+    {
+      "source": "main",
+      "left": "SQL-L2",
+      "right": "JSON-L2",
+      "se_pp": 4.620158996860889,
+      "mde80_pp": 12.943769150937104,
+      "normal_approx_power_for_5pp": 0.1912140276530001
+    },
+    {
+      "source": "main",
+      "left": "SQL-L2",
+      "right": "SQL-L2-E",
+      "se_pp": 2.8706113575139725,
+      "mde80_pp": 8.042262346158346,
+      "normal_approx_power_for_5pp": 0.41375354185160296
+    },
+    {
+      "source": "main",
+      "left": "SQL-R",
+      "right": "JSON-L2",
+      "se_pp": 6.13888824747178,
+      "mde80_pp": 17.198618569764363,
+      "normal_approx_power_for_5pp": 0.12876911581583833
+    },
+    {
+      "source": "main",
+      "left": "SQL-R",
+      "right": "SQL-L1",
+      "se_pp": 4.586866421913826,
+      "mde80_pp": 12.850497165092495,
+      "normal_approx_power_for_5pp": 0.19332292697871678
+    },
+    {
+      "source": "main",
+      "left": "SQL-R",
+      "right": "SQL-L1.5S",
+      "se_pp": 5.34588081479121,
+      "mde80_pp": 14.97694066851276,
+      "normal_approx_power_for_5pp": 0.15465498006379902
+    },
+    {
+      "source": "main",
+      "left": "SQL-R",
+      "right": "SQL-L1.5W",
+      "se_pp": 4.865474246021223,
+      "mde80_pp": 13.631040726762397,
+      "normal_approx_power_for_5pp": 0.17699272310215503
+    },
+    {
+      "source": "main",
+      "left": "SQL-R",
+      "right": "SQL-L1c",
+      "se_pp": 4.41137167987382,
+      "mde80_pp": 12.358833689936667,
+      "normal_approx_power_for_5pp": 0.2052412367555741
+    },
+    {
+      "source": "main",
+      "left": "SQL-R",
+      "right": "SQL-L2",
+      "se_pp": 4.881137785119056,
+      "mde80_pp": 13.674923466362218,
+      "normal_approx_power_for_5pp": 0.1761573978838582
+    },
+    {
+      "source": "ontology",
+      "left": "SQL-L1",
+      "right": "SQL-L1-onto",
+      "se_pp": 2.1888586565356523,
+      "mde80_pp": 6.132274056688893,
+      "normal_approx_power_for_5pp": 0.6271674382918426
+    },
+    {
+      "source": "ontology",
+      "left": "SQL-L1plus",
+      "right": "SQL-L3a-full",
+      "se_pp": 1.8610802847319308,
+      "mde80_pp": 5.213975015426451,
+      "normal_approx_power_for_5pp": 0.7662807812573624
+    }
+  ],
+  "independent_bernoulli_scenarios": {
+    "eval_commit": "5b65e0c450ba36d83707c00dc9443be16b08d086",
+    "groups": {
+      "可从数据发现": {
+        "questions": 20,
+        "attempts_per_cell": 60,
+        "ids": [
+          "Q01",
+          "Q02",
+          "Q04",
+          "Q05",
+          "Q06",
+          "Q08",
+          "Q09",
+          "Q12",
+          "Q16",
+          "Q35",
+          "Q52",
+          "Q54",
+          "Q55",
+          "Q56",
+          "Q57",
+          "Q60",
+          "Q61",
+          "Q62",
+          "Q71",
+          "Q77"
+        ],
+        "correct": {
+          "SQL-L1": 55,
+          "SQL-L1-E": 54
+        },
+        "delta_pp": -1.6666666666666667,
+        "bootstrap_ci95_pp": [
+          -6.666666666666667,
+          3.3333333333333335
+        ],
+        "exact_ci95_pp": [
+          -6.666666666666667,
+          3.3333333333333335
+        ],
+        "difference_count_histogram": {
+          "0": 17,
+          "1": 1,
+          "-1": 2
+        }
+      },
+      "只能由业务告知": {
+        "questions": 78,
+        "attempts_per_cell": 234,
+        "ids": [
+          "Q03",
+          "Q10",
+          "Q100",
+          "Q101",
+          "Q102",
+          "Q103",
+          "Q104",
+          "Q105",
+          "Q106",
+          "Q107",
+          "Q108",
+          "Q109",
+          "Q11",
+          "Q110",
+          "Q111",
+          "Q112",
+          "Q113",
+          "Q114",
+          "Q115",
+          "Q116",
+          "Q117",
+          "Q118",
+          "Q119",
+          "Q120",
+          "Q121",
+          "Q122",
+          "Q13",
+          "Q14",
+          "Q15",
+          "Q18",
+          "Q19",
+          "Q20",
+          "Q21",
+          "Q22",
+          "Q23",
+          "Q24",
+          "Q25",
+          "Q26",
+          "Q27",
+          "Q28",
+          "Q30",
+          "Q31",
+          "Q32",
+          "Q34",
+          "Q36",
+          "Q37",
+          "Q38",
+          "Q41",
+          "Q43",
+          "Q47",
+          "Q49",
+          "Q50",
+          "Q51",
+          "Q53",
+          "Q58",
+          "Q63",
+          "Q64",
+          "Q65",
+          "Q66",
+          "Q67",
+          "Q70",
+          "Q72",
+          "Q73",
+          "Q74",
+          "Q75",
+          "Q78",
+          "Q80",
+          "Q81",
+          "Q82",
+          "Q84",
+          "Q87",
+          "Q88",
+          "Q89",
+          "Q90",
+          "Q92",
+          "Q94",
+          "Q96",
+          "Q98"
+        ],
+        "correct": {
+          "SQL-L1": 195,
+          "SQL-L1-E": 198
+        },
+        "delta_pp": 1.282051282051282,
+        "bootstrap_ci95_pp": [
+          -3.418803418803419,
+          6.41025641025641
+        ],
+        "exact_ci95_pp": [
+          -3.418803418803419,
+          6.41025641025641
+        ],
+        "difference_count_histogram": {
+          "0": 60,
+          "-1": 6,
+          "1": 8,
+          "3": 1,
+          "-2": 2,
+          "2": 1
+        }
+      }
+    },
+    "bootstrap_replicates": 10000,
+    "seed": 20261109,
+    "input_sha256": {
+      "runs/20261031-T31-v5-rulings-01/manifest.json": "def8b415492c1a9477458c942cdaf5351413d3152d5b449b8d757ae5bbfcfedd",
+      "$SEMDEBT_EVAL_DIR@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/cube_100.yaml": "9f08510d1bf86104458d0e5fd66b787d60f9d50e1cbe0df5e2d128ade24b26cd",
+      "$SEMDEBT_EVAL_DIR@5b65e0c450ba36d83707c00dc9443be16b08d086/questions/new.yaml": "a42925ee9631250aef0f40c8a539fa28f2a36d6effa5e86c27360b23bcf97a6c",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl": "10054c729b82c91504922b73f70bddbbf97700847427d3a709c73f8dfd578f2a",
+      "runs/20261031-T31-v5-rulings-01/SQL-L1-E.jsonl": "03ee8734785d216720d9115bbdbe87f5f87e78836203238599aed77067fac5aa"
+    },
+    "script_sha256": "2c99f5ce9c2912c0a846208fe62381c2655c467a07eae5d6a000a01f9c66fcaf",
+    "model_api_calls": 0,
+    "sql_executions": 0
+  },
+  "input_sha256": {
+    "reports/results/accuracy-v5-comparisons.csv": "13b52993809c5cfe6a2fc10015eafd0d9bb33c09dbf081fe4f4fbceb8945eefe",
+    "reports/results/l3a-full.md": "e45df7850c8f6158531861ea208148740a9492a6e7210adbc0c995eb02ce00dd",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5S.jsonl": "190dd5d0c8529595388d854bd1086d9f414e9cb00cb4d36d6df3075559cfd340",
+    "runs/20261031-T31-v5-rulings-01/SQL-L3a.jsonl": "98aeb013c46be903aec2405ae0397d18276160d92aeaa6b5af81f3b19425a06c",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-E.jsonl": "03ee8734785d216720d9115bbdbe87f5f87e78836203238599aed77067fac5aa",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned-instr.jsonl": "71ae56b1d4e738aa26664f0686d228a0a8cf37c04c8cc7fda5d66f2d904a977e",
+    "runs/20261031-T31-v5-rulings-01/JSON-L2.jsonl": "3f20f1598f16be0138babb64c1de0c02079b8dc42d1497ee8c6524159ab76188",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus-tuned-instr.jsonl": "e0cd78d6b6153d8aca70804a9705c879649dd870dff47c289cda3fbfef451464",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2.jsonl": "189c4d3ad52ebd03ab17ea15bbaf5c2595f10cf2e67b0df77bf667bcf6099bb0",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T2.jsonl": "7a56993607ab8dbde164f77ff00eea54104fa382eb30b600f5b70ab4abefb5ac",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1c.jsonl": "1535d2304ebbdc0d6bba32ab4699a8302c4bf59f7e949b5219443e9fc194aed6",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1plus.jsonl": "48af0eab88f6b09d0502a15cac6d7f3543f325e70118542193c367828635bfb1",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.5W.jsonl": "271b48a20bbcd920602c1073bf423970ea3899645e83127437695264ee5fa090",
+    "runs/20261031-T31-v5-rulings-01/SQL-L2-E.jsonl": "e0aca16c51617846b65f03178f35b58fb68022c0c68b8220f8a1d465e96f223a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-tuned.jsonl": "8de7ef70b8f2f29d0b4ed179ee77d5e72bd3844d6b9cb88b9159dbcf5728be19",
+    "runs/20261031-T31-v5-rulings-01/SQL-R.jsonl": "21bce20f6503f1e85e9b01f850bb92aeb886ba8372eb4e26e6922baac6e8c713",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1.jsonl": "10054c729b82c91504922b73f70bddbbf97700847427d3a709c73f8dfd578f2a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T4.jsonl": "bf98674cf34172299b4380850e75f857ce524490bbd0a537ab70ae950dbe453a",
+    "runs/20261031-T31-v5-rulings-01/SQL-L1-T3.jsonl": "7610200351491774c82b5bc8288667fea82060e23f50736b31db656701ae3ee3",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0-E.jsonl": "79ed656e3150f3124db0e1d7d7c2636e719b0a69355b0acbc222c761e7ca2ad6",
+    "runs/20261031-T31-v5-rulings-01/SQL-L0.jsonl": "be5785873c78bb5bb2efbc3ec31ba9490e89793d40d211e9e2097b3543112011",
+    "runs/20261107-T34-final-01/codex-verdicts.jsonl": "a523d2852e4f73da41612e21952510aa8aee7cea50ec06108c9a34996010e032",
+    "9fe12ecdad1d61306200ca17404577b2d18e776f:reports/midterm/v10-number-sources.md": "145e637519f3f50d54f8cf58e44b5e5347fe4aa8d9e094715f1add7e005dbc40",
+    "reports/results/t19a-v7-numbers.md": "3ec1f2e0a022cd0cccb750ca31c09a592950e5d1d95bcf728fba450847658137",
+    "reports/recheck/v103-independent.json": "2b0ebdda67e361c6e7cdabfab9eb9407b55e4a754c86ddeef3f3502f76802c02"
+  },
+  "model_api_calls": 0,
+  "sql_executions": 0
+}
