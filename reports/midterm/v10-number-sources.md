@@ -110,3 +110,16 @@
 | 上篇 附录 怎么判分 | 判定规则一部分是看过各单元抽样出的错例之后补的 | `decisions/2026-10-28-residual-content-principles.md`（来源：T31 残余抽样 200 次，`reports/validation/t31-residual-sample-codex.md` 按单元分层）；`decisions/2026-10-31-v7-content-review-rulings.md` |
 
 删去：Cube 对照不写显著性（Cube 只公开汇总数）；L1c 对照表从四行减到两行（科目、同店）。
+
+## v10.3 下篇（2026-11-09，按用户对 v10.2 下篇 rev 374 的批注改）
+
+位置：「v10.3 下篇」tab `d212af6f-d129`（正文节点 `978b187b-9c17`，rev 3）。数字取值不变，新写进正文的如下。
+
+| 位置 | 说法 | 出处 |
+|---|---|---|
+| 第 1 节 | 按题目类型拆开，agent 在 L1 上也没有显著提升：靠常识和数据就能解的 20 题 L1→L1-E −1.7 [−6.7, +3.3]；78 题 +1.3 [−3.8, +6.0] | `reports/results/t19a-v7-numbers.md` D3 移组行，「L1→L1-E」列 |
+| 第 2 节 | 示例代码出自 L1 的本体版本（L1-onto） | 同 v10 一节：`build/contexts/SQL-L1-onto.yaml` |
+| 第 5 节、实验过程说明、附录 | 「模型换版本」改为「模型指纹变了」：模型名称仍是 DeepSeek-V4.1-Flash-1017，变的是接口返回的版本标识 | `reports/results/l3a-full.md`「采集与冻结」（指纹 bc19ba97，主表 e72d3c7f）；`reports/results/t29-u2-content-analysis.md` 第 3 行 |
+| 局限 | 逐题比较的差值区间大约正负 5 个百分点，小于约 5 个百分点的差别多半测不出来 | `tasks/T19a-v10-plan.md` 第六节（「98 题的同题配对区间约 ±5 个百分点」「能测出多大的差：约 5–6 个百分点以上」）；正文各配对区间的半宽也在 4–6 个百分点 |
+
+删去：第 1 节「agent 可以有」（用户批注要求，本实验没有证据支持）；局限「错因归类由 AI 做」（用户删除线）。
