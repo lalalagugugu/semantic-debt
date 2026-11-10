@@ -364,3 +364,15 @@ independent-check 复核 101 次（Codex 逐条判对的部分），99 次一致
 - 两篇公众号已发。Release `midterm-v1` 和对照页（gh-pages）已上线（#285）。README 已链 Release 和对照页；报告上下篇待 v8-drafting 导出后再把 README 那句改成正式链接。
 - 新待办（用户提）：研究公众号自动排版（字号、行距），现在手工排版不美观。
 - 写作复盘进 skill：用 v10、v10.1、v10.2、v10.3 的用户批注（v10 计划第九节七条是起点）。
+
+## 归档前现状（2026-11-10，本地协调会话压缩前）
+
+**已完成**：中期报告拆上下篇定稿（Claude Docs 文档 `e6ba0940-5536-4c83-b2fd-296fbdf47b8d`：上篇 v10.2 tab `543ecd3b-8b98`，下篇 v10.3 tab `d212af6f-d129`），导出 `reports/midterm-report-part1.md`、`part2.md`；两篇公众号已发；两库公开；Release `midterm-v1`、对照页 https://lalalagugugu.github.io/semantic-debt/ 上线；README 链接齐全；T34 本体对照完成；写作规则 skill 在 `.claude/skills/report-writing/`（PR #287，草稿副本 `tasks/skill-drafts/`）。
+
+**下一步**
+1. LinkedIn 系列：`tasks/linkedin-plan.md`（10 帖），等用户定语言和是否发 Article，再开新会话逐帖起草。
+2. 公众号自动排版研究（字号、行距），用户提出，未开始。
+3. 写作 skill 待用户看过后补充；v10.2 下篇的用户批注尚未逐条归纳进 skill。
+4. 暂缓：L3B、论文、开放题评分、跨模型、DAX。
+
+**会话**：v8-drafting 上下文满、已不可用（用户关了自动压缩），可关闭。T34、t13-ed 已完成。导出 Claude Docs tab 的可行办法：`create` 一个 blob（format markdown），再用 Artifact `read` 带 `path`=asset id 下到 scratchpad。
